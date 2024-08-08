@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
 
 mongoose.connect("mongodb://localhost:27017/Registration",{
-    useNewUrlParser:true,
-    useUnifiedTopology:true,
-   
+  connectTimeoutMS: 30000  
 
 }).then(()=>{
        console.log(`Connection Successfull:)`)
