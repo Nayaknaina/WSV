@@ -307,7 +307,12 @@
 
     <!-- Global Required JS -->
 
-
+<script>
+    if (window.location.pathname.endsWith('.html')) {
+    const newPath = window.location.pathname.slice(0, -5);
+    window.history.replaceState(null, '', newPath);
+}
+</script>
 
     <script defer src="https://worksuite.uffyeh.com/saas/js/cookieconsent.js"></script>
     <script>
