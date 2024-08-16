@@ -25,17 +25,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
 
-// Handle dynamic routes to serve pages without .html extension
-app.get("/:page", (req, res) => {
-  const page = req.params.page;
-  const filePath = path.join(static_path, `${page}.html`);
-
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      res.status(404).send("Page not found");
-    }
-  });
-});
 
 // Login and Signup routes
 app.get("/login", (req, res) => {
@@ -94,6 +83,19 @@ app.post("/login", async (req, res) => {
     console.error(err);
     res.status(500).send("Error logging in");
   }
+});
+
+
+// Handle dynamic routes to serve pages without .html extension
+app.get("/:page", (req, res) => {
+  const page = req.params.page;
+  const filePath = path.join(static_path, `${page}.html`);
+
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      res.status(404).send("Page not found");
+    }
+  });
 });
 
 // Start the server
