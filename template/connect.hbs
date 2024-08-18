@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html>
+<style>
+    fb\\:login-button {
+    display: block;
+    margin: 20px auto;
+    background-color: #4267B2;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 10px 20px;
+}
 
+</style>
 <head>
     <title>
         Connect
@@ -44,9 +55,6 @@
 </head>
 
 <body class>
-
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="
-            height="0" width="0" style="display:none;visibility:hidden;"></iframe></noscript>
 
 
 
@@ -243,29 +251,48 @@
                                     aria-labelledby="application-tab">
                                     <div class="row">
 
-                                        <div class="clearfix"></div>
+                                        
 
-                                        <div class="clearfix"></div>
+                                        
                                         <div class="col-md-3">
                                             <div class="card border-0">
                                                 <div class="card-body text-center p-30">
-                                                    <img src="agency.png" class="border-0 product-img"
+                                                    <img src="facebook.png" class="border-0 product-img"
                                                         style="width: 80px;height:80px;">
-                                                    <h3 class="text-bodycolor m-t-20 m-b-20">WSV.connect Apps</h3>
+                                                    <h3 class="text-bodycolor m-t-20 m-b-20">WSV.connect Fb</h3>
                                                     <p class="text-secondary font-14 m-b-0">
                                                         Integrate different applications and start automating your work.
                                                     </p>
-                                                    <a target="_blank" href="/connect"
-                                                        class="btn btn-outline-secondary border m-t-25 font-15">Access
-                                                        Now</a>
-                                                </div>
+                                                    {{!-- <a target="_blank" href="/access?project=connect"
+                                                        class="btn btn-outline-secondary border m-t-25 font-15">connect
+                                                        now</a> --}}
+<fb:login-button 
+  config_id="475895635252740"
+  onlogin="checkLoginState();">
+</fb:login-button>                                                </div>
+                                               
                                             </div>
                                         </div>
-
+                                          <div class="col-md-3">
+                                            <div class="card border-0">
+                                                <div class="card-body text-center p-30">
+                                                    <img src="whatsapp.png" class="border-0 product-img"
+                                                        style="width: 80px;height:80px;">
+                                                    <h3 class="text-bodycolor m-t-20 m-b-20">WSV.connect Whatsapp</h3>
+                                                    <p class="text-secondary font-14 m-b-0">
+                                                        Integrate different applications and start automating your work.
+                                                    </p>
+                                                    <a target="_blank" href="/connect?project=connect"
+                                                        class="btn btn-outline-secondary border m-t-25 font-15">connect
+                                                        now</a>
+                                                </div>
+                                               
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="border-dashed border-light-blue m-t-10"></div>
+                            {{!-- <div class="border-dashed border-light-blue m-t-10"></div>
                             <h2 class="text-bodycolor m-t-30">Exclusive Limited Time Offer</h2>
                             <div class="card m-t-20 border-0">
                                 <div class="card-body p-t-20 p-b-20">
@@ -302,8 +329,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card m-t-20 m-b-80 border-0">
+                            </div> --}}
+                            {{!-- <div class="card m-t-20 m-b-80 border-0">
                                 <div class="card-body p-t-20 p-b-20">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col-lg-7 col-md-7 col-sm-7">
@@ -339,7 +366,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                     <div class="row">
@@ -357,9 +384,7 @@
                                                             data-original-title="Add team members and share workflow(s) or folder(s) access with them.">Team
                                                             Members</span></h3>
                                                 </div>
-                                                <div id="add-member-form" style=" 
-            display: none;
-        ">
+                                                <div id="add-member-form" style=" display: none;">
                                                     <form id="member-form">
                                                         <label for="name">Name:</label>
                                                         <input type="text" id="name" name="name" required>
@@ -473,6 +498,54 @@
         var hash = window.location.hash;
         $('#nav-tab a[href="' + hash + '"]').tab('show');
     </script>
+
+{{!-- facebooklogin sdk --}}
+<script async defer crossorigin="anonymous" 
+        src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '446678988272887', // Replace with your App ID
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v20.0' // Latest Facebook Graph API version
+            });
+
+            FB.AppEvents.logPageView();
+        };
+
+        function checkLoginState() {
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+            });
+        }
+
+        function statusChangeCallback(response) {
+            if (response.status === 'connected') {
+                // Logged into your app and Facebook.
+                fetchUserData();
+            } else {
+                // Not logged into your app or unable to tell.
+                console.log("User not authenticated");
+            }
+        }
+
+        function fetchUserData() {
+            FB.api('/me', {fields: 'name,email'}, function(response) {
+                console.log('Successful login for: ' + response.name);
+                console.log(response);
+
+                // Send user data to the server or display it on the dashboard
+            });
+
+            FB.api('/me/accounts', function(response) {
+                console.log(response);
+                // Fetching Pages managed by the user
+            });
+        }
+    </script>
+
 </body>
 
 </html>

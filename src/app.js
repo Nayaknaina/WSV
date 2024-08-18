@@ -8,9 +8,22 @@ const logIncollection = require("./db/conn");
 require("./db/conn");
 const hbs = require("hbs");
 require('dotenv').config();
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const FacebookStrategy = require('passport-facebook').Strategy;
+const axios = require('axios');
 
 const { generateToken, authenticate } = require('../utils/auth');
 
+// Middleware
+app.use(cookieParser()); // Add this line
+app.use(session({
+  secret: process.env.JWT_SECRET, // Use your JWT secret as the session secret
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true } // Set secure to true if using HTTPS
+}));
 
 
 
@@ -41,7 +54,13 @@ app.get("/signup", (req, res) => {
 });
 app.get("/logout", (req, res) => {
   // Clear the session or cookies here
+  res.clearCookie('token');
   res.redirect("/");
+});
+
+app.get("/connect", (req, res) => {
+  // Clear session or cookies here
+  res.render("connect");
 });
 
 // app.post("/signup",async(req,res)=>{
@@ -54,11 +73,42 @@ app.get("/logout", (req, res) => {
 
 // res.render("dashboard")
 // })
+
+//for facebook business Login
+
+app.get('/auth/facebook/callback', async (req, res) => {
+  const { code } = req.query;
+
+  try {
+      const response = await axios.get(`https://graph.facebook.com/v20.0/oauth/access_token`, {
+          params: {
+              client_id: '446678988272887',
+              redirect_uri: 'https://360followups.com/auth/facebook/callback',
+              client_secret: '46d7bcf496e7cb36a1d16ea5a72c8965',
+              code: code
+          }
+      });
+
+      const { access_token } = response.data;
+      // Store the access_token securely, usually in a database
+
+      // Redirect to dashboard after successful login
+      res.redirect('/dashboard');
+  } catch (error) {
+      console.error('Error fetching access token:', error);
+      res.send('Error logging in with Facebook.');
+  }
+});
+
+
+//for signups
+
 app.post("/signup", async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
   
   if (password !== confirmPassword) {
-    return res.send("Passwords do not match!");
+    return res.render('signup', { errorMessage: 'password do not match' });
+    // return res.send("Passwords do not match!");
   }
 
   const data = { name, email, password };
@@ -112,7 +162,7 @@ app.post("/login", async (req, res) => {
     const check = await logIncollection.findOne({ email: req.body.email });
 
     if (!check || check.password !== req.body.password) {
-      return res.status(401).send("Invalid email or password");
+      return res.render('signup', { errorMessage: 'Invalid username or password' });
     }
 
     const token = await generateToken(check);
@@ -124,7 +174,8 @@ app.post("/login", async (req, res) => {
 
     res.render('dashboard', { user: check });
   } catch (err) {
-    console.error(err);
+    console.error('Error logging in user:', err);
+    return res.render('signup', { errorMessage: 'Server error' });
   }
 });
 
@@ -134,7 +185,7 @@ app.post("/login", async (req, res) => {
 // });
 
 app.listen(port, () => {
-  console.log(`Server is running at PORT  ${port}`);
+  console.log(`Server is running at   localhost:${port}`);
 });
 
 

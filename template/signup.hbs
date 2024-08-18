@@ -464,11 +464,12 @@ form.sign-in-form {
   }
 }
 </style>
+ 
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <title>Sign in & Sign up Form</title>
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <title>SignIn/SignUp</title>
   </head>
   <body>
     <div class="container">
@@ -589,6 +590,15 @@ form.sign-in-form {
       </div>
     </div>
 
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+      {{#if errorMessage}}
+        console.log("Error message:", "{{errorMessage}}");
+        toastr.error("{{errorMessage}}");
+    {{/if}}
+    </script>
     <script >
 const sign_in_btn = document.querySelector("#sign-in-btn");
 const sign_up_btn = document.querySelector("#sign-up-btn");
@@ -696,11 +706,6 @@ togglePasswords.forEach((togglePassword, index) => {
 
  </script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
- <script>
-      {{#if errorMessage}}
-        console.log("Error message:", "{{errorMessage}}");
-        toastr.error("hhhh");
-    {{/if}}
-    </script>
+
   </body>
 </html>
