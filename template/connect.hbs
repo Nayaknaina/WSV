@@ -232,9 +232,9 @@
                     <div class="container">
                         <div class="row page-titles p-t-35 p-b-15">
                             <div class="col-md-12 col-12 align-self-center">
-                                <h1 class="text-bodycolor">Welcome To wsv.connect <b> {{user.name}}</b></h1>
-                                <p class="text-secondary font-14">Click 'Access Now' to start using any WSV.connect
-                                    application. You can enjoy complete access with a single WSV.connect Plus plan. <a
+                                <h1 class="text-bodycolor">Welcome To 360followups <b> {{user.name}}</b></h1>
+                                <p class="text-secondary font-14">Click 'Access Now' to start using any 360followups
+                                    application. You can enjoy complete access with a single 360followups Plus plan. <a
                                         target="_blank" rel="noopener noreferrer"
                                         href="https://www.pabbly.com/#pricing"><u>Learn more</u></a></p>
                             </div>
@@ -259,18 +259,22 @@
                                                 <div class="card-body text-center p-30">
                                                     <img src="facebook.png" class="border-0 product-img"
                                                         style="width: 80px;height:80px;">
-                                                    <h3 class="text-bodycolor m-t-20 m-b-20">WSV.connect Fb</h3>
+                                                    <h3 class="text-bodycolor m-t-20 m-b-20">360followups Fb</h3>
                                                     <p class="text-secondary font-14 m-b-0">
                                                         Integrate different applications and start automating your work.
                                                     </p>
                                                     {{!-- <a target="_blank" href="/access?project=connect"
                                                         class="btn btn-outline-secondary border m-t-25 font-15">connect
                                                         now</a> --}}
-<fb:login-button 
-scope="pages_show_list,leads_retrieval" 
-  config_id="475895635252740"
-  onlogin="checkLoginState();">
-</fb:login-button>                                                </div>
+                                                    <fb:login-button 
+                                                     class="btn btn-outline-secondary border m-t-25 font-15"
+                                                    scope="pages_show_list,leads_retrieval" 
+                                                    config_id="475895635252740"
+                                                    onlogin="checkLoginState();">
+                                                    connect
+                                                        now
+                                                    </fb:login-button>                                              
+                                                  </div>
                                                
                                             </div>
                                         </div>
@@ -279,7 +283,7 @@ scope="pages_show_list,leads_retrieval"
                                                 <div class="card-body text-center p-30">
                                                     <img src="whatsapp.png" class="border-0 product-img"
                                                         style="width: 80px;height:80px;">
-                                                    <h3 class="text-bodycolor m-t-20 m-b-20">WSV.connect Whatsapp</h3>
+                                                    <h3 class="text-bodycolor m-t-20 m-b-20">360followups Whatsapp</h3>
                                                     <p class="text-secondary font-14 m-b-0">
                                                         Integrate different applications and start automating your work.
                                                     </p>
@@ -385,11 +389,11 @@ scope="pages_show_list,leads_retrieval"
                                                             data-original-title="Add team members and share workflow(s) or folder(s) access with them.">Team
                                                             Members</span></h3>
                                                 </div>
-                                                <div id="add-member-form" style=" display: none;">
+                                                <div id="add-member-form" style=" display:none;">
                                                     <form id="member-form">
-                                                        <label for="name">Name:</label>
+                                                        <label for="name">Name :</label>
                                                         <input type="text" id="name" name="name" required>
-                                                        <label for="email">Email:</label>
+                                                        <label for="email"></label>
                                                         <input type="email" id="email" name="email" required>
                                                         <button type="submit">Submit</button>
                                                     </form>
@@ -542,13 +546,50 @@ scope="pages_show_list,leads_retrieval"
             });
 
             FB.api('/me/accounts', function(response) {
-                 response.data.forEach(page => {
-        console.log('Page Name:', page.name);
-        console.log('Page Access Token:', page.access_token);
-        // Store the Page ID and Access Token for lead retrieval
-         });
+                  response.data.forEach(page => {
+                    console.log('Page Name:', page.name);
+                    console.log('Page Access Token:', page.access_token);
+
+                    // Store the Page ID and Access Token for lead retrieval
+                    const page_id = page.id;
+                    const access_token = page.access_token;
+
+                    // Fetch leads for this page
+                    fetchFacebookLeads(page_id, access_token);
+                });
             });
         }
+
+        async function fetchFacebookLeads(page_id, access_token) {
+            try {
+                const response = await axios.get(`https://graph.facebook.com/v17.0/${page_id}/leadgen_forms`, {
+                    params: {
+                        access_token: access_token
+                    }
+                });
+
+                const forms = response.data.data;
+
+                for (const form of forms) {
+                    const leadsResponse = await axios.get(`https://graph.facebook.com/v17.0/${form.id}/leads`, {
+                        params: {
+                            access_token: access_token,
+                            fields: 'id,created_time,field_data'
+                        }
+                    });
+
+                    const leads = leadsResponse.data.data;
+                    console.log('Leads:', leads);
+
+                    // Display leads on the dashboard or process them as needed
+                    // You can create HTML elements to show leads or store them in a database
+                }
+            } catch (error) {
+                console.error('Error fetching leads:', error);
+            }
+        }
+
+
     </script>
 
 </body>
