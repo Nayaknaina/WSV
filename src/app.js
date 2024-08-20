@@ -17,7 +17,7 @@ const { generateToken, authenticate } = require('../utils/auth');
 
 // Middleware
 const sessionStore = process.env.NODE_ENV === 'production'
-  ? MongoStore.create({ mongoUrl: process.env.MONGO_URI }) // Replace with your MongoDB connection URI
+  ? MongoStore.create({ mongoUrl: 'mongodb+srv://nainanayak288:Dkccg5NaZMANqu7F@wsvconnect.bpxfx.mongodb.net/' }) // Replace with your MongoDB connection URI
   : new session.MemoryStore();
 
 app.use(session({
