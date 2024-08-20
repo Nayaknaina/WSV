@@ -267,6 +267,7 @@
                                                         class="btn btn-outline-secondary border m-t-25 font-15">connect
                                                         now</a> --}}
 <fb:login-button 
+scope="pages_show_list,leads_retrieval" 
   config_id="475895635252740"
   onlogin="checkLoginState();">
 </fb:login-button>                                                </div>
@@ -528,6 +529,7 @@
             } else {
                 // Not logged into your app or unable to tell.
                 console.log("User not authenticated");
+                
             }
         }
 
@@ -540,8 +542,11 @@
             });
 
             FB.api('/me/accounts', function(response) {
-                console.log(response);
-                // Fetching Pages managed by the user
+                 response.data.forEach(page => {
+        console.log('Page Name:', page.name);
+        console.log('Page Access Token:', page.access_token);
+        // Store the Page ID and Access Token for lead retrieval
+         });
             });
         }
     </script>
