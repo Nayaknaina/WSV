@@ -562,7 +562,7 @@
 
         async function fetchFacebookLeads(page_id, access_token) {
             try {
-                const response = await axios.get(`https://graph.facebook.com/v17.0/${page_id}/leadgen_forms`, {
+                const response = await axios.get(`https://graph.facebook.com/v20.0/${page_id}/leadgen_forms`, {
                     params: {
                         access_token: access_token
                     }
@@ -571,7 +571,7 @@
                 const forms = response.data.data;
 
                 for (const form of forms) {
-                    const leadsResponse = await axios.get(`https://graph.facebook.com/v17.0/${form.id}/leads`, {
+                    const leadsResponse = await axios.get(`https://graph.facebook.com/v20.0/${form.id}/leads`, {
                         params: {
                             access_token: access_token,
                             fields: 'id,created_time,field_data'
