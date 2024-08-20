@@ -11,16 +11,26 @@ const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const axios = require('axios');
+const MongoStore = require('connect-mongo');
 
 const { generateToken, authenticate } = require('../utils/auth');
 
 // Middleware
-app.use(cookieParser()); // Add this line
+const sessionStore = process.env.NODE_ENV === 'production'
+  ? MongoStore.create({ mongoUrl: process.env.MONGO_URI }) // Replace with your MongoDB connection URI
+  : new session.MemoryStore();
+
 app.use(session({
   secret: process.env.JWT_SECRET, // Use your JWT secret as the session secret
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: true } // Set secure to true if using HTTPS
+  store: sessionStore, // Use the appropriate session store
+  cookie: {
+    secure: true, // Always true since you're using HTTPS
+    maxAge: 1000 * 60 * 60 * 24, // Optional: Set cookie expiration (e.g., 1 day)
+    httpOnly: true, // Helps to prevent XSS attacks by not allowing client-side JavaScript to access the cookie
+    sameSite: 'strict', // Helps to prevent CSRF attacks
+  }
 }));
 
 
