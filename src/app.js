@@ -14,6 +14,7 @@ const axios = require("axios");
 const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
 const { generateToken, authenticate } = require("../utils/auth");
+const { log } = require("console");
 
 // Middleware
 const sessionStore =
@@ -63,20 +64,22 @@ app.get("/signup", (req, res) => {
   res.render("signup");
 });
 
+// ✅
 app.get("/dashboard", async (req, res, next) => {
   try {
     const token = req.cookies["360Followers"];
-    console.log(token);
+    // console.log(token);
 
     const userData = await jwt.decode(token);
-    if (!userData) {
-      res.redirect("/login");
+    if (userData === null) {
+      // console.log("sjvfjs cjsagvyd vh");
+      return res.redirect("/login");
     }
-    console.log(userData);
+    console.log("helloooooo", userData);
 
     const user = await logIncollection.findById(userData.id);
 
-    console.log(user);
+    // console.log(user);
 
     res.render("dashboard", { user });
   } catch (error) {
