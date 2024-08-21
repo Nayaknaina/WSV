@@ -24,7 +24,7 @@ const generateToken = async (user) => {
 
 const authenticate = async (req, res, next) => {
   try {
-    const token = req.header('Authorization').replace('Bearer', '');
+    const token = req.cookies["360Followers"];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await logIncollection.findOne({ _id: decoded.id });
