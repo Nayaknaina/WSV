@@ -1,9 +1,9 @@
 const express = require("express");
+const logIncollection = require("./db/conn");
 const app = express();
 const path = require("path");
 const port = process.env.PORT || 8000;
 const templatepath = path.join(__dirname, "../template");
-const logIncollection = require("./db/conn");
 const hbs = require("hbs");
 require("dotenv").config();
 const session = require("express-session");
@@ -75,7 +75,7 @@ app.get("/dashboard", async (req, res, next) => {
       // console.log("sjvfjs cjsagvyd vh");
       return res.redirect("/login");
     }
-    console.log("helloooooo", userData);
+    console.log(userData);
 
     const user = await logIncollection.findById(userData.id);
 
@@ -157,9 +157,19 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
-app.get("/connect", (req, res) => {
-  // Clear session or cookies here
-  res.render("connect");
+app.get("/connect", async (req, res) => {  
+  const token = req.cookies["360Followers"];
+    // console.log(token);
+
+    const userData = await jwt.decode(token);
+    if (userData === null) {
+      // console.log("sjvfjs cjsagvyd vh");
+      return res.redirect("/login");
+    }
+ 
+  const user = jwt.decode(userData)
+
+  res.render("connect",{user});
 });
 
 //for facebook business Login
