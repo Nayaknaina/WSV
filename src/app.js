@@ -88,6 +88,18 @@ app.get("/login", (req, res) => {
 app.get("/signup", (req, res) => {
   res.render("signup");
 });
+app.get("/profile", async (req, res) => {
+
+  const token = req.cookies["360Followers"];
+    const userData = jwt.decode(token);
+
+    if (!userData) {
+      return res.redirect("/login");
+    }
+    const user = await logIncollection.findById(userData.id);
+
+    res.render("profile", { user });
+});
 
 // Dashboard route
 app.get("/dashboard", async (req, res) => {
@@ -190,12 +202,12 @@ app.get("/auth/facebook/callback", async (req, res) => {
     );
 
     const accessToken = tokenResponse.data.access_token;
-    console.log(accessToken);
+    // console.log(accessToken);
 
     req.session.accessToken = accessToken;
-    console.log(req.session.accessToken);
+    // console.log(req.session.accessToken);
 
-    res.redirect("/dashboard/leads");
+    res.redirect("/leads");
   } catch (error) {
     console.error("Error fetching access token:", error);
     res.status(500).send("Error logging in with Facebook.");
@@ -203,7 +215,7 @@ app.get("/auth/facebook/callback", async (req, res) => {
 });
 
 // Facebook Leads Fetch Route
-app.get("/dashboard/leads", ensureAuthenticated, async (req, res) => {
+app.get("/leads", ensureAuthenticated, async (req, res) => {
   try {
     const accessToken = req.session.accessToken;
 
@@ -253,9 +265,9 @@ app.get("/dashboard/leads", ensureAuthenticated, async (req, res) => {
 
     const user = await logIncollection.findById(userData.id);
 
-    console.log(allLeads);
+    // console.log(allLeads);
 
-    res.render("connect", { user, allLeads });
+    res.render("leads", { user, allLeads });
     // res.json({ leads: allLeads });
   } catch (error) {
     console.error("Error fetching leads:", error);
@@ -265,7 +277,7 @@ app.get("/dashboard/leads", ensureAuthenticated, async (req, res) => {
 
 // Middleware to ensure the user is authenticated
 function ensureAuthenticated(req, res, next) {
-  console.log(req.session.accessToken);
+  // console.log(req.session.accessToken);
 
   if (req.session.accessToken) {
     return next();
