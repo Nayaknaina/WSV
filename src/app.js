@@ -8,13 +8,15 @@ const hbs = require("hbs");
 require("dotenv").config();
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
-const passport = require("passport");
-const FacebookStrategy = require("passport-facebook").Strategy;
 const axios = require("axios");
 const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
-const { generateToken, authenticate } = require("../utils/auth");
-const { log } = require("console");
+const { generateToken } = require("../utils/auth");
+const querystring = require("querystring");
+
+// const process.env. = "446678988272887"; // Your Facebook app ID
+// const Your Facebook app secret
+// const REDIRECT_URI = "http://localhost:8000/auth/facebook/callback";
 
 // Middleware
 const sessionStore =
@@ -25,18 +27,27 @@ const sessionStore =
       }) // Replace with your MongoDB connection URI
     : new session.MemoryStore();
 
+// app.use(
+//   session({
+//     secret: 'your_secret_key', // Use your JWT secret as the session secret
+//     resave: false,
+//     saveUninitialized: true,
+//     // store: sessionStore,
+//     cookie: {
+//       // secure: process.env.NODE_ENV === "production",
+//       maxAge: 1000 * 60 * 60 * 24,
+//       httpOnly: true,
+//       sameSite: "strict",
+//     },
+//   })
+// );
+
 app.use(
   session({
-    secret: process.env.JWT_SECRET, // Use your JWT secret as the session secret
+    secret: "your_secret_key", // Replace with your own secret key
     resave: false,
     saveUninitialized: true,
-    store: sessionStore, // Use the appropriate session store
-    cookie: {
-      secure: true, // Always true since you're using HTTPS
-      maxAge: 1000 * 60 * 60 * 24, // Optional: Set cookie expiration (e.g., 1 day)
-      httpOnly: true, // Helps to prevent XSS attacks by not allowing client-side JavaScript to access the cookie
-      sameSite: "strict", // Helps to prevent CSRF attacks
-    },
+    store: sessionStore,
   })
 );
 
@@ -47,7 +58,7 @@ app.set("view engine", "hbs");
 app.set("views", templatepath);
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-// Serve static files from 'template' directory
+
 app.use(express.static("template"));
 
 // Handle root request
@@ -55,6 +66,20 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
 
+app.get("/connect", async (req, res) => {
+  const token = req.cookies["360Followers"];
+  // console.log(token);
+
+  const userData =  jwt.decode(token);
+  if (userData === null) {
+    
+    return res.redirect("/login");
+  }
+
+  const user = jwt.decode(userData);
+
+  res.render("connect", { user, allLeads: null });
+});
 // Login and Signup routes
 app.get("/login", (req, res) => {
   res.render("signup");
@@ -64,68 +89,47 @@ app.get("/signup", (req, res) => {
   res.render("signup");
 });
 
-// ✅
-app.get("/dashboard", async (req, res, next) => {
+// Dashboard route
+app.get("/dashboard", async (req, res) => {
   try {
     const token = req.cookies["360Followers"];
-    // console.log(token);
+    const userData = jwt.decode(token);
 
-    const userData = await jwt.decode(token);
-    if (userData === null) {
-      // console.log("sjvfjs cjsagvyd vh");
+    if (!userData) {
       return res.redirect("/login");
     }
-    console.log(userData);
 
     const user = await logIncollection.findById(userData.id);
-
-    // console.log(user);
-
+    // req.session.id = userData.id;
     res.render("dashboard", { user });
   } catch (error) {
-    res.status(500).send("internal error");
+    res.status(500).send("Internal error");
   }
 });
 
-//for signups
-
+// Signup handler
 app.post("/signup", async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
-
     const user = await logIncollection.findOne({ email });
 
-    console.log(user);
-
     if (user)
-      return res.render("signup", { errorMessage: "user already exist" });
-
+      return res.render("signup", { errorMessage: "User already exists" });
     if (password !== confirmPassword)
-      return res.render("signup", { errorMessage: "password do not match" });
+      return res.render("signup", { errorMessage: "Passwords do not match" });
 
-    const data = { name, email, password };
-
-    // const user = await logIncollection.insertMany([data]);
-
-    const newUser = new logIncollection(data);
-    newUser.save();
+    const newUser = new logIncollection({ name, email, password });
+    await newUser.save();
     const token = await generateToken(newUser);
-    console.log(token);
 
-    console.log(newUser);
-
-    res.cookie("360Followers", token, {
-      httpOnly: true,
-      maxAge: 3600000, // 1 hour
-    });
-
-    // res.render('dashboard', { user: data });
+    res.cookie("360Followers", token, { httpOnly: true, maxAge: 3600000 });
     res.redirect("/dashboard");
   } catch (err) {
     res.status(500).send("Error signing up");
   }
 });
 
+// Login handler
 app.post("/login", async (req, res) => {
   try {
     const check = await logIncollection.findOne({ email: req.body.email });
@@ -137,13 +141,7 @@ app.post("/login", async (req, res) => {
     }
 
     const token = await generateToken(check);
-
-    res.cookie("360Followers", token, {
-      httpOnly: true,
-      maxAge: 3600000, // 1 hour
-    });
-
-    // res.redirect('/dashboard', { user: check });
+    res.cookie("360Followers", token, { httpOnly: true, maxAge: 3600000 });
     res.redirect("/dashboard");
   } catch (err) {
     console.error(err);
@@ -152,58 +150,128 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-  // Clear the session or cookies here
-  res.clearCookie("token");
+  res.clearCookie("360Followers");
   res.redirect("/");
 });
 
-app.get("/connect", async (req, res) => {  
-  const token = req.cookies["360Followers"];
-    // console.log(token);
+// Facebook Login Route
+app.get("/auth/facebook", (req, res) => {
+  const facebookAuthUrl =
+    `https://www.facebook.com/v20.0/dialog/oauth?` +
+    querystring.stringify({
+      client_id: process.env.FB_CLIENT_ID,
+      redirect_uri: process.env.REDIRECT_URI,
+      scope: "email,pages_show_list,leads_retrieval",
+      response_type: "code",
+    });
 
-    const userData = await jwt.decode(token);
-    if (userData === null) {
-      // console.log("sjvfjs cjsagvyd vh");
-      return res.redirect("/login");
-    }
- 
-  const user = jwt.decode(userData)
-
-  res.render("connect",{user});
+  res.redirect(facebookAuthUrl);
 });
 
-//for facebook business Login
-
-// ! not for me
-
+// Facebook Callback Route
 app.get("/auth/facebook/callback", async (req, res) => {
   const { code } = req.query;
 
+  if (!code) {
+    return res.status(400).send("Invalid authorization code");
+  }
+
   try {
-    const response = await axios.get(
-      `https://graph.facebook.com/v20.0/oauth/access_token`,
+    const tokenResponse = await axios.get(
+      "https://graph.facebook.com/v20.0/oauth/access_token",
       {
         params: {
-          client_id: "446678988272887",
-          redirect_uri: "https://360followups.com/auth/facebook/callback",
-          client_secret: "46d7bcf496e7cb36a1d16ea5a72c8965",
-          code: code,
+          client_id: process.env.FB_CLIENT_ID,
+          redirect_uri: process.env.REDIRECT_URI,
+          client_secret: process.env.FB_CLIENT_SECRET,
+          code
         },
       }
     );
 
-    const { access_token } = response.data;
-    // Store the access_token securely, usually in a database
+    const accessToken = tokenResponse.data.access_token;
+    console.log(accessToken);
 
-    // Redirect to dashboard after successful login
-    res.redirect("/dashboard");
+    req.session.accessToken = accessToken;
+    console.log(req.session.accessToken);
+
+    res.redirect("/dashboard/leads");
   } catch (error) {
     console.error("Error fetching access token:", error);
-    res.send("Error logging in with Facebook.");
+    res.status(500).send("Error logging in with Facebook.");
   }
 });
 
-// ! not for me
+// Facebook Leads Fetch Route
+app.get("/dashboard/leads", ensureAuthenticated, async (req, res) => {
+  try {
+    const accessToken = req.session.accessToken;
+
+    const pagesResponse = await axios.get(
+      `https://graph.facebook.com/v20.0/me/accounts`,
+      {
+        params: {
+          access_token: accessToken,
+        },
+      }
+    );
+
+    const pages = pagesResponse.data.data;
+    let allLeads = [];
+
+    for (const page of pages) {
+      const leadFormsResponse = await axios.get(
+        `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
+        {
+          params: { access_token: page.access_token },
+        }
+      );
+
+      const leadForms = leadFormsResponse.data.data;
+
+      for (const form of leadForms) {
+        const leadsResponse = await axios.get(
+          `https://graph.facebook.com/v20.0/${form.id}/leads`,
+          {
+            params: {
+              access_token: page.access_token,
+              fields: "id,created_time,field_data",
+            },
+          }
+        );
+
+        allLeads.push(...leadsResponse.data.data);
+      }
+    }
+
+    const token = req.cookies["360Followers"];
+    const userData = jwt.decode(token);
+
+    if (!userData) {
+      return res.redirect("/login");
+    }
+
+    const user = await logIncollection.findById(userData.id);
+
+    console.log(allLeads);
+
+    res.render("connect", { user, allLeads });
+    // res.json({ leads: allLeads });
+  } catch (error) {
+    console.error("Error fetching leads:", error);
+    res.status(500).send("Error fetching leads");
+  }
+});
+
+// Middleware to ensure the user is authenticated
+function ensureAuthenticated(req, res, next) {
+  console.log(req.session.accessToken);
+
+  if (req.session.accessToken) {
+    return next();
+  }
+  res.redirect("/connect");
+}
 
 // Handle dynamic routes to serve pages without .html extension
 app.get("/:page", (req, res) => {
@@ -219,5 +287,5 @@ app.get("/:page", (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server is running at   localhost:${port}`);
+  console.log(`Server is running at http://localhost:${port}`);
 });
