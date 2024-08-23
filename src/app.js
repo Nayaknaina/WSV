@@ -69,7 +69,7 @@ app.use(express.static("template"));
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  googlecallbackURL: process.env.GOOGLE_CALLBACK,
+  callbackURL: "https://360followups.com/auth/google/callback",
   passReqToCallback: true
 },
 async function(request, accessToken, refreshToken, profile, done) {
