@@ -11,7 +11,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -261,6 +263,71 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-md-3">
+                                            <button type="button" data-original-title="Add pipeline"
+                                                onclick="addPipelineForm()" class="btn btn-outline-primary font-15"><i
+                                                    class="fas fa-plus-circle font-12"></i>
+                                                <span class="ml-1 d-none d-sm-inline">Add Pipeline</span>
+                                            </button>
+
+                                            <div style="display: none;" id="add-pipeline-form" class="card border-0">
+                                                <form action="/pipeline" method="post" class="row g-3">
+
+                                                    <div class="col-auto">
+
+                                                        <input type="text" class="form-control" id="inputPassword2"
+                                                            name="title" placeholder="Enter Pipline">
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <button type="submit" class="btn btn-primary mb-3">Add</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card border-0">
+                                                <ul>
+                                                    {{#each pipelines}}
+                                                    <div style="display: flex; justify-content: space-between;">
+                                                        <li>
+                                                            <form style="display: flex; justify-content: space-between;" action="/pipeline/update/{{_id}}" method="post"
+                                                                    >
+                                                            <input type="text" disabled class="form-control update-input"
+                                                                name="title" value="{{title}}">
+
+                                                            <button type="submit" hidden class="sub-btn"><i class="fa-solid fa-square-check"></i></button>
+                                                            </form>
+                                                        </li>
+                                                        <span>
+
+                                                           
+
+
+                                                            <span>
+                                                                <i onclick="updatePiplineForm({})"
+                                                                    class="fa-solid fa-pen-to-square"></i>
+
+                                                                <a href="/pipeline/del/{{_id}}"><i
+                                                                        class="fa-regular fa-trash-can"></i></a>
+
+                                                                <i id="color-piker-btn" class="fa-solid fa-palette"></i>
+
+                                                            </span>
+
+                                                            <div id="color-piker-box">
+                                                                <span class="circle-red"></span>
+                                                                <span class="circle-pink"></span>
+                                                                <span class="circle-blue"></span>
+                                                                <span class="circle-yellow"></span>
+                                                                <span class="circle-green"></span>
+                                                                <span class="circle-purpul"></span>
+                                                            </div>
+                                                        </span>
+                                                    </div>
+                                                    {{/each}}
+                                                </ul>
+                                            </div>
+                                        </div>
 
                                     </div>
                                 </div>
@@ -472,6 +539,29 @@
         // on load of the page: switch to the currently selected tab
         var hash = window.location.hash;
         $('#nav-tab a[href="' + hash + '"]').tab('show');
+    </script>
+
+
+    <script>
+        function addPipelineForm() {
+            let popform = document.querySelector('#add-pipeline-form')
+            if (popform.style.display === 'none')
+                popform.style.display = 'block'
+            else
+                popform.style.display = 'none'
+
+        }
+
+        let flag = 0;
+        function updatePiplineForm() {
+            let inps = document.querySelectorAll('.update-input')
+            {{!-- let inps = document.querySelectorAll('.update-input') --}}
+            inps.forEach((inp) => {
+                inp.disabled = false
+                console.log(inp.nextSibling.nextSibling)
+                inp.nextSibling.hidden = false
+            })
+        }
     </script>
 </body>
 

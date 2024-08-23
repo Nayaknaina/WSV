@@ -1,5 +1,5 @@
 const express = require("express");
-const logIncollection = require("./db/conn");
+const logIncollection = require("./models/admin.model.js");
 const app = express();
 const path = require("path");
 const port = process.env.PORT || 8000;
@@ -15,6 +15,9 @@ const { generateToken } = require("../utils/auth");
 const querystring = require("querystring");
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
+
+const { v4: uuidv4 } = require('uuid');
+const pipelineModel = require('./models/pipeline.model.js')
 
 // const process.env. = "446678988272887"; // Your Facebook app ID
 // const Your Facebook app secret
@@ -145,6 +148,42 @@ app.get("/login", (req, res) => {
 app.get("/signup", (req, res) => {
   res.render("signup");
 });
+
+app.post('/pipeline',async (req,res)=>{
+  const {title} = req.body
+
+  const token = req.cookies["360Followers"];
+  const userData = jwt.decode(token);
+
+  if (!userData) {
+    return res.redirect("/login");
+  }
+  const user = await logIncollection.findById(userData.id);
+
+  const pipeline = new pipelineModel({ uid:user._id, title ,cid:user.cid });
+    await pipeline.save();
+
+    res.redirect('/dashboard')
+  
+  })
+
+app.get('/pipeline/del/:id',async(req,res)=>{
+  const {id} = req.params
+  let pipeline = await pipelineModel.findByIdAndDelete(id)
+  // console.log(pipeline);
+  res.redirect('/dashboard')
+})
+
+app.get('/pipeline/update/:id',async(req,res)=>{
+  const {id} = req.params
+  let pipeline = await pipelineModel.findById(id)
+
+  console.log(pipeline);
+  res.redirect('/dashboard')
+})
+
+
+
 app.get("/profile", async (req, res) => {
 
   const token = req.cookies["360Followers"];
@@ -166,14 +205,15 @@ app.get("/dashboard", async (req, res) => {
   try {
     const token = req.cookies["360Followers"];
     const userData = jwt.decode(token);
-
+    
     if (!userData) {
       return res.redirect("/login");
     }
-
+    
     const user = await logIncollection.findById(userData.id);
+    const pipelines = await pipelineModel.find({uid: user._id})
     // req.session.id = userData.id;
-    res.render("dashboard", { user });
+    res.render("dashboard", { user, pipelines });
   } catch (error) {
     res.status(500).send("Internal error");
   }
@@ -208,8 +248,8 @@ app.post("/signup", async (req, res) => {
       return res.render("signup", { errorMessage: "User already exists" });
     if (password !== confirmPassword)
       return res.render("signup", { errorMessage: "Passwords do not match" });
-
-    const newUser = new logIncollection({ name, email, password });
+    const cid = uuidv4();
+    const newUser = new logIncollection({ name, email, password,cid });
     await newUser.save();
     const token = await generateToken(newUser);
 
