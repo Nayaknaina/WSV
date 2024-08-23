@@ -40,4 +40,7 @@ const authenticate = async (req, res, next) => {
   }
 };
 
+
+
+
 module.exports = { generateToken, authenticate };

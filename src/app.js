@@ -13,6 +13,8 @@ const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
 const { generateToken } = require("../utils/auth");
 const querystring = require("querystring");
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth2').Strategy;
 
 // const process.env. = "446678988272887"; // Your Facebook app ID
 // const Your Facebook app secret
@@ -61,6 +63,61 @@ app.use(cookieParser());
 
 app.use(express.static("template"));
 
+
+
+// Passport.js Google Strategy
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "http://localhost:8000/auth/google/callback",
+  passReqToCallback: true
+},
+async function(request, accessToken, refreshToken, profile, done) {
+  try {
+    let user = await logIncollection.findOne({ googleId: profile.id });
+    
+    if (user) {
+      // Update the existing user
+      user.name = profile.displayName;
+      user.email = profile.email;
+      user.profilePicture = profile.photos[0].value;
+      await user.save();
+    } else {
+      // Create a new user
+      user = await logIncollection.create({
+        googleId: profile.id,
+        name: profile.displayName,
+        email: profile.email,
+        profilePicture: profile.photos[0].value,
+      });
+    }
+    
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+}));
+
+// Passport.js serialize and deserialize user
+passport.serializeUser((user, done) => {
+  done(null, user.id); // Serialize user by their unique ID
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await logIncollection.findById(id); // Find user by ID
+    
+    
+    done(null, user); // Attach user object to request
+  } catch (err) {
+    done(err, null);
+  }
+});
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 // Handle root request
 app.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
@@ -101,6 +158,9 @@ app.get("/profile", async (req, res) => {
     res.render("profile", { user });
 });
 
+
+  
+
 // Dashboard route
 app.get("/dashboard", async (req, res) => {
   try {
@@ -119,7 +179,26 @@ app.get("/dashboard", async (req, res) => {
   }
 });
 
+// Google Authentication Routes
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }),(req,res)=>{
+  
+  
+});
+
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/signup' }),
+  async (req, res) => {
+    const token = await generateToken(req.user);
+
+    res.cookie("360Followers", token, { httpOnly: true, maxAge: 3600000 });
+    res.redirect('/dashboard');
+  }
+);
+
+
+
 // Signup handler
+
 app.post("/signup", async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
@@ -299,5 +378,5 @@ app.get("/:page", (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running at PORT:${port}`);
 });
