@@ -10,7 +10,6 @@ const logInSchema = new mongoose.Schema({
   },
   name: {
     type: String,
-    required: true,
     trim: true,
     max: 24
   },
@@ -21,6 +20,10 @@ const logInSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  contact:{
+    type:String,
+    trim: true,
+  },
   profilePicture: {
     type: String,
     trim: true, 
@@ -28,6 +31,26 @@ const logInSchema = new mongoose.Schema({
   password: {
     type: String,
     required: function() { return !this.googleId; } 
+  },
+  address:{
+    type:String,
+    lowercase: true,
+    trim: true,
+  },
+  city:{
+    type:String,
+    lowercase: true,
+    trim: true,
+  },
+  state:{
+    type:String,
+    lowercase: true,
+    trim: true,
+  },
+  country:{
+    type:String,
+    lowercase: true,
+    trim: true
   }
 });
 

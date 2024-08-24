@@ -1,16 +1,5 @@
 <!DOCTYPE html>
 <html>
-<style>
-  fb\\:login-button {
-    display: block;
-    margin: 20px auto;
-    background-color: #4267B2;
-    color: white;
-    font-size: 16px;
-    border-radius: 5px;
-    padding: 10px 20px;
-  }
-</style>
 
 <head>
   <title>
@@ -54,7 +43,53 @@
 
 </head>
 
-<body>
+<style>
+  .feature-box {
+    padding: 20px 15px;
+    height: 100%;
+    box-shadow: 0 0 0.3125rem 0 rgba(20, 12, 0, .06);
+    background-image: radial-gradient(at 50% 100%, #fff 0%, rgb(99 156 220 / 50%) 100%), linear-gradient(to bottom, rgba(168, 181, 243, 0.25) 0%, rgb(196 182 182 / 40%) 100%);
+    border-radius: 10px;
+  }
+
+  .feature-box .icon {
+    position: relative;
+    z-index: 0;
+    margin-bottom: 15px;
+    background-color: #2a3bf8;
+    padding: 20px;
+    border-radius: 72px;
+    height: 52px;
+    width: 52px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .feature-box .icon:before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    bottom: 3px;
+    border-radius: 72px;
+    background: -moz-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    background: -webkit-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#00ffffff', GradientType=0);
+    transform: rotate(145deg);
+    opacity: .2;
+
+  }
+
+  .feature-box .icon i {
+    font-size: 30px;
+    color: #ffffff;
+    position: relative;
+    z-index: 1;
+  }
+</style>
+
+<body class>
 
 
 
@@ -144,20 +179,14 @@
             <div class="my-profile dropdown-menu dropdown-menu-right font-14 border-0 text-bodycolor m-t-10"
               aria-labelledby="dropdownMenuLink">
               <div class="user-info-wrap d-flex p-t-15 p-20 border-bottom-primary2">
-                {{#if user.profilePicture}}
-                <img id="user_image" width="70" height="70"
-                  src="{{user.profilePicture}}"
-                  class="rounded-circle">
-                {{else}}
-                <img id="user_image" width="70" height="70"
+                <img id="user_image"
                   src="//www.gravatar.com/avatar/9ef7cb630b294dc458d676560e96d060?d=http%3A%2F%2Faccounts.pabbly.com%2Fimages%2Fdefault-profile-pic.png"
                   class="rounded-circle">
-                {{/if}}
                 <div class="user-info p-l-10">
                   <p class="text-bodycolor font-demi font-15 m-0">
                     {{user.name}}</p>
                   <span class="font-12 text-secondary"><a href="/cdn-cgi/l/email-protection" class="__cf_email__"
-                      data-cfemail="731d120a12181d121a1d124a44464633141e121a1f5d101c1e">{{user.email}}</a></span>
+                      data-cfemail="731d120a12181d121a1d124a44464633141e121a1f5d101c1e">[email&#160;protected]</a></span>
                 </div>
               </div>
               <a class="dropdown-item p-t-15 p-b-15 border-bottom-primary2" href="/profile">
@@ -183,13 +212,13 @@
         <div id="fg-sidebar" class="bg-bodycolor h-100">
           <ul class="fg-sidebar-menu p-0 sticky">
             <li id="apps" class="sidebar-list-item text-center">
-              <a href="/apps" class="fg-list-item p-t-15 p-b-15 d-block">
+              <a href="/dashboard" class="fg-list-item p-t-15 p-b-15 d-block">
                 <i class="fa fa-home text-white font-20"></i>
 
                 <span class="m-t-5 text-center d-block text-white font-12">Home</span>
               </a>
             </li>
-            <li id="apps" class="sidebar-list-item text-center ">
+            <li id="apps" class="sidebar-list-item text-center active">
               <a href="/apps" class="fg-list-item p-t-15 p-b-15 d-block">
                 <i class="fas fa-globe text-white font-20"></i>
                 <span class="m-t-5 text-center d-block text-white font-12">All Apps</span>
@@ -207,13 +236,13 @@
                 <span class="m-t-5 text-center d-block text-white font-12">Team</span>
               </a>
             </li>
-            <li id="help" class="sidebar-list-item text-center">
+            <li id="profile" class="sidebar-list-item text-center">
               <a href="/profile" class="fg-list-item p-t-15 p-b-15 d-block">
                 <i class="fas fa-user-cog text-white font-20"></i>
                 <span class="m-t-5 text-center d-block text-white font-12">Get help</span>
               </a>
             </li>
-            <li id="logout" class="sidebar-list-item text-center">
+            <li id="profile" class="sidebar-list-item text-center">
               <a href="/logout" class="fg-list-item p-t-15 p-b-15 d-block">
                 <i class="fas fa-power-off text-white font-20"></i>
                 <span class="m-t-5 text-center d-block text-white font-12">Logout</span>
@@ -226,85 +255,161 @@
           $(document).ready(function () {
             var pathname = window.location.pathname;
             var path = pathname.replace('/', '');
-            $('ul.fg-sidebar-menu li#' + path).addClass('active');
+            {{!-- $('ul.fg-sidebar-menu li#' + path).addClass('active'); --}}
           });
         </script>
       </div>
       <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0">
-        <div class="container-fluid bg-white shadow-sm m-b-40">
+        <div class="container-fluid bg-white shadow-sm m-b-20">
           <div class="container">
             <div class="row page-titles p-t-35 p-b-15">
               <div class="col-md-12 col-12 align-self-center">
-                <h1 class="text-bodycolor">Account Management<b> </b></h1>
-                <p class="text-secondary font-14">View and manage all your account associated information.</p>
+                <h1 class="text-bodycolor">Welcome To 360followups Apps<b> {{user.name}} </b></h1>
+                <p class="text-secondary font-14">Click 'Access Now' to start using any 360followups
+                  application. You can enjoy complete access with a single 360followups Plus plan. <a target="_blank"
+                    rel="noopener noreferrer" href="https://www.pabbly.com/#pricing"><u>Learn more</u></a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+     
+            {{!-- <div class="col-lg-3 col-md-6 col-12 m-b-10 wow fadeIn" data-wow-delay="0.2s">
+          <h1 class="text-center">Apps</h1>
+          </div> --}}
+ 
+
+        <div class="container min-vh-100">
+          <div class="row">
+
+            <div class="col-lg-3 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-facebook-square"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">Facebook </h5>
+                <p>Connect your Facebook pages and automate chats based on user selections. </p>
               </div>
             </div>
 
-            <form id="profile-form" class="row g-3">
-              <div class="col-md-6 mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input value="{{user.name}}" disabled name="name" type="text" class="form-control"  id="name" placeholder="Name">
+            <div class="col-lg-3 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-whatsapp-square"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">WhatsApp Business</h5>
+                <p>Allow users to log in to their own WhatsApp number using WhatsApp Web inside the 360followups </p>
               </div>
+            </div>
 
-              <div class="col-md-6 mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input disabled value="{{user.email}}" name="email" type="email" class="form-control" id="email" placeholder="Email">
+            {{!-- <div class="col-lg-4 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-instagram"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">Instagram</h5>
+                <p>Connect your Facebook pages and automate chats based on user selections.</p>
               </div>
+            </div>
 
-              <div class="col-md-6 mb-3">
-                <label for="contact" class="form-label">Contact</label>
-                <input disabled value="{{user.contact}}" name="contact" type="tel" class="form-control" id="contact" placeholder="Contact Number">
+            <div class="col-lg-4 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-telegram"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">Telegram</h5>
+                <p>Integration for Lead collection</p>
               </div>
+            </div>
 
-              <div class="col-6">
-                <label for="inputAddress" class="form-label">Address</label>
-                <input disabled value="{{user.address}}" name="address" type="text" class="form-control" id="inputAddress" placeholder="Address">
+            <div class="col-lg-4 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-google"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">Google Ads</h5>
+                <p>As you can see in the source code, we provided a comprehensive documentation.</p>
               </div>
+            </div>
 
-              <div class="col-md-6 mb-3">
-                <label for="inputCity" class="form-label">City</label>
-                <input disabled value="{{user.city}}" name="city" type="text" class="form-control" id="inputCity" placeholder="City">
+            <div class="col-lg-4 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fas fa-download"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold"></h5>
+                <p>When you will connect</p>
               </div>
+            </div>
+             --}}
+          </div>
+          <div class="col-lg-3 col-md-6 col-12 m-b-10 m-t-50 wow fadeIn" data-wow-delay="0.2s">
+          <h1 class="text-center">My Apps</h1>
+          </div>
+          <div class="row">
 
-              <div class="col-md-6 mb-3">
-                <label for="inputState" class="form-label">State</label>
-                <input disabled value="{{user.state}}" name="state" type="text" class="form-control" id="inputState" placeholder="State">
+            <div class="col-lg-3 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-facebook-square"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">Facebook </h5>
+                <p>Connect your Facebook pages and automate chats based on user selections. </p>
               </div>
-              <div class="col-md-6 mb-3">
-                <label for="inputCountry" class="form-label">Country</label>
-                <input disabled value="{{user.country}}" name="country" type="text" class="form-control" id="inputCountry" placeholder="Country">
+            </div>
+
+            {{!--  <div class="col-lg-3 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-whatsapp-square"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">WhatsApp Business</h5>
+                <p>Allow users to log in to their own WhatsApp number using WhatsApp Web inside the 360followups </p>
               </div>
+            </div>
 
-              
-
-
-              <div class="col-12">
-                <button type="button" id="edit" class="btn btn-primary" onclick="updateProfileData()">Edit</button>
-                <button type="submit" id="save" disabled class="btn btn-secondary">Save</button>
+            <div class="col-lg-4 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-instagram"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">Instagram</h5>
+                <p>Connect your Facebook pages and automate chats based on user selections.</p>
               </div>
-            </form>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-telegram"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">Telegram</h5>
+                <p>Integration for Lead collection</p>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fab fa-google"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold">Google Ads</h5>
+                <p>As you can see in the source code, we provided a comprehensive documentation.</p>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-12 m-b-30 wow fadeIn" data-wow-delay="0.2s">
+              <div class="feature-box bg-white br-5 text-center">
+                <span class="align-items-center d-inline-flex icon justify-content-center mx-auto">
+                  <i class="fas fa-download"></i>
+                </span>
+                <h5 class="mb-3 mb-md-4 font-weight-bold"></h5>
+                <p>When you will connect</p>
+              </div>
+            </div>
+             --}}
           </div>
         </div>
-        {{!-- <div class="container min-vh-100">
-
-
-
-
-          <ul>
-            {{#each allLeads}}
-            <li>
-
-              <strong>Created Time:</strong> {{created_time}} <br>
-
-              <ul>
-                {{#each field_data}}
-                <li><strong>{{name}}:</strong> {{#each values}}{{this}} {{/each}}</li>
-                {{/each}}
-              </ul>
-            </li>
-            {{/each}}
-          </ul>
-        </div> --}}
       </div>
 
 
@@ -377,31 +482,7 @@
     $('#nav-tab a[href="' + hash + '"]').tab('show');
   </script>
 
-  <script>
-    function updateProfileData(e){
-      let formInputs = document.querySelectorAll('#profile-form input')
-      let editBtn = document.querySelector('#profile-form #edit')
-      let saveBtn = document.querySelector('#profile-form #save')
-      if(editBtn.textContent === 'Edit'){
-        editBtn.textContent = 'Cancel'
-        saveBtn.disabled = false
-      formInputs.forEach((forminput)=>{
-        forminput.disabled = false
-      })
-      }else{
-        editBtn.textContent = 'Edit'
-        saveBtn.disabled = true
-      formInputs.forEach((forminput)=>{
-        forminput.disabled = true
-      })
-      }
-      
-
-
-    }
-  </script>
-
-
+  {{!-- facebooklogin sdk --}}
 
 
 </body>

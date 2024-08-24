@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-
     <link rel="stylesheet" type="text/css" href="/styles/loader.css">
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -44,6 +43,21 @@
 
 
 </head>
+
+
+<style>
+    #pipeline-bx li label {
+        width: 26px;
+        height: 26px;
+        border-radius: 50px;
+        margin: 5px 10px;
+    }
+
+    .pipeline-box {
+        margin-top: 10px;
+        display: none;
+    }
+</style>
 
 <body class>
 
@@ -139,15 +153,20 @@
                         <div class="my-profile dropdown-menu dropdown-menu-right font-14 border-0 text-bodycolor m-t-10"
                             aria-labelledby="dropdownMenuLink">
                             <div class="user-info-wrap d-flex p-t-15 p-20 border-bottom-primary2">
-                                <img id="user_image"
+                                {{#if user.profilePicture}}
+                                <img id="user_image" width="70" height="70" src="{{user.profilePicture}}"
+                                    class="rounded-circle">
+                                {{else}}
+                                <img id="user_image" width="70" height="70"
                                     src="//www.gravatar.com/avatar/9ef7cb630b294dc458d676560e96d060?d=http%3A%2F%2Faccounts.pabbly.com%2Fimages%2Fdefault-profile-pic.png"
                                     class="rounded-circle">
+                                {{/if}}
                                 <div class="user-info p-l-10">
                                     <p class="text-bodycolor font-demi font-15 m-0">
                                         {{user.name}}</p>
                                     <span class="font-12 text-secondary"><a href="/cdn-cgi/l/email-protection"
                                             class="__cf_email__"
-                                            data-cfemail="731d120a12181d121a1d124a44464633141e121a1f5d101c1e">[email&#160;protected]</a></span>
+                                            data-cfemail="731d120a12181d121a1d124a44464633141e121a1f5d101c1e">{{user.email}}</a></span>
                                 </div>
                             </div>
                             <a class="dropdown-item p-t-15 p-b-15 border-bottom-primary2" href="/profile">
@@ -192,7 +211,7 @@
                             </a>
                         </li>
                         <li id="" class="sidebar-list-item text-center">
-                            <a href="#team-section" class="fg-list-item p-t-15 p-b-15 d-block">
+                            <a href="/team" class="fg-list-item p-t-15 p-b-15 d-block">
                                 <i class="fas fa-user-plus text-white font-20"></i>
                                 <span class="m-t-5 text-center d-block text-white font-12">Team</span>
                             </a>
@@ -263,65 +282,60 @@
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div class="col-md-3">
-                                            <button type="button" data-original-title="Add pipeline"
-                                                onclick="addPipelineForm()" class="btn btn-outline-primary font-15"><i
-                                                    class="fas fa-plus-circle font-12"></i>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button type="button" onclick="showPipeBox()"
+                                                class="btn btn-outline-primary font-15">
+                                                <i class="fas fa-plus-circle font-12"></i>
                                                 <span class="ml-1 d-none d-sm-inline">Add Pipeline</span>
                                             </button>
+                                            <div class="pipeline-box card border-0">
 
-                                            <div style="display: none;" id="add-pipeline-form" class="card border-0">
-                                                <form action="/pipeline" method="post" class="row g-3">
+                                                <form action="/pipeline" method="post" class="row g-3 ">
 
                                                     <div class="col-auto">
 
                                                         <input type="text" class="form-control" id="inputPassword2"
-                                                            name="title" placeholder="Enter Pipline">
+                                                            name="title" placeholder="Add Pipline">
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <input type="color" name="color">
                                                     </div>
                                                     <div class="col-auto">
                                                         <button type="submit" class="btn btn-primary mb-3">Add</button>
                                                     </div>
                                                 </form>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="card border-0">
-                                                <ul>
+
+                                                <ul id="pipeline-bx">
                                                     {{#each pipelines}}
                                                     <div style="display: flex; justify-content: space-between;">
-                                                        <li>
-                                                            <form style="display: flex; justify-content: space-between;" action="/pipeline/update/{{_id}}" method="post"
-                                                                    >
-                                                            <input type="text" disabled class="form-control update-input"
-                                                                name="title" value="{{title}}">
+                                                        <li style="list-style: none;">
+                                                            <form style="display: flex; justify-content: space-between;"
+                                                                action="/pipeline/update/{{_id}}" method="post">
+                                                                <input type="text" disabled id="title{{_id}}"
+                                                                    name="title" value="{{title}}">
 
-                                                            <button type="submit" hidden class="sub-btn"><i class="fa-solid fa-square-check"></i></button>
+                                                                <label for="color{{_id}}" id="colorLabel{{_id}}"
+                                                                    style="width: 26px; height: 26px; border-radius: 50px; margin: 5px 10px; background-color: {{color}}"></label>
+
+                                                                <input style="opacity: 0;" disabled type="color"
+                                                                    id="color{{_id}}" name="color" value="{{color}}">
+
+                                                                <button type="submit"
+                                                                    style="border: none; outline: none;" hidden
+                                                                    class="sub-btn" id="submit-btn{{_id}}"><i
+                                                                        class="fa-solid fa-square-check"></i></button>
                                                             </form>
                                                         </li>
                                                         <span>
-
-                                                           
-
-
                                                             <span>
-                                                                <i onclick="updatePiplineForm({})"
+                                                                <i onclick="updatePiplineForm('{{_id}}')"
                                                                     class="fa-solid fa-pen-to-square"></i>
-
                                                                 <a href="/pipeline/del/{{_id}}"><i
                                                                         class="fa-regular fa-trash-can"></i></a>
-
-                                                                <i id="color-piker-btn" class="fa-solid fa-palette"></i>
-
                                                             </span>
-
-                                                            <div id="color-piker-box">
-                                                                <span class="circle-red"></span>
-                                                                <span class="circle-pink"></span>
-                                                                <span class="circle-blue"></span>
-                                                                <span class="circle-yellow"></span>
-                                                                <span class="circle-green"></span>
-                                                                <span class="circle-purpul"></span>
-                                                            </div>
                                                         </span>
                                                     </div>
                                                     {{/each}}
@@ -553,15 +567,35 @@
         }
 
         let flag = 0;
-        function updatePiplineForm() {
-            let inps = document.querySelectorAll('.update-input')
-            {{!-- let inps = document.querySelectorAll('.update-input') --}}
-            inps.forEach((inp) => {
-                inp.disabled = false
-                console.log(inp.nextSibling.nextSibling)
-                inp.nextSibling.hidden = false
-            })
+        function updatePiplineForm(id) {
+            const titleInput = document.getElementById(`title${id}`);
+            const colorInput = document.getElementById(`color${id}`);
+            const submitBtn = document.getElementById(`submit-btn${id}`);
+
+            if (titleInput.disabled && colorInput.disabled) {
+                // Enable editing
+                titleInput.disabled = false;
+                colorInput.disabled = false;
+                submitBtn.hidden = false;
+            } else {
+                // Prevent further editing
+                titleInput.disabled = true;
+                colorInput.disabled = true;
+
+                submitBtn.hidden = true;
+            }
+
         }
+
+        function showPipeBox() {
+            let pipeBox = document.querySelector('.pipeline-box')
+            if (pipeBox.style.display === 'none')
+                pipeBox.style.display = 'block'
+            else
+                pipeBox.style.display = 'none'
+
+        }
+
     </script>
 </body>
 

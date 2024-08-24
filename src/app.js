@@ -19,10 +19,6 @@ const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const { v4: uuidv4 } = require('uuid');
 const pipelineModel = require('./models/pipeline.model.js')
 
-// const process.env. = "446678988272887"; // Your Facebook app ID
-// const Your Facebook app secret
-// const REDIRECT_URI = "http://localhost:8000/auth/facebook/callback";
-
 // Middleware
 const sessionStore =
   process.env.NODE_ENV === "production"
@@ -32,20 +28,6 @@ const sessionStore =
       }) // Replace with your MongoDB connection URI
     : new session.MemoryStore();
 
-// app.use(
-//   session({
-//     secret: 'your_secret_key', // Use your JWT secret as the session secret
-//     resave: false,
-//     saveUninitialized: true,
-//     // store: sessionStore,
-//     cookie: {
-//       // secure: process.env.NODE_ENV === "production",
-//       maxAge: 1000 * 60 * 60 * 24,
-//       httpOnly: true,
-//       sameSite: "strict",
-//     },
-//   })
-// );
 
 app.use(
   session({
@@ -121,6 +103,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+// app.use('/pipeline', pipelineRouter)
+
 // Handle root request
 app.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
@@ -145,12 +129,19 @@ app.get("/login", (req, res) => {
   res.render("signup");
 });
 
+// app 
+app.get("/apps", (req, res) => {
+  res.render("app");
+});
+
 app.get("/signup", (req, res) => {
   res.render("signup");
 });
 
+// ! pipeline are here 
+
 app.post('/pipeline',async (req,res)=>{
-  const {title} = req.body
+  const {title,color} = req.body
 
   const token = req.cookies["360Followers"];
   const userData = jwt.decode(token);
@@ -160,11 +151,11 @@ app.post('/pipeline',async (req,res)=>{
   }
   const user = await logIncollection.findById(userData.id);
 
-  const pipeline = new pipelineModel({ uid:user._id, title ,cid:user.cid });
+  const pipeline = new pipelineModel({ uid:user._id, color, title ,cid:user.cid });
     await pipeline.save();
-
-    res.redirect('/dashboard')
+    // console.log(pipeline);
   
+    res.redirect('/dashboard')
   })
 
 app.get('/pipeline/del/:id',async(req,res)=>{
@@ -174,11 +165,18 @@ app.get('/pipeline/del/:id',async(req,res)=>{
   res.redirect('/dashboard')
 })
 
-app.get('/pipeline/update/:id',async(req,res)=>{
+app.post('/pipeline/update/:id',async(req,res)=>{
   const {id} = req.params
+  const {title,color} = req.body
   let pipeline = await pipelineModel.findById(id)
 
   console.log(pipeline);
+  console.log(title,color);
+
+  pipeline.color = color;
+  pipeline.title = title;
+  pipeline.updatedAt = Date.now();
+  await pipeline.save()
   res.redirect('/dashboard')
 })
 
