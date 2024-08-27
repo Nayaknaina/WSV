@@ -11,12 +11,14 @@ const cookieParser = require("cookie-parser");
 const axios = require("axios");
 const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
+const otpGenerator = require("otp-generator");
 const { generateToken } = require("../utils/auth");
 const querystring = require("querystring");
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 
 const { v4: uuidv4 } = require('uuid');
+const { sendMail } = require("./service/mailSender.js");
 const pipelineModel = require('./models/pipeline.model.js')
 
 // Middleware
@@ -110,18 +112,8 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
 
-app.get("/connect", async (req, res) => {
-  const token = req.cookies["360Followers"];
-  // console.log(token);
-
-  const userData =  jwt.decode(token);
-  if (userData === null) {
-    
-    return res.redirect("/login");
-  }
-
-  const user = jwt.decode(userData);
-
+app.get("/connect", isAdminLoggedIn, async (req, res) => {
+  const user = req.user
   res.render("connect", { user, allLeads: null });
 });
 // Login and Signup routes
@@ -130,8 +122,45 @@ app.get("/login", (req, res) => {
 });
 
 // app 
-app.get("/apps", (req, res) => {
-  res.render("app");
+app.get("/apps", isAdminLoggedIn,(req, res) => {
+  const user = req.user
+  res.render("app",{user});
+});
+// team 
+app.get("/team", isAdminLoggedIn,(req, res) => {
+  const user = req.user
+  res.render("team",{user});
+});
+
+app.post("/team/invite", isAdminLoggedIn, async(req, res) => {
+  const user = req.user
+  const mailMsg = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="text-align: center;">
+        <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
+        <h2>Web Soft Valley</h2>
+        <p>Developing Future</p>
+      </div>
+
+      <h3>Hello ${req.body.name}!</h3>
+      <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
+      
+      <p>Email: <a href="mailto:${req.body.email}">${req.body.email}</a></p>
+      <p>Password: <strong>${password}</strong></p>
+
+      <div style="text-align: center;">
+        <a href="https://example.com/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+          Login to Dashboard
+        </a>
+      </div>
+
+      <p>Regards,<br>Web Soft Valley Technology</p>
+    </div>
+  `;
+  const subject = `Invitation from ${user.name}`
+  await sendMail(req.body.email, mailMsg, subject);
+
+  res.redirect("/team",{user});
 });
 
 app.get("/signup", (req, res) => {
@@ -140,16 +169,10 @@ app.get("/signup", (req, res) => {
 
 // ! pipeline are here 
 
-app.post('/pipeline',async (req,res)=>{
+app.post('/pipeline',isAdminLoggedIn, async (req,res)=>{
   const {title,color} = req.body
 
-  const token = req.cookies["360Followers"];
-  const userData = jwt.decode(token);
-
-  if (!userData) {
-    return res.redirect("/login");
-  }
-  const user = await logIncollection.findById(userData.id);
+  const user = await logIncollection.findById(req.user.id);
 
   const pipeline = new pipelineModel({ uid:user._id, color, title ,cid:user.cid });
     await pipeline.save();
@@ -158,39 +181,42 @@ app.post('/pipeline',async (req,res)=>{
     res.redirect('/dashboard')
   })
 
-app.get('/pipeline/del/:id',async(req,res)=>{
+app.get('/pipeline/del/:id',isAdminLoggedIn, async(req,res)=>{
   const {id} = req.params
   let pipeline = await pipelineModel.findByIdAndDelete(id)
   // console.log(pipeline);
   res.redirect('/dashboard')
 })
 
-app.post('/pipeline/update/:id',async(req,res)=>{
+app.post('/pipeline/update/:id', isAdminLoggedIn,async(req,res)=>{
   const {id} = req.params
-  const {title,color} = req.body
+  const {title,color, defaultVal} = req.body
+  
   let pipeline = await pipelineModel.findById(id)
-
-  console.log(pipeline);
-  console.log(title,color);
 
   pipeline.color = color;
   pipeline.title = title;
   pipeline.updatedAt = Date.now();
+  
+  if (defaultVal === 'on') { 
+    await pipelineModel.updateMany({ uid: req.user.id }, { $set: { defaultVal: false } });
+    
+    pipeline.defaultVal = true;
+  }
+  else{
+  pipeline.defaultVal = false;
+  }
+
   await pipeline.save()
   res.redirect('/dashboard')
+
 })
 
 
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", isAdminLoggedIn, async (req, res) => {
 
-  const token = req.cookies["360Followers"];
-    const userData = jwt.decode(token);
-
-    if (!userData) {
-      return res.redirect("/login");
-    }
-    const user = await logIncollection.findById(userData.id);
+    const user = await logIncollection.findById(req.user.id);
 
     res.render("profile", { user });
 });
@@ -199,16 +225,10 @@ app.get("/profile", async (req, res) => {
   
 
 // Dashboard route
-app.get("/dashboard", async (req, res) => {
+app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   try {
-    const token = req.cookies["360Followers"];
-    const userData = jwt.decode(token);
     
-    if (!userData) {
-      return res.redirect("/login");
-    }
-    
-    const user = await logIncollection.findById(userData.id);
+    const user = await logIncollection.findById(req.user.id);
     const pipelines = await pipelineModel.find({uid: user._id})
     // req.session.id = userData.id;
     res.render("dashboard", { user, pipelines });
@@ -228,7 +248,7 @@ app.get('/auth/google/callback',
   async (req, res) => {
     const token = await generateToken(req.user);
 
-    res.cookie("360Followers", token, { httpOnly: true, maxAge: 3600000 });
+    res.cookie("360Followers", token, { httpOnly: true, maxAge: 2 * 30 * 24 * 60 * 60 * 1000 });
     res.redirect('/dashboard');
   }
 );
@@ -251,7 +271,7 @@ app.post("/signup", async (req, res) => {
     await newUser.save();
     const token = await generateToken(newUser);
 
-    res.cookie("360Followers", token, { httpOnly: true, maxAge: 3600000 });
+    res.cookie("360Followers", token, { httpOnly: true, maxAge: 2 * 30 * 24 * 60 * 60 * 1000 });
     res.redirect("/dashboard");
   } catch (err) {
     res.status(500).send("Error signing up");
@@ -270,7 +290,7 @@ app.post("/login", async (req, res) => {
     }
 
     const token = await generateToken(check);
-    res.cookie("360Followers", token, { httpOnly: true, maxAge: 3600000 });
+    res.cookie("360Followers", token, { httpOnly: true, maxAge: 2 * 30 * 24 * 60 * 60 * 1000 });
     res.redirect("/dashboard");
   } catch (err) {
     console.error(err);
@@ -418,3 +438,25 @@ app.get("/:page", (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at PORT:${port}`);
 });
+
+
+
+
+function isAdminLoggedIn(req, res, next) {
+  // console.log("isAdminLoggedIn middilware");
+  const token = req.cookies["360Followers"];
+  
+  if (!token || token === undefined) {
+    return res.redirect("/login");
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+     return res.redirect("/login");
+    }   
+    
+    req.user = decoded;
+    console.log(req.user);
+   return next();
+  });
+}
