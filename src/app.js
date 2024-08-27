@@ -193,7 +193,7 @@ app.post('/pipeline/update/:id', isAdminLoggedIn,async(req,res)=>{
   const {title,color, defaultVal} = req.body
   
   let pipeline = await pipelineModel.findById(id)
-
+  
   pipeline.color = color;
   pipeline.title = title;
   pipeline.updatedAt = Date.now();
@@ -363,7 +363,7 @@ app.get("/leads", ensureAuthenticated, async (req, res) => {
           access_token: accessToken,
         },
       }
-    );
+    );                                                          
 
     const pages = pagesResponse.data.data;
     let allLeads = [];

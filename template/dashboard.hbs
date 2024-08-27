@@ -293,53 +293,112 @@
                                             </button>
                                             <div class="pipeline-box card border-0">
 
-                                                <form action="/pipeline" method="post" class="row g-3 ">
+                                                <form action="/pipeline" style="margin: 0; padding: 0 30px;"
+                                                    method="post" class="row g-3 ">
 
-                                                    <div class="col-auto">
+                                                    <div class="col-auto" style="padding: 0;">
 
                                                         <input type="text" class="form-control" id="inputPassword2"
                                                             name="title" placeholder="Add Pipline">
                                                     </div>
                                                     <div class="col-auto">
-                                                        <input type="color" name="color">
+                                                        <input type="color"
+                                                            style="width: 32px; height: 32px; border: none; padding: 0;"
+                                                            name="color">
                                                     </div>
                                                     <div class="col-auto">
                                                         <button type="submit" class="btn btn-primary mb-3">Add</button>
                                                     </div>
                                                 </form>
 
-                                                <ul id="pipeline-bx">
+                                              
+
+                                                <ul id="pipeline-bx" style="padding: 0;">
+                                                    {{!-- First render the checked items --}}
                                                     {{#each pipelines}}
-                                                    <div style="display: flex; justify-content: space-between;">
+                                                    {{#if defaultVal}}
+                                                    <div style="display: flex; justify-content: space-between; padding: 0 30px;"
+                                                        class="pipeline-item">
                                                         <li style="list-style: none;">
                                                             <form style="display: flex; justify-content: space-between;"
                                                                 action="/pipeline/update/{{_id}}" method="post">
-                                                                <input type="text" disabled id="title{{_id}}"
-                                                                    name="title" value="{{title}}">
+                                                                <input type="text" style="width: 196px;" disabled
+                                                                    id="title{{_id}}" name="title" value="{{title}}">
 
                                                                 <label for="color{{_id}}" id="colorLabel{{_id}}"
-                                                                    style="width: 26px; height: 26px; border-radius: 50px; margin: 5px 10px; background-color: {{color}}"></label>
+                                                                    style="width: 26px; cursor: pointer; height: 26px; border-radius: 50px; margin: 5px 18px; background-color: {{color}}"></label>
 
                                                                 <input style="opacity: 0;" disabled type="color"
+                                                                    onchange="LabelColorChanged('{{_id}}')"
                                                                     id="color{{_id}}" name="color" value="{{color}}">
 
+                                                                <input
+                                                                    style="display: inline-block; width: 25px; margin: 10px; height: 25px; cursor: pointer;"
+                                                                    type="checkbox" checked id="default{{_id}}" disabled
+                                                                    name="defaultVal">
+
                                                                 <button type="submit"
-                                                                    style="border: none; outline: none;" hidden
-                                                                    class="sub-btn" id="submit-btn{{_id}}"><i
+                                                                    style="position: relative; right: -80px; border: none; outline: none; font-size: 32px; display: inline-block;"
+                                                                    hidden class="sub-btn" id="submit-btn{{_id}}"><i
                                                                         class="fa-solid fa-square-check"></i></button>
                                                             </form>
                                                         </li>
-                                                        <span>
-                                                            <span>
-                                                                <i onclick="updatePiplineForm('{{_id}}')"
-                                                                    class="fa-solid fa-pen-to-square"></i>
-                                                                <a href="/pipeline/del/{{_id}}"><i
-                                                                        class="fa-regular fa-trash-can"></i></a>
-                                                            </span>
+                                                        <span
+                                                            style="display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 20px;">
+                                                            <i style="cursor: pointer;"
+                                                                onclick="updatePiplineForm('{{_id}}')"
+                                                                class="fa-solid fa-pen-to-square"></i>
+                                                            <a href="/pipeline/del/{{_id}}"><i
+                                                                    style="cursor: pointer; color: red;"
+                                                                    class="fa-regular fa-trash-can"></i></a>
                                                         </span>
                                                     </div>
+                                                    {{/if}}
+                                                    {{/each}}
+
+                                                    {{!-- Now render the unchecked items --}}
+                                                    {{#each pipelines}}
+                                                    {{#unless defaultVal}}
+                                                    <div style="display: flex; justify-content: space-between; padding: 0 30px;"
+                                                        class="pipeline-item">
+                                                        <li style="list-style: none;">
+                                                            <form style="display: flex; justify-content: space-between;"
+                                                                action="/pipeline/update/{{_id}}" method="post">
+                                                                <input type="text" style="width: 196px;" disabled
+                                                                    id="title{{_id}}" name="title" value="{{title}}">
+
+                                                                <label for="color{{_id}}" id="colorLabel{{_id}}"
+                                                                    style="width: 26px; cursor: pointer; height: 26px; border-radius: 50px; margin: 5px 18px; background-color: {{color}}"></label>
+
+                                                                <input style="opacity: 0;" disabled type="color"
+                                                                    onchange="LabelColorChanged('{{_id}}')"
+                                                                    id="color{{_id}}" name="color" value="{{color}}">
+
+                                                                <input
+                                                                    style="display: inline-block; width: 25px; margin: 10px; height: 25px; cursor: pointer;"
+                                                                    type="checkbox" id="default{{_id}}" disabled
+                                                                    name="defaultVal">
+
+                                                                <button type="submit"
+                                                                    style="border: none; position: relative; right: -80px; outline: none; font-size: 32px; display: inline-block;"
+                                                                    hidden class="sub-btn" id="submit-btn{{_id}}"><i
+                                                                        class="fa-solid fa-square-check"></i></button>
+                                                            </form>
+                                                        </li>
+                                                        <span
+                                                            style="display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 20px;">
+                                                            <i style="cursor: pointer;"
+                                                                onclick="updatePiplineForm('{{_id}}')"
+                                                                class="fa-solid fa-pen-to-square"></i>
+                                                            <a href="/pipeline/del/{{_id}}"><i
+                                                                    style="color: red; cursor: pointer;"
+                                                                    class="fa-regular fa-trash-can"></i></a>
+                                                        </span>
+                                                    </div>
+                                                    {{/unless}}
                                                     {{/each}}
                                                 </ul>
+
                                             </div>
                                         </div>
 
@@ -438,9 +497,7 @@
                                                             data-original-title="Add team members and share workflow(s) or folder(s) access with them.">Team
                                                             Members</span></h3>
                                                 </div>
-                                                <div id="add-member-form" style=" 
-            display: none;
-        ">
+                                                <div id="add-member-form" style="display: none;">
                                                     <form id="member-form">
                                                         <label for="name">Name:</label>
                                                         <input type="text" id="name" name="name" required>
@@ -570,17 +627,20 @@
         function updatePiplineForm(id) {
             const titleInput = document.getElementById(`title${id}`);
             const colorInput = document.getElementById(`color${id}`);
+            const defaultinp = document.getElementById(`default${id}`);
             const submitBtn = document.getElementById(`submit-btn${id}`);
 
             if (titleInput.disabled && colorInput.disabled) {
                 // Enable editing
                 titleInput.disabled = false;
                 colorInput.disabled = false;
+                defaultinp.disabled = false;
                 submitBtn.hidden = false;
             } else {
                 // Prevent further editing
                 titleInput.disabled = true;
                 colorInput.disabled = true;
+                defaultinp.disabled = true;
 
                 submitBtn.hidden = true;
             }
@@ -593,6 +653,17 @@
                 pipeBox.style.display = 'block'
             else
                 pipeBox.style.display = 'none'
+
+        }
+
+        function LabelColorChanged(id) {
+            const colorLabel = document.querySelector(`#colorLabel${id}`);
+            const colorInput = document.querySelector(`#color${id}`);
+
+            colorInput.click();
+
+            const selectedColor = colorInput.value;
+            colorLabel.style.backgroundColor = selectedColor;
 
         }
 
