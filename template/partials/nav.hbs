@@ -1,0 +1,119 @@
+
+    <nav class="fg-header navbar top-navbar navbar-toggleable-sm navbar-light p-20 bg-white">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6 d-flex justify-content-start align-middle p-l-5">
+            <a class="navbar-brand p-0" href="#">
+                <img src="" class="logo" alt="logo" style="max-height:35px">
+            </a>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6 d-flex justify-content-end align-middle p-r-0">
+            <div class="fg-user-menu d-flex justify-content-end">
+                <div class="dropdown m-r-15">
+                    <i class="fas fa-th border text-secondary rounded p-10" data-toggle="dropdown"></i>
+                    <div class="dropdown-menu dropdown-menu-right font-15 text-bodycolor border-0 p-0 m-t-15"
+                        aria-labelledby="dropdownMenuLink">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50"
+                                    href="/access?project=connect" target="_blank">
+                                    <img class="mx-auto d-block m-b-10 product-img"
+                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/connect.svg" />
+                                    <p class="m-b-0">Connect</p>
+                                </a>
+                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50" href=""
+                                    target="_blank">
+                                    <img class="mx-auto d-block m-b-10 product-img"
+                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/billing.svg" />
+                                    <p class="m-b-0">Subscription<br>Billing</p>
+                                </a>
+                            </div>
+                            <hr>
+                            <div class="d-flex">
+                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50"
+                                    href="/access?project=mailget" target="_blank">
+                                    <img class="mx-auto d-block m-b-10 product-img"
+                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/pem.svg" />
+                                    <p class="m-b-0">Email<br>Marketing</p>
+                                </a>
+                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50"
+                                    href="/access?project=formget" target="_blank">
+                                    <img class="mx-auto d-block m-b-10 product-img"
+                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/pfb.svg" />
+                                    <p class="m-b-0">Form<br>Builder</p>
+                                </a>
+                            </div>
+                            <hr>
+                            <div class="d-flex">
+                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50"
+                                    href="/access?project=emailverify" target="_blank">
+                                    <img class="mx-auto d-block m-b-10 product-img"
+                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/pev.svg" />
+                                    <p class="m-b-0">Email<br>Verification</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fg-user-nav-wrap align-self-center">
+                    <div class="toast fade hide" data-delay="1000">
+                        <div class="toast-header">
+                            Toast Header
+                        </div>
+                        <div class="toast-body">
+                            Some inside this body
+                        </div>
+                    </div>
+                    <div class="modal fade" id="dangerModal" tabindex="-1" role="dialog"
+                        aria-labelledby="dangerModalTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body text-center m-b-20 m-t-30">
+                                    <i class="fas fa-exclamation-circle text-danger font-50 m-b-25"></i>
+                                    <h2 class="text-bodycolor">Error</h2>
+                                    <span class="font-15 text-secondary error-message"></span>
+                                </div>
+                                <div class="modal-footer border-primary2">
+                                    <button type="button" class="btn btn-white text-secondary border font-15"
+                                        data-dismiss="modal">CLOSE</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <img class="rounded-circle m-w-35 avatar-img"
+                            src="//www.gravatar.com/avatar/9ef7cb630b294dc458d676560e96d060?d=http%3A%2F%2Faccounts.pabbly.com%2Fimages%2Fdefault-profile-pic.png"
+                            alt="Profile Picture" data-toggle="dropdown">
+                        <div class="my-profile dropdown-menu dropdown-menu-right font-14 border-0 text-bodycolor m-t-10"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="user-info-wrap d-flex p-t-15 p-20 border-bottom-primary2">
+                                {{#if user.profilePicture}}
+                                <img id="user_image" width="70" height="70" src="{{user.profilePicture}}"
+                                    class="rounded-circle">
+                                {{else}}
+                                <img id="user_image" width="70" height="70"
+                                    src="//www.gravatar.com/avatar/9ef7cb630b294dc458d676560e96d060?d=http%3A%2F%2Faccounts.pabbly.com%2Fimages%2Fdefault-profile-pic.png"
+                                    class="rounded-circle">
+                                {{/if}}
+                                <div class="user-info p-l-10">
+                                    <p class="text-bodycolor font-demi font-15 m-0">
+                                        {{user.name}}</p>
+                                    <span class="font-12 text-secondary"><a href="/cdn-cgi/l/email-protection"
+                                            class="__cf_email__"
+                                            data-cfemail="731d120a12181d121a1d124a44464633141e121a1f5d101c1e">{{user.email}}</a></span>
+                                </div>
+                            </div>
+                            <a class="dropdown-item p-t-15 p-b-15 border-bottom-primary2" href="/profile">
+                                <i class="fas fa-user-circle text-secondary font-16 m-r-10"></i>My Account</a>
+                            <a id="my_subscription_access" data-customer_id="66aa7f6c4c4b6335299ad1d1"
+                                class="dropdown-item p-t-15 p-b-15 border-bottom-primary2" href="#" target="_blank">
+                                <i class="fas fa-comment-dollar text-secondary font-16 m-r-10"></i>
+                                My Subscription
+                            </a>
+                            <a class="dropdown-item p-t-15 p-b-15" href="/logout/">
+                                <i class="fas fa-arrow-circle-right text-secondary font-16 m-r-10"></i>Log Out</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
