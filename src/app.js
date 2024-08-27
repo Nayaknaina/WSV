@@ -133,8 +133,14 @@ app.get("/team", isAdminLoggedIn,(req, res) => {
   res.render("team",{user});
 });
 
-app.post("/team/invite", isAdminLoggedIn, async(req, res) => {
-  const user = req.user
+app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
+  const user = req.user;
+  const password = otpGenerator.generate(6, { 
+    digits: true, 
+    lowerCaseAlphabets: true, 
+    upperCaseAlphabets: true, 
+    specialChars: false
+  });
   const mailMsg = `
     <div style="font-family: Arial, sans-serif; color: #333;">
       <div style="text-align: center;">
@@ -143,10 +149,10 @@ app.post("/team/invite", isAdminLoggedIn, async(req, res) => {
         <p>Developing Future</p>
       </div>
 
-      <h3>Hello ${req.body.name}!</h3>
+      <h3>Hello Karan !</h3>
       <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
       
-      <p>Email: <a href="mailto:${req.body.email}">${req.body.email}</a></p>
+      <p>Email: <a href="mailto:kkkkkkkkkkkkk">kkkkkkkkkkkkk</a></p>
       <p>Password: <strong>${password}</strong></p>
 
       <div style="text-align: center;">
@@ -159,7 +165,7 @@ app.post("/team/invite", isAdminLoggedIn, async(req, res) => {
     </div>
   `;
   const subject = `Invitation from ${user.name}`
-  await sendMail(req.body.email, mailMsg, subject);
+  await sendMail('karanghorse91@gmail.com', mailMsg, subject);
 
   res.redirect("/team",{user});
 });
