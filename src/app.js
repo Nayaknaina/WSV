@@ -228,6 +228,12 @@ app.get("/profile", isAdminLoggedIn, async (req, res) => {
     res.render("profile", { user });
 });
 
+app.get("/gethelp", isAdminLoggedIn, async (req, res) => {
+
+  const user = await logIncollection.findById(req.user.id);
+
+  res.render("gethelp", { user });
+});
 
   
 
