@@ -2,16 +2,16 @@
 <html>
 <style>
     fb\\:login-button {
-    display: block;
-    margin: 20px auto;
-    background-color: #4267B2;
-    color: white;
-    font-size: 16px;
-    border-radius: 5px;
-    padding: 10px 20px;
-}
-
+        display: block;
+        margin: 20px auto;
+        background-color: #4267B2;
+        color: white;
+        font-size: 16px;
+        border-radius: 5px;
+        padding: 10px 20px;
+    }
 </style>
+
 <head>
     <title>
         Connect
@@ -32,22 +32,7 @@
     <link rel="stylesheet" type="text/css" href="/styles/loader.css">
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
-        window.heap = window.heap || [], heap.load = function (e, t) {
-            window.heap.appid = e, window.heap.config = t = t || {};
-            var r = t.forceSSL || "https:" === document.location.protocol,
-                a = document.createElement("script");
-            a.type = "text/javascript", a.async = !0, a.src = (r ? "https:" : "http:") + "//cdn.heapanalytics.com/js/heap-" + e + ".js";
-            var n = document.getElementsByTagName("script")[0];
-            n.parentNode.insertBefore(a, n);
-            for (var o = function (e) {
-                return function () {
-                    heap.push([e].concat(Array.prototype.slice.call(arguments, 0)))
-                }
-            }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], c = 0; c < p.length; c++) heap[p[c]] = o(p[c])
-        };
-        heap.load("490363613");
-    </script>
+
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
         src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
 
@@ -56,211 +41,185 @@
 
 <body class>
 
+    {{> nav}}
 
-
-
-    <nav class="fg-header navbar top-navbar navbar-toggleable-sm navbar-light p-20 bg-white">
-        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6 d-flex justify-content-start align-middle p-l-5">
-            <a class="navbar-brand p-0" href="#">
-                <img src="" class="logo" alt="logo" style="max-height:35px">
-            </a>
-        </div>
-        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6 d-flex justify-content-end align-middle p-r-0">
-            <div class="fg-user-menu d-flex justify-content-end">
-                <div class="dropdown m-r-15">
-                    <i class="fas fa-th border text-secondary rounded p-10" data-toggle="dropdown"></i>
-                    <div class="dropdown-menu dropdown-menu-right font-15 text-bodycolor border-0 p-0 m-t-15"
-                        aria-labelledby="dropdownMenuLink">
-                        <div class="card-body">
-                            <div class="d-flex">
-                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50"
-                                    href="/access?project=connect" target="_blank">
-                                    <img class="mx-auto d-block m-b-10 product-img"
-                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/connect.svg" />
-                                    <p class="m-b-0">Connect</p>
-                                </a>
-                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50" href=""
-                                    target="_blank">
-                                    <img class="mx-auto d-block m-b-10 product-img"
-                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/billing.svg" />
-                                    <p class="m-b-0">Subscription<br>Billing</p>
-                                </a>
-                            </div>
-                            <hr>
-                            <div class="d-flex">
-                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50"
-                                    href="/access?project=mailget" target="_blank">
-                                    <img class="mx-auto d-block m-b-10 product-img"
-                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/pem.svg" />
-                                    <p class="m-b-0">Email<br>Marketing</p>
-                                </a>
-                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50"
-                                    href="/access?project=formget" target="_blank">
-                                    <img class="mx-auto d-block m-b-10 product-img"
-                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/pfb.svg" />
-                                    <p class="m-b-0">Form<br>Builder</p>
-                                </a>
-                            </div>
-                            <hr>
-                            <div class="d-flex">
-                                <a class="dropdown-item text-center p-30 p-t-20 p-b-20 rounded w-50"
-                                    href="/access?project=emailverify" target="_blank">
-                                    <img class="mx-auto d-block m-b-10 product-img"
-                                        src="https://d3cuh014go2nda.cloudfront.net/assets/images/svg/pev.svg" />
-                                    <p class="m-b-0">Email<br>Verification</p>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="fg-user-nav-wrap align-self-center">
-                    <div class="toast fade hide" data-delay="1000">
-                        <div class="toast-header">
-                            Toast Header
-                        </div>
-                        <div class="toast-body">
-                            Some inside this body
-                        </div>
-                    </div>
-                    <div class="modal fade" id="dangerModal" tabindex="-1" role="dialog"
-                        aria-labelledby="dangerModalTitle" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-body text-center m-b-20 m-t-30">
-                                    <i class="fas fa-exclamation-circle text-danger font-50 m-b-25"></i>
-                                    <h2 class="text-bodycolor">Error</h2>
-                                    <span class="font-15 text-secondary error-message"></span>
-                                </div>
-                                <div class="modal-footer border-primary2">
-                                    <button type="button" class="btn btn-white text-secondary border font-15"
-                                        data-dismiss="modal">CLOSE</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dropdown">
-                        <img class="rounded-circle m-w-35 avatar-img"
-                            src="//www.gravatar.com/avatar/9ef7cb630b294dc458d676560e96d060?d=http%3A%2F%2Faccounts.pabbly.com%2Fimages%2Fdefault-profile-pic.png"
-                            alt="Profile Picture" data-toggle="dropdown">
-                        <div class="my-profile dropdown-menu dropdown-menu-right font-14 border-0 text-bodycolor m-t-10"
-                            aria-labelledby="dropdownMenuLink">
-                            <div class="user-info-wrap d-flex p-t-15 p-20 border-bottom-primary2">
-                                <img id="user_image"
-                                    src="//www.gravatar.com/avatar/9ef7cb630b294dc458d676560e96d060?d=http%3A%2F%2Faccounts.pabbly.com%2Fimages%2Fdefault-profile-pic.png"
-                                    class="rounded-circle">
-                                <div class="user-info p-l-10">
-                                    <p class="text-bodycolor font-demi font-15 m-0">
-                                        {{user.name}}</p>
-                                    <span class="font-12 text-secondary"><a href="/cdn-cgi/l/email-protection"
-                                            class="__cf_email__"
-                                            data-cfemail="731d120a12181d121a1d124a44464633141e121a1f5d101c1e">[email&#160;protected]</a></span>
-                                </div>
-                            </div>
-                            <a class="dropdown-item p-t-15 p-b-15 border-bottom-primary2" href="/profile">
-                                <i class="fas fa-user-circle text-secondary font-16 m-r-10"></i>My Account</a>
-                            <a id="my_subscription_access" data-customer_id="66aa7f6c4c4b6335299ad1d1"
-                                class="dropdown-item p-t-15 p-b-15 border-bottom-primary2" href="#" target="_blank">
-                                <i class="fas fa-comment-dollar text-secondary font-16 m-r-10"></i>
-                                My Subscription
-                            </a>
-                            <a class="dropdown-item p-t-15 p-b-15" href="/logout/">
-                                <i class="fas fa-arrow-circle-right text-secondary font-16 m-r-10"></i>Log Out</a>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
 
     <div class="container-fluid">
         <div class="row">
-            <div class="fg-main-sidebar-wrap col-xl-1 col-lg-1 col-md-1 p-l-0 p-r-0 d-lg-block d-none">
-                <div id="fg-sidebar" class="bg-bodycolor h-100">
-                    <ul class="fg-sidebar-menu p-0 sticky">
-                        <li id="apps" class="sidebar-list-item text-center active">
-                            <a href="/apps" class="fg-list-item p-t-15 p-b-15 d-block">
-                                <i class="fa fa-home text-white font-20"></i>
-
-                                <span class="m-t-5 text-center d-block text-white font-12">Home</span>
-                            </a>
-                        </li>
-                        <li id="apps" class="sidebar-list-item text-center ">
-                            <a href="/apps" class="fg-list-item p-t-15 p-b-15 d-block">
-                                <i class="fas fa-globe text-white font-20"></i>
-                                <span class="m-t-5 text-center d-block text-white font-12">All Apps</span>
-                            </a>
-                        </li>
-                        <li id="profile" class="sidebar-list-item text-center">
-                            <a href="/profile" class="fg-list-item p-t-15 p-b-15 d-block">
-                                <i class="fas fa-user-circle text-white font-20"></i>
-                                <span class="m-t-5 text-center d-block text-white font-12">Account</span>
-                            </a>
-                        </li>
-                        <li id="" class="sidebar-list-item text-center">
-                            <a href="#team-section" class="fg-list-item p-t-15 p-b-15 d-block">
-                                <i class="fas fa-user-plus text-white font-20"></i>
-                                <span class="m-t-5 text-center d-block text-white font-12">Team</span>
-                            </a>
-                        </li>
-                        <li id="profile" class="sidebar-list-item text-center">
-                            <a href="/profile" class="fg-list-item p-t-15 p-b-15 d-block">
-                                <i class="fas fa-user-cog text-white font-20"></i>
-                                <span class="m-t-5 text-center d-block text-white font-12">Get help</span>
-                            </a>
-                        </li>
-                        <li id="profile" class="sidebar-list-item text-center">
-                            <a href="/logout" class="fg-list-item p-t-15 p-b-15 d-block">
-                                <i class="fas fa-power-off text-white font-20"></i>
-                                <span class="m-t-5 text-center d-block text-white font-12">Logout</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <script data-cfasync="false"
-                    src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-                <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
-                    $(document).ready(function () {
-                        var pathname = window.location.pathname;
-                        var path = pathname.replace('/', '');
-                        $('ul.fg-sidebar-menu li#' + path).addClass('active');
-                    });
-                </script>
-            </div>
+            {{> sidebar}}
             <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0">
+                  {{> NameHead}}
                 <div class="container-fluid bg-white shadow-sm m-b-40">
-                    <div class="container">
-                        <div class="row page-titles p-t-35 p-b-15">
-                            <div class="col-md-12 col-12 align-self-center">
-                                <h1 class="text-bodycolor">Welcome To 360followups <b> {{user.name}} </b></h1>
-                                <p class="text-secondary font-14">Click 'Access Now' to start using any 360followups
-                                    application. You can enjoy complete access with a single 360followups Plus plan. <a
-                                        target="_blank" rel="noopener noreferrer"
-                                        href="https://www.pabbly.com/#pricing"><u>Learn more</u></a></p>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h2 class="text-bodycolor">Lead</h2>
+                            <!-- Add your Lead content here -->
+                        </div>
+                        <div class="col-md- 6">
+                            <h2 class="text-bodycolor">My Leads</h2>
+                            <!-- Add your My Leads content here -->
                         </div>
                     </div>
                 </div>
+
                 <div class="container min-vh-100">
+                    <style>
+                        body {
+                            background-color: #ededed;
+                            font-family: "Open Sans", sans-serif;
 
-                
+                        }
 
-                    
+
+
+                        ul {
+                            list-style-type: none;
+                            padding: 0;
+                        }
+
+                        nav {
+                            background: #d9d9d9;
+                            margin: 20px 0;
+                            border-radius: 8px;
+                            overflow: hidden;
+                            transition: max-height 0.4s ease;
+
+                        }
+
+                        nav label {
+                            display: block;
+                            padding: 7px;
+                            box-shadow: 0 0 0.3125rem 0 rgba(20, 12, 0, .06);
+                            background-image: radial-gradient(at 50% 100%, #fff 0%, rgb(206 229 255 / 50%) 100%), linear-gradient(to bottom, rgb(0 0 0 / 25%) 0%, rgb(196 182 182 / 40%) 100%);
+                            color: rgb(7, 7, 7);
+                            font-size: 1.2em;
+                            cursor: pointer;
+                            font-variant: small-caps;
+                        }
+
+                        .slide {
+                            max-height: 0;
+                            overflow: hidden;
+                            transition: max-height 0.4s ease;
+                            background-color: #f9f9f9;
+                            padding: 0 15px;
+                        }
+
+                        .slide li {
+                            padding: 10px 0;
+                            border-bottom: 1px solid #ddd;
+                        }
+
+                        .slide li:last-child {
+                            border-bottom: none;
+                        }
+
+                        input[type="checkbox"] {
+                            display: none;
+                        }
+
+                        input[type="checkbox"]:checked+.slide {
+                            max-height: 500px;
+                            /* Adjust as per content */
+                            padding: 15px;
+                        }
+
+                        .created-time-label {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 10px;
+                            background-color: #f8f9fa;
+                            border: 1px solid #1a0068;
+                            border-radius: 5px;
+                        }
+
+                        .icon-container {
+                            display: flex;
+                            gap: 20px;
+                            right: 10px;
+                            justify-content: space-between;
+                        }
+
+                        .created-time-icon {
+                            width: 20px;
+                            height: 20px;
+                        }
+
+                        @media (max-width: 768px) {
+                            nav label {
+                                font-size: 1em;
+                                padding: 10px;
+                            }
+
+                            .slide li {
+                                font-size: 1.0em;
+                            }
+                        }
+
+                        @media (max-width: 480px) {
+                            nav label {
+                                font-size: 0.9em;
+                                padding: 8px;
+                            }
+
+                            .slide li {
+                                font-size: 0.8em;
+                            }
+                        }
+                    </style>
+
                     <ul>
-        {{#each allLeads}}
-            <li>
-                
-                <strong>Created Time:</strong> {{created_time}} <br>
+                        {{#each allLeads}}
+                        <li>
+                            <nav>
+                                <label for="touch-{{@index}}" class="created-time-label">
+                                    <strong>Created Time:{{created_time}}</strong>
+                                    <span class="icon-container">
+                                        <img src="add.png" class="created-time-icon">
+                                        <img src="delete.png" class="created-time-icon">
 
-                <ul>
-                    {{#each field_data}}
-                        <li><strong>{{name}}:</strong> {{#each values}}{{this}} {{/each}}</li>
-                    {{/each}}
-                </ul>
-            </li>
-        {{/each}}
-    </ul> 
+                                    </span>
+
+                                </label>
+                                <input type="checkbox" id="touch-{{@index}}">
+                                <ul class="slide">
+                                    {{#each field_data}}
+                                    <li>
+                                        <strong>{{name}}:</strong>
+                                        {{#each values}}{{this}} {{/each}}
+                                    </li>
+                                    {{/each}}
+                                </ul>
+                            </nav>
+                        </li>
+                        {{/each}}
+                    </ul>
+
+
+                    <script>
+                        document.querySelectorAll('.lead-item').forEach(item => {
+                            item.addEventListener('click', function () {
+                                const currentOpenItem = document.querySelector('.lead-item.open');
+
+                                if (currentOpenItem && currentOpenItem !== this) {
+                                    currentOpenItem.classList.remove('open');
+                                    currentOpenItem.querySelector('.slide').style.height = '0px';
+                                }
+
+                                this.classList.toggle('open');
+                                const slide = this.querySelector('.slide');
+
+                                if (this.classList.contains('open')) {
+                                    slide.style.height = slide.scrollHeight + 'px';
+                                } else {
+                                    slide.style.height = '0px';
+                                }
+                            });
+                        });
+                    </script>
                 </div>
+
             </div>
 
 

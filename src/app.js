@@ -45,6 +45,7 @@ app.use(express.static(static_path));
 app.use(express.json());
 app.set("view engine", "hbs");
 app.set("views", templatepath);
+hbs.registerPartials(path.join(__dirname, '../template/partials'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
@@ -56,7 +57,7 @@ app.use(express.static("template"));
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://360followups.com/auth/google/callback",
+  callbackURL: process.env.GOOGLE_CALLBACK,
   passReqToCallback: true
 },
 async function(request, accessToken, refreshToken, profile, done) {
