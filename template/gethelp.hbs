@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    Connect
+  </title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="./" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
+
+  <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/custom.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+
+  <link rel="stylesheet" type="text/css" href="/styles/loader.css">
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+    window.heap = window.heap || [], heap.load = function (e, t) {
+      window.heap.appid = e, window.heap.config = t = t || {};
+      var r = t.forceSSL || "https:" === document.location.protocol,
+        a = document.createElement("script");
+      a.type = "text/javascript", a.async = !0, a.src = (r ? "https:" : "http:") + "//cdn.heapanalytics.com/js/heap-" + e + ".js";
+      var n = document.getElementsByTagName("script")[0];
+      n.parentNode.insertBefore(a, n);
+      for (var o = function (e) {
+        return function () {
+          heap.push([e].concat(Array.prototype.slice.call(arguments, 0)))
+        }
+      }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], c = 0; c < p.length; c++) heap[p[c]] = o(p[c])
+    };
+    heap.load("490363613");
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
+    src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+
+</head>
+
+<body>
+{{> nav}}
+
+  <div class="container-fluid">
+    <div class="row">
+     {{> sidebar}}
+      
+
+
+      <div class="fg-main-footer bg-white border-top w-100">
+        <div class="col-md-12">
+          <p class="sub_footer_text m-t-10 m-b-10 text-center"> Copyright © 2024. Web Soft Valley All Rights
+            Reserved
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
+    crossorigin="anonymous"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/js/bootstrap-select.js"></script>
+
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+  <script src="/js/dependencies/sweetalert.min.js?nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+
+
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="/assets/js/timezones.full.min.js"></script>
+
+  <script src="/assets/js/custom-new.js"></script>
+  <script>
+
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+    $(document).ready(function () {
+      $('#signup').on('submit', function () {
+        $('.loader-display').css('display', 'block');
+      });
+    });
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+    $(window).scroll(function () {
+      if ($(window).scrollTop() >= 72) {
+        $('#top_header').addClass('sticky');
+      } else {
+        $('#top_header').removeClass('sticky');
+      }
+    });
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+    $('#nav-tab a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+
+    // store the currently selected tab in the hash value
+    $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
+      var id = $(e.target).attr("href").substr(1);
+      console.log("id", id);
+      window.location.hash = id;
+    });
+
+    // on load of the page: switch to the currently selected tab
+    var hash = window.location.hash;
+    $('#nav-tab a[href="' + hash + '"]').tab('show');
+  </script>
+
+  <script>
+    function updateProfileData(e){
+      let formInputs = document.querySelectorAll('#profile-form input')
+      let editBtn = document.querySelector('#profile-form #edit')
+      let saveBtn = document.querySelector('#profile-form #save')
+      if(editBtn.textContent === 'Edit'){
+        editBtn.textContent = 'Cancel'
+        saveBtn.disabled = false
+      formInputs.forEach((forminput)=>{
+        forminput.disabled = false
+      })
+      }else{
+        editBtn.textContent = 'Edit'
+        saveBtn.disabled = true
+      formInputs.forEach((forminput)=>{
+        forminput.disabled = true
+      })
+      }
+      
+
+
+    }
+  </script>
+
+
+
+
+</body>
+
+</html>
