@@ -11,7 +11,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="./" />
   <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/custom.css">
@@ -41,6 +43,7 @@
   <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
     src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
 
+  <link rel="stylesheet" href="/kcss/sendmail.css">
 
 </head>
 
@@ -91,12 +94,35 @@
 </style>
 
 <body class>
+  <div id="popup-reg" class="popup">
+    <div id="popup-reg" class="popup-content">
 
-{{> nav}}
+      <form id="send" action="/team/invite" method="get" class="send-form">
+        <div class="form-group">
+          <input type="text" placeholder="Enter name..." id="name" name="name" required="required">
+          <label for="name">
+            <i class="fa fa-user"></i>
+          </label>
+        </div>
+        <div class="form-group">
+          <input type="email" placeholder="Enter mail..." id="mail" name="email" required="required">
+          <label for="mail">
+            <i class="fa fa-envelope"></i>
+          </label>
+        </div>
+
+        <button type="submit"  class="main-btn-rect btn-outline-primary" name="text" value="Send">
+          <i class="fa fa-paper-plane "></i>Send</button>
+      </form>
+      <span class="fade-out main-btn-circle">╳</span>
+    </div>
+  </div>
+
+  {{> nav}}
 
   <div class="container-fluid">
     <div class="row">
-    {{> sidebar}}
+      {{> sidebar}}
       <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0">
         <div class="container-fluid bg-white shadow-sm m-b-20">
           <div class="container">
@@ -113,6 +139,21 @@
 
 
         <div class="row col-11 ml-5">
+          <div class="col-8"></div>
+          <div class="col-3 mb-2 mt-2">
+            <button type="button" class="btn btn-outline-primary font-15 main-btn-rect popup-btn" data-popup="popup-reg">
+              <i class="fas fa-plus-circle font-12"></i>
+              <span class="ml-1 d-none d-sm-inline">Add Team Member</span>
+            </button>
+
+          </div>
+        </div>
+
+
+
+
+
+        <div class="row col-11 ml-5">
           <div class="col">
             <h2>Your team members</h2>
           </div>
@@ -124,6 +165,8 @@
             <i class="fa-solid fa-trash-can"></i>
           </div>
         </div>
+
+
 
         <div class="row col-11 ml-5">
           <table class="table m-0">
@@ -141,31 +184,31 @@
                 <td>Mark</td>
                 <td>Otto</td>
                 <td> <i class="fa-solid fa-ban"></i>
-            <i class="fa-solid fa-trash-can"></i></td>
+                  <i class="fa-solid fa-trash-can"></i>
+                </td>
               </tr>
               <tr>
                 <th scope="row">2</th>
                 <td>Jacob</td>
                 <td>Thornton</td>
                 <td> <i class="fa-solid fa-ban"></i>
-            <i class="fa-solid fa-trash-can"></i></td>
+                  <i class="fa-solid fa-trash-can"></i>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry</td>
                 <td>the Bird</td>
                 <td> <i class="fa-solid fa-ban"></i>
-            <i class="fa-solid fa-trash-can"></i></td>
+                  <i class="fa-solid fa-trash-can"></i>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
 
 
-        {{!-- <form action="/team/invite" method="post">
-          <input type="email" name="email">
-          <button type="submit">invite</button>
-        </form> --}}
+
 
 
 
@@ -241,7 +284,7 @@
 
     {{!-- facebooklogin sdk --}}
 
-
+    <script src="/kjs/sendmail.js"></script>
 </body>
 
 </html>

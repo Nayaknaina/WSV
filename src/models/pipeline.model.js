@@ -20,7 +20,11 @@ const pipelineSchema = new mongoose.Schema(
     cid:{
       type: String,
     },
-
+    color: String,
+    defaultVal: {
+      type: Boolean,
+      default: false
+    },
     
   },
   {

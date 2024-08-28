@@ -8,16 +8,25 @@ const teamMemberSchema = new mongoose.Schema(
     company_id: {
       type: String
     },
+    owner_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'logIncollection'
+    },
     email: {
       type: String,
       unique:true,
       trime:true,
       lowercase:true,
+      required: true,
+    },
+    password:{
+      type: String,
+      required: true
     },
 
     leads: [
       {
-        name: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'lead'
       },
     ],

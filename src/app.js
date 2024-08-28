@@ -20,6 +20,7 @@ const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const { v4: uuidv4 } = require('uuid');
 const { sendMail } = require("./service/mailSender.js");
 const pipelineModel = require('./models/pipeline.model.js')
+const memberModel = require('./models/member.models.js')
 
 // Middleware
 const sessionStore =
@@ -135,13 +136,16 @@ app.get("/team", isAdminLoggedIn,(req, res) => {
 
 app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
   const user = req.user;
-  const password = otpGenerator.generate(6, { 
+  const {name, email} = req.query
+  const password = otpGenerator.generate(8, { 
     digits: true, 
     lowerCaseAlphabets: true, 
     upperCaseAlphabets: true, 
     specialChars: false
   });
-  const mailMsg = `
+
+  const mailMsg = 
+  `
     <div style="font-family: Arial, sans-serif; color: #333;">
       <div style="text-align: center;">
         <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
@@ -149,10 +153,10 @@ app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
         <p>Developing Future</p>
       </div>
 
-      <h3>Hello Karan !</h3>
+      <h3>Hello ${name} !</h3>
       <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
       
-      <p>Email: <a href="mailto:kkkkkkkkkkkkk">kkkkkkkkkkkkk</a></p>
+      <p>Email: <a href="mailto:${email}">${email}</a></p>
       <p>Password: <strong>${password}</strong></p>
 
       <div style="text-align: center;">
@@ -165,9 +169,16 @@ app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
     </div>
   `;
   const subject = `Invitation from ${user.name}`
-  await sendMail('karanghorse91@gmail.com', mailMsg, subject);
+  const isSent = await sendMail(email, mailMsg, subject);
+  console.log(isSent);
 
-  res.redirect("/team",{user});
+  if (isSent[0].res === 'okk') {
+    const admin = await logIncollection.findById(req.user.id)
+    const newMember = new memberModel({ name, email, password,cid: admin.cid, owner_id: admin._id });
+    await newMember.save();
+  }
+  
+  return res.redirect("/team");
 });
 
 app.get("/signup", (req, res) => {
@@ -462,14 +473,14 @@ function isAdminLoggedIn(req, res, next) {
   if (!token || token === undefined) {
     return res.redirect("/login");
   }
-
+  
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
      return res.redirect("/login");
     }   
     
     req.user = decoded;
-    console.log(req.user);
+    // console.log(req.user);
    return next();
   });
 }

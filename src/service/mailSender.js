@@ -1,25 +1,25 @@
 const nodeMail = require('nodemailer')
 
-async function sendMail(userEmail, msg, subject='360followups') {
+async function sendMail(userEmail, msg, subject='360followups.com') {
     const transporter = nodeMail.createTransport({
         service: 'gmail',
         auth:{
-            user: '360followups@gmail.com',
+            user: 'karanghorse91@gmail.com',
             pass: process.env.MAIL_SECRET,
         }
     })
 
     const mailOption = {
-        from: '360followups@gmail.com',
+        from: 'karanghorse91@gmail.com',
         to: userEmail,
         subject: subject,
-        text: msg,
+        html: msg,
     }
 
     try {
         const result = await transporter.sendMail(mailOption)
         console.log("mail send sucessfully");
-        return result;
+        return [{res:'okk'},result];
     } catch (err) {
         console.log('mail send failed with error', err);
     }
