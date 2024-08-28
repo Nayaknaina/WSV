@@ -48,7 +48,7 @@
         <div class="row">
             {{> sidebar}}
             <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0">
-                  {{> NameHead}}
+                {{> NameHead}}
                 <div class="container-fluid bg-white shadow-sm m-b-40">
                     <div class="row">
                         <div class="col-md-6">
@@ -63,6 +63,7 @@
                 </div>
 
                 <div class="container min-vh-100">
+                    
                     <style>
                         body {
                             background-color: #ededed;
@@ -170,11 +171,19 @@
                     </style>
 
                     <ul>
-                        {{#each allLeads}}
+                        {{#each leads}}
                         <li>
                             <nav>
                                 <label for="touch-{{@index}}" class="created-time-label">
-                                    <strong>Created Time:{{created_time}}</strong>
+                                    <strong>Created Time : {{formatDate income_time}}</strong>
+                                    <strong>Recived from : {{ app }}</strong>
+                                    <strong>Phone Number :
+                                        {{#each leads_data}}
+                                        {{#if (containsPhoneNumber ans)}}
+                                        <a href="tel:{{ans}}">{{ans}}</a>
+                                        {{/if}}
+                                        {{/each}}
+                                    </strong>
                                     <span class="icon-container">
                                         <img src="add.png" class="created-time-icon">
                                         <img src="delete.png" class="created-time-icon">
@@ -184,10 +193,10 @@
                                 </label>
                                 <input type="checkbox" id="touch-{{@index}}">
                                 <ul class="slide">
-                                    {{#each field_data}}
+                                    {{#each leads_data}}
                                     <li>
-                                        <strong>{{name}}:</strong>
-                                        {{#each values}}{{this}} {{/each}}
+                                        <strong>{{que}}:</strong>
+                                        {{ans}}
                                     </li>
                                     {{/each}}
                                 </ul>

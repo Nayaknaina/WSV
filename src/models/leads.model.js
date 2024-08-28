@@ -6,9 +6,12 @@ const leadsSchema = new mongoose.Schema(
       type: String,
     },
 
-    owner: {
-      type: mongoose.Schema.ObjectId,
+    uid: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: "user",
+    },
+    cid: {
+      type: String,
     },
 
     income_time: {
@@ -20,12 +23,14 @@ const leadsSchema = new mongoose.Schema(
       default: false,
     },             
 
-    user_details: [
+    leads_data: [
       {
-        name: String,
-        value: String,
+        _id: false,
+        que: String,
+        ans: String,
       },
     ],
+    app:String,
     
   },
   {

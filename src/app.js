@@ -21,6 +21,7 @@ const { v4: uuidv4 } = require('uuid');
 const { sendMail } = require("./service/mailSender.js");
 const pipelineModel = require('./models/pipeline.model.js')
 const memberModel = require('./models/member.models.js')
+const leadsModel = require('./models/leads.model.js')
 
 // Middleware
 const sessionStore =
@@ -44,9 +45,27 @@ app.use(
 const static_path = path.join(__dirname, "../public");
 app.use(express.static(static_path));
 app.use(express.json());
+
+
+
 app.set("view engine", "hbs");
 app.set("views", templatepath);
+
 hbs.registerPartials(path.join(__dirname, '../template/partials'));
+
+hbs.registerHelper('formatDate', function (datetime) {
+  const date = new Date(datetime);
+  return date.toISOString().split('T')[0]; // Extract YYYY-MM-DD
+});
+
+hbs.registerHelper('containsPhoneNumber', function (text) {
+  // Regular expression for matching phone numbers
+  const phoneNumberPattern = /(\+?\d{1,4}[ -]?)?(\(?\d{2,4}\)?[ -]?)?\d{6,12}/;
+  return phoneNumberPattern.test(text);
+});
+
+
+
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
@@ -426,9 +445,35 @@ app.get("/leads", ensureAuthenticated, async (req, res) => {
 
     const user = await logIncollection.findById(userData.id);
 
-    // console.log(allLeads);
+    console.log(allLeads[0]);
 
-    res.render("leads", { user, allLeads });
+    allLeads.forEach(async (lead)=>{
+      const perLead = await leadsModel.findOne({lead_id: lead.id})
+
+      if (!perLead) {
+        let leads_datas = [];
+
+        lead.field_data.forEach((data)=>{
+
+          leads_datas.push({que:data.name, ans:data.values[0]});
+
+          
+        })
+        const newLead = new leadsModel({ 
+          lead_id: lead.id,
+          income_time:lead.created_time,
+          uid:user._id,
+          cid: user.cid,
+          leads_data:leads_datas,
+          app: 'facebook',
+         });
+         await newLead.save()
+        console.log(leads_datas);
+      }
+    })
+
+    let leads = await leadsModel.find({cid: user.cid})
+    res.render("leads", { user, leads });
     // res.json({ leads: allLeads });
   } catch (error) {
     console.error("Error fetching leads:", error);
