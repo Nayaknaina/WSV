@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const logInSchema = new mongoose.Schema({
   role: {
     type: String,
-    default: 'admin'
   },
   googleId: {
     type: String,
@@ -12,15 +11,12 @@ const logInSchema = new mongoose.Schema({
   cid:{
     type: String,
   },
+  facebookToken:{
+    type:String,
+  },
   teams: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'teamMember',
-    validate: {
-      validator: function (v) {
-        return v.length <= 5;
-      },
-      message: "A user can have a maximum of 5 team members."
-    }
   }],
   myleads:[{
     type: mongoose.Schema.Types.ObjectId,

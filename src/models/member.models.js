@@ -9,7 +9,7 @@ const teamMemberSchema = new mongoose.Schema(
     name: {
       type: String,
     },
-    company_id: {
+    cid: {
       type: String
     },
     owner_id: {

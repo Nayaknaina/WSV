@@ -5,7 +5,8 @@ const generateToken = async (user) => {
     const payload = {
       id: user._id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      role: user.role
     };
   
     // Ensure that the environment variable is defined in your variable
