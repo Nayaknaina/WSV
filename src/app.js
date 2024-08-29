@@ -159,9 +159,6 @@ app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
 
   const user = await logIncollection.findById(req.user.id)
 
-  if (user.teams.length >= 5) {
-    return res.render('team',{user, errorMessage: "you can't add more teammets please buy subscription"})
-  }
 
   const {name, email} = req.query
   const password = otpGenerator.generate(8, { 
@@ -321,7 +318,7 @@ app.post("/signup", async (req, res) => {
     if (password !== confirmPassword)
       return res.render("signup", { errorMessage: "Passwords do not match" });
     const cid = uuidv4();
-    const newUser = new logIncollection({ name, email, password,cid });
+    const newUser = new logIncollection({ name, email, password,cid, role: 'admin' });
     await newUser.save();
     const token = await generateToken(newUser);
 
@@ -367,15 +364,19 @@ app.get("/auth/facebook", (req, res) => {
       scope: "email,pages_show_list,leads_retrieval",
       response_type: "code",
     });
-
+    console.log("redirected from /auth/fb");
+    
   res.redirect(facebookAuthUrl);
 });
 
 // Facebook Callback Route
-app.get("/auth/facebook/callback", async (req, res) => {
+app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
   const { code } = req.query;
+  console.log("comming to /auth/fb/cb");
 
   if (!code) {
+    console.log("no code");
+    
     return res.status(400).send("Invalid authorization code");
   }
 
@@ -392,30 +393,19 @@ app.get("/auth/facebook/callback", async (req, res) => {
       }
     );
 
+    console.log("now we have an token");
+    
     const accessToken = tokenResponse.data.access_token;
-    // console.log(accessToken);
+    console.log(accessToken);
     let admin = await logIncollection.findById(req.user.id)
+    // console.log(admin);
+    
     admin.facebookToken = accessToken;
     await admin.save()
+
+    
     // console.log(req.session.accessToken);
 
-    res.redirect("/leads");
-  } catch (error) {
-    console.error("Error fetching access token:", error);
-    res.status(500).send("Error logging in with Facebook.");
-  }
-});
-
-// Facebook Leads Fetch Route
-app.get("/leads", isAdminLoggedIn,ensureAuthenticated, async (req, res) => {
-  try {
-    
-    if (req.user.role === 'member') {
-      let member = await memberModel.findById(req.user.id).populate('owner_id')
-    }else{
-      let admin = await logIncollection.findById(req.user.id)
-      
-    }
     const pagesResponse = await axios.get(
       `https://graph.facebook.com/v20.0/me/accounts`,
       {
@@ -453,16 +443,11 @@ app.get("/leads", isAdminLoggedIn,ensureAuthenticated, async (req, res) => {
       }
     }
 
-    const token = req.cookies["360Followers"];
-    const userData = jwt.decode(token);
 
-    if (!userData) {
-      return res.redirect("/login");
-    }
-    
-    const user = await logIncollection.findById(userData.id);
+    const user = await logIncollection.findById(req.user.id);
 
-    // console.log(allLeads[0]);
+    console.log("allLeads are here");
+    // console.log(allLeads);
 
     allLeads.forEach(async (lead)=>{
       const perLead = await leadsModel.findOne({lead_id: lead.id})
@@ -486,7 +471,102 @@ app.get("/leads", isAdminLoggedIn,ensureAuthenticated, async (req, res) => {
       }
     })
 
+    chalteRaho(accessToken);
+
+    res.redirect("/leads");
+  } catch (error) {
+    console.error("Error fetching access token:", error);
+    res.status(500).send("Error logging in with Facebook.");
+  }
+});
+
+// Facebook Leads Fetch Route
+app.get("/leads", isAdminLoggedIn, async (req, res) => {
+  try {
+let user;
+console.log("leads page");
+
+    if (req.user.role === 'admin') {   
+       user = await logIncollection.findById(req.user.id).populate('myleads')
+    }
+    else{
+      user = await memberModel.findById(req.user.id).populate('myleads')
+    }
+ 
+
+    // const pagesResponse = await axios.get(
+    //   `https://graph.facebook.com/v20.0/me/accounts`,
+    //   {
+    //     params: {
+    //       access_token: accessToken,
+    //     },
+    //   }
+    // );                                                          
+
+    // const pages = pagesResponse.data.data;
+    // let allLeads = [];
+
+    // for (const page of pages) {
+    //   const leadFormsResponse = await axios.get(
+    //     `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
+    //     {
+    //       params: { access_token: page.access_token },
+    //     }
+    //   );
+
+    //   const leadForms = leadFormsResponse.data.data;
+
+    //   for (const form of leadForms) {
+    //     const leadsResponse = await axios.get(
+    //       `https://graph.facebook.com/v20.0/${form.id}/leads`,
+    //       {
+    //         params: {
+    //           access_token: page.access_token,
+    //           fields: "id,created_time,field_data",
+    //         },
+    //       }
+    //     );
+
+    //     allLeads.push(...leadsResponse.data.data);
+    //   }
+    // }
+
+    // const token = req.cookies["360Followers"];
+    // const userData = jwt.decode(token);
+
+    // if (!userData) {
+    //   return res.redirect("/login");
+    // }
+    
+    // const user = await logIncollection.findById(userData.id);
+
+    // // console.log(allLeads[0]);
+
+    // allLeads.forEach(async (lead)=>{
+    //   const perLead = await leadsModel.findOne({lead_id: lead.id})
+
+    //   if (!perLead) {
+    //     let leads_datas = [];
+
+    //     lead.field_data.forEach((data)=>{
+    //       leads_datas.push({que:data.name, ans:data.values[0]});  
+    //     })
+
+    //     const newLead = new leadsModel({ 
+    //       lead_id: lead.id,
+    //       income_time:lead.created_time,
+    //       cid: user.cid,
+    //       leads_data:leads_datas,
+    //       app: 'facebook',
+    //      });
+    //      await newLead.save()
+    //     // console.log(leads_datas);
+    //   }
+    // })
+  // console.log(user);
+  
     let leads = await leadsModel.find({cid: user.cid})
+   console.log(user);
    
     res.render("leads", { user, leads });
     // res.json({ leads: allLeads });
@@ -507,26 +587,61 @@ app.get('/lead/book/:id', isAdminLoggedIn, async (req,res)=>{
     let admin = await logIncollection.findById(req.user.id)
     admin.myleads.push(lead._id)
     lead.uid = admin._id;
+    await admin.save()
+    await lead.save()
   }
   else{
     let member = await memberModel.findById(req.user.id)
     member.myleads.push(lead._id)
     lead.uid = member._id;
+    await member.save()
+    await lead.save()
+    
+    console.log("bokking the leads by ", member);
+    
+  }
+  res.redirect('/leads')
+  
+})
+
+app.get('/lead/remove/:id', isAdminLoggedIn, async (req,res)=>{
+  let {id} = req.params;
+  
+  let lead = await leadsModel.findById(id);
+  if (!lead) {
+    return res.redirect('/leads')
+  }
+  if (req.user.role === 'admin') {   
+    let admin = await logIncollection.findById(req.user.id)
+    admin.myleads.
+    lead.uid = '';
+    await admin.save()
+    await lead.save()
+  }
+  else{
+    let member = await memberModel.findById(req.user.id)
+    member.myleads.
+    lead.uid = '';
+    await member.save()
+    await lead.save()
+    
+    console.log("bokking the leads by ", member);
+    
   }
   res.redirect('/leads')
   
 })
 
 
-// Middleware to ensure the user is authenticated
-function ensureAuthenticated(req, res, next) {
-  // console.log(req.session.accessToken);
+// // Middleware to ensure the user is authenticated
+// function ensureAuthenticated(req, res, next) {
+//   // console.log(req.session.accessToken);
 
-  if (req.session.accessToken) {
-    return next();
-  }
-  res.redirect("/connect");
-}
+//   if (req.session.accessToken) {
+//     return next();
+//   }
+//   res.redirect("/connect");
+// }
 
 // Handle dynamic routes to serve pages without .html extension
 app.get("/:page", (req, res) => {
@@ -549,7 +664,7 @@ app.listen(port, () => {
 
 
 function isAdminLoggedIn(req, res, next) {
-  // console.log("isAdminLoggedIn middilware");
+  console.log("isAdminLoggedIn middilware");
   const token = req.cookies["360Followers"];
   
   if (!token || token === undefined) {
@@ -565,4 +680,87 @@ function isAdminLoggedIn(req, res, next) {
     // console.log(req.user);
    return next();
   });
+}
+
+
+
+async function findNewLead(accessToken) {
+  
+  let allNewLeads = [];
+  const pagesResponse = await axios.get(
+    `https://graph.facebook.com/v20.0/me/accounts`,
+    {
+      params: {
+        access_token: accessToken,
+      },
+    }
+  );                                                          
+
+  const pages = pagesResponse.data.data;
+  let allLeads = [];
+
+  for (const page of pages) {
+    const leadFormsResponse = await axios.get(
+      `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
+      {
+        params: { access_token: page.access_token },
+      }
+    );
+
+    const leadForms = leadFormsResponse.data.data;
+
+    for (const form of leadForms) {
+      const leadsResponse = await axios.get(
+        `https://graph.facebook.com/v20.0/${form.id}/leads`,
+        {
+          params: {
+            access_token: page.access_token,
+            fields: "id,created_time,field_data",
+          },
+        }
+      );
+
+      allLeads.push(...leadsResponse.data.data);
+    }
+  }
+
+
+  
+  allLeads.forEach(async (lead)=>{
+    const perLead = await leadsModel.findOne({lead_id: lead.id})
+
+    if (!perLead) {
+
+      console.log("new lead found",lead );
+      
+      let leads_datas = [];
+
+      lead.field_data.forEach((data)=>{
+        leads_datas.push({que:data.name, ans:data.values[0]});  
+      })
+
+      const newLead = new leadsModel({ 
+        lead_id: lead.id,
+        income_time:lead.created_time,
+        cid: user.cid,
+        leads_data:leads_datas,
+        app: 'facebook',
+       });
+       await newLead.save()
+       allNewLeads.push(newLead)
+
+      // console.log(leads_datas);
+    }
+  })
+
+return allLeads;
+}
+
+function chalteRaho(token) {
+  let i = 0;
+  setInterval(() => {
+    findNewLead(token)
+    console.log("step",i++);
+    
+  }, 60000);
 }
