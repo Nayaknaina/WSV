@@ -156,13 +156,7 @@ app.get("/team", isAdminLoggedIn,(req, res) => {
 });
 
 app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
-
-  const user = await logIncollection.findById(req.user.id)
-
-  if (user.teams.length >= 5) {
-    return res.render('team',{user, errorMessage: "you can't add more teammets please buy subscription"})
-  }
-
+  const user = req.user;
   const {name, email} = req.query
   const password = otpGenerator.generate(8, { 
     digits: true, 
@@ -462,7 +456,7 @@ app.get("/leads", isAdminLoggedIn,ensureAuthenticated, async (req, res) => {
     
     const user = await logIncollection.findById(userData.id);
 
-    // console.log(allLeads[0]);
+    console.log(allLeads[0]);
 
     allLeads.forEach(async (lead)=>{
       const perLead = await leadsModel.findOne({lead_id: lead.id})
