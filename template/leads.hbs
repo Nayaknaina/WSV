@@ -228,7 +228,7 @@
                         {{#each user.myleads}}
                         <li>
                             <nav>
-                                <label for="touch-{{@index}}" class="created-time-label">
+                                <label for="touch2-{{@index}}" class="created-time-label">
                                     <strong>Created Time : {{formatDate income_time}}</strong>
                                     <strong>Recived from : {{ app }}</strong>
                                     <span class="icon-container">
@@ -247,7 +247,7 @@
                                         {{/each}}
                                     </span>
                                 </label>
-                                <input type="checkbox" id="touch-{{@index}}">
+                                <input type="checkbox" id="touch2-{{@index}}">
                                 <ul class="slide">
                                     {{#each leads_data}}
                                     <li>
@@ -259,13 +259,14 @@
                         </li>
                         {{/each}}
                         {{else}}
-                        <li>No leads added here</li>
+                        <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads added here</li>
                         {{/if}}
                     </ul>
 
 
 
                     <script>
+                        // for leads drop-down
                         document.querySelectorAll('.lead-item').forEach(item => {
                             item.addEventListener('click', function () {
                                 const currentOpenItem = document.querySelector('.lead-item.open');

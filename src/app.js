@@ -492,78 +492,6 @@ console.log("leads page");
     else{
       user = await memberModel.findById(req.user.id).populate('myleads')
     }
- 
-
-    // const pagesResponse = await axios.get(
-    //   `https://graph.facebook.com/v20.0/me/accounts`,
-    //   {
-    //     params: {
-    //       access_token: accessToken,
-    //     },
-    //   }
-    // );                                                          
-
-    // const pages = pagesResponse.data.data;
-    // let allLeads = [];
-
-    // for (const page of pages) {
-    //   const leadFormsResponse = await axios.get(
-    //     `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
-    //     {
-    //       params: { access_token: page.access_token },
-    //     }
-    //   );
-
-    //   const leadForms = leadFormsResponse.data.data;
-
-    //   for (const form of leadForms) {
-    //     const leadsResponse = await axios.get(
-    //       `https://graph.facebook.com/v20.0/${form.id}/leads`,
-    //       {
-    //         params: {
-    //           access_token: page.access_token,
-    //           fields: "id,created_time,field_data",
-    //         },
-    //       }
-    //     );
-
-    //     allLeads.push(...leadsResponse.data.data);
-    //   }
-    // }
-
-    // const token = req.cookies["360Followers"];
-    // const userData = jwt.decode(token);
-
-    // if (!userData) {
-    //   return res.redirect("/login");
-    // }
-    
-    // const user = await logIncollection.findById(userData.id);
-
-    // // console.log(allLeads[0]);
-
-    // allLeads.forEach(async (lead)=>{
-    //   const perLead = await leadsModel.findOne({lead_id: lead.id})
-
-    //   if (!perLead) {
-    //     let leads_datas = [];
-
-    //     lead.field_data.forEach((data)=>{
-    //       leads_datas.push({que:data.name, ans:data.values[0]});  
-    //     })
-
-    //     const newLead = new leadsModel({ 
-    //       lead_id: lead.id,
-    //       income_time:lead.created_time,
-    //       cid: user.cid,
-    //       leads_data:leads_datas,
-    //       app: 'facebook',
-    //      });
-    //      await newLead.save()
-    //     // console.log(leads_datas);
-    //   }
-    // })
-  // console.log(user);
   
     let leads = await leadsModel.find({cid: user.cid})
    console.log(user);
@@ -613,14 +541,14 @@ app.get('/lead/remove/:id', isAdminLoggedIn, async (req,res)=>{
   }
   if (req.user.role === 'admin') {   
     let admin = await logIncollection.findById(req.user.id)
-    admin.myleads.
+    admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
     lead.uid = '';
     await admin.save()
     await lead.save()
   }
   else{
     let member = await memberModel.findById(req.user.id)
-    member.myleads.
+    member.myleads.splice(member.myleads.indexOf(lead._id), 1);
     lead.uid = '';
     await member.save()
     await lead.save()
