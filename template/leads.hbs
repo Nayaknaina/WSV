@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <style>
     fb\\:login-button {
         display: block;
@@ -27,7 +28,7 @@
     <link rel="stylesheet" href="/assets/css/custom.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" type="text/css" href="/styles/loader.css">
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -41,24 +42,27 @@
 
 <body class>
 
-    {{> nav}}
+    {{!-- {{> nav}} --}}
 
 
     <div class="container-fluid">
-        <div class="row">
+        <div class="row  justify-content-center">
             {{> sidebar}}
-            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0">
+            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  home-section">
                 {{> NameHead}}
                 <div class="container-fluid bg-white shadow-sm m-b-40">
                     <div class="row">
-                        <div class="col-md-6">
-                            <h2 class="text-bodycolor">Lead</h2>
+                        {{!-- <div class="col-md-1 text-center"></div> --}}
+                        <div class="col-md-6 text-center py-2">
+                            <button id="all-lead-btn" onclick="showAllLeads()" type="button" class="btn btn-primary p-x-8">All leads</button>
                             <!-- Add your Lead content here -->
                         </div>
-                        <div class="col-md- 6">
-                            <h2 class="text-bodycolor">My Leads</h2>
+                        <div class="col-md-6 text-center py-2">
                             <!-- Add your My Leads content here -->
+                            <button id="my-lead-btn"  onclick="showMyLeads()" type="button" class="btn btn-outline-primary p-x-8">my leads</button>
+                          
                         </div>
+                        {{!-- <div class="col-md-1 text-center"></div> --}}
                     </div>
                 </div>
 
@@ -170,24 +174,63 @@
                         }
                     </style>
 
-                    <ul>
+                    <ul id="allLeads" style="display: block;">
                         {{#each leads}}
                         <li>
                             <nav>
                                 <label for="touch-{{@index}}" class="created-time-label">
                                     <strong>Created Time : {{formatDate income_time}}</strong>
                                     <strong>Recived from : {{ app }}</strong>
-                                    <strong>Phone Number :
+                                    
+                                    <span class="icon-container">
+                                        {{!-- <img src="add.png" class="created-time-icon"> --}}
+                                        <a href="/lead/book/{{_id}}"><i class="fa-solid fa-check" style="color: #36383a;"></i></a>
+                                        
                                         {{#each leads_data}}
                                         {{#if (containsPhoneNumber ans)}}
-                                        <a href="tel:{{ans}}">{{ans}}</a>
+                                        <a href="tel:{{ans}}"><i class="fa-solid fa-phone" style="color: #23CC93;"></i></a>
+                                        <a href="https://wa.me/{{ans}}" target="_blank">
+                                        <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                                        </a>
                                         {{/if}}
                                         {{/each}}
-                                    </strong>
-                                    <span class="icon-container">
-                                        <img src="add.png" class="created-time-icon">
-                                        <img src="delete.png" class="created-time-icon">
+                                    </span>
 
+                                </label>
+                                <input type="checkbox" id="touch-{{@index}}">
+                                <ul class="slide">
+                                    {{#each leads_data}}
+                                    <li>
+                                        <strong>{{que}}:</strong>
+                                        {{ans}}
+                                    </li>
+                                    {{/each}}
+                                </ul>
+                            </nav>
+                        </li>
+                        {{/each}}
+                    </ul>
+
+                    <ul id="myLeads" style="display: none;">
+                        {{#each leads}}
+                        <li>
+                            <nav>
+                                <label for="touch-{{@index}}" class="created-time-label">
+                                    {{!-- <strong>Created Time : {{formatDate income_time}}</strong> --}}
+                                    {{!-- <strong>Recived from : {{ app }}</strong> --}}
+                                    
+                                    <span class="icon-container">
+                                        {{!-- <img src="add.png" class="created-time-icon"> --}}
+                                        <a href="/lead/book/{{_id}}"><i class="fa-solid fa-check" style="color: #36383a;"></i></a>
+                                        
+                                        {{#each leads_data}}
+                                        {{#if (containsPhoneNumber ans)}}
+                                        <a href="tel:{{ans}}"><i class="fa-solid fa-phone" style="color: #23CC93;"></i></a>
+                                        <a href="https://wa.me/{{ans}}" target="_blank">
+                                        <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                                        </a>
+                                        {{/if}}
+                                        {{/each}}
                                     </span>
 
                                 </label>
@@ -301,6 +344,40 @@
         $('#nav-tab a[href="' + hash + '"]').tab('show');
     </script>
 
+<script>
+    function showMyLeads(){
+        let myLeadsBox = document.querySelector('#myLeads')
+        let allLeadsBox = document.querySelector('#allLeads')
+        let myBtn = document.querySelector('#my-lead-btn')
+        let allBtn = document.querySelector('#all-lead-btn')
+
+        myLeadsBox.style.display = 'block'
+        allLeadsBox.style.display = 'none'
+       
+
+        myBtn.classList.remove('btn-outline-primary')
+        myBtn.classList.add('btn-primary')
+
+        allBtn.classList.add('btn-outline-primary')
+        allBtn.classList.remove('btn-primary')
+    }
+    function showAllLeads(t){
+        let myLeadsBox = document.querySelector('#myLeads')
+        let allLeadsBox = document.querySelector('#allLeads')
+        let myBtn = document.querySelector('#my-lead-btn')
+        let allBtn = document.querySelector('#all-lead-btn')
+
+        allLeadsBox.style.display = 'block'
+        myLeadsBox.style.display = 'none'
+
+        myBtn.classList.remove('btn-primary')
+        myBtn.classList.add('btn-outline-primary')
+
+        allBtn.classList.remove('btn-outline-primary')
+        allBtn.classList.add('btn-primary')
+      }
+
+</script>
 
 
 </body>

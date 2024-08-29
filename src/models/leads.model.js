@@ -7,8 +7,7 @@ const leadsSchema = new mongoose.Schema(
     },
 
     uid: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      type: String,
     },
     cid: {
       type: String,
@@ -19,8 +18,9 @@ const leadsSchema = new mongoose.Schema(
     },
 
     status: {
-      type: Boolean,
-      default: false,
+      type: String,
+      enum: ['new', 'pending', 'completed', 'lost'], 
+      default: 'new', 
     },             
 
     leads_data: [

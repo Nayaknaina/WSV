@@ -23,6 +23,8 @@ const pipelineModel = require('./models/pipeline.model.js')
 const memberModel = require('./models/member.models.js')
 const leadsModel = require('./models/leads.model.js')
 
+const memberRoute = require('./routes/members.route.js')
+
 // Middleware
 const sessionStore =
   process.env.NODE_ENV === "production"
@@ -126,7 +128,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-// app.use('/pipeline', pipelineRouter)
+app.use('/member', memberRoute)
 
 // Handle root request
 app.get("/", (req, res) => {
@@ -154,7 +156,13 @@ app.get("/team", isAdminLoggedIn,(req, res) => {
 });
 
 app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
-  const user = req.user;
+
+  const user = await logIncollection.findById(req.user.id)
+
+  if (user.teams.length >= 5) {
+    return res.render('team',{user, errorMessage: "you can't add more teammets please buy subscription"})
+  }
+
   const {name, email} = req.query
   const password = otpGenerator.generate(8, { 
     digits: true, 
@@ -162,6 +170,8 @@ app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
     upperCaseAlphabets: true, 
     specialChars: false
   });
+
+ 
 
   const mailMsg = 
   `
@@ -192,9 +202,10 @@ app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
   console.log(isSent);
 
   if (isSent[0].res === 'okk') {
-    const admin = await logIncollection.findById(req.user.id)
-    const newMember = new memberModel({ name, email, password,cid: admin.cid, owner_id: admin._id });
+    const newMember = new memberModel({ name, email, password,cid: user.cid, owner_id: user._id });
     await newMember.save();
+    user.teams.push(newMember._id)
+    await user.save()
   }
   
   return res.redirect("/team");
@@ -383,8 +394,9 @@ app.get("/auth/facebook/callback", async (req, res) => {
 
     const accessToken = tokenResponse.data.access_token;
     // console.log(accessToken);
-
-    req.session.accessToken = accessToken;
+    let admin = await logIncollection.findById(req.user.id)
+    admin.facebookToken = accessToken;
+    await admin.save()
     // console.log(req.session.accessToken);
 
     res.redirect("/leads");
@@ -395,10 +407,15 @@ app.get("/auth/facebook/callback", async (req, res) => {
 });
 
 // Facebook Leads Fetch Route
-app.get("/leads", ensureAuthenticated, async (req, res) => {
+app.get("/leads", isAdminLoggedIn,ensureAuthenticated, async (req, res) => {
   try {
-    const accessToken = req.session.accessToken;
-
+    
+    if (req.user.role === 'member') {
+      let member = await memberModel.findById(req.user.id).populate('owner_id')
+    }else{
+      let admin = await logIncollection.findById(req.user.id)
+      
+    }
     const pagesResponse = await axios.get(
       `https://graph.facebook.com/v20.0/me/accounts`,
       {
@@ -442,10 +459,10 @@ app.get("/leads", ensureAuthenticated, async (req, res) => {
     if (!userData) {
       return res.redirect("/login");
     }
-
+    
     const user = await logIncollection.findById(userData.id);
 
-    console.log(allLeads[0]);
+    // console.log(allLeads[0]);
 
     allLeads.forEach(async (lead)=>{
       const perLead = await leadsModel.findOne({lead_id: lead.id})
@@ -454,25 +471,23 @@ app.get("/leads", ensureAuthenticated, async (req, res) => {
         let leads_datas = [];
 
         lead.field_data.forEach((data)=>{
-
-          leads_datas.push({que:data.name, ans:data.values[0]});
-
-          
+          leads_datas.push({que:data.name, ans:data.values[0]});  
         })
+
         const newLead = new leadsModel({ 
           lead_id: lead.id,
           income_time:lead.created_time,
-          uid:user._id,
           cid: user.cid,
           leads_data:leads_datas,
           app: 'facebook',
          });
          await newLead.save()
-        console.log(leads_datas);
+        // console.log(leads_datas);
       }
     })
 
     let leads = await leadsModel.find({cid: user.cid})
+   
     res.render("leads", { user, leads });
     // res.json({ leads: allLeads });
   } catch (error) {
@@ -480,6 +495,28 @@ app.get("/leads", ensureAuthenticated, async (req, res) => {
     res.status(500).send("Error fetching leads");
   }
 });
+
+app.get('/lead/book/:id', isAdminLoggedIn, async (req,res)=>{
+  let {id} = req.params;
+  
+  let lead = await leadsModel.findById(id);
+  if (!lead) {
+    return res.redirect('/leads')
+  }
+  if (req.user.role === 'admin') {   
+    let admin = await logIncollection.findById(req.user.id)
+    admin.myleads.push(lead._id)
+    lead.uid = admin._id;
+  }
+  else{
+    let member = await memberModel.findById(req.user.id)
+    member.myleads.push(lead._id)
+    lead.uid = member._id;
+  }
+  res.redirect('/leads')
+  
+})
+
 
 // Middleware to ensure the user is authenticated
 function ensureAuthenticated(req, res, next) {

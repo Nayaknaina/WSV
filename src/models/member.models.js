@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const teamMemberSchema = new mongoose.Schema(
   {
+    role: {
+      type: String,
+      default: 'member'
+    },
     name: {
       type: String,
     },
@@ -24,7 +28,7 @@ const teamMemberSchema = new mongoose.Schema(
       required: true
     },
 
-    leads: [
+    myleads: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'lead'
