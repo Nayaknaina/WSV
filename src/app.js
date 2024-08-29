@@ -1,8 +1,12 @@
 const express = require("express");
 const logIncollection = require("./models/admin.model.js");
+const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode');
 const app = express();
 const path = require("path");
 const port = process.env.PORT || 8000;
+let qrCodeData = ''; // To store QR code data
+let whatsappClientReady = false; // Flag to track client readiness
 const templatepath = path.join(__dirname, "../template");
 const hbs = require("hbs");
 require("dotenv").config();
@@ -24,6 +28,70 @@ const memberModel = require('./models/member.models.js')
 const leadsModel = require('./models/leads.model.js')
 
 const memberRoute = require('./routes/members.route.js')
+
+// Initialize WhatsApp Client
+const client = new Client({
+  authStrategy: new LocalAuth(), // This saves session data locally
+});
+
+// Generate and store the QR code data
+client.on('qr', (qr) => {
+  qrcode.toDataURL(qr, (err, url) => {
+      if (err) {
+          console.error('Error generating QR code:', err);
+          return;
+      }
+      qrCodeData = url;
+      qrCodeData = url;
+      console.log("url iti aahe");
+      console.log(url);
+      
+  });
+});
+
+// Event when client is authenticated and READY
+client.on('ready', () => {
+  console.log('WhatsApp client is ready!');
+  whatsappClientReady = true;
+});
+
+// Event when client is disconnected
+client.on('disconnected', () => {
+  console.log('WhatsApp client has been disconnected.');
+  whatsappClientReady = false;
+});
+
+// Function to send a WhatsApp message
+function sendMessageToLead(phoneNumber, message) {
+  if (!whatsappClientReady) {
+      console.error('WhatsApp client is not ready. Cannot send message.');
+      return;
+  }
+
+  client.sendMessage(phoneNumber, message)
+      .then((result) => {
+          console.log('Message sent:', result);
+      })
+      .catch((error) => {
+          console.error('Error sending message:', error);
+      });
+}
+
+// Serve QR code via HTTP
+app.get('/qr', (req, res) => {
+  res.send(`
+      <html>
+          <body>
+              <h1>Scan this QR Code with WhatsApp</h1>
+              <img src="${qrCodeData}" alt="QR Code">
+              <form action="/logout" method="get">
+                  <button type="submit">Log Out</button>
+              </form>
+          </body>
+      </html>
+  `);
+});
+
 
 // Middleware
 const sessionStore =
@@ -73,7 +141,19 @@ app.use(cookieParser());
 
 app.use(express.static("template"));
 
-
+// Endpoint to handle logout
+app.get('/logout', async (req, res) => {
+  try {
+      await client.logout(); // Log out the client
+      console.log('Logged out successfully.');
+      whatsappClientReady = false;
+      qrCodeData = ''; // Clear QR code data
+      res.send('Logged out successfully. <a href="/qr">Scan QR Code again</a>');
+  } catch (error) {
+      console.error('Error logging out:', error);
+      res.status(500).send('Error logging out.');
+  }
+});
 
 // Passport.js Google Strategy
 passport.use(new GoogleStrategy({
@@ -658,6 +738,7 @@ app.get("/:page", (req, res) => {
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running at PORT:${port}`);
+  client.initialize();
 });
 
 
