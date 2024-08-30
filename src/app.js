@@ -72,6 +72,10 @@ hbs.registerHelper('formatDate', function (datetime) {
   return date.toISOString().split('T')[0]; // Extract YYYY-MM-DD
 });
 
+hbs.registerHelper('ifEquals', function(arg1, arg2, options) {
+  return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
+});
+
 hbs.registerHelper('containsPhoneNumber', function (text) {
   // Regular expression for matching phone numbers
   const phoneNumberPattern = /(\+?\d{1,4}[ -]?)?(\(?\d{2,4}\)?[ -]?)?\d{6,12}/;
