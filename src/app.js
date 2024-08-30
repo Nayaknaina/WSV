@@ -27,70 +27,14 @@ const pipelineModel = require('./models/pipeline.model.js')
 const memberModel = require('./models/member.models.js')
 const leadsModel = require('./models/leads.model.js')
 
-const memberRoute = require('./routes/members.route.js')
+const memberRoute = require('./routes/members.route.js');
+const { log } = require("console");
 
 // Initialize WhatsApp Client
 const client = new Client({
   authStrategy: new LocalAuth(), // This saves session data locally
 });
 
-// Generate and store the QR code data
-client.on('qr', (qr) => {
-  qrcode.toDataURL(qr, (err, url) => {
-      if (err) {
-          console.error('Error generating QR code:', err);
-          return;
-      }
-      qrCodeData = url;
-      qrCodeData = url;
-      console.log("url iti aahe");
-      console.log(url);
-      
-  });
-});
-
-// Event when client is authenticated and READY
-client.on('ready', () => {
-  console.log('WhatsApp client is ready!');
-  whatsappClientReady = true;
-});
-
-// Event when client is disconnected
-client.on('disconnected', () => {
-  console.log('WhatsApp client has been disconnected.');
-  whatsappClientReady = false;
-});
-
-// Function to send a WhatsApp message
-function sendMessageToLead(phoneNumber, message) {
-  if (!whatsappClientReady) {
-      console.error('WhatsApp client is not ready. Cannot send message.');
-      return;
-  }
-
-  client.sendMessage(phoneNumber, message)
-      .then((result) => {
-          console.log('Message sent:', result);
-      })
-      .catch((error) => {
-          console.error('Error sending message:', error);
-      });
-}
-
-// Serve QR code via HTTP
-app.get('/qr', (req, res) => {
-  res.send(`
-      <html>
-          <body>
-              <h1>Scan this QR Code with WhatsApp</h1>
-              <img src="${qrCodeData}" alt="QR Code">
-              <form action="/logout" method="get">
-                  <button type="submit">Log Out</button>
-              </form>
-          </body>
-      </html>
-  `);
-});
 
 
 // Middleware
@@ -153,6 +97,55 @@ app.get('/logout', async (req, res) => {
       console.error('Error logging out:', error);
       res.status(500).send('Error logging out.');
   }
+});
+// Generate and store the QR code data
+client.on('qr', (qr) => {
+  qrcode.toDataURL(qr, (err, url) => {
+      if (err) {
+          console.error('Error generating QR code:', err);
+          return;
+      }
+      qrCodeData = url;
+     
+      
+  });
+});
+
+// Event when client is authenticated and READY
+client.on('ready', () => {
+  console.log('WhatsApp client is ready!');
+  whatsappClientReady = true;
+});
+
+// Event when client is disconnected
+client.on('disconnected', () => {
+  console.log('WhatsApp client has been disconnected.');
+  whatsappClientReady = false;
+});
+
+// Function to send a WhatsApp message
+function sendMessageToLead(phoneNumber, message) {
+  if (!whatsappClientReady) {
+      console.error('WhatsApp client is not ready. Cannot send message.');
+      return;
+  }
+
+  client.sendMessage(phoneNumber, message)
+      .then((result) => {
+          console.log('Message sent:', result);
+      })
+      .catch((error) => {
+          console.error('Error sending message:', error);
+      });
+}
+
+
+// Serve QR code via HTTP
+app.get('/qr', isAdminLoggedIn,(req, res) => {
+  const user = req.user
+  console.log( qrCodeData);
+  
+  res.render("qr",{user,qrCodeData});
 });
 
 // Passport.js Google Strategy
