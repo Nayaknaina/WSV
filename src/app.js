@@ -26,6 +26,7 @@ const { sendMail } = require("./service/mailSender.js");
 const pipelineModel = require('./models/pipeline.model.js')
 const memberModel = require('./models/member.models.js')
 const leadsModel = require('./models/leads.model.js')
+const templateModel = require('./models/temlate.model.js')
 
 const memberRoute = require('./routes/members.route.js');
 const { log } = require("console");
@@ -35,6 +36,66 @@ const client = new Client({
   authStrategy: new LocalAuth(), // This saves session data locally
 });
 
+<<<<<<< HEAD
+=======
+// Generate and store the QR code data
+client.on('qr', (qr) => {
+  qrcode.toDataURL(qr, (err, url) => {
+      if (err) {
+          console.error('Error generating QR code:', err);
+          return;
+      }
+      qrCodeData = url;
+     
+      // console.log("url iti aahe");
+      // console.log(url);
+      
+  });
+});
+
+// Event when client is authenticated and READY
+client.on('ready', () => {
+  console.log('WhatsApp client is ready!');
+  whatsappClientReady = true;
+});
+
+// Event when client is disconnected
+client.on('disconnected', () => {
+  console.log('WhatsApp client has been disconnected.');
+  whatsappClientReady = false;
+});
+
+// Function to send a WhatsApp message
+function sendMessageToLead(phoneNumber, message) {
+  if (!whatsappClientReady) {
+      console.error('WhatsApp client is not ready. Cannot send message.');
+      return;
+  }
+
+  client.sendMessage(phoneNumber, message)
+      .then((result) => {
+          console.log('Message sent:', result);
+      })
+      .catch((error) => {
+          console.error('Error sending message:', error);
+      });
+}
+
+// Serve QR code via HTTP
+app.get('/qr', (req, res) => {
+  res.send(`
+      <html>
+          <body>
+              <h1>Scan this QR Code with WhatsApp</h1>
+              <img src="${qrCodeData}" alt="QR Code">
+              <form action="/logout" method="get">
+                  <button type="submit">Log Out</button>
+              </form>
+          </body>
+      </html>
+  `);
+});
+>>>>>>> 62cef81e93c21d479894ab98daaa6bd07c8d2d16
 
 
 // Middleware
@@ -226,9 +287,42 @@ app.get("/apps", isAdminLoggedIn,(req, res) => {
   const user = req.user
   res.render("app",{user});
 });
+
+app.get("/template", isAdminLoggedIn, async(req, res) => {
+  let user;
+  if (req.user.role === 'admin') {
+    user = await logIncollection.findById(req.user.id);
+  }else{
+    user = await memberModel.findById(req.user.id);
+  }
+
+  let templates = await templateModel.find({cid: user.cid});
+  
+  res.render("template",{user, templates});
+});
+
+app.post('/template/update/:id', isAdminLoggedIn, async (req,res)=>{
+  let {id}=req.params;
+  let template = await templateModel.findById(id)
+
+  let {title,text,client,team} = req.body
+
+  console.log(req.body);
+  
+
+  res.redirect('/template')
+})
+
 // team 
-app.get("/team", isAdminLoggedIn,(req, res) => {
-  const user = req.user
+app.get("/team", isAdminLoggedIn, async(req, res) => {
+  let user;
+  if (user.role === 'admin') {
+    user = await logIncollection.findById(req.user.id).populate('teams')
+  }else{
+    user = await memberModel.findById(req.user.id).populate('owner_id')
+    console.log(user);
+    
+  }
   res.render("team",{user});
 });
 
@@ -260,7 +354,7 @@ app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
       <p>Password: <strong>${password}</strong></p>
 
       <div style="text-align: center;">
-        <a href="https://example.com/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+        <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
           Login to Dashboard
         </a>
       </div>
