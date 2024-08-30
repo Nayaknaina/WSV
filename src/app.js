@@ -26,6 +26,7 @@ const { sendMail } = require("./service/mailSender.js");
 const pipelineModel = require('./models/pipeline.model.js')
 const memberModel = require('./models/member.models.js')
 const leadsModel = require('./models/leads.model.js')
+const templateModel = require('./models/temlate.model.js')
 
 const memberRoute = require('./routes/members.route.js')
 
@@ -42,9 +43,9 @@ client.on('qr', (qr) => {
           return;
       }
       qrCodeData = url;
-      qrCodeData = url;
-      console.log("url iti aahe");
-      console.log(url);
+     
+      // console.log("url iti aahe");
+      // console.log(url);
       
   });
 });
@@ -126,6 +127,10 @@ hbs.registerPartials(path.join(__dirname, '../template/partials'));
 hbs.registerHelper('formatDate', function (datetime) {
   const date = new Date(datetime);
   return date.toISOString().split('T')[0]; // Extract YYYY-MM-DD
+});
+
+hbs.registerHelper('ifEquals', function(arg1, arg2, options) {
+  return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
 });
 
 hbs.registerHelper('containsPhoneNumber', function (text) {
@@ -229,9 +234,42 @@ app.get("/apps", isAdminLoggedIn,(req, res) => {
   const user = req.user
   res.render("app",{user});
 });
+
+app.get("/template", isAdminLoggedIn, async(req, res) => {
+  let user;
+  if (req.user.role === 'admin') {
+    user = await logIncollection.findById(req.user.id);
+  }else{
+    user = await memberModel.findById(req.user.id);
+  }
+
+  let templates = await templateModel.find({cid: user.cid});
+  
+  res.render("template",{user, templates});
+});
+
+app.post('/template/update/:id', isAdminLoggedIn, async (req,res)=>{
+  let {id}=req.params;
+  let template = await templateModel.findById(id)
+
+  let {title,text,client,team} = req.body
+
+  console.log(req.body);
+  
+
+  res.redirect('/template')
+})
+
 // team 
-app.get("/team", isAdminLoggedIn,(req, res) => {
-  const user = req.user
+app.get("/team", isAdminLoggedIn, async(req, res) => {
+  let user;
+  if (user.role === 'admin') {
+    user = await logIncollection.findById(req.user.id).populate('teams')
+  }else{
+    user = await memberModel.findById(req.user.id).populate('owner_id')
+    console.log(user);
+    
+  }
   res.render("team",{user});
 });
 
@@ -263,7 +301,7 @@ app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
       <p>Password: <strong>${password}</strong></p>
 
       <div style="text-align: center;">
-        <a href="https://example.com/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+        <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
           Login to Dashboard
         </a>
       </div>
