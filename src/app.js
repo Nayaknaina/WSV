@@ -1,11 +1,11 @@
 const express = require("express");
 const logIncollection = require("./models/admin.model.js");
-const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode');
+const { Client, LocalAuth } = require("whatsapp-web.js");
+const qrcode = require("qrcode");
 const app = express();
 const path = require("path");
 const port = process.env.PORT || 8000;
-let qrCodeData = ''; // To store QR code data
+let qrCodeData = ""; // To store QR code data
 let whatsappClientReady = false; // Flag to track client readiness
 const templatepath = path.join(__dirname, "../template");
 const hbs = require("hbs");
@@ -18,17 +18,20 @@ const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
 const { generateToken } = require("../utils/auth");
 const querystring = require("querystring");
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth2').Strategy;
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth2").Strategy;
 
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 const { sendMail } = require("./service/mailSender.js");
-const pipelineModel = require('./models/pipeline.model.js')
-const memberModel = require('./models/member.models.js')
-const leadsModel = require('./models/leads.model.js')
-const templateModel = require('./models/temlate.model.js')
+const { upload } = require("./service/multer.js");
+const fs = require("fs");
 
-const memberRoute = require('./routes/members.route.js');
+const pipelineModel = require("./models/pipeline.model.js");
+const memberModel = require("./models/member.models.js");
+const leadsModel = require("./models/leads.model.js");
+const templateModel = require("./models/temlate.model.js");
+
+const memberRoute = require("./routes/members.route.js");
 const { log } = require("console");
 
 // Initialize WhatsApp Client
@@ -36,7 +39,63 @@ const client = new Client({
   authStrategy: new LocalAuth(), // This saves session data locally
 });
 
+// Generate and store the QR code data
+client.on("qr", (qr) => {
+  qrcode.toDataURL(qr, (err, url) => {
+    if (err) {
+      console.error("Error generating QR code:", err);
+      return;
+    }
+    qrCodeData = url;
 
+    // console.log("url iti aahe");
+    // console.log(url);
+  });
+});
+
+// Event when client is authenticated and READY
+client.on("ready", () => {
+  console.log("WhatsApp client is ready!");
+  whatsappClientReady = true;
+});
+
+// Event when client is disconnected
+client.on("disconnected", () => {
+  console.log("WhatsApp client has been disconnected.");
+  whatsappClientReady = false;
+});
+
+// Function to send a WhatsApp message
+function sendMessageToLead(phoneNumber, message) {
+  if (!whatsappClientReady) {
+    console.error("WhatsApp client is not ready. Cannot send message.");
+    return;
+  }
+
+  client
+    .sendMessage(phoneNumber, message)
+    .then((result) => {
+      console.log("Message sent:", result);
+    })
+    .catch((error) => {
+      console.error("Error sending message:", error);
+    });
+}
+
+// Serve QR code via HTTP
+app.get("/qr", (req, res) => {
+  res.send(`
+      <html>
+          <body>
+              <h1>Scan this QR Code with WhatsApp</h1>
+              <img src="${qrCodeData}" alt="QR Code">
+              <form action="/logout" method="get">
+                  <button type="submit">Log Out</button>
+              </form>
+          </body>
+      </html>
+  `);
+});
 
 // Middleware
 const sessionStore =
@@ -46,7 +105,6 @@ const sessionStore =
           "mongodb+srv://nainanayak288:Dkccg5NaZMANqu7F@wsvconnect.bpxfx.mongodb.net/",
       }) // Replace with your MongoDB connection URI
     : new session.MemoryStore();
-
 
 app.use(
   session({
@@ -61,72 +119,90 @@ const static_path = path.join(__dirname, "../public");
 app.use(express.static(static_path));
 app.use(express.json());
 
-
-
 app.set("view engine", "hbs");
 app.set("views", templatepath);
 
-hbs.registerPartials(path.join(__dirname, '../template/partials'));
+hbs.registerPartials(path.join(__dirname, "../template/partials"));
 
-hbs.registerHelper('formatDate', function (datetime) {
+hbs.registerHelper("formatDate", function (datetime) {
   const date = new Date(datetime);
-  return date.toISOString().split('T')[0]; // Extract YYYY-MM-DD
+  return date.toISOString().split("T")[0]; // Extract YYYY-MM-DD
 });
 
-hbs.registerHelper('ifEquals', function(arg1, arg2, options) {
-  return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
+hbs.registerHelper("ifEquals", function (arg1, arg2, options) {
+  return arg1 === arg2 ? options.fn(this) : options.inverse(this);
 });
 
-hbs.registerHelper('containsPhoneNumber', function (text) {
+hbs.registerHelper("containsPhoneNumber", function (text) {
   // Regular expression for matching phone numbers
   const phoneNumberPattern = /(\+?\d{1,4}[ -]?)?(\(?\d{2,4}\)?[ -]?)?\d{6,12}/;
   return phoneNumberPattern.test(text);
 });
 
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
+app.use(express.static("template"));
+// app.use('/public', express.static(path.join(__dirname, '../../public')));
 
-
+// Endpoint to handle logout
+app.get("/logout", async (req, res) => {
+  try {
+    await client.logout(); // Log out the client
+    console.log("Logged out successfully.");
+    whatsappClientReady = false;
+    qrCodeData = ""; // Clear QR code data
+    res.send('Logged out successfully. <a href="/qr">Scan QR Code again</a>');
+  } catch (error) {
+    console.error("Error logging out:", error);
+    res.status(500).send("Error logging out.");
+  }
+});
 
 // Serve QR code via HTTP
-app.get('/qr', isAdminLoggedIn,(req, res) => {
-  const user = req.user
-  console.log( qrCodeData);
-  
-  res.render("qr",{user,qrCodeData});
+app.get("/qr", isAdminLoggedIn, (req, res) => {
+  const user = req.user;
+  console.log(qrCodeData);
+
+  res.render("qr", { user, qrCodeData });
 });
 
 // Passport.js Google Strategy
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK,
-  passReqToCallback: true
-},
-async function(request, accessToken, refreshToken, profile, done) {
-  try {
-    let user = await logIncollection.findOne({ googleId: profile.id });
-    
-    if (user) {
-      // Update the existing user
-      user.name = profile.displayName;
-      user.email = profile.email;
-      user.profilePicture = profile.photos[0].value;
-      await user.save();
-    } else {
-      // Create a new user
-      user = await logIncollection.create({
-        googleId: profile.id,
-        name: profile.displayName,
-        email: profile.email,
-        profilePicture: profile.photos[0].value,
-      });
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK,
+      passReqToCallback: true,
+    },
+    async function (request, accessToken, refreshToken, profile, done) {
+      try {
+        let user = await logIncollection.findOne({ googleId: profile.id });
+
+        if (user) {
+          // Update the existing user
+          user.name = profile.displayName;
+          user.email = profile.email;
+          user.profilePicture = profile.photos[0].value;
+          await user.save();
+        } else {
+          // Create a new user
+          user = await logIncollection.create({
+            googleId: profile.id,
+            name: profile.displayName,
+            email: profile.email,
+            profilePicture: profile.photos[0].value,
+          });
+        }
+
+        done(null, user);
+      } catch (err) {
+        done(err, null);
+      }
     }
-    
-    done(null, user);
-  } catch (err) {
-    done(err, null);
-  }
-}));
+  )
+);
 
 // Passport.js serialize and deserialize user
 passport.serializeUser((user, done) => {
@@ -136,8 +212,7 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await logIncollection.findById(id); // Find user by ID
-    
-    
+
     done(null, user); // Attach user object to request
   } catch (err) {
     done(err, null);
@@ -147,8 +222,7 @@ passport.deserializeUser(async (id, done) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-app.use('/member', memberRoute)
+app.use("/member", memberRoute);
 
 // Handle root request
 app.get("/", (req, res) => {
@@ -156,7 +230,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/connect", isAdminLoggedIn, async (req, res) => {
-  const user = req.user
+  const user = req.user;
   res.render("connect", { user, allLeads: null });
 });
 // Login and Signup routes
@@ -164,64 +238,118 @@ app.get("/login", (req, res) => {
   res.render("signup");
 });
 
-// app 
-app.get("/apps", isAdminLoggedIn,(req, res) => {
-  const user = req.user
-  res.render("app",{user});
+// app
+app.get("/apps", isAdminLoggedIn, (req, res) => {
+  const user = req.user;
+  res.render("app", { user });
 });
 
-app.get("/template", isAdminLoggedIn, async(req, res) => {
+app.get("/template", isAdminLoggedIn, async (req, res) => {
   let user;
-  if (req.user.role === 'admin') {
+  if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id);
-  }else{
+  } else {
     user = await memberModel.findById(req.user.id);
   }
 
-  let templates = await templateModel.find({cid: user.cid});
-  
-  res.render("template",{user, templates});
+  let templates = await templateModel.find({ cid: user.cid });
+
+  res.render("template", { user, templates });
 });
 
-app.post('/template/update/:id', isAdminLoggedIn, async (req,res)=>{
-  let {id}=req.params;
-  let template = await templateModel.findById(id)
+app.post(
+  "/template/update/:id",
+  isAdminLoggedIn,
+  upload.fields([{ name: "image" }, { name: "pdf" }]),
+  async (req, res) => {
+    let { id } = req.params;
+    let template = await templateModel.findById(id);
 
-  let {title,text,client,team} = req.body
+    let { title, text, client, team } = req.body;
 
-  console.log(req.body);
-  
+    const imageFile = req.files["image"] ? req.files["image"][0].filename : "";
+    const pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
+    console.log(imageFile);
 
-  res.redirect('/template')
-})
+    template.title = title;
+    template.text = text;
 
-// team 
-app.get("/team", isAdminLoggedIn, async(req, res) => {
-  let user;
-  if (user.role === 'admin') {
-    user = await logIncollection.findById(req.user.id).populate('teams')
-  }else{
-    user = await memberModel.findById(req.user.id).populate('owner_id')
-    console.log(user);
-    
+    template.client = client === "on" ? true : false;
+    template.team = team === "on" ? true : false;
+
+    const filePath1 = path.join(
+      __dirname,
+      "..",
+      "template",
+      "images",
+      "uploads",
+      "whatsapp",
+      template.image
+    );
+    const filePath2 = path.join(
+      __dirname,
+      "..",
+      "template",
+      "images",
+      "uploads",
+      "whatsapp",
+      template.pdf
+    );
+    if (template.image != "") {
+      fs.unlink(filePath1, (err) => {
+        if (err) {
+          console.log("Error removing file", err);
+          return;
+        }
+        console.log("file removed successfully");
+      });
+      template.image = imageFile;
+    } else {
+      template.image = imageFile;
+    }
+
+    if (template.pdf != "") {
+      fs.unlink(filePath2, (err) => {
+        if (err) {
+          console.log("Error removing file", err);
+          return;
+        }
+        console.log("file removed successfully");
+      });
+      template.pdf = imageFile;
+    } else {
+      template.pdf = imageFile;
+    }
+
+    await template.save();
+    // console.log(req.body);
+    res.redirect("/template");
   }
-  res.render("team",{user});
+);
+
+// team
+app.get("/team", isAdminLoggedIn, async (req, res) => {
+  let user;
+  if (user.role === "admin") {
+    user = await logIncollection.findById(req.user.id).populate("teams");
+  } else {
+    user = await memberModel.findById(req.user.id).populate("owner_id");
+    console.log(user);
+  }
+  res.render("team", { user });
 });
 
-app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
+app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
   const user = req.user;
-  const {name, email} = req.query
-  const password = otpGenerator.generate(8, { 
-    digits: true, 
-    lowerCaseAlphabets: true, 
-    upperCaseAlphabets: true, 
-    specialChars: false
+  const { name, email } = req.query;
+  const password = otpGenerator.generate(8, {
+    digits: true,
+    lowerCaseAlphabets: true,
+    upperCaseAlphabets: true,
+    specialChars: false,
   });
 
- 
-
-  const mailMsg = 
-  `
+  const mailMsg = `
     <div style="font-family: Arial, sans-serif; color: #333;">
       <div style="text-align: center;">
         <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
@@ -244,17 +372,23 @@ app.get("/team/invite", isAdminLoggedIn, async(req, res) => {
       <p>Regards,<br>Web Soft Valley Technology</p>
     </div>
   `;
-  const subject = `Invitation from ${user.name}`
+  const subject = `Invitation from ${user.name}`;
   const isSent = await sendMail(email, mailMsg, subject);
   console.log(isSent);
 
-  if (isSent[0].res === 'okk') {
-    const newMember = new memberModel({ name, email, password,cid: user.cid, owner_id: user._id });
+  if (isSent[0].res === "okk") {
+    const newMember = new memberModel({
+      name,
+      email,
+      password,
+      cid: user.cid,
+      owner_id: user._id,
+    });
     await newMember.save();
-    user.teams.push(newMember._id)
-    await user.save()
+    user.teams.push(newMember._id);
+    await user.save();
   }
-  
+
   return res.redirect("/team");
 });
 
@@ -262,75 +396,74 @@ app.get("/signup", (req, res) => {
   res.render("signup");
 });
 
-// ! pipeline are here 
+// ! pipeline are here
 
-app.post('/pipeline',isAdminLoggedIn, async (req,res)=>{
-  const {title,color} = req.body
+app.post("/pipeline", isAdminLoggedIn, async (req, res) => {
+  const { title, color } = req.body;
 
   const user = await logIncollection.findById(req.user.id);
 
-  const pipeline = new pipelineModel({ uid:user._id, color, title ,cid:user.cid });
-    await pipeline.save();
-    // console.log(pipeline);
-  
-    res.redirect('/dashboard')
-  })
-
-app.get('/pipeline/del/:id',isAdminLoggedIn, async(req,res)=>{
-  const {id} = req.params
-  let pipeline = await pipelineModel.findByIdAndDelete(id)
+  const pipeline = new pipelineModel({
+    uid: user._id,
+    color,
+    title,
+    cid: user.cid,
+  });
+  await pipeline.save();
   // console.log(pipeline);
-  res.redirect('/dashboard')
-})
 
-app.post('/pipeline/update/:id', isAdminLoggedIn,async(req,res)=>{
-  const {id} = req.params
-  const {title,color, defaultVal} = req.body
-  
-  let pipeline = await pipelineModel.findById(id)
-  
+  res.redirect("/dashboard");
+});
+
+app.get("/pipeline/del/:id", isAdminLoggedIn, async (req, res) => {
+  const { id } = req.params;
+  let pipeline = await pipelineModel.findByIdAndDelete(id);
+  // console.log(pipeline);
+  res.redirect("/dashboard");
+});
+
+app.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
+  const { id } = req.params;
+  const { title, color, defaultVal } = req.body;
+
+  let pipeline = await pipelineModel.findById(id);
+
   pipeline.color = color;
   pipeline.title = title;
   pipeline.updatedAt = Date.now();
-  
-  if (defaultVal === 'on') { 
-    await pipelineModel.updateMany({ uid: req.user.id }, { $set: { defaultVal: false } });
-    
+
+  if (defaultVal === "on") {
+    await pipelineModel.updateMany(
+      { uid: req.user.id },
+      { $set: { defaultVal: false } }
+    );
+
     pipeline.defaultVal = true;
+  } else {
+    pipeline.defaultVal = false;
   }
-  else{
-  pipeline.defaultVal = false;
-  }
 
-  await pipeline.save()
-  res.redirect('/dashboard')
-
-})
-
-
+  await pipeline.save();
+  res.redirect("/dashboard");
+});
 
 app.get("/profile", isAdminLoggedIn, async (req, res) => {
+  const user = await logIncollection.findById(req.user.id);
 
-    const user = await logIncollection.findById(req.user.id);
-
-    res.render("profile", { user });
+  res.render("profile", { user });
 });
 
 app.get("/gethelp", isAdminLoggedIn, async (req, res) => {
-
   const user = await logIncollection.findById(req.user.id);
 
   res.render("gethelp", { user });
 });
 
-  
-
 // Dashboard route
 app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   try {
-    
     const user = await logIncollection.findById(req.user.id);
-    const pipelines = await pipelineModel.find({uid: user._id})
+    const pipelines = await pipelineModel.find({ uid: user._id });
     // req.session.id = userData.id;
     res.render("dashboard", { user, pipelines });
   } catch (error) {
@@ -338,59 +471,26 @@ app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// // Middleware to check user registration status
-// async function checkUserRegistration(req, res, next) {
-//   const userEmail = req.query.email; // Assuming email is passed in query params
-//   const user = await logIncollection.findOne({ email: userEmail });
-
-//   if (user && user.organisation && user.sector) {
-//     res.send('Form already filled. Access granted to the dashboard.');
-//   } else {
-//     next();
-//   }
-// }
-
-// // Route to render the form if not filled
-// app.get('/form', checkUserRegistration, (req, res) => {
-//   res.render('popupForm'); // Renders the form if user hasn't filled it yet
-// });
-
-// // Handle form submission to update the user's organisation and sector
-// app.post('/submit-form', async (req, res) => {
-//   const { email, organisation, sector } = req.body;
-
-//   // Find the user and update with organisation and sector
-//   const user = await logIncollection.findOne({ email });
-
-//   if (user) {
-//     user.organisation = organisation;
-//     user.sector = sector;
-//     await user.save();
-
-//     res.send('Form submitted successfully! Dashboard access granted.');
-//   } else {
-//     res.send('User not found.');
-//   }
-// });
-
-
 // Google Authentication Routes
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }),(req,res)=>{
-  
-  
-});
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
+  (req, res) => {}
+);
 
-app.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/signup' }),
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/signup" }),
   async (req, res) => {
     const token = await generateToken(req.user);
 
-    res.cookie("360Followers", token, { httpOnly: true, maxAge: 2 * 30 * 24 * 60 * 60 * 1000 });
-    res.redirect('/dashboard');
+    res.cookie("360Followers", token, {
+      httpOnly: true,
+      maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
+    });
+    res.redirect("/dashboard");
   }
 );
-
-
 
 // Signup handler
 
@@ -404,11 +504,20 @@ app.post("/signup", async (req, res) => {
     if (password !== confirmPassword)
       return res.render("signup", { errorMessage: "Passwords do not match" });
     const cid = uuidv4();
-    const newUser = new logIncollection({ name, email, password,cid, role: 'admin' });
+    const newUser = new logIncollection({
+      name,
+      email,
+      password,
+      cid,
+      role: "admin",
+    });
     await newUser.save();
     const token = await generateToken(newUser);
 
-    res.cookie("360Followers", token, { httpOnly: true, maxAge: 2 * 30 * 24 * 60 * 60 * 1000 });
+    res.cookie("360Followers", token, {
+      httpOnly: true,
+      maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
+    });
     res.redirect("/dashboard");
   } catch (err) {
     res.status(500).send("Error signing up");
@@ -427,7 +536,10 @@ app.post("/login", async (req, res) => {
     }
 
     const token = await generateToken(check);
-    res.cookie("360Followers", token, { httpOnly: true, maxAge: 2 * 30 * 24 * 60 * 60 * 1000 });
+    res.cookie("360Followers", token, {
+      httpOnly: true,
+      maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
+    });
     res.redirect("/dashboard");
   } catch (err) {
     console.error(err);
@@ -450,8 +562,8 @@ app.get("/auth/facebook", (req, res) => {
       scope: "email,pages_show_list,leads_retrieval",
       response_type: "code",
     });
-    console.log("redirected from /auth/fb");
-    
+  console.log("redirected from /auth/fb");
+
   res.redirect(facebookAuthUrl);
 });
 
@@ -462,7 +574,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
 
   if (!code) {
     console.log("no code");
-    
+
     return res.status(400).send("Invalid authorization code");
   }
 
@@ -474,22 +586,21 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
           client_id: process.env.FB_CLIENT_ID,
           redirect_uri: process.env.REDIRECT_URI,
           client_secret: process.env.FB_CLIENT_SECRET,
-          code
+          code,
         },
       }
     );
 
     console.log("now we have an token");
-    
+
     const accessToken = tokenResponse.data.access_token;
     console.log(accessToken);
-    let admin = await logIncollection.findById(req.user.id)
+    let admin = await logIncollection.findById(req.user.id);
     // console.log(admin);
-    
-    admin.facebookToken = accessToken;
-    await admin.save()
 
-    
+    admin.facebookToken = accessToken;
+    await admin.save();
+
     // console.log(req.session.accessToken);
 
     const pagesResponse = await axios.get(
@@ -499,7 +610,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
           access_token: accessToken,
         },
       }
-    );                                                          
+    );
 
     const pages = pagesResponse.data.data;
     let allLeads = [];
@@ -529,36 +640,35 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       }
     }
 
-
     if (!userData) {
       return res.redirect("/login");
     }
-    
+
     const user = await logIncollection.findById(userData.id);
 
     console.log(allLeads[0]);
 
-    allLeads.forEach(async (lead)=>{
-      const perLead = await leadsModel.findOne({lead_id: lead.id})
+    allLeads.forEach(async (lead) => {
+      const perLead = await leadsModel.findOne({ lead_id: lead.id });
 
       if (!perLead) {
         let leads_datas = [];
 
-        lead.field_data.forEach((data)=>{
-          leads_datas.push({que:data.name, ans:data.values[0]});  
-        })
+        lead.field_data.forEach((data) => {
+          leads_datas.push({ que: data.name, ans: data.values[0] });
+        });
 
-        const newLead = new leadsModel({ 
+        const newLead = new leadsModel({
           lead_id: lead.id,
-          income_time:lead.created_time,
+          income_time: lead.created_time,
           cid: user.cid,
-          leads_data:leads_datas,
-          app: 'facebook',
-         });
-         await newLead.save()
+          leads_data: leads_datas,
+          app: "facebook",
+        });
+        await newLead.save();
         // console.log(leads_datas);
       }
-    })
+    });
 
     chalteRaho(accessToken);
 
@@ -572,19 +682,18 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
 // Facebook Leads Fetch Route
 app.get("/leads", isAdminLoggedIn, async (req, res) => {
   try {
-let user;
-console.log("leads page");
+    let user;
+    console.log("leads page");
 
-    if (req.user.role === 'admin') {   
-       user = await logIncollection.findById(req.user.id).populate('myleads')
+    if (req.user.role === "admin") {
+      user = await logIncollection.findById(req.user.id).populate("myleads");
+    } else {
+      user = await memberModel.findById(req.user.id).populate("myleads");
     }
-    else{
-      user = await memberModel.findById(req.user.id).populate('myleads')
-    }
-  
-    let leads = await leadsModel.find({cid: user.cid})
-   console.log(user);
-   
+
+    let leads = await leadsModel.find({ cid: user.cid });
+    console.log(user);
+
     res.render("leads", { user, leads });
     // res.json({ leads: allLeads });
   } catch (error) {
@@ -593,62 +702,55 @@ console.log("leads page");
   }
 });
 
-app.get('/lead/book/:id', isAdminLoggedIn, async (req,res)=>{
-  let {id} = req.params;
-  
+app.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
+  let { id } = req.params;
+
   let lead = await leadsModel.findById(id);
   if (!lead) {
-    return res.redirect('/leads')
+    return res.redirect("/leads");
   }
-  if (req.user.role === 'admin') {   
-    let admin = await logIncollection.findById(req.user.id)
-    admin.myleads.push(lead._id)
+  if (req.user.role === "admin") {
+    let admin = await logIncollection.findById(req.user.id);
+    admin.myleads.push(lead._id);
     lead.uid = admin._id;
-    await admin.save()
-    await lead.save()
-  }
-  else{
-    let member = await memberModel.findById(req.user.id)
-    member.myleads.push(lead._id)
+    await admin.save();
+    await lead.save();
+  } else {
+    let member = await memberModel.findById(req.user.id);
+    member.myleads.push(lead._id);
     lead.uid = member._id;
-    await member.save()
-    await lead.save()
-    
-    console.log("bokking the leads by ", member);
-    
-  }
-  res.redirect('/leads')
-  
-})
+    await member.save();
+    await lead.save();
 
-app.get('/lead/remove/:id', isAdminLoggedIn, async (req,res)=>{
-  let {id} = req.params;
-  
+    console.log("bokking the leads by ", member);
+  }
+  res.redirect("/leads");
+});
+
+app.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
+  let { id } = req.params;
+
   let lead = await leadsModel.findById(id);
   if (!lead) {
-    return res.redirect('/leads')
+    return res.redirect("/leads");
   }
-  if (req.user.role === 'admin') {   
-    let admin = await logIncollection.findById(req.user.id)
+  if (req.user.role === "admin") {
+    let admin = await logIncollection.findById(req.user.id);
     admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
-    lead.uid = '';
-    await admin.save()
-    await lead.save()
-  }
-  else{
-    let member = await memberModel.findById(req.user.id)
+    lead.uid = "";
+    await admin.save();
+    await lead.save();
+  } else {
+    let member = await memberModel.findById(req.user.id);
     member.myleads.splice(member.myleads.indexOf(lead._id), 1);
-    lead.uid = '';
-    await member.save()
-    await lead.save()
-    
-    console.log("bokking the leads by ", member);
-    
-  }
-  res.redirect('/leads')
-  
-})
+    lead.uid = "";
+    await member.save();
+    await lead.save();
 
+    console.log("bokking the leads by ", member);
+  }
+  res.redirect("/leads");
+});
 
 // // Middleware to ensure the user is authenticated
 // function ensureAuthenticated(req, res, next) {
@@ -678,32 +780,26 @@ app.listen(port, () => {
   client.initialize();
 });
 
-
-
-
 function isAdminLoggedIn(req, res, next) {
   console.log("isAdminLoggedIn middilware");
   const token = req.cookies["360Followers"];
-  
+
   if (!token || token === undefined) {
     return res.redirect("/login");
   }
-  
+
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-     return res.redirect("/login");
-    }   
-    
+      return res.redirect("/login");
+    }
+
     req.user = decoded;
     // console.log(req.user);
-   return next();
+    return next();
   });
 }
 
-
-
 async function findNewLead(accessToken) {
-  
   let allNewLeads = [];
   const pagesResponse = await axios.get(
     `https://graph.facebook.com/v20.0/me/accounts`,
@@ -712,7 +808,7 @@ async function findNewLead(accessToken) {
         access_token: accessToken,
       },
     }
-  );                                                          
+  );
 
   const pages = pagesResponse.data.data;
   let allLeads = [];
@@ -742,43 +838,39 @@ async function findNewLead(accessToken) {
     }
   }
 
-
-  
-  allLeads.forEach(async (lead)=>{
-    const perLead = await leadsModel.findOne({lead_id: lead.id})
+  allLeads.forEach(async (lead) => {
+    const perLead = await leadsModel.findOne({ lead_id: lead.id });
 
     if (!perLead) {
+      console.log("new lead found", lead);
 
-      console.log("new lead found",lead );
-      
       let leads_datas = [];
 
-      lead.field_data.forEach((data)=>{
-        leads_datas.push({que:data.name, ans:data.values[0]});  
-      })
+      lead.field_data.forEach((data) => {
+        leads_datas.push({ que: data.name, ans: data.values[0] });
+      });
 
-      const newLead = new leadsModel({ 
+      const newLead = new leadsModel({
         lead_id: lead.id,
-        income_time:lead.created_time,
+        income_time: lead.created_time,
         cid: user.cid,
-        leads_data:leads_datas,
-        app: 'facebook',
-       });
-       await newLead.save()
-       allNewLeads.push(newLead)
+        leads_data: leads_datas,
+        app: "facebook",
+      });
+      await newLead.save();
+      allNewLeads.push(newLead);
 
       // console.log(leads_datas);
     }
-  })
+  });
 
-return allLeads;
+  return allLeads;
 }
 
 function chalteRaho(token) {
   let i = 0;
   setInterval(() => {
-    findNewLead(token)
-    console.log("step",i++);
-    
+    findNewLead(token);
+    console.log("step", i++);
   }, 60000);
 }

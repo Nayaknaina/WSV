@@ -21,9 +21,11 @@ const templateSchema = new mongoose.Schema(
     },
     image:{
       type: String,
+      default: ''
     },
     pdf:{
       type: String,
+      default: ''
     },
     client: {
       type: Boolean,

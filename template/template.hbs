@@ -5,7 +5,7 @@
   <title>
     Connect
   </title>
-  
+
   <meta name="robots" content="noindex, nofollow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,7 +47,7 @@
 
 <style>
   .box-form-container {
-    height:90%;
+    height: 90%;
     width: 90%;
     position: absolute;
     left: 10%;
@@ -58,7 +58,7 @@
     display: none;
     justify-content: center;
     align-items: center;
-   
+
   }
 
 
@@ -73,7 +73,7 @@
     padding: 20px;
   }
 
-  
+
   .box-form input,
   .box-form textarea,
   .box-form label {
@@ -124,7 +124,8 @@
     cursor: not-allowed;
   }
 
-  .box-form input, .box-form textarea{
+  .box-form input,
+  .box-form textarea {
     padding: 5px;
     font-size: 1rem;
     border: 1px solid rgb(40, 40, 40);
@@ -149,7 +150,8 @@
     width: 100%;
     height: auto;
   }
-  #remove-container{
+
+  #remove-container {
     position: absolute;
     right: 5%;
     top: 5%;
@@ -161,11 +163,11 @@
     padding: 10px 12px;
     color: #fff;
   }
- .card-deck .card{
-  border-radius: 12px !important;
-  overflow: hidden;
- }
-  
+
+  .card-deck .card {
+    border-radius: 12px !important;
+    overflow: hidden;
+  }
 </style>
 
 
@@ -178,94 +180,98 @@
   <div class="container-fluid">
     <div class="row">
       {{> sidebar}}
-    {{#ifEquals user.role 'admin'}}
-          <div class="box-form-container">
-            <div class="box-form" id="form1">
-              <form action="/template/update/{{templates.[0]._id}}" method="post">
-                <label for="title2">Title</label>
-                <input type="text" id="title2" name="title" value="{{templates.[0].title}}" placeholder="Enter title">
+      {{#ifEquals user.role 'admin'}}
+      <div class="box-form-container">
+        <div class="box-form" id="form1">
+          <form action="/template/update/{{templates.[0]._id}}" enctype='multipart/form-data' method="post">
+            <label for="title2">Title</label>
+            <input type="text" id="title2" name="title" value="{{templates.[0].title}}" placeholder="Enter title">
 
-                <label for="text2">Text</label>
-                <textarea id="text2" name="text" rows="4" placeholder="Enter text">{{templates.[0].text}}</textarea>
+            <label for="text2">Text</label>
+            <textarea id="text2" name="text" rows="4" placeholder="Enter text">{{templates.[0].text}}</textarea>
 
-                <label for="image2">Image File</label>
-                <input type="file" id="image2" name="image" accept="image/*">
+            <label for="image2">Image File</label>
+            <input type="file" id="image2" name="image" accept="image/*">
 
-                <label for="pdf2">PDF File</label>
-                <input type="file" id="pdf2" name="pdf" accept="application/pdf">
+            <label for="pdf2">PDF File</label>
+            <input type="file" id="pdf2" name="pdf" accept="application/pdf">
 
-                <label class="checkbox-label">
-                  <input type="checkbox" id="client" {{#if templates.[0].client }} checked {{/if}} name="client">Would you like to send reminder to customer?
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" id="team" {{#if templates.[0].team }} checked {{/if}} name="team">Would you like to send reminder to team member?
-                </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="client" {{#if templates.[0].client }} checked {{/if}} name="client">Would you
+              like to send reminder to customer?
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="team" {{#if templates.[0].team }} checked {{/if}} name="team">Would you like to
+              send reminder to team member?
+            </label>
 
-                <div class="buttons">
-                  <button type="submit" class="save-button">save</button>
-                  
-                </div>
-              </form>
+            <div class="buttons">
+              <button type="submit" class="save-button">save</button>
+
             </div>
+          </form>
+        </div>
 
-            <div class="box-form" id="form2">
-              <form action="/template/update/{{templates.[1]._id}}" method="post">
-                <label for="title2">Title</label>
-                <input type="text" id="title2" value="{{ templates.[1].title}} " name="title" placeholder="Enter title">
+        <div class="box-form" id="form2">
+          <form action="/template/update/{{templates.[1]._id}}" enctype='multipart/form-data' method="post">
+            <label for="title2">Title</label>
+            <input type="text" id="title2" value="{{ templates.[1].title}} " name="title" placeholder="Enter title">
 
-                <label for="text2">Text</label>
-                <textarea id="text2" name="text" rows="4"  placeholder="Enter text"> {{ templates.[1].text}}</textarea>
+            <label for="text2">Text</label>
+            <textarea id="text2" name="text" rows="4" placeholder="Enter text"> {{ templates.[1].text}}</textarea>
 
-                <label for="image2">Image File</label>
-                <input type="file" id="image2" name="image" accept="image/*">
+            <label for="image2">Image File</label>
+            <input type="file" id="image2" name="image" accept="image/*">
 
-                <label for="pdf2">PDF File</label>
-                <input type="file" id="pdf2" name="pdf" accept="application/pdf">
+            <label for="pdf2">PDF File</label>
+            <input type="file" id="pdf2" name="pdf" accept="application/pdf">
 
-                <label class="checkbox-label">
-                  <input type="checkbox" id="client" {{#if templates.[0].client }} checked {{/if}} name="client">Would you like to send reminder to customer?
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" id="team" {{#if templates.[0].team }} checked {{/if}} name="team">Would you like to send reminder to team member?
-                </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="client" {{#if templates.[0].client }} checked {{/if}} name="client">Would you
+              like to send reminder to customer?
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="team" {{#if templates.[0].team }} checked {{/if}} name="team">Would you like to
+              send reminder to team member?
+            </label>
 
-                <div class="buttons">
-                  <button type="submit" class="save-button">save</button>
-                  
-                </div>
-              </form>
+            <div class="buttons">
+              <button type="submit" class="save-button">save</button>
+
             </div>
+          </form>
+        </div>
 
-            <div class="box-form" id="form3">
-              <form action="/template/update/{{templates.[2]._id}}" method="post">
-                <label for="title2">Title</label>
-                <input type="text" id="title2" {{ templates.[2].title }} name="title" placeholder="Enter title">
+        <div class="box-form" id="form3">
+          <form action="/template/update/{{templates.[2]._id}}" method="post">
+            <label for="title2">Title</label>
+            <input type="text" id="title2" {{ templates.[2].title }} name="title" placeholder="Enter title">
 
-                <label for="text2">Text</label>
-                <textarea id="text2" name="text" {{templates.[2].text }} rows="4" placeholder="Enter text"></textarea>
+            <label for="text2">Text</label>
+            <textarea id="text2" name="text" {{templates.[2].text }} rows="4" placeholder="Enter text"></textarea>
 
-                {{!-- <label for="image2">Image File</label>
-                <input type="file" id="image2" name="image2" accept="image/*">
+            {{!-- <label for="image2">Image File</label>
+            <input type="file" id="image2" name="image2" accept="image/*">
 
-                <label for="pdf2">PDF File</label>
-                <input type="file" id="pdf2" name="pdf2" accept="application/pdf">
+            <label for="pdf2">PDF File</label>
+            <input type="file" id="pdf2" name="pdf2" accept="application/pdf">
 
-                <label class="checkbox-label">
-                  <input type="checkbox" id="client2" name="client2">Would you like to send reminder to customer?
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" id="team2" name="team2">Would you like to send reminder to team member?
-                </label> --}}
+            <label class="checkbox-label">
+              <input type="checkbox" id="client2" name="client2">Would you like to send reminder to customer?
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="team2" name="team2">Would you like to send reminder to team member?
+            </label> --}}
 
-                <div class="buttons">
-                  <button type="submit" class="save-button">save</button>
-                  
-                </div>
-              </form>
+            <div class="buttons">
+              <button type="submit" class="save-button">save</button>
+
             </div>
+          </form>
+        </div>
 
-          <i id="remove-container" onclick="closeFormContainer()" class="fa-solid fa-xmark"></i>
-          </div>
+        <i id="remove-container" onclick="closeFormContainer()" class="fa-solid fa-xmark"></i>
+      </div>
       {{/ifEquals}}
       <div id="blurkro" class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0 home-section">
         {{> NameHead}}
@@ -279,7 +285,12 @@
 
               <div class="card">
                 <div class="img-bx">
-                  <img class="card-img-top" src="https://www.sammobile.com/wp-content/uploads/2023/05/WhatsApp-Logo.jpg" alt="template image ">
+                  {{#if templates.[0].image}}
+                  <img class="card-img-top" src="/assets/uploads/whatsapp/{{templates.[0].image}}" alt="template image">
+                  {{else}}
+                  <img class="card-img-top" src="https://www.sammobile.com/wp-content/uploads/2023/05/WhatsApp-Logo.jpg"
+                    alt="template image">
+                  {{/if}}
 
                 </div>
                 <div class="card-body">
@@ -300,7 +311,12 @@
 
               <div class="card">
                 <div class="img-bx">
-                  <img class="card-img-top" src="https://www.sammobile.com/wp-content/uploads/2023/05/WhatsApp-Logo.jpg" alt="template image ">
+                  {{#if templates.[1].image}}
+                  <img class="card-img-top" src="/public/assets/uploads/whatsapp/{{templates.[1].image}}" alt="template image">
+                  {{else}}
+                  <img class="card-img-top" src="https://www.sammobile.com/wp-content/uploads/2023/05/WhatsApp-Logo.jpg"
+                    alt="template image">
+                  {{/if}}
                 </div>
                 <div class="card-body">
                   <h5 class="card-title" style="text-transform: capitalize;">{{templates.[1].title}}</h5>
@@ -318,7 +334,7 @@
                 </div>
               </div>
 
-              <div class="card" >
+              <div class="card">
                 <div class="img-bx">
                   <img class="card-img-top" src="https://www.sammobile.com/wp-content/uploads/2023/05/WhatsApp-Logo.jpg"
                     alt="template image ">
@@ -344,10 +360,10 @@
         </div>
       </div>
 
-    {{#ifEquals user.role 'admin'}}
+      {{#ifEquals user.role 'admin'}}
       <script>
 
-        function openForm1(){
+        function openForm1() {
           let container = document.querySelector('.box-form-container')
           let form = document.querySelector('#form1')
 
@@ -357,18 +373,18 @@
 
         }
 
-        function openForm2(){
+        function openForm2() {
           let container = document.querySelector('.box-form-container')
           let form = document.querySelector('#form2')
 
           console.log(form)
-          
+
           form.style.display = 'block'
           container.style.display = 'flex'
           document.querySelector('#blurkro').style.filter = 'blur(10px)'
         }
 
-        function openForm3(){
+        function openForm3() {
           let container = document.querySelector('.box-form-container')
           let form = document.querySelector('#form3')
 
@@ -377,25 +393,25 @@
           document.querySelector('#blurkro').style.filter = 'blur(10px)'
         }
 
-        function closeFormContainer(){
+        function closeFormContainer() {
           let container = document.querySelector('.box-form-container')
           let forms = document.querySelectorAll('.box-form')
           container.style.display = 'none'
 
           document.querySelector('#blurkro').style.filter = 'blur(0)'
-          forms.forEach((form)=>{
+          forms.forEach((form) => {
             form.style.display = 'none'
           })
 
-          
+
         }
       </script>
-    {{/ifEquals}}
+      {{/ifEquals}}
 
       {{> footer}}
 
     </div>
-    
+
   </div>
   <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
