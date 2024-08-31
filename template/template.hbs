@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    Connect
+  </title>
+  
+  <meta name="robots" content="noindex, nofollow">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="./" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/custom.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+  <link rel="stylesheet" type="text/css" href="/styles/loader.css">
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+    window.heap = window.heap || [], heap.load = function (e, t) {
+      window.heap.appid = e, window.heap.config = t = t || {};
+      var r = t.forceSSL || "https:" === document.location.protocol,
+        a = document.createElement("script");
+      a.type = "text/javascript", a.async = !0, a.src = (r ? "https:" : "http:") + "//cdn.heapanalytics.com/js/heap-" + e + ".js";
+      var n = document.getElementsByTagName("script")[0];
+      n.parentNode.insertBefore(a, n);
+      for (var o = function (e) {
+        return function () {
+          heap.push([e].concat(Array.prototype.slice.call(arguments, 0)))
+        }
+      }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], c = 0; c < p.length; c++) heap[p[c]] = o(p[c])
+    };
+    heap.load("490363613");
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
+    src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+
+</head>
+
+<style>
+  .box-form-container {
+    height:90%;
+    width: 90%;
+    position: absolute;
+    left: 10%;
+    top: 5%;
+
+    z-index: 99;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+   
+  }
+
+
+  .box-form {
+    min-width: 300px;
+    display: none;
+    width: 400px;
+    height: auto;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+
+  
+  .box-form input,
+  .box-form textarea,
+  .box-form label {
+    display: block;
+    width: 100%;
+    outline: none;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+  }
+
+  .box-form input:disabled,
+  .box-form textarea:disabled {
+    background-color: #e9ecef;
+  }
+
+  .box-form input[type="checkbox"] {
+    width: auto;
+    display: inline-block;
+  }
+
+  .box-form .checkbox-label {
+    display: inline-block;
+    margin-right: 15px;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+  }
+
+  .buttons button:hover {
+    background-color: #0056b3;
+  }
+
+  .buttons button[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .box-form input, .box-form textarea{
+    padding: 5px;
+    font-size: 1rem;
+    border: 1px solid rgb(40, 40, 40);
+    border-radius: 6px;
+  }
+</style>
+
+
+<style>
+  .img-bx {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    object-fit: cover;
+    background-position: center;
+  }
+
+  .img-bx img {
+    width: 100%;
+    height: auto;
+  }
+  #remove-container{
+    position: absolute;
+    right: 5%;
+    top: 5%;
+    font-size: 2rem;
+    font-weight: 700;
+    cursor: pointer;
+    background-color: rgb(255, 81, 0);
+    border-radius: 50%;
+    padding: 10px 12px;
+    color: #fff;
+  }
+ .card-deck .card{
+  border-radius: 12px !important;
+  overflow: hidden;
+ }
+  
+</style>
+
+
+<body class>
+
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="
+      height="0" width="0" style="display:none;visibility:hidden;"></iframe></noscript>
+
+
+  <div class="container-fluid">
+    <div class="row">
+      {{> sidebar}}
+    {{#ifEquals user.role 'admin'}}
+          <div class="box-form-container">
+            <div class="box-form" id="form1">
+              <form action="/template/update/{{templates.[0]._id}}" method="post">
+                <label for="title2">Title</label>
+                <input type="text" id="title2" name="title" value="{{templates.[0].title}}" placeholder="Enter title">
+
+                <label for="text2">Text</label>
+                <textarea id="text2" name="text" rows="4" placeholder="Enter text">{{templates.[0].text}}</textarea>
+
+                <label for="image2">Image File</label>
+                <input type="file" id="image2" name="image" accept="image/*">
+
+                <label for="pdf2">PDF File</label>
+                <input type="file" id="pdf2" name="pdf" accept="application/pdf">
+
+                <label class="checkbox-label">
+                  <input type="checkbox" id="client" {{#if templates.[0].client }} checked {{/if}} name="client">Would you like to send reminder to customer?
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="team" {{#if templates.[0].team }} checked {{/if}} name="team">Would you like to send reminder to team member?
+                </label>
+
+                <div class="buttons">
+                  <button type="submit" class="save-button">save</button>
+                  
+                </div>
+              </form>
+            </div>
+
+            <div class="box-form" id="form2">
+              <form action="/template/update/{{templates.[1]._id}}" method="post">
+                <label for="title2">Title</label>
+                <input type="text" id="title2" value="{{ templates.[1].title}} " name="title" placeholder="Enter title">
+
+                <label for="text2">Text</label>
+                <textarea id="text2" name="text" rows="4"  placeholder="Enter text"> {{ templates.[1].text}}</textarea>
+
+                <label for="image2">Image File</label>
+                <input type="file" id="image2" name="image" accept="image/*">
+
+                <label for="pdf2">PDF File</label>
+                <input type="file" id="pdf2" name="pdf" accept="application/pdf">
+
+                <label class="checkbox-label">
+                  <input type="checkbox" id="client" {{#if templates.[0].client }} checked {{/if}} name="client">Would you like to send reminder to customer?
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="team" {{#if templates.[0].team }} checked {{/if}} name="team">Would you like to send reminder to team member?
+                </label>
+
+                <div class="buttons">
+                  <button type="submit" class="save-button">save</button>
+                  
+                </div>
+              </form>
+            </div>
+
+            <div class="box-form" id="form3">
+              <form action="/template/update/{{templates.[2]._id}}" method="post">
+                <label for="title2">Title</label>
+                <input type="text" id="title2" {{ templates.[2].title }} name="title" placeholder="Enter title">
+
+                <label for="text2">Text</label>
+                <textarea id="text2" name="text" {{templates.[2].text }} rows="4" placeholder="Enter text"></textarea>
+
+                {{!-- <label for="image2">Image File</label>
+                <input type="file" id="image2" name="image2" accept="image/*">
+
+                <label for="pdf2">PDF File</label>
+                <input type="file" id="pdf2" name="pdf2" accept="application/pdf">
+
+                <label class="checkbox-label">
+                  <input type="checkbox" id="client2" name="client2">Would you like to send reminder to customer?
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="team2" name="team2">Would you like to send reminder to team member?
+                </label> --}}
+
+                <div class="buttons">
+                  <button type="submit" class="save-button">save</button>
+                  
+                </div>
+              </form>
+            </div>
+
+          <i id="remove-container" onclick="closeFormContainer()" class="fa-solid fa-xmark"></i>
+          </div>
+      {{/ifEquals}}
+      <div id="blurkro" class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0 home-section">
+        {{> NameHead}}
+        <div class="container ">
+
+
+
+
+          <div class="row">
+            <div class="card-deck">
+
+              <div class="card">
+                <div class="img-bx">
+                  <img class="card-img-top" src="https://www.sammobile.com/wp-content/uploads/2023/05/WhatsApp-Logo.jpg" alt="template image ">
+
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title" style="text-transform: capitalize;">{{ templates.[0].title}}</h5>
+                  <p class="card-text">{{ templates.[0].text}}</p>
+                </div>
+                <div class="card-footer">
+                  <small class="text-muted">{{#if templates.[0].client }} for client {{/if}}</small><br>
+                  <small class="text-muted">{{#if templates.[0].team }} for team {{/if}}</small>
+                </div>
+                <div class="card-footer">
+                  {{#ifEquals user.role 'admin'}}
+                  <button type="button" class="btn btn-primary edit-button" onclick="openForm1()">Edit</button>
+                  {{/ifEquals}}
+                  <button type="submit" class="btn btn-success send-button">Send</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="img-bx">
+                  <img class="card-img-top" src="https://www.sammobile.com/wp-content/uploads/2023/05/WhatsApp-Logo.jpg" alt="template image ">
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title" style="text-transform: capitalize;">{{templates.[1].title}}</h5>
+                  <p class="card-text">{{templates.[1].text}}</p>
+                </div>
+                <div class="card-footer">
+                  <small class="text-muted">{{#if templates.[1].client }} for client {{/if}}</small>
+                  <small class="text-muted">{{#if templates.[1].team }} for team {{/if}}</small>
+                </div>
+                <div class="card-footer">
+                  {{#ifEquals user.role 'admin'}}
+                  <button type="button" class="btn btn-primary edit-button" onclick="openForm2()">Edit</button>
+                  {{/ifEquals}}
+                  <button type="submit" class="btn btn-success send-button">Send</button>
+                </div>
+              </div>
+
+              <div class="card" >
+                <div class="img-bx">
+                  <img class="card-img-top" src="https://www.sammobile.com/wp-content/uploads/2023/05/WhatsApp-Logo.jpg"
+                    alt="template image ">
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title" style="text-transform: capitalize;">{{templates.[2].title}}</h5>
+                  <p class="card-text">{{templates.[2].text}}</p>
+                </div>
+                <div class="card-footer">
+
+                </div>
+                <div class="card-footer">
+                  {{#ifEquals user.role 'admin'}}
+                  <button type="button" class="btn btn-primary edit-button" onclick="openForm3()">Edit</button>
+                  {{/ifEquals}}
+                  <button type="submit" class="btn btn-success send-button">Send</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    {{#ifEquals user.role 'admin'}}
+      <script>
+
+        function openForm1(){
+          let container = document.querySelector('.box-form-container')
+          let form = document.querySelector('#form1')
+
+          container.style.display = 'flex'
+          form.style.display = 'block'
+          document.querySelector('#blurkro').style.filter = 'blur(10px)'
+
+        }
+
+        function openForm2(){
+          let container = document.querySelector('.box-form-container')
+          let form = document.querySelector('#form2')
+
+          console.log(form)
+          
+          form.style.display = 'block'
+          container.style.display = 'flex'
+          document.querySelector('#blurkro').style.filter = 'blur(10px)'
+        }
+
+        function openForm3(){
+          let container = document.querySelector('.box-form-container')
+          let form = document.querySelector('#form3')
+
+          container.style.display = 'flex'
+          form.style.display = 'block'
+          document.querySelector('#blurkro').style.filter = 'blur(10px)'
+        }
+
+        function closeFormContainer(){
+          let container = document.querySelector('.box-form-container')
+          let forms = document.querySelectorAll('.box-form')
+          container.style.display = 'none'
+
+          document.querySelector('#blurkro').style.filter = 'blur(0)'
+          forms.forEach((form)=>{
+            form.style.display = 'none'
+          })
+
+          
+        }
+      </script>
+    {{/ifEquals}}
+
+      {{> footer}}
+
+    </div>
+    
+  </div>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
+    crossorigin="anonymous"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/js/bootstrap-select.js"></script>
+
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+  <script src="/js/dependencies/sweetalert.min.js?nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+
+
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="/assets/js/timezones.full.min.js"></script>
+
+  <script src="/assets/js/custom-new.js"></script>
+  <script>
+
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+    $(document).ready(function () {
+      $('#signup').on('submit', function () {
+        $('.loader-display').css('display', 'block');
+      });
+    });
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+    $(window).scroll(function () {
+      if ($(window).scrollTop() >= 72) {
+        $('#top_header').addClass('sticky');
+      } else {
+        $('#top_header').removeClass('sticky');
+      }
+    });
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+    $('#nav-tab a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+
+    // store the currently selected tab in the hash value
+    $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
+      var id = $(e.target).attr("href").substr(1);
+      console.log("id", id);
+      window.location.hash = id;
+    });
+
+    // on load of the page: switch to the currently selected tab
+    var hash = window.location.hash;
+    $('#nav-tab a[href="' + hash + '"]').tab('show');
+  </script>
+</body>
+
+</html>
