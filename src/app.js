@@ -36,66 +36,6 @@ const client = new Client({
   authStrategy: new LocalAuth(), // This saves session data locally
 });
 
-<<<<<<< HEAD
-=======
-// Generate and store the QR code data
-client.on('qr', (qr) => {
-  qrcode.toDataURL(qr, (err, url) => {
-      if (err) {
-          console.error('Error generating QR code:', err);
-          return;
-      }
-      qrCodeData = url;
-     
-      // console.log("url iti aahe");
-      // console.log(url);
-      
-  });
-});
-
-// Event when client is authenticated and READY
-client.on('ready', () => {
-  console.log('WhatsApp client is ready!');
-  whatsappClientReady = true;
-});
-
-// Event when client is disconnected
-client.on('disconnected', () => {
-  console.log('WhatsApp client has been disconnected.');
-  whatsappClientReady = false;
-});
-
-// Function to send a WhatsApp message
-function sendMessageToLead(phoneNumber, message) {
-  if (!whatsappClientReady) {
-      console.error('WhatsApp client is not ready. Cannot send message.');
-      return;
-  }
-
-  client.sendMessage(phoneNumber, message)
-      .then((result) => {
-          console.log('Message sent:', result);
-      })
-      .catch((error) => {
-          console.error('Error sending message:', error);
-      });
-}
-
-// Serve QR code via HTTP
-app.get('/qr', (req, res) => {
-  res.send(`
-      <html>
-          <body>
-              <h1>Scan this QR Code with WhatsApp</h1>
-              <img src="${qrCodeData}" alt="QR Code">
-              <form action="/logout" method="get">
-                  <button type="submit">Log Out</button>
-              </form>
-          </body>
-      </html>
-  `);
-});
->>>>>>> 62cef81e93c21d479894ab98daaa6bd07c8d2d16
 
 
 // Middleware
@@ -145,64 +85,6 @@ hbs.registerHelper('containsPhoneNumber', function (text) {
 
 
 
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-
-app.use(express.static("template"));
-
-// Endpoint to handle logout
-app.get('/logout', async (req, res) => {
-  try {
-      await client.logout(); // Log out the client
-      console.log('Logged out successfully.');
-      whatsappClientReady = false;
-      qrCodeData = ''; // Clear QR code data
-      res.send('Logged out successfully. <a href="/qr">Scan QR Code again</a>');
-  } catch (error) {
-      console.error('Error logging out:', error);
-      res.status(500).send('Error logging out.');
-  }
-});
-// Generate and store the QR code data
-client.on('qr', (qr) => {
-  qrcode.toDataURL(qr, (err, url) => {
-      if (err) {
-          console.error('Error generating QR code:', err);
-          return;
-      }
-      qrCodeData = url;
-     
-      
-  });
-});
-
-// Event when client is authenticated and READY
-client.on('ready', () => {
-  console.log('WhatsApp client is ready!');
-  whatsappClientReady = true;
-});
-
-// Event when client is disconnected
-client.on('disconnected', () => {
-  console.log('WhatsApp client has been disconnected.');
-  whatsappClientReady = false;
-});
-
-// Function to send a WhatsApp message
-function sendMessageToLead(phoneNumber, message) {
-  if (!whatsappClientReady) {
-      console.error('WhatsApp client is not ready. Cannot send message.');
-      return;
-  }
-
-  client.sendMessage(phoneNumber, message)
-      .then((result) => {
-          console.log('Message sent:', result);
-      })
-      .catch((error) => {
-          console.error('Error sending message:', error);
-      });
-}
 
 
 // Serve QR code via HTTP
@@ -455,6 +337,42 @@ app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
     res.status(500).send("Internal error");
   }
 });
+
+// // Middleware to check user registration status
+// async function checkUserRegistration(req, res, next) {
+//   const userEmail = req.query.email; // Assuming email is passed in query params
+//   const user = await logIncollection.findOne({ email: userEmail });
+
+//   if (user && user.organisation && user.sector) {
+//     res.send('Form already filled. Access granted to the dashboard.');
+//   } else {
+//     next();
+//   }
+// }
+
+// // Route to render the form if not filled
+// app.get('/form', checkUserRegistration, (req, res) => {
+//   res.render('popupForm'); // Renders the form if user hasn't filled it yet
+// });
+
+// // Handle form submission to update the user's organisation and sector
+// app.post('/submit-form', async (req, res) => {
+//   const { email, organisation, sector } = req.body;
+
+//   // Find the user and update with organisation and sector
+//   const user = await logIncollection.findOne({ email });
+
+//   if (user) {
+//     user.organisation = organisation;
+//     user.sector = sector;
+//     await user.save();
+
+//     res.send('Form submitted successfully! Dashboard access granted.');
+//   } else {
+//     res.send('User not found.');
+//   }
+// });
+
 
 // Google Authentication Routes
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }),(req,res)=>{
