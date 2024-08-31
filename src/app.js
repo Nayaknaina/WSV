@@ -24,7 +24,7 @@ const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const { v4: uuidv4 } = require("uuid");
 const { sendMail } = require("./service/mailSender.js");
 const { upload } = require("./service/multer.js");
-const fs = require('fs')
+const fs = require("fs");
 
 const pipelineModel = require("./models/pipeline.model.js");
 const memberModel = require("./models/member.models.js");
@@ -267,45 +267,58 @@ app.post(
 
     let { title, text, client, team } = req.body;
 
-    const imageFile = req.files['image'] ? req.files['image'][0].filename : '';
-    const pdfFile = req.files['pdf'] ? req.files['pdf'][0].filename : '';
+    const imageFile = req.files["image"] ? req.files["image"][0].filename : "";
+    const pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
+    console.log(imageFile);
 
     template.title = title;
     template.text = text;
-    
-    template.client = client === 'on' ? true: false;
-    template.team = team === 'on' ? true: false;
 
-    if (template.image != '') {
-      fs.unlink(
-        "./public/assets/uploads/whatsapp/" + template.image,
-        (err) => {
-          if (err) {
-            console.log("Error removing file",err);
-            return;
-          }
+    template.client = client === "on" ? true : false;
+    template.team = team === "on" ? true : false;
+
+    const filePath1 = path.join(
+      __dirname,
+      "..",
+      "template",
+      "images",
+      "uploads",
+      "whatsapp",
+      template.image
+    );
+    const filePath2 = path.join(
+      __dirname,
+      "..",
+      "template",
+      "images",
+      "uploads",
+      "whatsapp",
+      template.pdf
+    );
+    if (template.image != "") {
+      fs.unlink(filePath1, (err) => {
+        if (err) {
+          console.log("Error removing file", err);
+          return;
         }
-      );
-      template.image = imageFile 
-    } else{
-      template.image = imageFile 
+        console.log("file removed successfully");
+      });
+      template.image = imageFile;
+    } else {
+      template.image = imageFile;
     }
 
-    if (template.pdf != '') {
-      fs.unlink(
-        "./public/assets/uploads/whatsapp/" + template.pdf,
-        (err) => {
-          if (err) {
-            console.log("Error removing file");
-            return;
-          }
+    if (template.pdf != "") {
+      fs.unlink(filePath2, (err) => {
+        if (err) {
+          console.log("Error removing file", err);
+          return;
         }
-      );
-
-      template.pdf = pdfFile 
-    }
-    else{
-      template.pdf = pdfFile 
+        console.log("file removed successfully");
+      });
+      template.pdf = imageFile;
+    } else {
+      template.pdf = imageFile;
     }
 
     await template.save();
