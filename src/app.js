@@ -528,6 +528,28 @@ app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/signup" }),
   async (req, res) => {
+    console.log(req.user);
+    
+    let user = await logIncollection.findOne({email: req.user.email})
+    const cid = uuidv4();
+    user.cid = cid;
+    await user.save()
+
+  const pipelines = [
+    { title: 'win', color: '#28A745' },
+    { title: 'loss', color: '#DC3545' },
+    { title: 'held', color: '#007BFF' },
+    { title: 'pending', color: '#FFC107' },
+  ].map(pipelineData => new pipelineModel({
+    uid: user._id,
+    color: pipelineData.color,
+    title: pipelineData.title,
+    cid: user.cid,
+  }));
+
+  // Save all pipelines in parallel
+  await Promise.all(pipelines.map(pipeline => pipeline.save()));
+
     const token = await generateToken(req.user);
 
     res.cookie("360Followers", token, {
