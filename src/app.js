@@ -257,8 +257,7 @@ app.get("/template", isAdminLoggedIn, async (req, res) => {
   res.render("template", { user, templates });
 });
 
-app.post(
-  "/template/update/:id",
+app.post("/template/update/:id",
   isAdminLoggedIn,
   upload.fields([{ name: "image" }, { name: "pdf" }]),
   async (req, res) => {
@@ -512,6 +511,21 @@ app.post("/signup", async (req, res) => {
       role: "admin",
     });
     await newUser.save();
+
+    const pipelines = [
+      { title: "win", color: "#28A745" },
+      { title: "loss", color: "#DC3545" },
+      { title: "held", color: "#007BFF" },
+      { title: "pending", color: "#FFC107" },
+    ].map((pipelineData) =>new pipelineModel({
+          uid: newUser._id,
+          color: pipelineData.color,
+          title: pipelineData.title,
+          cid: newUser.cid,
+        }));
+    // Save all pipelines in parallel
+    await Promise.all(pipelines.map((pipeline) => pipeline.save()));
+
     const token = await generateToken(newUser);
 
     res.cookie("360Followers", token, {
@@ -640,13 +654,11 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       }
     }
 
-    if (!userData) {
+    if (!admin) {
       return res.redirect("/login");
     }
 
-    const user = await logIncollection.findById(userData.id);
-
-    console.log(allLeads[0]);
+    // console.log(allLeads[0]);
 
     allLeads.forEach(async (lead) => {
       const perLead = await leadsModel.findOne({ lead_id: lead.id });
@@ -661,7 +673,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
         const newLead = new leadsModel({
           lead_id: lead.id,
           income_time: lead.created_time,
-          cid: user.cid,
+          cid: admin.cid,
           leads_data: leads_datas,
           app: "facebook",
         });
@@ -686,15 +698,26 @@ app.get("/leads", isAdminLoggedIn, async (req, res) => {
     console.log("leads page");
 
     if (req.user.role === "admin") {
-      user = await logIncollection.findById(req.user.id).populate("myleads");
+      user = await logIncollection.findById(req.user.id).populate({
+        path: "myleads",
+        populate: {
+          path: "status", // Ensure that leads' status is populated
+        },
+      });
     } else {
-      user = await memberModel.findById(req.user.id).populate("myleads");
+      user = await memberModel.findById(req.user.id).populate({
+        path: "myleads",
+        populate: {
+          path: "status", // Populate status from leads
+        },
+      });
     }
 
-    let leads = await leadsModel.find({ cid: user.cid });
-    console.log(user);
+    let leads = await leadsModel.find({ cid: user.cid }).populate("status");
+    let pipes = await pipelineModel.find({ cid: user.cid });
+    // console.log(user);
 
-    res.render("leads", { user, leads });
+    res.render("leads", { user, leads, pipes });
     // res.json({ leads: allLeads });
   } catch (error) {
     console.error("Error fetching leads:", error);
@@ -752,15 +775,20 @@ app.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
   res.redirect("/leads");
 });
 
-// // Middleware to ensure the user is authenticated
-// function ensureAuthenticated(req, res, next) {
-//   // console.log(req.session.accessToken);
+app.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
+  let { id } = req.params;
 
-//   if (req.session.accessToken) {
-//     return next();
-//   }
-//   res.redirect("/connect");
-// }
+  let lead = await leadsModel.findById(id);
+  let pipe = await pipelineModel.findById(req.body.pipeId);
+
+  if (!lead) {
+    return res.redirect("/leads");
+  }
+  lead.status = pipe._id;
+  await lead.save();
+
+  res.redirect("/leads");
+});
 
 // Handle dynamic routes to serve pages without .html extension
 app.get("/:page", (req, res) => {
