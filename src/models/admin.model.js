@@ -65,7 +65,10 @@ const logInSchema = new mongoose.Schema({
     type:String,
     lowercase: true,
     trim: true
-  }
+  },
+  organizationName: { type: String },
+  sector: { type: String, }
+ 
 });
 
 // Define the model

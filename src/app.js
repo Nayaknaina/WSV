@@ -31,6 +31,7 @@ const memberModel = require("./models/member.models.js");
 const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
 
+
 const memberRoute = require("./routes/members.route.js");
 const { log } = require("console");
 
@@ -82,24 +83,11 @@ function sendMessageToLead(phoneNumber, message) {
     });
 }
 
-// Serve QR code via HTTP
-app.get("/qr", (req, res) => {
-  res.send(`
-      <html>
-          <body>
-              <h1>Scan this QR Code with WhatsApp</h1>
-              <img src="${qrCodeData}" alt="QR Code">
-              <form action="/logout" method="get">
-                  <button type="submit">Log Out</button>
-              </form>
-          </body>
-      </html>
-  `);
-});
+
 
 // Middleware
 const sessionStore =
-  process.env.NODE_ENV === "production"
+process.env.NODE_ENV === "production"
     ? MongoStore.create({
         mongoUrl:
           "mongodb+srv://nainanayak288:Dkccg5NaZMANqu7F@wsvconnect.bpxfx.mongodb.net/",
@@ -143,21 +131,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(express.static("template"));
-// app.use('/public', express.static(path.join(__dirname, '../../public')));
 
-// Endpoint to handle logout
-app.get("/logout", async (req, res) => {
-  try {
-    await client.logout(); // Log out the client
-    console.log("Logged out successfully.");
-    whatsappClientReady = false;
-    qrCodeData = ""; // Clear QR code data
-    res.send('Logged out successfully. <a href="/qr">Scan QR Code again</a>');
-  } catch (error) {
-    console.error("Error logging out:", error);
-    res.status(500).send("Error logging out.");
-  }
-});
 
 // Serve QR code via HTTP
 app.get("/qr", isAdminLoggedIn, (req, res) => {
@@ -166,6 +140,14 @@ app.get("/qr", isAdminLoggedIn, (req, res) => {
 
   res.render("qr", { user, qrCodeData });
 });
+
+app.get("/logoutWA",(req,res)=>{
+  qrCodeData = "";
+  client.logout();
+
+  // Redirect to dashboard
+  res.redirect("/dashboard");
+})
 
 // Passport.js Google Strategy
 passport.use(
@@ -228,6 +210,9 @@ app.use("/member", memberRoute);
 app.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
+
+
+// Endpoint to handle form submission
 
 app.get("/connect", isAdminLoggedIn, async (req, res) => {
   const user = req.user;
@@ -458,17 +443,79 @@ app.get("/gethelp", isAdminLoggedIn, async (req, res) => {
   res.render("gethelp", { user });
 });
 
+
+app.post("/submit-form", async (req, res) => {
+  try {
+    const email = req.body.email;
+    const organizationName = req.body.organizationName;
+    const sector = req.body.sector;
+
+    const user = await logIncollection.findOne({ email });
+
+    if (user) {
+      res.send({ message: "Form submitted successfully", id: user._id });
+    } else {
+      res.status(404).send({ message: "User not found"})
+    }
+  }
+  catch (error) {
+    res.status(500).send("Internal error");
+  }
+});
+//UPDATE-USER
+app.post("/update-user", async (req, res) => {
+  try {
+    const id = req.body.id;
+    const organizationName = req.body.organizationName;
+    const sector = req.body.sector;
+
+    await logIncollection.findByIdAndUpdate(id, {
+      organizationName,
+      sector
+    });
+
+    res.send({ message: "User updated successfully" });
+  } catch (error) {
+    res.status(500).send({ message: "Error updating user" });
+  }
+});
+
 // Dashboard route
 app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   try {
     const user = await logIncollection.findById(req.user.id);
-    const pipelines = await pipelineModel.find({ uid: user._id });
-    // req.session.id = userData.id;
-    res.render("dashboard", { user, pipelines });
+    if (!user.organizationName) {
+      res.render("dashboard", { showForm: true });
+    } else {
+      const pipelines = await pipelineModel.find({ uid: user._id });
+      res.render("dashboard", { user, pipelines, showForm: false });
+    }
   } catch (error) {
     res.status(500).send("Internal error");
   }
 });
+// app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     const user = await logIncollection.findById(req.user.id);
+//     const pipelines = await pipelineModel.find({ uid: user._id });
+//     // req.session.id = userData.id;
+//     res.render("dashboard", { user, pipelines });
+//   } catch (error) {
+//     res.status(500).send("Internal error");
+//   }
+// });
+// app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     const user = await Organization.findOne({ email: req.user.email });
+//     let showForm = true;
+//     if (user) {
+//       showForm = !user.formSubmitted;
+//     }
+//     res.render("dashboard", { user, showForm });
+//   } catch (error) {
+//     res.status(500).send("Internal error");
+//   }
+// });
 
 // Google Authentication Routes
 app.get(

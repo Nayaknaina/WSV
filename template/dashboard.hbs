@@ -75,15 +75,18 @@
 
 <body class>
 
+
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="
             height="0" width="0" style="display:none;visibility:hidden;"></iframe></noscript>
-
+    {{#if showForm}}
     <!-- Popup Form -->
     <div id="popup-form">
-        <form id="org-form">
+        <form id="org-form" action="/submit-form" method="post">
             <h2>Fill the Form to Access Dashboard</h2>
-            <label for="organisation">Name of Organisation:</label>
-            <input type="text" id="organisation" name="organisation" required>
+            <label for="email">Enter the registered EmailId:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="organizationName">Name of Organisation:</label>
+            <input type="text" id="organizationName" name="organizationName" required>
 
             <label for="sector">Sector:</label>
             <select id="sector" name="sector" required>
@@ -92,6 +95,7 @@
                 <option value="Finance">Finance</option>
                 <option value="Education">Education</option>
                 <option value="Healthcare">Healthcare</option>
+                <option value="Agriculture">Agriculture</option>
                 <!-- Add more sectors as needed -->
             </select>
 
@@ -99,7 +103,7 @@
         </form>
     </div>
 
-
+    {{else}}
     <div class="container-fluid" id="dashboard-content">
         <div class="row">
             {{> sidebar}}
@@ -249,7 +253,7 @@
                     <!--/.col-->
 
 
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-3 col-md-6" >
                         <div class="social-box twitter">
                             <i class="fa fa-whatsapp"></i>
                             <a target="_blank" href="/qr" class="btn btn-outline-secondary border  font-15">connect
@@ -271,7 +275,7 @@
                     <!--/.col-->
 
 
-                    <div class="col-lg-3 col-md-6">
+                    {{!-- <div class="col-lg-3 col-md-6">
                         <div class="social-box google-plus">
                             <i class="fa fa-google-plus"></i>
                             <ul>
@@ -286,7 +290,7 @@
                             </ul>
                         </div>
                         <!--/social-box-->
-                    </div>
+                    </div> --}}
                     <!--/.col-->
 
                     <div class="col-xl-6">
@@ -404,7 +408,7 @@
                                 <ul>
                                     <li class="active">
                                         <h5>750</h5>
-                                        Tweets
+                                         Leads
                                     </li>
                                     <li>
                                         <h5>865</h5>
@@ -423,7 +427,7 @@
                             <footer class="twt-footer">
                                 <a href="#"><i class="fa fa-camera"></i></a>
                                 <a href="#"><i class="fa fa-map-marker"></i></a>
-                                New Castle, UK
+                                India
                                 <span class="pull-right">
                                     32
                                 </span>
@@ -439,7 +443,7 @@
                                     <div class="stat-icon dib"><i class="ti-money text-success border-success"></i>
                                     </div>
                                     <div class="stat-content dib">
-                                        <div class="stat-text">Total Profit</div>
+                                        <div class="stat-text">Total Leads</div>
                                         <div class="stat-digit">1,012</div>
                                     </div>
                                 </div>
@@ -498,6 +502,7 @@
 
         </div>
     </div>
+    {{/if}}
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
         crossorigin="anonymous"></script>
@@ -612,25 +617,64 @@
 
         }
 
+      
+
         //popup form
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const popupForm = document.getElementById('popup-form');
-            const dashboardContent = document.getElementById('dashboard-content');
+        document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('org-form');
+            const popupForm = document.getElementById('popup-form');
 
-            // Prevent access to the dashboard until the form is submitted
-            dashboardContent.style.filter = 'blur(5px)';
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
 
-            form.addEventListener('submit', function (e) {
-                e.preventDefault(); // Prevent form submission
+                    const formData = new FormData(form);
+                    const data = {
+                        email: formData.get('email'),
+                        organizationName: formData.get('organizationName'),
+                        sector: formData.get('sector')
+                    };
 
-                // Check if all required fields are filled
-                if (form.checkValidity()) {
-                    popupForm.style.display = 'none'; // Hide the popup
-                    dashboardContent.style.filter = 'none'; // Remove blur effect
-                }
-            });
+                    try {
+                        const response = await fetch('/submit-form', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            alert(result.message);
+                            // Update the user document with organizationName and sector
+                            await fetch('/update-user', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    id: result.id,
+                                    organizationName: data.organizationName,
+                                    sector: data.sector
+                                })
+                            });
+
+                            // Hide form after successful submission
+                            popupForm.style.display = 'none';
+                            // Reload the page to show the dashboard
+                            window.location.reload();
+                        } else {
+                            alert(result.message); // Show error message
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Error submitting the form');
+                    }
+                });
+            }
         });
 
     </script>
