@@ -18,9 +18,8 @@ const leadsSchema = new mongoose.Schema(
     },
 
     status: {
-      type: String,
-      enum: ['new', 'pending', 'completed', 'lost'], 
-      default: 'new', 
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'pipeline',
     },             
 
     leads_data: [

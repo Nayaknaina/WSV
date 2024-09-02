@@ -150,9 +150,58 @@
                             justify-content: space-between;
                         }
 
+                        .status-circle {
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 50%;
+                            border: 2px solid black;
+                            background-color: #36383a;
+                            position: relative;
+                        }
+
                         .created-time-icon {
                             width: 20px;
                             height: 20px;
+                        }
+
+                        #status-box {
+                            display: none;
+                            width: auto;
+                            height: auto;
+                            position: relative;
+                            top: 0%;
+                            z-index: 99999999;
+                            right: 0%;
+                        }
+
+                        .ul-box {
+                            width: auto;
+                            height: auto;
+                            position: absolute;
+                            top: 3rem;
+                            right: 1rem;
+                            display: none;
+                        }
+
+                        .ul-box.open {
+                            display: block;
+                        }
+
+                        .ul-box li {
+                            border: 2px solid rgb(124, 124, 124);
+                            width: auto;
+                            border-radius: 4px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 2px 8px;
+                            gap: 10px;
+                        }
+                        .drop-circle{
+                            width: 18px;
+                            height: 18px;
+                            border-radius: 50%;
+                            border: 2px solid rgb(0, 0, 0);
                         }
 
                         @media (max-width: 768px) {
@@ -179,6 +228,7 @@
                     </style>
 
                     <ul id="allLeads" style="display: block;">
+                        {{#if leads.length}}
                         {{#each leads}}
                         <li>
                             <nav>
@@ -207,6 +257,17 @@
                                         </a>
                                         {{/if}}
                                         {{/each}}
+                                         <span class="status-circle" onclick="toggleDropdown()"
+                                            style="background-color: {{status.color}};">
+                                            <div class="ul-box">
+                                                {{#each ../pipes}}
+                        <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                            <span>{{title}}</span>
+                            <span class="drop-circle" style="background-color: {{color}};"></span>
+                        </li>
+                        {{/each}}
+                </div>
+                </span>
                                     </span>
                                 </label>
                                 <input type="checkbox" id="touch-{{@index}}">
@@ -220,14 +281,19 @@
                             </nav>
                         </li>
                         {{/each}}
+                        {{else}}
+                        <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
+                            added here</li>
+                        {{/if}}
                     </ul>
+
 
 
                     <ul id="myLeads" style="display: none;">
                         {{#if user.myleads.length}}
                         {{#each user.myleads}}
                         <li>
-                            <nav>
+                            <nav style="position: relative;">
                                 <label for="touch2-{{@index}}" class="created-time-label">
                                     <strong>Created Time : {{formatDate income_time}}</strong>
                                     <strong>Recived from : {{ app }}</strong>
@@ -240,67 +306,125 @@
                                         <a href="tel:{{ans}}">
                                             <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
                                         </a>
+
                                         <a href="https://wa.me/{{ans}}" target="_blank">
                                             <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
                                         </a>
                                         {{/if}}
+
                                         {{/each}}
-                                    </span>
-                                </label>
-                                <input type="checkbox" id="touch2-{{@index}}">
-                                <ul class="slide">
-                                    {{#each leads_data}}
-                                    <li>
-                                        <strong>{{que}}:</strong> {{ans}}
-                                    </li>
-                                    {{/each}}
-                                </ul>
-                            </nav>
+                                        <span class="status-circle" onclick="toggleDropdown()"
+                                            style="background-color: {{status.color}};">
+                                            <div class="ul-box">
+                                                {{#each ../pipes}}
+                        <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                            <span>{{title}}</span>
+                            <span class="drop-circle" style="background-color: {{color}};"></span>
                         </li>
                         {{/each}}
-                        {{else}}
-                        <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads added here</li>
-                        {{/if}}
-                    </ul>
+                </div>
+                </span>
+
+                </span>
+                </label>
+
+
+                <input type="checkbox" id="touch2-{{@index}}">
+                <ul class="slide">
+                    {{#each leads_data}}
+                    <li>
+                        <strong>{{que}}:</strong> {{ans}}
+                    </li>
+                    {{/each}}
+                </ul>
+                </nav>
+                </li>
+                {{/each}}
+                {{else}}
+                <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
+                    added here</li>
+                {{/if}}
+                </ul>
 
 
 
-                    <script>
-                        // for leads drop-down
-                        document.querySelectorAll('.lead-item').forEach(item => {
-                            item.addEventListener('click', function () {
-                                const currentOpenItem = document.querySelector('.lead-item.open');
 
-                                if (currentOpenItem && currentOpenItem !== this) {
-                                    currentOpenItem.classList.remove('open');
-                                    currentOpenItem.querySelector('.slide').style.height = '0px';
-                                }
+                <script>
+                    // for leads drop-down
+                    document.querySelectorAll('.lead-item').forEach(item => {
+                        item.addEventListener('click', function () {
+                            const currentOpenItem = document.querySelector('.lead-item.open');
 
-                                this.classList.toggle('open');
-                                const slide = this.querySelector('.slide');
+                            if (currentOpenItem && currentOpenItem !== this) {
+                                currentOpenItem.classList.remove('open');
+                                currentOpenItem.querySelector('.slide').style.height = '0px';
+                            }
 
-                                if (this.classList.contains('open')) {
-                                    slide.style.height = slide.scrollHeight + 'px';
-                                } else {
-                                    slide.style.height = '0px';
-                                }
-                            });
+                            this.classList.toggle('open');
+                            const slide = this.querySelector('.slide');
+
+                            if (this.classList.contains('open')) {
+                                slide.style.height = slide.scrollHeight + 'px';
+                            } else {
+                                slide.style.height = '0px';
+                            }
                         });
-                    </script>
-                </div>
+                    });
 
-            </div>
+                    function toggleDropdown() {
+                        let boxs = document.querySelectorAll(".ul-box")
+                        boxs.forEach((box) => {
+                            box.classList.add('open');
+                        })
+                    }
 
 
-            <div class="fg-main-footer bg-white border-top w-100">
-                <div class="col-md-12">
-                    <p class="sub_footer_text m-t-10 m-b-10 text-center"> Copyright © 2024. Web Soft Valley All Rights
-                        Reserved
-                    </p>
-                </div>
+                    function submitForm(leadId, status, pipeId) {
+                        fetch(`/lead/status/update/${leadId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'  // Specify that we're sending JSON
+                            },
+                            body: JSON.stringify({ status, pipeId })  // Convert the status to a JSON string
+                        })
+                            .then(response => {
+                                // Ensure the response is JSON
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                                location.reload()
+                            })
+                            .then(data => {
+                                console.log('Success:', data);
+                            })
+                    }
+
+
+                    function showStatusBox() {
+                        let box = document.querySelector('#status-box')
+
+                        console.log(box)
+                        box.style.display = 'block'
+                    }
+                
+
+                </script>
             </div>
 
         </div>
+
+
+        <div class="fg-main-footer bg-white border-top w-100">
+            <div class="col-md-12">
+                <p class="sub_footer_text m-t-10 m-b-10 text-center"> Copyright © 2024. Web Soft Valley All Rights
+                    Reserved
+                </p>
+            </div>
+        </div>
+
+    </div>
     </div>
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"

@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../../public/assets/uploads/whatsapp');
+    const dir = path.join(__dirname, '../../template/images/uploads/whatsapp');
     
     // Check if the directory exists
     if (!fs.existsSync(dir)) {
