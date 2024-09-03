@@ -1,12 +1,9 @@
 const express = require("express");
-const logIncollection = require("./models/admin.model.js");
-const { Client, LocalAuth } = require("whatsapp-web.js");
-const qrcode = require("qrcode");
 const app = express();
+
 const path = require("path");
 const port = process.env.PORT || 8000;
-let qrCodeData = ""; // To store QR code data
-let whatsappClientReady = false; // Flag to track client readiness
+ 
 const templatepath = path.join(__dirname, "../template");
 const hbs = require("hbs");
 require("dotenv").config();
@@ -25,47 +22,47 @@ const { v4: uuidv4 } = require("uuid");
 const { sendMail } = require("./service/mailSender.js");
 const { upload } = require("./service/multer.js");
 const fs = require("fs");
-
+const logIncollection = require("./models/admin.model.js");
 const pipelineModel = require("./models/pipeline.model.js");
 const memberModel = require("./models/member.models.js");
 const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
-
-
 const memberRoute = require("./routes/members.route.js");
 const { log } = require("console");
 
+//Whatsapp-----------------------------------------
+const { Client, LocalAuth } = require("whatsapp-web.js");
+const qr = require("qr-image");
+
+let qrCodeData = ""; 
+let whatsappClientReady = false; 
+let isConnected = false; 
+
 // Initialize WhatsApp Client
 const client = new Client({
-  authStrategy: new LocalAuth(), // This saves session data locally
+  authStrategy: new LocalAuth(),
 });
-
 // Generate and store the QR code data
-client.on("qr", (qr) => {
-  qrcode.toDataURL(qr, (err, url) => {
-    if (err) {
-      console.error("Error generating QR code:", err);
-      return;
-    }
-    qrCodeData = url;
+client.on("qr", (qrCode) => {
 
-    // console.log("url iti aahe");
-    // console.log(url);
-  });
+  const qrImage = qr.imageSync(qrCode, { type: 'png' });
+  qrCodeData = `data:image/png;base64,${qrImage.toString('base64')}`;
+  
 });
 
 // Event when client is authenticated and READY
 client.on("ready", () => {
   console.log("WhatsApp client is ready!");
   whatsappClientReady = true;
+  isConnected = true; 
 });
 
 // Event when client is disconnected
 client.on("disconnected", () => {
   console.log("WhatsApp client has been disconnected.");
   whatsappClientReady = false;
+  isConnected = false; 
 });
-
 // Function to send a WhatsApp message
 function sendMessageToLead(phoneNumber, message) {
   if (!whatsappClientReady) {
@@ -82,16 +79,16 @@ function sendMessageToLead(phoneNumber, message) {
       console.error("Error sending message:", error);
     });
 }
-
+//-------------------------------------------
 
 
 // Middleware
 const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({
-        mongoUrl:
-          "mongodb+srv://nainanayak288:Dkccg5NaZMANqu7F@wsvconnect.bpxfx.mongodb.net/",
-      }) // Replace with your MongoDB connection URI
+      mongoUrl:
+        "mongodb+srv://nainanayak288:Dkccg5NaZMANqu7F@wsvconnect.bpxfx.mongodb.net/",
+    }) // Replace with your MongoDB connection URI
     : new session.MemoryStore();
 
 app.use(
@@ -149,21 +146,32 @@ app.use(cookieParser());
 app.use(express.static("template"));
 
 
+//logout the whtsapps
+app.get("/logoutWA", async(req, res) => {
+  try {
+    qrCodeData = "";
+    await client.logout(); 
+    isConnected = false; 
+    console.log("WhatsApp client logged out successfully.");
+  } catch (error) {
+    console.error("Error during logout:", error);
+  }
+
+  
+  res.redirect("/dashboard");
+})
 // Serve QR code via HTTP
 app.get("/qr", isAdminLoggedIn, (req, res) => {
   const user = req.user;
-  console.log(qrCodeData);
 
-  res.render("qr", { user, qrCodeData });
+  // Render the QR page with the current connection status
+  res.render("qr", {
+    user,
+    qrCodeData,
+    isConnected, // Pass the connection status to the template
+  });
 });
 
-app.get("/logoutWA",(req,res)=>{
-  qrCodeData = "";
-  client.logout();
-
-  // Redirect to dashboard
-  res.redirect("/dashboard");
-});
 
 // Passport.js Google Strategy
 passport.use(
@@ -247,6 +255,8 @@ app.get("/apps", isAdminLoggedIn, (req, res) => {
 
 app.get("/template", isAdminLoggedIn, async (req, res) => {
   let user;
+  console.log(req.user);
+
   if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id);
   } else {
@@ -254,6 +264,8 @@ app.get("/template", isAdminLoggedIn, async (req, res) => {
   }
 
   let templates = await templateModel.find({ cid: user.cid });
+  console.log(templates);
+
 
   res.render("template", { user, templates });
 });
@@ -475,7 +487,7 @@ app.post("/submit-form", async (req, res) => {
     if (user) {
       res.send({ message: "Form submitted successfully", id: user._id });
     } else {
-      res.status(404).send({ message: "User not found" });
+      res.status(404).send({ message: "User not found" })
     }
   } catch (error) {
     res.status(500).send("Internal error");
@@ -543,39 +555,69 @@ app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] }),
-  (req, res) => {}
+  (req, res) => { }
 );
 
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/signup" }),
   async (req, res) => {
-    // console.log(req.user);
+    console.log(req.user);
 
-    let user = await logIncollection.findOne({ email: req.user.email });
+    let user = await logIncollection.findOne({ email: req.user.email })
     const cid = uuidv4();
     user.cid = cid;
-    await user.save();
+    user.role = "admin"
+    await user.save()
 
     const pipelines = [
-      { title: "win", color: "#28A745" },
-      { title: "loss", color: "#DC3545" },
-      { title: "held", color: "#007BFF" },
-      { title: "pending", color: "#FFC107" },
-    ].map(
-      (pipelineData) =>
-        new pipelineModel({
-          uid: user._id,
-          color: pipelineData.color,
-          title: pipelineData.title,
-          cid: user.cid,
-        })
-    );
+      { title: 'win', color: '#28A745' },
+      { title: 'loss', color: '#DC3545' },
+      { title: 'held', color: '#007BFF' },
+      { title: 'pending', color: '#FFC107' },
+    ].map(pipelineData => new pipelineModel({
+      uid: user._id,
+      color: pipelineData.color,
+      title: pipelineData.title,
+      cid: user.cid,
+    }));
 
-  // Save all pipelines in parallel
-    await Promise.all(pipelines.map((pipeline) => pipeline.save()));
+    // Save all pipelines in parallel
+    await Promise.all(pipelines.map(pipeline => pipeline.save()));
 
-    const token = await generateToken(req.user);
+    const templates = [
+      {
+        title: 'welcome',
+        text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
+        client: true, team: false
+      },
+
+      {
+        title: 'after call',
+        text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
+        client: true,
+        team: false,
+      },
+
+      {
+        title: 'before call',
+        text: '',
+        client: false,
+        team: false
+      }
+    ].map(temp => new templateModel({
+      uid: user._id,
+      title: temp.title,
+      text: temp.text,
+      client: temp.client,
+      team: temp.team,
+      cid: user.cid,
+    }));
+
+    // Save all pipelines in parallel
+    await Promise.all(templates.map(temp => temp.save()));
+
+    const token = await generateToken(user);
 
     res.cookie("360Followers", token, {
       httpOnly: true,
@@ -607,21 +649,51 @@ app.post("/signup", async (req, res) => {
     await newUser.save();
 
     const pipelines = [
-      { title: "win", color: "#28A745" },
-      { title: "loss", color: "#DC3545" },
-      { title: "held", color: "#007BFF" },
-      { title: "pending", color: "#FFC107" },
-    ].map(
-      (pipelineData) =>
-        new pipelineModel({
-          uid: newUser._id,
-          color: pipelineData.color,
-          title: pipelineData.title,
-          cid: newUser.cid,
-        })
-    );
+      { title: 'win', color: '#28A745' },
+      { title: 'loss', color: '#DC3545' },
+      { title: 'held', color: '#007BFF' },
+      { title: 'pending', color: '#FFC107' },
+    ].map(pipelineData => new pipelineModel({
+      uid: user._id,
+      color: pipelineData.color,
+      title: pipelineData.title,
+      cid: user.cid,
+    }));
+
     // Save all pipelines in parallel
-    await Promise.all(pipelines.map((pipeline) => pipeline.save()));
+    await Promise.all(pipelines.map(pipeline => pipeline.save()));
+
+    const templates = [
+      {
+        title: 'welcome',
+        text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
+        client: true, team: false
+      },
+
+      {
+        title: 'after call',
+        text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
+        client: true,
+        team: false,
+      },
+
+      {
+        title: 'before call',
+        text: '',
+        client: false,
+        team: false
+      }
+    ].map(temp => new templateModel({
+      uid: user._id,
+      title: temp.title,
+      text: temp.text,
+      client: temp.client,
+      team: temp.team,
+      cid: user.cid,
+    }));
+
+    // Save all pipelines in parallel
+    await Promise.all(templates.map(temp => temp.save()));
 
     const token = await generateToken(newUser);
 
@@ -755,7 +827,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       return res.redirect("/login");
     }
 
-    // console.log(allLeads[0]);
+    // console.log(allLeads0);
 
     allLeads.forEach(async (lead) => {
       const perLead = await leadsModel.findOne({ lead_id: lead.id });
@@ -899,10 +971,11 @@ app.get("/:page", (req, res) => {
   });
 });
 
+client.initialize();
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running at PORT:${port}`);
-  client.initialize();
+  
 });
 
 function isAdminLoggedIn(req, res, next) {

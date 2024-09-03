@@ -227,10 +227,6 @@
 
 <body>
     <div class="container">
-        <!-- Sidebar similar to WhatsApp Web -->
-
-
-        <!-- Main content area for QR scanner -->
         <div class="main-content">
 
             <div class="header">
@@ -238,7 +234,7 @@
             </div>
             <div class="scanner-section">
                 <div class="scanner-info">
-                    <h3>Use WhatsApp on your computer</h3>
+                    <h3>Use Whatsapp Of Your Phone</h3>
                     <ol>
                         <li>Open WhatsApp on your phone</li>
                         <li>Tap <strong>Menu</strong> or <strong>Settings</strong> and select <strong>Linked
@@ -252,9 +248,11 @@
 
             </div>
             <p class="status-message">Waiting for your phone...</p>
+            {{#if isConnected}}
             <form action="/logoutWA" method="get">
                 <button type="submit">Logout</button>
             </form>
+            {{/if}}
         </div>
 
     </div>

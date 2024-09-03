@@ -121,13 +121,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
-                        <div class="social-box facebook">
-                            <i class="fa fa-facebook"></i>
-                            <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
-                        </div>
-                        <!--/social-box-->
-                    </div>
+                   
                     <!--/.col-->
                     <div class="col-lg-3 col-md-6">
                         <div class="social-box facebook">
@@ -157,6 +151,13 @@
                         <!--/social-box-->
                     </div>
                     {{#each pipes}}
+                     <div class="col-lg-3 col-md-6">
+                        <div class="social-box mailchimp">
+                           <i class="fab fa-mailchimp"></i>
+                            <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
+                        </div>
+                        <!--/social-box-->
+                    </div>
                     <div class="col-sm-6 col-lg-3">
                         <div class="card text-white" style="background-color: {{color}};">
                             <div class="card-body pb-0">
@@ -288,7 +289,7 @@
 
                                     <div class="media-body">
                                         <div class="profile-details">
-                                            {{#if user.profilePicture}}
+                                            {{#if user.profilePicture}}  
                                             <img id="user_image" width="70" height="70" src="{{user.profilePicture}}"
                                                 class="rounded-circle">
                                             {{else}}
