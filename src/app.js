@@ -114,8 +114,24 @@ hbs.registerHelper("formatDate", function (datetime) {
   return date.toISOString().split("T")[0]; // Extract YYYY-MM-DD
 });
 
+hbs.registerHelper('countLeadsByStatus', function(leads, pipelineTitle) {
+  // Check if leads is defined and is an array
+  if (!Array.isArray(leads)) {
+    return 0; // Return 0 if leads is not an array
+  }
+
+  const filteredLeads = leads.filter(lead => {
+    return lead.status && lead.status.title === pipelineTitle;
+  });
+
+  return filteredLeads.length;
+});
 hbs.registerHelper("ifEquals", function (arg1, arg2, options) {
   return arg1 === arg2 ? options.fn(this) : options.inverse(this);
+});
+
+hbs.registerHelper('json', function(context) {
+  return JSON.stringify(context);
 });
 
 hbs.registerHelper("containsPhoneNumber", function (text) {
@@ -254,7 +270,8 @@ app.get("/template", isAdminLoggedIn, async (req, res) => {
   res.render("template", { user, templates });
 });
 
-app.post("/template/update/:id",
+app.post(
+  "/template/update/:id",
   isAdminLoggedIn,
   upload.fields([{ name: "image" }, { name: "pdf" }]),
   async (req, res) => {
@@ -423,23 +440,26 @@ app.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
   const { title, color, defaultVal } = req.body;
 
   let pipeline = await pipelineModel.findById(id);
-
+  
   pipeline.color = color;
   pipeline.title = title;
-  pipeline.updatedAt = Date.now();
-
+  
   if (defaultVal === "on") {
-    await pipelineModel.updateMany(
-      { uid: req.user.id },
-      { $set: { defaultVal: false } }
-    );
-
+    let allpipes = await pipelineModel.find({ uid: req.user.id });
+    allpipes.forEach(async (pipe)=>{
+      pipe.defaultVal = false;
+      await pipe.save()
+      console.log(pipe);
+      
+    })
+    console.log("comes");
     pipeline.defaultVal = true;
-  } else {
-    pipeline.defaultVal = false;
-  }
-
+  } 
+  
   await pipeline.save();
+  let pipes = await pipelineModel.find({uid: req.user.id});
+  console.log(pipes, req.body);
+  
   res.redirect("/dashboard");
 });
 
@@ -469,8 +489,7 @@ app.post("/submit-form", async (req, res) => {
     } else {
       res.status(404).send({ message: "User not found" })
     }
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).send("Internal error");
   }
 });
@@ -483,7 +502,7 @@ app.post("/update-user", async (req, res) => {
 
     await logIncollection.findByIdAndUpdate(id, {
       organizationName,
-      sector
+      sector,
     });
 
     res.send({ message: "User updated successfully" });
@@ -495,13 +514,16 @@ app.post("/update-user", async (req, res) => {
 // Dashboard route
 app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   try {
-    const user = await logIncollection.findById(req.user.id);
+    const user = await logIncollection.findById(req.user.id).populate("myleads");
     if (!user.organizationName) {
-      res.render("dashboard", { showForm: true });
-    } else {
-      const pipelines = await pipelineModel.find({ uid: user._id });
-      res.render("dashboard", { user, pipelines, showForm: false });
+      return res.render("dashboard", { showForm: true });
     }
+
+    const pipes = await pipelineModel.find({ cid: user.cid });
+    const leads = await leadsModel.find({ cid: user.cid }).populate("status");
+ 
+    res.render("dashboard", { user, pipes, leads, showForm: false });
+
   } catch (error) {
     res.status(500).send("Internal error");
   }

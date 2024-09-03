@@ -155,6 +155,7 @@
                         </div>
                         <!--/social-box-->
                     </div>
+                    {{#each pipes}}
                      <div class="col-lg-3 col-md-6">
                         <div class="social-box mailchimp">
                            <i class="fab fa-mailchimp"></i>
@@ -163,9 +164,9 @@
                         <!--/social-box-->
                     </div>
                     <div class="col-sm-6 col-lg-3">
-                        <div class="card text-white bg-flat-color-1">
+                        <div class="card text-white" style="background-color: {{color}};">
                             <div class="card-body pb-0">
-                                <div class="dropdown float-right">
+                                {{!-- <div class="dropdown float-right">
                                     <button class="btn bg-transparent dropdown-toggle theme-toggle text-light"
                                         type="button" id="dropdownMenuButton1" data-toggle="dropdown">
                                         <i class="fa fa-cog"></i>
@@ -177,11 +178,13 @@
                                             <a class="dropdown-item" href="#">Something else here</a>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <h4 class="mb-0">
-                                    <span class="count">10468</span>
+                                    <span class="count" style="font-size: x-large;">
+                                        {{countLeadsByStatus ../leads title}}
+                                    </span>
                                 </h4>
-                                <p class="text-light">Total Leads</p>
+                                <p style="font-size: x-large;" class="text-light">{{title}}</p>
 
                                 <div class="chart-wrapper px-0" style="height:70px;" height="70">
                                     <canvas id="widgetChart1"></canvas>
@@ -191,119 +194,7 @@
 
                         </div>
                     </div>
-                    <!--/.col-->
-
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card text-white bg-flat-color-2">
-                            <div class="card-body pb-0">
-                                <div class="dropdown float-right">
-                                    <button class="btn bg-transparent dropdown-toggle theme-toggle text-light"
-                                        type="button" id="dropdownMenuButton2" data-toggle="dropdown">
-                                        <i class="fa fa-cog"></i>
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                        <div class="dropdown-menu-content">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <h4 class="mb-0">
-                                    <span class="count">10468</span>
-                                </h4>
-                                <p class="text-light">Pipeline Status</p>
-
-                                <div class="chart-wrapper px-0" style="height:70px;" height="70">
-                                    <canvas id="widgetChart2"></canvas>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <!--/.col-->
-
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card text-white bg-flat-color-3">
-                            <div class="card-body pb-0">
-                                <div class="dropdown float-right">
-                                    <button class="btn bg-transparent dropdown-toggle theme-toggle text-light"
-                                        type="button" id="dropdownMenuButton3" data-toggle="dropdown">
-                                        <i class="fa fa-cog"></i>
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
-                                        <div class="dropdown-menu-content">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <h4 class="mb-0">
-                                    <span class="count">10468</span>
-                                </h4>
-                                <p class="text-light">Pipeline Status</p>
-
-                            </div>
-
-                            <div class="chart-wrapper px-0" style="height:70px;" height="70">
-                                <canvas id="widgetChart3"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <!--/.col-->
-
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card text-white bg-flat-color-4">
-                            <div class="card-body pb-0">
-                                <div class="dropdown float-right">
-                                    <button class="btn bg-transparent dropdown-toggle theme-toggle text-light"
-                                        type="button" id="dropdownMenuButton4" data-toggle="dropdown">
-                                        <i class="fa fa-cog"></i>
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton4">
-                                        <div class="dropdown-menu-content">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <h4 class="mb-0">
-                                    <span class="count">10468</span>
-                                </h4>
-                                <p class="text-light">Pipeline Status</p>
-
-                                <div class="chart-wrapper px-3" style="height:70px;" height="70">
-                                    <canvas id="widgetChart4"></canvas>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <!--/.col-->
-
-
-                    <!--/.col-->
-
-
-                    {{!-- <div class="col-lg-3 col-md-6">
-                        <div class="social-box google-plus">
-                            <i class="fa fa-google-plus"></i>
-                            <ul>
-                                <li>
-                                    <span class="count">94</span> k
-                                    <span>followers</span>
-                                </li>
-                                <li>
-                                    <span class="count">92</span>
-                                    <span>circles</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <!--/social-box-->
-                    </div> --}}
-                    <!--/.col-->
+                    {{/each}}
 
                     <div class="col-xl-6">
                         <div class="card">
@@ -311,10 +202,10 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <h4 class="card-title mb-0">Traffic</h4>
-                                        <div class="small text-muted">October 2017</div>
+                                        <div class="small text-muted">Lead Analytics</div>
                                     </div>
                                     <!--/.col-->
-                                    <div class="col-sm-8 hidden-sm-down">
+                                    {{!-- <div class="col-sm-8 hidden-sm-down">
                                         <button type="button" class="btn btn-primary float-right bg-flat-color-1"><i
                                                 class="fa fa-cloud-download"></i></button>
                                         <div class="btn-toolbar float-right" role="toolbar"
@@ -331,18 +222,20 @@
                                                 </label>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <!--/.col-->
 
 
                                 </div>
                                 <!--/.row-->
                                 <div class="chart-wrapper mt-4">
-                                    <canvas id="trafficChart" style="height:200px;" height="200"></canvas>
+                                    <canvas id="competitionGraph" style="width:800px; height:300px;"
+                                        height="300"></canvas>
                                 </div>
 
                             </div>
-                            <div class="card-footer">
+
+                            {{!-- <div class="card-footer">
                                 <ul>
                                     <li>
                                         <div class="text-muted">Visits</div>
@@ -385,17 +278,17 @@
                                         </div>
                                     </li>
                                 </ul>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
 
                     <div class="col-xl-3 col-lg-6">
                         <section class="card">
-                            <div class="twt-feed blue-bg">
-                                <div class="corner-ribon black-ribon">
-                                    <i class="fa fa-twitter"></i>
+                            <div class="profile-card">
+                                <div href="/profile" class="corner-ribon black-ribon">
+                                    <i class="fas fa-edit"></i>
                                 </div>
-                                <div class="fa fa-twitter wtt-mark"></div>
+
 
                                 <div class="media">
 
@@ -419,16 +312,16 @@
                             <div class="weather-category twt-category">
                                 <ul>
                                     <li class="active">
-                                        <h5>750</h5>
+                                        <h5>{{leads.length}}</h5>
                                         Leads
                                     </li>
                                     <li>
-                                        <h5>865</h5>
-                                        Following
+                                        <h5>{{user.myleads.length}}</h5>
+                                        my leads
                                     </li>
                                     <li>
-                                        <h5>3645</h5>
-                                        Followers
+                                        <h5>{{user.teams.length}}</h5>
+                                        myteam
                                     </li>
                                 </ul>
                             </div>
@@ -447,24 +340,189 @@
                         </section>
                     </div>
 
+                    <style>
+                        form {
+                            background: none;
+                            padding: 0;
+                            border-radius: 0;
+                            box-shadow: none;
+                            width: 100%;
+                            gap: 7px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+
+                        }
+
+                        form input {
+                            width: 65%;
+                        }
+
+                        .colorinp {
+                            display: block;
+                            cursor: pointer;
+                            border-radius: 50%;
+
+                        }
+
+                        #pipeAddBtn {
+                            font-size: 15px;
+                            border-radius: 4px;
+                        }
+
+                        li {
+                            list-style: none;
+                            margin: 0;
+                        }
+
+                        li form input {
+                            margin: 0;
+                            border: none;
+                        }
+                    </style>
 
                     <div class="col-xl-3 col-lg-6">
                         <div class="card">
                             <div class="card-body">
                                 <div class="stat-widget-one">
-                                    <div class="stat-icon dib"><i class="ti-money text-success border-success"></i>
-                                    </div>
-                                    <div class="stat-content dib">
-                                        <div class="stat-text">Total Leads</div>
-                                        <div class="stat-digit">1,012</div>
-                                    </div>
+                                    <form action="/pipeline" method="post">
+                                        <input type="text" id="inputPassword2" name="title" placeholder="Enter Pipline">
+                                        <input type="color" class="colorinp"
+                                            style="width: 32px; height: 32px; border: none; padding: 0;" name="color">
+                                        <button type="submit" class="btn btn-primary" id="pipeAddBtn">Add</button>
+                                    </form>
+
+                                    <ul>
+                                        {{#each pipes}}
+                                        {{#if defaultVal}}
+                                        {{!-- Display the default document at the top --}}
+                                        <li
+                                            style="display: flex; border-radius: 4px; padding-right: 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
+                                            <form style="display: flex; justify-content: space-between;"
+                                                action="/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
+
+                                                <input type="text" disabled name="title" value="{{title}}"
+                                                    id="title-{{_id}}">
+
+                                                <input type="color" disabled class="colorinp" value="{{color}}"
+                                                    style="width: 28px; height: 28px; border: none; padding: 0;"
+                                                    name="color" id="color-{{_id}}">
+
+                                                <input type="checkbox" checked disabled class="colorinp"
+                                                    style="width: 20px; height: 20px; margin-right: 5px; border: none; padding: 0;"
+                                                    name="defaultVal" id="check-{{_id}}">
+
+
+                                                <i id="sub-{{_id}}"
+                                                    style="font-size: 23px; margin-right: 10px; cursor: pointer;" hidden
+                                                    onclick="submitForm('{{_id}}')"
+                                                    class="fa-solid fa-square-check"></i>
+                                            </form>
+                                            <span
+                                                style="display: flex; justify-content: center; align-items: center; gap: 4px;">
+                                                <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
+                                                    class="fa-solid fa-pen-to-square"></i>
+                                                <a href="/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
+                                                        style="color: crimson;"></i></a>
+                                            </span>
+                                        </li>
+                                        {{/if}}
+                                        {{/each}}
+
+                                        {{!-- Loop through again, this time displaying the non-default documents --}}
+                                        {{#each pipes}}
+                                        {{#unless defaultVal}}
+                                        <li
+                                            style="display: flex; border-radius: 4px; padding-right: 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
+                                            <form style="display: flex; justify-content: space-between;"
+                                                action="/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
+
+                                                <input type="text" disabled name="title" value="{{title}}"
+                                                    id="title-{{_id}}">
+
+                                                <input type="color" disabled class="colorinp" value="{{color}}"
+                                                    style="width: 28px; height: 28px; border: none; padding: 0;"
+                                                    name="color" id="color-{{_id}}">
+
+                                                <input type="checkbox" disabled class="colorinp"
+                                                    style="width: 20px; height: 20px; border: none; padding: 0;"
+                                                    name="defaultVal" id="check-{{_id}}">
+
+
+                                                <i id="sub-{{_id}}"
+                                                    style="font-size: 23px; margin-right: 10px; cursor: pointer;" hidden
+                                                    onclick="submitForm('{{_id}}')"
+                                                    class="fa-solid fa-square-check"></i>
+                                            </form>
+                                            <span
+                                                style="display: flex; justify-content: center; align-items: center; gap: 4px;">
+                                                <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
+                                                    class="fa-solid fa-pen-to-square"></i>
+                                                <a href="/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
+                                                        style="color: crimson;"></i></a>
+                                            </span>
+                                        </li>
+                                        {{/unless}}
+                                        {{/each}}
+
+
+                                    </ul>
+
+
+                                    {{!-- <div class="col-md-6">
+                                        <div class="card border-0">
+                                            <ul>
+                                                {{#each pipelines}}
+                                                <div style="display: flex; justify-content: space-between;">
+                                                    <li>
+                                                        <form style="display: flex; justify-content: space-between;"
+                                                            action="/pipeline/update/{{_id}}" method="post">
+                                                            <input type="text" disabled
+                                                                class="form-control update-input" name="title"
+                                                                value="{{title}}">
+
+                                                            <button type="submit" hidden class="sub-btn"><i
+                                                                    class="fa-solid fa-square-check"></i></button>
+                                                        </form>
+                                                    </li>
+                                                    <span>
+
+
+
+
+                                                        <span>
+                                                            <i onclick="updatePiplineForm({})"
+                                                                class="fa-solid fa-pen-to-square"></i>
+
+                                                            <a href="/pipeline/del/{{_id}}"><i
+                                                                    class="fa-regular fa-trash-can"></i></a>
+
+                                                            <i id="color-piker-btn" class="fa-solid fa-palette"></i>
+
+                                                        </span>
+
+                                                        <div id="color-piker-box">
+                                                            <span class="circle-red"></span>
+                                                            <span class="circle-pink"></span>
+                                                            <span class="circle-blue"></span>
+                                                            <span class="circle-yellow"></span>
+                                                            <span class="circle-green"></span>
+                                                            <span class="circle-purpul"></span>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                                {{/each}}
+                                            </ul>
+                                        </div>
+                                    </div> --}}
+
                                 </div>
                             </div>
                         </div>
                     </div>
 
 
-                    <div class="col-xl-3 col-lg-6">
+                    {{!-- <div class="col-xl-3 col-lg-6">
                         <div class="card">
                             <div class="card-body">
                                 <div class="stat-widget-one">
@@ -491,7 +549,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="col-xl-6">
                         <div class="card">
@@ -587,10 +645,12 @@
 
         let flag = 0;
         function updatePiplineForm(id) {
-            const titleInput = document.getElementById(`title${id}`);
-            const colorInput = document.getElementById(`color${id}`);
-            const defaultinp = document.getElementById(`default${id}`);
-            const submitBtn = document.getElementById(`submit-btn${id}`);
+            const titleInput = document.getElementById(`title-${id}`);
+            const colorInput = document.getElementById(`color-${id}`);
+            const defaultinp = document.getElementById(`check-${id}`);
+            const submitBtn = document.getElementById(`sub-${id}`);
+
+            console.log(titleInput)
 
             if (titleInput.disabled && colorInput.disabled) {
                 // Enable editing
@@ -609,13 +669,9 @@
 
         }
 
-        function showPipeBox() {
-            let pipeBox = document.querySelector('.pipeline-box')
-            if (pipeBox.style.display === 'none')
-                pipeBox.style.display = 'block'
-            else
-                pipeBox.style.display = 'none'
-
+        function submitForm(id) {
+            let form = document.querySelector(`#form${id}`)
+            form.submit()
         }
 
         function LabelColorChanged(id) {
@@ -690,6 +746,85 @@
         });
 
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        console.log("hello ji")
+        const leads = {{{ json leads }}};
+        console.log(leads);
+        const pipelines = {{{ json pipes }}};
+        console.log(pipelines);
+
+        const pipelineMap = {};
+        pipelines.forEach(pipe => {
+            pipelineMap[pipe.title] = {
+                color: pipe.color + '40',
+                count: 0
+            };
+        });
+
+        console.log('pipe object =========', pipelineMap)
+
+        const processedData = {};
+
+        console.log('val of status', leads[1].status.title)
+        leads.forEach(lead => {
+            const date = new Date(lead.income_time).toISOString().split('T')[0];
+            const statusTitle = lead.status ? lead.status.title : 'Unknown'; // Default status title
+
+            if (!processedData[date]) {
+                processedData[date] = {};
+            }
+
+            if (pipelineMap[statusTitle]) {
+                if (!processedData[date][statusTitle]) {
+                    processedData[date][statusTitle] = 0;
+                }
+                processedData[date][statusTitle]++;
+            } else {
+                // Handle unknown status if needed
+                if (!processedData[date]['Unknown']) {
+                    processedData[date]['Unknown'] = 0;
+                }
+                processedData[date]['Unknown']++;
+            }
+        });
+        console.log("611====", processedData)
+        // Prepare data for the graph
+        const labels = Object.keys(processedData);
+        const datasets = Object.keys(pipelineMap).map(statusTitle => {
+            return {
+                label: statusTitle,
+                data: labels.map(date => processedData[date][statusTitle] || 0),
+                backgroundColor: pipelineMap[statusTitle].color, // Use backgroundColor for area chart
+                borderColor: pipelineMap[statusTitle].color, // Optional, to keep the border color
+                borderWidth: 4,
+                fill: true,
+                tension: .5, // Set fill to true for area chart
+            };
+        });
+
+        const ctx = document.getElementById('competitionGraph').getContext('2d');
+        const competitionData = {
+            labels: labels,
+            datasets: datasets
+        };
+
+        const config = {
+            type: 'line', // 'line' type can be used for area charts too
+            data: competitionData,
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Income Time' } },
+                    y: { title: { display: true, text: 'Number of Leads' } },
+                },
+            },
+        };
+
+        new Chart(ctx, config);
+    </script>
+
+
 </body>
 
 </html>
