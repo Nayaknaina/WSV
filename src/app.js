@@ -87,7 +87,7 @@ function sendMessageToLead(phoneNumber, message) {
 
 // Middleware
 const sessionStore =
-process.env.NODE_ENV === "production"
+  process.env.NODE_ENV === "production"
     ? MongoStore.create({
         mongoUrl:
           "mongodb+srv://nainanayak288:Dkccg5NaZMANqu7F@wsvconnect.bpxfx.mongodb.net/",
@@ -117,8 +117,24 @@ hbs.registerHelper("formatDate", function (datetime) {
   return date.toISOString().split("T")[0]; // Extract YYYY-MM-DD
 });
 
+hbs.registerHelper('countLeadsByStatus', function(leads, pipelineTitle) {
+  // Check if leads is defined and is an array
+  if (!Array.isArray(leads)) {
+    return 0; // Return 0 if leads is not an array
+  }
+
+  const filteredLeads = leads.filter(lead => {
+    return lead.status && lead.status.title === pipelineTitle;
+  });
+
+  return filteredLeads.length;
+});
 hbs.registerHelper("ifEquals", function (arg1, arg2, options) {
   return arg1 === arg2 ? options.fn(this) : options.inverse(this);
+});
+
+hbs.registerHelper('json', function(context) {
+  return JSON.stringify(context);
 });
 
 hbs.registerHelper("containsPhoneNumber", function (text) {
@@ -147,7 +163,7 @@ app.get("/logoutWA",(req,res)=>{
 
   // Redirect to dashboard
   res.redirect("/dashboard");
-})
+});
 
 // Passport.js Google Strategy
 passport.use(
@@ -242,7 +258,8 @@ app.get("/template", isAdminLoggedIn, async (req, res) => {
   res.render("template", { user, templates });
 });
 
-app.post("/template/update/:id",
+app.post(
+  "/template/update/:id",
   isAdminLoggedIn,
   upload.fields([{ name: "image" }, { name: "pdf" }]),
   async (req, res) => {
@@ -411,23 +428,26 @@ app.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
   const { title, color, defaultVal } = req.body;
 
   let pipeline = await pipelineModel.findById(id);
-
+  
   pipeline.color = color;
   pipeline.title = title;
-  pipeline.updatedAt = Date.now();
-
+  
   if (defaultVal === "on") {
-    await pipelineModel.updateMany(
-      { uid: req.user.id },
-      { $set: { defaultVal: false } }
-    );
-
+    let allpipes = await pipelineModel.find({ uid: req.user.id });
+    allpipes.forEach(async (pipe)=>{
+      pipe.defaultVal = false;
+      await pipe.save()
+      console.log(pipe);
+      
+    })
+    console.log("comes");
     pipeline.defaultVal = true;
-  } else {
-    pipeline.defaultVal = false;
-  }
-
+  } 
+  
   await pipeline.save();
+  let pipes = await pipelineModel.find({uid: req.user.id});
+  console.log(pipes, req.body);
+  
   res.redirect("/dashboard");
 });
 
@@ -455,10 +475,9 @@ app.post("/submit-form", async (req, res) => {
     if (user) {
       res.send({ message: "Form submitted successfully", id: user._id });
     } else {
-      res.status(404).send({ message: "User not found"})
+      res.status(404).send({ message: "User not found" });
     }
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).send("Internal error");
   }
 });
@@ -471,7 +490,7 @@ app.post("/update-user", async (req, res) => {
 
     await logIncollection.findByIdAndUpdate(id, {
       organizationName,
-      sector
+      sector,
     });
 
     res.send({ message: "User updated successfully" });
@@ -483,13 +502,16 @@ app.post("/update-user", async (req, res) => {
 // Dashboard route
 app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   try {
-    const user = await logIncollection.findById(req.user.id);
+    const user = await logIncollection.findById(req.user.id).populate("myleads");
     if (!user.organizationName) {
-      res.render("dashboard", { showForm: true });
-    } else {
-      const pipelines = await pipelineModel.find({ uid: user._id });
-      res.render("dashboard", { user, pipelines, showForm: false });
+      return res.render("dashboard", { showForm: true });
     }
+
+    const pipes = await pipelineModel.find({ cid: user.cid });
+    const leads = await leadsModel.find({ cid: user.cid }).populate("status");
+ 
+    res.render("dashboard", { user, pipes, leads, showForm: false });
+
   } catch (error) {
     res.status(500).send("Internal error");
   }
@@ -528,27 +550,30 @@ app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/signup" }),
   async (req, res) => {
-    console.log(req.user);
-    
-    let user = await logIncollection.findOne({email: req.user.email})
+    // console.log(req.user);
+
+    let user = await logIncollection.findOne({ email: req.user.email });
     const cid = uuidv4();
     user.cid = cid;
-    await user.save()
+    await user.save();
 
-  const pipelines = [
-    { title: 'win', color: '#28A745' },
-    { title: 'loss', color: '#DC3545' },
-    { title: 'held', color: '#007BFF' },
-    { title: 'pending', color: '#FFC107' },
-  ].map(pipelineData => new pipelineModel({
-    uid: user._id,
-    color: pipelineData.color,
-    title: pipelineData.title,
-    cid: user.cid,
-  }));
+    const pipelines = [
+      { title: "win", color: "#28A745" },
+      { title: "loss", color: "#DC3545" },
+      { title: "held", color: "#007BFF" },
+      { title: "pending", color: "#FFC107" },
+    ].map(
+      (pipelineData) =>
+        new pipelineModel({
+          uid: user._id,
+          color: pipelineData.color,
+          title: pipelineData.title,
+          cid: user.cid,
+        })
+    );
 
   // Save all pipelines in parallel
-  await Promise.all(pipelines.map(pipeline => pipeline.save()));
+    await Promise.all(pipelines.map((pipeline) => pipeline.save()));
 
     const token = await generateToken(req.user);
 
@@ -586,12 +611,15 @@ app.post("/signup", async (req, res) => {
       { title: "loss", color: "#DC3545" },
       { title: "held", color: "#007BFF" },
       { title: "pending", color: "#FFC107" },
-    ].map((pipelineData) =>new pipelineModel({
+    ].map(
+      (pipelineData) =>
+        new pipelineModel({
           uid: newUser._id,
           color: pipelineData.color,
           title: pipelineData.title,
           cid: newUser.cid,
-        }));
+        })
+    );
     // Save all pipelines in parallel
     await Promise.all(pipelines.map((pipeline) => pipeline.save()));
 

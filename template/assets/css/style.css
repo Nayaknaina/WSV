@@ -1551,7 +1551,18 @@ header .form-inline {
   float: left;
   padding: 0 20px;
   width: 100%; }
-
+ 
+  /* Graph css to make responsive*/
+  .chart-wrapper {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto; 
+  }
+  
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
 .card {
   margin-bottom:24px;
   margin-bottom: 1.5rem;
@@ -1672,6 +1683,15 @@ header .form-inline {
 .blue-ribon {
   background: url("../../images/twitter_corner_blue.png") no-repeat; }
 
+  .profile-card {
+    background: linear-gradient(to right, #c49bf0 0%, #90b0e8 100%); /* Gradient background */
+    color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 .twt-feed .wtt-mark {
   color: rgba(255, 255, 255, 0.15);
   font-size: 160px;
