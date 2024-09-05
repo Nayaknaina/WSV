@@ -20,6 +20,8 @@
     "express": "^4.19.2",
     "express-hbs": "^2.5.0",
     "express-session": "^1.18.0",
+    "firebase": "^10.13.1",
+    "firebase-admin": "^12.4.0",
     "hbs": "^4.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
