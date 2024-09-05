@@ -22,9 +22,15 @@ const { v4: uuidv4 } = require("uuid");
 const { sendMail } = require("./service/mailSender.js");
 const { upload } = require("./service/multer.js");
 const fs = require("fs");
+
+const adminFireBase = require('firebase-admin');
+const serviceAccount = require('./config/followupsdemo-firebase-adminsdk-t0rmy-2b420cc28c.json');
+
+
 const logIncollection = require("./models/admin.model.js");
 const pipelineModel = require("./models/pipeline.model.js");
-const memberModel = require("./models/member.models.js");
+const memberModel = require("./models/member.model.js");
+const remarkModel = require("./models/remark.model.js");
 const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
 const memberRoute = require("./routes/members.route.js");
@@ -82,6 +88,10 @@ function sendMessageToLead(phoneNumber, message) {
 //-------------------------------------------
 
 
+adminFireBase.initializeApp({
+  credential: adminFireBase.credential.cert(serviceAccount)
+});
+
 // Middleware
 const sessionStore =
   process.env.NODE_ENV === "production"
@@ -114,6 +124,16 @@ hbs.registerHelper("formatDate", function (datetime) {
   return date.toISOString().split("T")[0]; // Extract YYYY-MM-DD
 });
 
+hbs.registerHelper("formatTime", function (datetime) {
+  if (!datetime) {
+      return ''; // Return an empty string if datetime is invalid
+  }
+  const date = new Date(datetime);
+  const hours = date.getUTCHours().toString().padStart(2, '0');
+  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`; // Format as HH:MM
+});
+
 hbs.registerHelper('countLeadsByStatus', function(leads, pipelineTitle) {
   // Check if leads is defined and is an array
   if (!Array.isArray(leads)) {
@@ -140,7 +160,7 @@ hbs.registerHelper("containsPhoneNumber", function (text) {
   return phoneNumberPattern.test(text);
 });
 
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(express.static("template"));
@@ -444,24 +464,28 @@ app.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
   pipeline.color = color;
   pipeline.title = title;
   
-  if (defaultVal === "on") {
-    let allpipes = await pipelineModel.find({ uid: req.user.id });
-    allpipes.forEach(async (pipe)=>{
-      pipe.defaultVal = false;
-      await pipe.save()
-      console.log(pipe);
-      
-    })
-    console.log("comes");
-    pipeline.defaultVal = true;
-  } 
+  if (defaultVal == "on") {
+    console.log(defaultVal);
+    await pipelineModel.updateMany({ uid: req.user.id }, { $set: { defaultVal: false } });
+    req.session.pipe = id;
+
+    await pipeline.save();
+    return res.redirect('/pipe/abc')
+  }
   
-  await pipeline.save();
-  let pipes = await pipelineModel.find({uid: req.user.id});
-  console.log(pipes, req.body);
-  
-  res.redirect("/dashboard");
+  return res.redirect("/dashboard");
 });
+app.get('/pipe/abc', async (req,res)=>{
+
+  let pipe = await pipelineModel.findById(req.session.pipe)
+  pipe.defaultVal = true;
+  await pipe.save()
+
+  delete req.session.pipe;
+  req.session.save();
+
+  res.redirect('/dashboard')
+})
 
 app.get("/profile", isAdminLoggedIn, async (req, res) => {
   const user = await logIncollection.findById(req.user.id);
@@ -519,7 +543,7 @@ app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       return res.render("dashboard", { showForm: true });
     }
 
-    const pipes = await pipelineModel.find({ cid: user.cid });
+    const pipes = await pipelineModel.find({ cid: user.cid }).sort({ defaultVal: -1 }).exec();
     const leads = await leadsModel.find({ cid: user.cid }).populate("status");
  
     res.render("dashboard", { user, pipes, leads, showForm: false });
@@ -884,9 +908,11 @@ app.get("/leads", isAdminLoggedIn, async (req, res) => {
 
     let leads = await leadsModel.find({ cid: user.cid }).populate("status");
     let pipes = await pipelineModel.find({ cid: user.cid });
-    // console.log(user);
+    let remarks = await remarkModel.find({ uid: user._id }).sort({ createdAt: -1 });
 
-    res.render("leads", { user, leads, pipes });
+    // console.log(remarks);
+
+    res.render("leads", { user, leads, pipes, remarks });
     // res.json({ leads: allLeads });
   } catch (error) {
     console.error("Error fetching leads:", error);
@@ -957,6 +983,51 @@ app.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
   await lead.save();
 
   res.redirect("/leads");
+});
+
+app.post('/remark/add/:id',isAdminLoggedIn, async (req,res)=>{
+  const {id} = req.params;
+  const {text, time, date} = req.body;
+  let user ;
+  console.log("hheeyeyy", req.body,id);
+  
+  if (req.user.role === 'admin') {
+    user = await logIncollection.findById(req.user.id)
+  }else 
+    user = await memberModel.findById(req.user.id)
+
+  console.log(req.body);
+  let lead = await leadsModel.findById(id)
+  console.log(lead);
+
+  let remark = new remarkModel({
+    uid: user._id,
+    cid: user.cid,
+    lead_id: lead._id,
+    text,
+    time,
+    date,
+  })
+  await remark.save()
+  return res.json(remark);
+  
+})
+
+
+app.post('/save-fcm-token', isAdminLoggedIn,async (req, res) => {
+  const fcmToken = req.body.token;
+  console.log('Received FCM Token:', fcmToken);
+
+  let user; 
+  if(req.user.role === 'admin')
+    user = await logIncollection.findById(req.user.id)
+  else
+    user = await memberModel.findById(req.user.id)
+
+  user.fcmToken = fcmToken;
+  await user.save();
+
+  res.status(200).send('FCM token saved successfully.');
 });
 
 // Handle dynamic routes to serve pages without .html extension
@@ -1071,4 +1142,22 @@ function chalteRaho(token) {
     findNewLead(token);
     console.log("step", i++);
   }, 60000);
+}
+
+async function sendPushNotification(fcmToken, title, body) {
+  const msg = {
+    notification: {
+      title: title,
+      body: body,
+    },
+    token: fcmToken, // User's FCM token
+  };
+
+  try {
+    // Send notification via FCM
+    const res = await admin.messaging().send(msg);
+    console.log('Successfully sent message:', res);
+  } catch (err) {
+    console.error('Error sending message:', err);
+  }
 }

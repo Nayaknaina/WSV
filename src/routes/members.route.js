@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const logIncollection = require("../models/admin.model.js");
-const memberModel = require("../models/member.models.js");
+const memberModel = require("../models/member.model.js");
 const { generateToken } = require("../../utils/auth.js");
 
 const jwt = require("jsonwebtoken");

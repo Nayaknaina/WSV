@@ -39,7 +39,7 @@
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
         src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
 
-
+    <link rel="stylesheet" href="/assets/css/remark.css">
 </head>
 
 <body class>
@@ -197,7 +197,8 @@
                             padding: 2px 8px;
                             gap: 10px;
                         }
-                        .drop-circle{
+
+                        .drop-circle {
                             width: 18px;
                             height: 18px;
                             border-radius: 50%;
@@ -257,62 +258,6 @@
                                         </a>
                                         {{/if}}
                                         {{/each}}
-                                         <span class="status-circle" onclick="toggleDropdown()"
-                                            style="background-color: {{status.color}};">
-                                            <div class="ul-box">
-                                                {{#each ../pipes}}
-                        <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
-                            <span>{{title}}</span>
-                            <span class="drop-circle" style="background-color: {{color}};"></span>
-                        </li>
-                        {{/each}}
-                </div>
-                </span>
-                                    </span>
-                                </label>
-                                <input type="checkbox" id="touch-{{@index}}">
-                                <ul class="slide">
-                                    {{#each leads_data}}
-                                    <li>
-                                        <strong>{{que}}:</strong> {{ans}}
-                                    </li>
-                                    {{/each}}
-                                </ul>
-                            </nav>
-                        </li>
-                        {{/each}}
-                        {{else}}
-                        <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
-                            added here</li>
-                        {{/if}}
-                    </ul>
-
-
-
-                    <ul id="myLeads" style="display: none;">
-                        {{#if user.myleads.length}}
-                        {{#each user.myleads}}
-                        <li>
-                            <nav style="position: relative;">
-                                <label for="touch2-{{@index}}" class="created-time-label">
-                                    <strong>Created Time : {{formatDate income_time}}</strong>
-                                    <strong>Recived from : {{ app }}</strong>
-                                    <span class="icon-container">
-                                        <a href="/lead/remove/{{_id}}">
-                                            <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
-                                        </a>
-                                        {{#each leads_data}}
-                                        {{#if (containsPhoneNumber ans)}}
-                                        <a href="tel:{{ans}}">
-                                            <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
-                                        </a>
-
-                                        <a href="https://wa.me/{{ans}}" target="_blank">
-                                            <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
-                                        </a>
-                                        {{/if}}
-
-                                        {{/each}}
                                         <span class="status-circle" onclick="toggleDropdown()"
                                             style="background-color: {{status.color}};">
                                             <div class="ul-box">
@@ -324,12 +269,9 @@
                         {{/each}}
                 </div>
                 </span>
-
                 </span>
                 </label>
-
-
-                <input type="checkbox" id="touch2-{{@index}}">
+                <input type="checkbox" id="touch-{{@index}}">
                 <ul class="slide">
                     {{#each leads_data}}
                     <li>
@@ -348,81 +290,249 @@
 
 
 
+                <ul id="myLeads" style="display: none;">
+                    {{#if user.myleads.length}}
+                    {{#each user.myleads}}
+                    <li>
+                        <nav style="position: relative;">
+                            <label for="touch2-{{@index}}" class="created-time-label">
+                                <strong>Created Time : {{formatDate income_time}}</strong>
+                                <strong>Recived from : {{ app }}</strong>
+                                <span class="icon-container" style="display: flex; align-items: center;">
+                                    <a href="/lead/remove/{{_id}}">
+                                        <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
+                                    </a>
+                                    {{#each leads_data}}
+                                    {{#if (containsPhoneNumber ans)}}
+                                    <a href="tel:{{ans}}">
+                                        <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
+                                    </a>
 
-                <script>
-                    // for leads drop-down
-                    document.querySelectorAll('.lead-item').forEach(item => {
-                        item.addEventListener('click', function () {
-                            const currentOpenItem = document.querySelector('.lead-item.open');
+                                    <a href="https://wa.me/{{ans}}" target="_blank">
+                                        <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                                    </a>
+                                    {{/if}}
 
-                            if (currentOpenItem && currentOpenItem !== this) {
-                                currentOpenItem.classList.remove('open');
-                                currentOpenItem.querySelector('.slide').style.height = '0px';
-                            }
+                                    {{/each}}
+                                    <i onclick="openRemarkPopUp()" class="fa-solid fa-file-pen"
+                                        style="color: #1E3050;"></i>
 
-                            this.classList.toggle('open');
-                            const slide = this.querySelector('.slide');
+                                    <span class="status-circle" onclick="toggleDropdown()"
+                                        style="background-color: {{status.color}};">
+                                        <div class="ul-box">
+                                            {{#each ../pipes}}
+                    <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                        <span>{{title}}</span>
+                        <span class="drop-circle" style="background-color: {{color}};"></span>
+                    </li>
+                    {{/each}}
+            </div>
+            </span>
 
-                            if (this.classList.contains('open')) {
-                                slide.style.height = slide.scrollHeight + 'px';
-                            } else {
-                                slide.style.height = '0px';
-                            }
-                        });
+            </span>
+            </label>
+
+            <section class="timeline" id="timeline" style="">
+                <ul id="timeline-ul-list">
+                    <h3 style="color: #28292a; text-align: center;">Your Remarks</h3>
+                    <li onclick="openAddRemarkForm()" style="cursor: pointer;">
+                        <div class="content add-remark" id="add-remark-content">
+                            <h2>
+                                <span class="add-remark-txt">add remark</span>
+                            </h2>
+
+                        </div>
+                    </li>
+                    <li id="remark-form-list">
+                        <div class="content">
+                            <form id="remarkForm" action="/remark/add/{{_id}}" method="post">
+                                <textarea placeholder="setting up next followup" required maxlength="150" name="text"
+                                    id="remark-form-text" cols="30" rows="5"></textarea>
+                                <input type="time" name="time" id="remark-form-time" required>
+                                <input type="date" name="date" id="remark-form-date" required>
+                                <button class="btn btn-primary mt-1" id="add-btn" style="font-size: 12px;"
+                                    type="submit">add</button>
+                                <button class="btn btn-danger mt-1" id="add-btn" style="font-size: 12px;"
+                                    onclick="closeAddRemarkForm()" type="button">cancel</button>
+                            </form>
+                        </div>
+                    </li>
+                    {{#each ../remarks}}
+                    <span id="new-remark-down"></span>
+                    <li>
+                        <div class="content">
+                            <div class="createdTime">{{formatTime createdAt}} {{formatDate createdAt}}</div>
+                            <p>{{text}}</p>
+                            <div class="createdTime">{{time}} {{formatDate date}}</div>
+                        </div>
+                    </li>
+                    {{/each}}
+                </ul>
+            </section>
+            <input type="checkbox" id="touch2-{{@index}}">
+            <ul class="slide">
+                {{#each leads_data}}
+                <li>
+                    <strong>{{que}}:</strong> {{ans}}
+                </li>
+                {{/each}}
+            </ul>
+            </nav>
+            </li>
+            {{/each}}
+            {{else}}
+            <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
+                added here</li>
+            {{/if}}
+            </ul>
+
+
+
+
+            <script>
+                // for leads drop-down
+                document.querySelectorAll('.lead-item').forEach(item => {
+                    item.addEventListener('click', function () {
+                        const currentOpenItem = document.querySelector('.lead-item.open');
+
+                        if (currentOpenItem && currentOpenItem !== this) {
+                            currentOpenItem.classList.remove('open');
+                            currentOpenItem.querySelector('.slide').style.height = '0px';
+                        }
+
+                        this.classList.toggle('open');
+                        const slide = this.querySelector('.slide');
+
+                        if (this.classList.contains('open')) {
+                            slide.style.height = slide.scrollHeight + 'px';
+                        } else {
+                            slide.style.height = '0px';
+                        }
                     });
+                });
 
-                    function toggleDropdown() {
-                        let boxs = document.querySelectorAll(".ul-box")
-                        boxs.forEach((box) => {
-                            box.classList.add('open');
+                function toggleDropdown() {
+                    let boxs = document.querySelectorAll(".ul-box")
+                    boxs.forEach((box) => {
+                        box.classList.add('open');
+                    })
+                }
+
+
+                function submitForm(leadId, status, pipeId) {
+                    fetch(`/lead/status/update/${leadId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'  // Specify that we're sending JSON
+                        },
+                        body: JSON.stringify({ status, pipeId })  // Convert the status to a JSON string
+                    })
+                        .then(response => {
+                            // Ensure the response is JSON
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                            location.reload()
                         })
-                    }
-
-
-                    function submitForm(leadId, status, pipeId) {
-                        fetch(`/lead/status/update/${leadId}`, {
-                            method: 'POST',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'  // Specify that we're sending JSON
-                            },
-                            body: JSON.stringify({ status, pipeId })  // Convert the status to a JSON string
+                        .then(data => {
+                            console.log('Success:', data);
                         })
-                            .then(response => {
-                                // Ensure the response is JSON
-                                if (!response.ok) {
-                                    throw new Error('Network response was not ok');
-                                }
-                                return response.json();
-                                location.reload()
-                            })
-                            .then(data => {
-                                console.log('Success:', data);
-                            })
+                }
+
+
+                function showStatusBox() {
+                    let box = document.querySelector('#status-box')
+
+                    console.log(box)
+                    box.style.display = 'block'
+                }
+
+                document.getElementById('remarkForm').addEventListener('submit', function (event) {
+                    event.preventDefault(); // Prevent the default form submission
+
+                    const text = document.getElementById('remark-form-text').value;
+                    const time = document.getElementById('remark-form-time').value;
+                    const date = document.getElementById('remark-form-date').value;
+
+                    const formData = {
+                        text: text,
+                        time: time,
+                        date: date
+                    };
+                    console.log(formData)
+                    const actionUrl = this.action;
+
+
+                    fetch(actionUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json(); // Assuming server responds with JSON
+                        })
+                        .then(data => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                            
+                                <div class="content">
+                                    <div class="createdTime">${formatDate(data.createdAt)}</div>
+                                    <p>${data.text}</p>
+                                    <div class="createdTime">${data.time} ${formatDate(data.date)}</div>
+                                </div>`;
+                            const span = document.getElementById('new-remark-down');
+
+
+                            if (span) {
+                                span.insertAdjacentElement('afterend', li);
+                            }
+
+                            //  const timelineList = document.getElementById('timeline-ul-list');
+                            //  timelineList.innerHTML += liElem;
+
+                            document.getElementById('remarkForm').reset();
+                            closeAddRemarkForm()
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
+
+                function formatDate(datetime) {
+
+                    if (!datetime) {
+                        return '';
                     }
 
+                    const date = new Date(datetime);
 
-                    function showStatusBox() {
-                        let box = document.querySelector('#status-box')
-
-                        console.log(box)
-                        box.style.display = 'block'
+                    if (isNaN(date)) {
+                        console.warn('Invalid date:', datetime);
+                        return '';
                     }
-                
+                    return date.toISOString().split("T")[0];
+                }
 
-                </script>
-            </div>
-
+            </script>
         </div>
 
+    </div>
 
-        <div class="fg-main-footer bg-white border-top w-100">
-            <div class="col-md-12">
-                <p class="sub_footer_text m-t-10 m-b-10 text-center"> Copyright © 2024. Web Soft Valley All Rights
-                    Reserved
-                </p>
-            </div>
+
+    <div class="fg-main-footer bg-white border-top w-100">
+        <div class="col-md-12">
+            <p class="sub_footer_text m-t-10 m-b-10 text-center"> Copyright © 2024. Web Soft Valley All Rights
+                Reserved
+            </p>
         </div>
+    </div>
 
     </div>
     </div>
@@ -517,6 +627,22 @@
             allBtn.classList.remove('btn-outline-primary')
             allBtn.classList.add('btn-primary')
         }
+
+        function openRemarkPopUp() {
+            let timelineBox = document.querySelector('#timeline')
+            timelineBox.classList.add('openTimeline')
+        }
+
+        function openAddRemarkForm() {
+            let form = document.querySelector('#remark-form-list')
+            form.classList.add('openform')
+        }
+        function closeAddRemarkForm() {
+            let form = document.querySelector('#remark-form-list')
+            form.classList.remove('openform')
+
+        }
+
 
     </script>
 

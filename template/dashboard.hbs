@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="vendors/jqvmap/dist/jqvmap.min.css">
 
 
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
 
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 
@@ -96,6 +96,11 @@
                 <option value="Education">Education</option>
                 <option value="Healthcare">Healthcare</option>
                 <option value="Agriculture">Agriculture</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Telecommunication">Telecommunication</option>
+                <option value="Realestate">Real Estate</option>
+                <option value="Consumer">Consumer Services</option>
+                <option value="Media">Media &amp; Entertainments</option>
                 <!-- Add more sectors as needed -->
             </select>
 
@@ -150,30 +155,20 @@
                         </div>
                         <!--/social-box-->
                     </div>
-                    {{#each pipes}}
-                     <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <div class="social-box mailchimp">
                            <i class="fab fa-mailchimp"></i>
                             <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
                         </div>
                         <!--/social-box-->
                     </div>
+
+                    <div class="row col-12" style="flex-wrap: wrap;">
+                    {{#each pipes}}
+                     
                     <div class="col-sm-6 col-lg-3">
                         <div class="card text-white" style="background-color: {{color}};">
                             <div class="card-body pb-0">
-                                {{!-- <div class="dropdown float-right">
-                                    <button class="btn bg-transparent dropdown-toggle theme-toggle text-light"
-                                        type="button" id="dropdownMenuButton1" data-toggle="dropdown">
-                                        <i class="fa fa-cog"></i>
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                        <div class="dropdown-menu-content">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
-                                    </div>
-                                </div> --}}
                                 <h4 class="mb-0">
                                     <span class="count" style="font-size: x-large;">
                                         {{countLeadsByStatus ../leads title}}
@@ -191,6 +186,8 @@
                     </div>
                     {{/each}}
 
+                    </div>
+
                     <div class="col-xl-6">
                         <div class="card">
                             <div class="card-body">
@@ -199,26 +196,7 @@
                                         <h4 class="card-title mb-0">Traffic</h4>
                                         <div class="small text-muted">Lead Analytics</div>
                                     </div>
-                                    <!--/.col-->
-                                    {{!-- <div class="col-sm-8 hidden-sm-down">
-                                        <button type="button" class="btn btn-primary float-right bg-flat-color-1"><i
-                                                class="fa fa-cloud-download"></i></button>
-                                        <div class="btn-toolbar float-right" role="toolbar"
-                                            aria-label="Toolbar with button groups">
-                                            <div class="btn-group mr-3" data-toggle="buttons" aria-label="First group">
-                                                <label class="btn btn-outline-secondary">
-                                                    <input type="radio" name="options" id="option1"> Day
-                                                </label>
-                                                <label class="btn btn-outline-secondary active">
-                                                    <input type="radio" name="options" id="option2" checked=""> Month
-                                                </label>
-                                                <label class="btn btn-outline-secondary">
-                                                    <input type="radio" name="options" id="option3"> Year
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div> --}}
-                                    <!--/.col-->
+                                    
 
 
                                 </div>
@@ -278,14 +256,14 @@
                     </div>
 
                     <div class="col-xl-3 col-lg-6">
-                        <section class="card">
-                            <div class="profile-card">
+                        <section class="card"  style="min-height: 400px;">
+                            <div class="profile-card" >
                                 <div href="/profile" class="corner-ribon black-ribon">
                                     <i class="fas fa-edit"></i>
                                 </div>
 
 
-                                <div class="media">
+                                <div class="media" >
 
                                     <div class="media-body">
                                         <div class="profile-details">
@@ -374,12 +352,15 @@
                             margin: 0;
                             border: none;
                         }
+                        #pipe-container-s::-webkit-scrollbar{
+                            display: none;
+                        }
                     </style>
 
                     <div class="col-xl-3 col-lg-6">
                         <div class="card">
-                            <div class="card-body">
-                                <div class="stat-widget-one">
+                            <div class="card-body" >
+                                <div class="stat-widget-one" id="pipe-container-s" style="height: 350px;max-height: 350px; overflow: auto;">
                                     <form action="/pipeline" method="post">
                                         <input type="text" id="inputPassword2" name="title" placeholder="Enter Pipline">
                                         <input type="color" class="colorinp"
@@ -818,7 +799,25 @@
 
         new Chart(ctx, config);
     </script>
+    
 
+<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-messaging.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    .then((registration) => {
+      console.log('Service Worker registered with scope:', registration.scope);
+    })
+    .catch((error) => {
+      console.error('Service Worker registration failed:', error);
+    });
+}
+
+</script>
+  <!-- Custom JavaScript to handle messaging -->
+  <script type="module" src="/assets/js/firebase-messaging.js"></script>
+  <script type="module" src="/assets/js/firebase-messaging-sw.js"></script>
 
 </body>
 

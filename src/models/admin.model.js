@@ -14,6 +14,7 @@ const logInSchema = new mongoose.Schema({
   facebookToken:{
     type:String,
   },
+  fcmToken: String,
   teams: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'teamMember',

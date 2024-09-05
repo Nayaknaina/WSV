@@ -28,6 +28,8 @@ const teamMemberSchema = new mongoose.Schema(
       required: true
     },
 
+    fcmToken: String,
+    
     myleads: [
       {
         type: mongoose.Schema.Types.ObjectId,
