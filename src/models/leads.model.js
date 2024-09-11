@@ -17,6 +17,10 @@ const leadsSchema = new mongoose.Schema(
       type: Date,
     },
 
+    remarks: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'remark',
+    }],             
     status: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'pipeline',

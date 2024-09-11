@@ -164,12 +164,12 @@ section {
 #add-btn{
   padding: 2px 8px;
 }
-#remark-form-list{
+/* #remark-form-list{
   display: none;
 }
 #remark-form-list.openform{
   display: block;
-}
+} */
 
 .createdTime{
   color: #787878;
