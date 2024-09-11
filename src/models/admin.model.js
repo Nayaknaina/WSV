@@ -14,6 +14,9 @@ const logInSchema = new mongoose.Schema({
   facebookToken:{
     type:String,
   },
+  whatsappSession:{
+    type:String,
+  },
   fcmToken: String,
   teams: [{
     type: mongoose.Schema.Types.ObjectId,

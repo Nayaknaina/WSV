@@ -24,68 +24,20 @@ const { upload } = require("./service/multer.js");
 const fs = require("fs");
 
 const adminFireBase = require('firebase-admin');
-const serviceAccount = require('./config/followupsdemo-firebase-adminsdk-t0rmy-2b420cc28c.json');
+const serviceAccount = require('./config/followupsdemo-firebase-adminsdk-t0rmy-26813e95da.json');
 
 
 const logIncollection = require("./models/admin.model.js");
 const pipelineModel = require("./models/pipeline.model.js");
 const memberModel = require("./models/member.model.js");
+const WAmodel = require("./models/whatsappSession.model.js");
 const remarkModel = require("./models/remark.model.js");
 const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
 const memberRoute = require("./routes/members.route.js");
 const { log } = require("console");
 
-//Whatsapp-----------------------------------------
-const { Client, LocalAuth } = require("whatsapp-web.js");
-const qr = require("qr-image");
-
-let qrCodeData = ""; 
-let whatsappClientReady = false; 
-let isConnected = false; 
-
-// Initialize WhatsApp Client
-const client = new Client({
-  authStrategy: new LocalAuth(),
-});
-// Generate and store the QR code data
-client.on("qr", (qrCode) => {
-
-  const qrImage = qr.imageSync(qrCode, { type: 'png' });
-  qrCodeData = `data:image/png;base64,${qrImage.toString('base64')}`;
-  
-});
-
-// Event when client is authenticated and READY
-client.on("ready", () => {
-  console.log("WhatsApp client is ready!");
-  whatsappClientReady = true;
-  isConnected = true; 
-});
-
-// Event when client is disconnected
-client.on("disconnected", () => {
-  console.log("WhatsApp client has been disconnected.");
-  whatsappClientReady = false;
-  isConnected = false; 
-});
-// Function to send a WhatsApp message
-function sendMessageToLead(phoneNumber, message) {
-  if (!whatsappClientReady) {
-    console.error("WhatsApp client is not ready. Cannot send message.");
-    return;
-  }
-
-  client
-    .sendMessage(phoneNumber, message)
-    .then((result) => {
-      console.log("Message sent:", result);
-    })
-    .catch((error) => {
-      console.error("Error sending message:", error);
-    });
-}
-//-------------------------------------------
+const qrcode = require('qrcode');
 
 
 adminFireBase.initializeApp({
@@ -120,6 +72,9 @@ app.set("views", templatepath);
 hbs.registerPartials(path.join(__dirname, "../template/partials"));
 
 hbs.registerHelper("formatDate", function (datetime) {
+  if (!datetime) {
+    return ''; // Return an empty string if datetime is invalid
+}
   const date = new Date(datetime);
   return date.toISOString().split("T")[0]; // Extract YYYY-MM-DD
 });
@@ -164,34 +119,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(express.static("template"));
-
-
-//logout the whtsapps
-app.get("/logoutWA", async(req, res) => {
-  try {
-    qrCodeData = "";
-    await client.logout(); 
-    isConnected = false; 
-    console.log("WhatsApp client logged out successfully.");
-  } catch (error) {
-    console.error("Error during logout:", error);
-  }
-
-  
-  res.redirect("/dashboard");
-})
-// Serve QR code via HTTP
-app.get("/qr", isAdminLoggedIn, (req, res) => {
-  const user = req.user;
-
-  // Render the QR page with the current connection status
-  res.render("qr", {
-    user,
-    qrCodeData,
-    isConnected, // Pass the connection status to the template
-  });
-});
-
 
 // Passport.js Google Strategy
 passport.use(
@@ -254,9 +181,6 @@ app.use("/member", memberRoute);
 app.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
-
-
-// Endpoint to handle form submission
 
 app.get("/connect", isAdminLoggedIn, async (req, res) => {
   const user = req.user;
@@ -538,15 +462,19 @@ app.post("/update-user", async (req, res) => {
 // Dashboard route
 app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   try {
+    console.log("dashboard");
+    
     const user = await logIncollection.findById(req.user.id).populate("myleads");
     if (!user.organizationName) {
       return res.render("dashboard", { showForm: true });
     }
-
-    const pipes = await pipelineModel.find({ cid: user.cid }).sort({ defaultVal: -1 }).exec();
-    const leads = await leadsModel.find({ cid: user.cid }).populate("status");
  
-    res.render("dashboard", { user, pipes, leads, showForm: false });
+    const pipes = await pipelineModel.find({ cid: user.cid }).sort({ defaultVal: -1 }).exec();
+    const leads = await leadsModel.find({ cid: user.cid }).populate("status")
+    
+    
+    res.render("dashboard", { user, pipes, leads});
+    // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
 
   } catch (error) {
     res.status(500).send("Internal error");
@@ -851,7 +779,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       return res.redirect("/login");
     }
 
-    // console.log(allLeads0);
+    console.log(allLeads.length);
 
     allLeads.forEach(async (lead) => {
       const perLead = await leadsModel.findOne({ lead_id: lead.id });
@@ -896,6 +824,9 @@ app.get("/leads", isAdminLoggedIn, async (req, res) => {
         populate: {
           path: "status", // Ensure that leads' status is populated
         },
+        populate: {
+          path: "remarks", // Populate status from leads
+        },
       });
     } else {
       user = await memberModel.findById(req.user.id).populate({
@@ -903,17 +834,18 @@ app.get("/leads", isAdminLoggedIn, async (req, res) => {
         populate: {
           path: "status", // Populate status from leads
         },
+        populate: {
+          path: "remarks", // Populate status from leads
+        },
       });
     }
 
     let leads = await leadsModel.find({ cid: user.cid }).populate("status");
     let pipes = await pipelineModel.find({ cid: user.cid });
-    let remarks = await remarkModel.find({ uid: user._id }).sort({ createdAt: -1 });
+    // let remarks = await remarkModel.find({ uid: user._id }).sort({ createdAt: -1 });
 
-    // console.log(remarks);
 
-    res.render("leads", { user, leads, pipes, remarks });
-    // res.json({ leads: allLeads });
+    res.render("leads", { user, leads, pipes });
   } catch (error) {
     console.error("Error fetching leads:", error);
     res.status(500).send("Error fetching leads");
@@ -927,6 +859,7 @@ app.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
   if (!lead) {
     return res.redirect("/leads");
   }
+
   if (req.user.role === "admin") {
     let admin = await logIncollection.findById(req.user.id);
     admin.myleads.push(lead._id);
@@ -939,9 +872,20 @@ app.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
     lead.uid = member._id;
     await member.save();
     await lead.save();
-
+    
     console.log("bokking the leads by ", member);
   }
+  console.log("ready for message sending");
+  
+//   const interval = setInterval(() => {
+//     if (whatsappClientReady) {
+//       sendMessageOnWA('9755313770', 'Hello!');
+//         clearInterval(interval); // Stop checking once the message is sent
+//     } else {
+//         console.log('Waiting for WhatsApp client to be ready...');
+//     }
+// }, 5000);
+
   res.redirect("/leads");
 });
 
@@ -1009,6 +953,11 @@ app.post('/remark/add/:id',isAdminLoggedIn, async (req,res)=>{
     date,
   })
   await remark.save()
+
+  lead.remarks.push(remark._id)
+  await lead.save()
+  console.log(lead);
+  
   return res.json(remark);
   
 })
@@ -1042,8 +991,6 @@ app.get("/:page", (req, res) => {
   });
 });
 
-client.initialize();
-// Start the server
 app.listen(port, () => {
   console.log(`Server is running at PORT:${port}`);
   
