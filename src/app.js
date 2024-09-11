@@ -23,14 +23,14 @@ const { sendMail } = require("./service/mailSender.js");
 const { upload } = require("./service/multer.js");
 const fs = require("fs");
 
-const adminFireBase = require('firebase-admin');
-const serviceAccount = require('./config/followupsdemo-firebase-adminsdk-t0rmy-26813e95da.json');
+// const adminFireBase = require('firebase-admin');
+// const serviceAccount = require('./config/followupsdemo-firebase-adminsdk-t0rmy-26813e95da.json');
 
 
 const logIncollection = require("./models/admin.model.js");
 const pipelineModel = require("./models/pipeline.model.js");
 const memberModel = require("./models/member.model.js");
-const WAmodel = require("./models/whatsappSession.model.js");
+// const WAmodel = require("./models/whatsappSession.model.js");
 const remarkModel = require("./models/remark.model.js");
 const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
@@ -40,9 +40,9 @@ const { log } = require("console");
 const qrcode = require('qrcode');
 
 
-adminFireBase.initializeApp({
-  credential: adminFireBase.credential.cert(serviceAccount)
-});
+// adminFireBase.initializeApp({
+//   credential: adminFireBase.credential.cert(serviceAccount)
+// });
 
 // Middleware
 const sessionStore =
@@ -298,7 +298,7 @@ app.get("/team", isAdminLoggedIn, async (req, res) => {
 
 app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
   const user = req.user;
-  const { name, email } = req.query;
+  const { name, email, mobile } = req.query;
   const password = otpGenerator.generate(8, {
     digits: true,
     lowerCaseAlphabets: true,
@@ -337,6 +337,7 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
     const newMember = new memberModel({
       name,
       email,
+      mobile,
       password,
       cid: user.cid,
       owner_id: user._id,
@@ -803,6 +804,8 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       }
     });
 
+    if (chalteRahoId) 
+      clearInterval(chalteRahoId)
     chalteRaho(accessToken);
 
     res.redirect("/leads");
@@ -1083,9 +1086,10 @@ async function findNewLead(accessToken) {
   return allLeads;
 }
 
+let chalteRahoId;
 function chalteRaho(token) {
   let i = 0;
-  setInterval(() => {
+  chalteRahoId = setInterval(() => {
     findNewLead(token);
     console.log("step", i++);
   }, 60000);
