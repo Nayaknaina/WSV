@@ -30,7 +30,6 @@ const serviceAccount = require('./config/followupsdemo-firebase-adminsdk-t0rmy-2
 const logIncollection = require("./models/admin.model.js");
 const pipelineModel = require("./models/pipeline.model.js");
 const memberModel = require("./models/member.model.js");
-const WAmodel = require("./models/whatsappSession.model.js");
 const remarkModel = require("./models/remark.model.js");
 const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
@@ -1318,20 +1317,3 @@ function chalteRaho(token) {
   }, 60000);
 }
 
-async function sendPushNotification(fcmToken, title, body) {
-  const msg = {
-    notification: {
-      title: title,
-      body: body,
-    },
-    token: fcmToken, // User's FCM token
-  };
-
-  try {
-    // Send notification via FCM
-    const res = await admin.messaging().send(msg);
-    console.log('Successfully sent message:', res);
-  } catch (err) {
-    console.error('Error sending message:', err);
-  }
-}
