@@ -450,8 +450,11 @@ form.sign-in-form {
               <input type="email" name="email" placeholder="Email" required/>
             </div>
             <div class="input-field">
+              <i class="fas fa-user"></i>
+              <input type="tel" name="mobile" placeholder="Mobile" required/>
+            </div>
+            <div class="input-field">
               <i class="fas fa-lock"></i>
-              
                <input placeholder="Password" name="password" id="password" type="password" required >
                <span class="password-toggle"><i class="fas fa-eye"></i></span>
             </div>
@@ -485,25 +488,6 @@ form.sign-in-form {
     {{/if}}
     </script>
     <script >
-// const sign_in_btn = document.querySelector("#sign-in-btn");
-// const sign_up_btn = document.querySelector("#sign-up-btn");
-// const container = document.querySelector(".container");
-// 
-// sign_up_btn.addEventListener("click", () => {
-//   container.classList.add("sign-up-mode");
-// });
-// 
-// sign_in_btn.addEventListener("click", () => {
-//   container.classList.remove ("sign-up-mode");
-// });
-
-// var myInput = document.getElementById("psw");
-// var letter = document.getElementById("letter");
-// var capital = document.getElementById("capital");
-// var number = document.getElementById("number");
-// var length = document.getElementById("length");
-// 
-
 //eye icon-toggle password
 const passwordField = document.getElementById("password");
 // Select all password toggle icons

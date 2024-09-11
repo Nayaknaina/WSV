@@ -9,6 +9,12 @@ const teamMemberSchema = new mongoose.Schema(
     name: {
       type: String,
     },
+    mobile:{
+      type: String,
+      required: true,
+      trim: true,
+
+    },
     cid: {
       type: String
     },
@@ -19,7 +25,7 @@ const teamMemberSchema = new mongoose.Schema(
     email: {
       type: String,
       unique:true,
-      trime:true,
+      trim:true,
       lowercase:true,
       required: true,
     },
