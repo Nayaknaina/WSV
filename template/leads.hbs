@@ -321,62 +321,62 @@
                                         style="background-color: {{status.color}};">
                                         <div class="ul-box">
                                             {{#each ../pipes}}
-                                            <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
-                                                <span>{{title}}</span>
-                                                <span class="drop-circle" style="background-color: {{color}};"></span>
-                                            </li>
-                                            {{/each}}
-                                        </div>
-                                    </span>
-
-                                </span>
-                            </label>
-
-                            <section class="timeline" id="timeline{{_id}}" style="">
-                                <ul id="timeline-ul-list">
-                                    <h3 style="color: #28292a; text-align: center;">Your Remarks</h3>
-                                    <li onclick="openAddRemarkForm('{{_id}}')" style="cursor: pointer;">
-                                        <div class="content add-remark" id="add-remark-content">
-                                            <h2><span class="add-remark-txt">add remark</span></h2>
-                                        </div>
-                                    </li>
-                                    <li id="remark-form-list{{_id}}" style="display: none;">
-                                        <div class="content">
-                                            <form id="remarkForm" onsubmit="createNewRemark('{{_id}}')">
-                                                <textarea placeholder="setting up next followup" required maxlength="150" name="text"
-                                                    id="remark-form-text{{id}}" cols="30" rows="5"></textarea>
-                                                <input type="time" name="time" id="remark-form-time{{id}}" required>
-                                                <input type="date" name="date" id="remark-form-date{{id}}" required>
-                                                <button class="btn btn-primary mt-1" id="add-btn" style="font-size: 12px;"
-                                                    type="submit">add</button>
-                                                <button class="btn btn-danger mt-1" id="add-btn" style="font-size: 12px;"
-                                                    onclick="closeAddRemarkForm('{{_id}}')" type="button">cancel</button>
-                                            </form>
-                                        </div>
-                                    </li>
-                                        
-                                {{#each remarks}}
-                                    <span id="new-remark-down"></span>
-                                        <li>
-                                            <div class="content">
-                                                <div class="createdTime">{{formatTime createdAt}} {{formatDate createdAt}}</div>
-                                                <p>{{text}}</p>
-                                                <div class="createdTime">{{time}} {{formatDate date}}</div>
-                                            </div>
-                                        </li>
-                                {{/each}}
-                                </ul>
-                            </section>
-                            <input type="checkbox" id="touch2-{{@index}}">
-                            <ul class="slide">
-                            {{#each leads_data}}
-                                <li>
-                                <strong>{{que}}:</strong> {{ans}}
-                                </li>
-                            {{/each}}
-                            </ul>
-                        </nav>
+                    <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                        <span>{{title}}</span>
+                        <span class="drop-circle" style="background-color: {{color}};"></span>
                     </li>
+                    {{/each}}
+            </div>
+            </span>
+
+            </span>
+            </label>
+
+            <section class="timeline" id="timeline{{_id}}" style="">
+                <ul id="timeline-ul-list">
+                    <h3 style="color: #28292a; text-align: center;">Your Remarks</h3>
+                    <li onclick="openAddRemarkForm('{{_id}}')" style="cursor: pointer;">
+                        <div class="content add-remark" id="add-remark-content">
+                            <h2><span class="add-remark-txt">add remark</span></h2>
+                        </div>
+                    </li>
+                    <li id="remark-form-list{{_id}}" style="display: none;">
+                        <div class="content">
+                            <form id="remarkForm" onsubmit="createNewRemark('{{_id}}')">
+                                <textarea placeholder="setting up next followup" required maxlength="150" name="text"
+                                    id="remark-form-text{{id}}" cols="30" rows="5"></textarea>
+                                <input type="time" min="current-time" name="time" id="remark-form-time{{id}}" required>
+                                <input type="date" min="current-date" name="date" id="remark-form-date{{id}}" required>
+                                <button class="btn btn-primary mt-1" id="add-btn" style="font-size: 12px;"
+                                    type="submit">add</button>
+                                <button class="btn btn-danger mt-1" id="add-btn" style="font-size: 12px;"
+                                    onclick="closeAddRemarkForm('{{_id}}')" type="button">cancel</button>
+                            </form>
+                        </div>
+                    </li>
+
+                    <span id="new-remark-down{{_id}}"></span>
+                    {{#each remarks}}
+                    <li>
+                        <div class="content">
+                            <div class="createdTime">{{formatTime createdAt}} {{formatDate createdAt}}</div>
+                            <p>{{text}}</p>
+                            <div class="createdTime">{{time}} {{formatDate date}}</div>
+                        </div>
+                    </li>
+                    {{/each}}
+                </ul>
+            </section>
+            <input type="checkbox" id="touch2-{{@index}}">
+            <ul class="slide">
+                {{#each leads_data}}
+                <li>
+                    <strong>{{que}}:</strong> {{ans}}
+                </li>
+                {{/each}}
+            </ul>
+            </nav>
+            </li>
             {{/each}}
             {{else}}
             <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
@@ -451,12 +451,22 @@
                     box.style.display = 'block'
                 }
 
-                function createNewRemark(id){
+                function createNewRemark(id) {
                     event.preventDefault(); // Prevent the default form submission
 
                     const text = document.getElementById(`remark-form-text${id}`).value;
                     const time = document.getElementById(`remark-form-time${id}`).value;
                     const date = document.getElementById(`remark-form-date${id}`).value;
+
+                    const now = new Date();
+
+                    const selectedDateTime = new Date(`${date}T${time}`);
+
+                    // Check if the selected date and time is in the past
+                    if (selectedDateTime < now) {
+                        alert("You cannot select a past date or time.");
+                        return false; // Prevent form submission
+                    }
 
                     const formData = {
                         text: text,
@@ -464,7 +474,7 @@
                         date: date
                     };
                     console.log(formData)
-                    
+
                     fetch(`/remark/add/${id}`, {
                         method: 'POST',
                         headers: {
@@ -487,7 +497,7 @@
                                     <p>${remark.text}</p>
                                     <div class="createdTime">${remark.time} ${formatDate(remark.date)}</div>
                                 </div>`;
-                            const span = document.getElementById('new-remark-down');
+                            const span = document.getElementById(`new-remark-down${id}`);
 
 
                             if (span) {
@@ -503,10 +513,10 @@
                         .catch(error => {
                             console.error('Error:', error);
                         });
-        
+
 
                 }
-    
+
 
                 function formatDate(datetime) {
 
@@ -522,7 +532,7 @@
                     }
                     return date.toISOString().split("T")[0];
                 }
-              
+
 
             </script>
         </div>
