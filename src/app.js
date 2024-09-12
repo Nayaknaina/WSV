@@ -89,9 +89,9 @@ function sendMessageToLead(phoneNumber, message) {
   }
 
   client
-    .sendMessage(`${phoneNumber}@c.us`, message)
+    .sendMessage(`91${phoneNumber}@c.us`, message)
     .then((result) => {
-      console.log("Message sent:", result);
+      console.log("Message sent:");
     })
     .catch((error) => {
       console.error("Error sending message:", error);
@@ -419,8 +419,7 @@ app.get("/template", isAdminLoggedIn, async (req, res) => {
   res.render("template", { user, templates });
 });
 
-app.post(
-  "/template/update/:id",
+app.post("/template/update/:id",
   isAdminLoggedIn,
   upload.fields([{ name: "image" }, { name: "pdf" }]),
   async (req, res) => {
@@ -710,14 +709,12 @@ app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
 // });
 
 // Google Authentication Routes
-app.get(
-  "/auth/google",
+app.get("/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] }),
   (req, res) => { }
 );
 
-app.get(
-  "/auth/google/callback",
+app.get("/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/signup" }),
   async (req, res) => {
     console.log(req.user);
@@ -1141,7 +1138,6 @@ app.post('/remark/add/:id',isAdminLoggedIn, async (req,res)=>{
   const {id} = req.params;
   const {text, time, date} = req.body;
   let user ;
-  console.log("hheeyeyy", req.body,id);
   
   if (req.user.role === 'admin') {
     user = await logIncollection.findById(req.user.id)
@@ -1150,7 +1146,6 @@ app.post('/remark/add/:id',isAdminLoggedIn, async (req,res)=>{
 
   console.log(req.body);
   let lead = await leadsModel.findById(id)
-  console.log(lead);
 
   let remark = new remarkModel({
     uid: user._id,
@@ -1164,7 +1159,35 @@ app.post('/remark/add/:id',isAdminLoggedIn, async (req,res)=>{
 
   lead.remarks.push(remark._id)
   await lead.save()
-  console.log(lead);
+  // console.log(lead);
+
+  const mobileRegex = /^[6-9]\d{9}$/;
+  let leadContactNo;
+  lead.leads_data.forEach(item => {
+    const answer = item.ans.trim();
+    
+    if (mobileRegex.test(answer)) {
+      console.log("Valid Mobile Number found:", answer);
+      leadContactNo = answer;
+    }
+  });
+
+  console.log(leadContactNo);
+  leadContactNo = '9755313770'
+  const remarkDateTime = new Date(`${date}T${time}:00`);
+  const currentTime = new Date();
+
+  const timeDifference = remarkDateTime - currentTime;
+
+  if (timeDifference > 0) {
+    setTimeout(() => {
+      console.log('Hello Dear');
+      sendMessageToLead(leadContactNo, `message for remainder to picup the call from 360followups`)
+      sendMessageToLead(user.mobile, `message for remainder to call your lead. mobile no.-  ${leadContactNo}`)
+    }, timeDifference);
+  } else {
+    console.log('The specified time is in the past. Cannot schedule.');
+  }
   
   return res.json(remark);
   
@@ -1322,20 +1345,20 @@ function chalteRaho(token) {
   }, 60000);
 }
 
-async function sendPushNotification(fcmToken, title, body) {
-  const msg = {
-    notification: {
-      title: title,
-      body: body,
-    },
-    token: fcmToken, // User's FCM token
-  };
+// async function sendPushNotification(fcmToken, title, body) {
+//   const msg = {
+//     notification: {
+//       title: title,
+//       body: body,
+//     },
+//     token: fcmToken, // User's FCM token
+//   };
 
-  try {
-    // Send notification via FCM
-    const res = await admin.messaging().send(msg);
-    console.log('Successfully sent message:', res);
-  } catch (err) {
-    console.error('Error sending message:', err);
-  }
-}
+//   try {
+//     // Send notification via FCM
+//     const res = await admin.messaging().send(msg);
+//     console.log('Successfully sent message:', res);
+//   } catch (err) {
+//     console.error('Error sending message:', err);
+//   }
+// }
