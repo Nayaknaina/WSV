@@ -73,8 +73,8 @@ client.on("ready", async () => {
   connectedPhoneNumber = client.info.wid.user;
   console.log("Connected WhatsApp Number:", connectedPhoneNumber);
 
-  // Process queued messages once the client is ready
-  processQueuedMessages();
+  // // Process queued messages once the client is ready
+  // processQueuedMessages();
 });
 
 
