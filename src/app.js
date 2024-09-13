@@ -3,7 +3,7 @@ const app = express();
 
 const path = require("path");
 const port = process.env.PORT || 8000;
- 
+
 const templatepath = path.join(__dirname, "../template");
 const hbs = require("hbs");
 require("dotenv").config();
@@ -26,7 +26,6 @@ const fs = require("fs");
 // const adminFireBase = require('firebase-admin');
 // const serviceAccount = require('./config/followupsdemo-firebase-adminsdk-t0rmy-26813e95da.json');
 
-
 const logIncollection = require("./models/admin.model.js");
 const pipelineModel = require("./models/pipeline.model.js");
 const memberModel = require("./models/member.model.js");
@@ -41,12 +40,10 @@ const { log } = require("console");
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qr = require("qr-image");
 
-
 let qrCodeData = "";
 let whatsappClientReady = false;
 let isConnected = false;
 let connectedPhoneNumber = "";
-
 
 // Initialize WhatsApp Client
 const client = new Client({
@@ -72,30 +69,56 @@ client.on("ready", async () => {
   // Fetch the connected WhatsApp account details
   connectedPhoneNumber = client.info.wid.user;
   console.log("Connected WhatsApp Number:", connectedPhoneNumber);
-
-  // Process queued messages once the client is ready
-  processQueuedMessages();
 });
 
-
 // Function to send a WhatsApp message
-function sendMessageToLead(phoneNumber, message) {
-  console.log("Trying to send message. Client ready status:", whatsappClientReady);
+async function sendMessageToLead(
+  phoneNumber,
+  message,
+  imagePath = "",
+  pdfPath = ""
+) {
+  console.log(
+    "Trying to send message. Client ready status:",
+    whatsappClientReady
+  );
 
+  // Check if WhatsApp client is ready
   if (!whatsappClientReady) {
     console.log("WhatsApp client is not ready. Queuing message.");
-
     return;
   }
 
-  client
-    .sendMessage(`91${phoneNumber}@c.us`, message)
-    .then((result) => {
-      console.log("Message sent:");
-    })
-    .catch((error) => {
-      console.error("Error sending message:", error);
-    });
+  try {
+    // If imagePath and captionText are provided, send image with caption
+    if (imagePath && pdfPath) {
+      // send image with text message And Pdf
+      const imageMedia = MessageMedia.fromFilePath(imagePath);
+      const pdfMedia = MessageMedia.fromFilePath(pdfPath);
+      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
+        caption: message,
+      });
+      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia);
+    } else if (imagePath && pdfPath === "") {
+      // send Only a image with text message
+      const imageMedia = MessageMedia.fromFilePath(imagePath);
+      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
+        caption: message,
+      });
+    } else if (pdfPath && imagePath === "") {
+      // send Only a pdf with text message
+      const pdfMedia = MessageMedia.fromFilePath(pdfPath);
+      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia, {
+        caption: message,
+      });
+    } else {
+      // Otherwise, send a regular text message
+      await client.sendMessage(`91${phoneNumber}@c.us`, message);
+      console.log("Text message sent successfully!");
+    }
+  } catch (error) {
+    console.error("Error sending message:", error);
+  }
 }
 
 // Function to re-initialize the WhatsApp client
@@ -168,9 +191,8 @@ client.on("auth_failure", async (message) => {
 // Initialize the WhatsApp client
 client.initialize();
 
-
-app.get('/connection-status', (req, res) => {
-  res.json({ isConnected }); 
+app.get("/connection-status", (req, res) => {
+  res.json({ isConnected });
 });
 
 //-------------------------------------------
@@ -180,14 +202,13 @@ app.get('/connection-status', (req, res) => {
 // Send a message to the test number
 // sendMessageToLead(testPhoneNumber, 'hello:)');
 
-
 // Middleware
 const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({
-      mongoUrl:
-        "mongodb+srv://nainanayak288:Dkccg5NaZMANqu7F@wsvconnect.bpxfx.mongodb.net/",
-    }) // Replace with your MongoDB connection URI
+        mongoUrl:
+          "mongodb+srv://nainanayak288:Dkccg5NaZMANqu7F@wsvconnect.bpxfx.mongodb.net/",
+      }) // Replace with your MongoDB connection URI
     : new session.MemoryStore();
 
 app.use(
@@ -210,29 +231,29 @@ hbs.registerPartials(path.join(__dirname, "../template/partials"));
 
 hbs.registerHelper("formatDate", function (datetime) {
   if (!datetime) {
-    return ''; // Return an empty string if datetime is invalid
-}
+    return ""; // Return an empty string if datetime is invalid
+  }
   const date = new Date(datetime);
   return date.toISOString().split("T")[0]; // Extract YYYY-MM-DD
 });
 
 hbs.registerHelper("formatTime", function (datetime) {
   if (!datetime) {
-      return ''; // Return an empty string if datetime is invalid
+    return ""; // Return an empty string if datetime is invalid
   }
   const date = new Date(datetime);
-  const hours = date.getUTCHours().toString().padStart(2, '0');
-  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+  const hours = date.getUTCHours().toString().padStart(2, "0");
+  const minutes = date.getUTCMinutes().toString().padStart(2, "0");
   return `${hours}:${minutes}`; // Format as HH:MM
 });
 
-hbs.registerHelper('countLeadsByStatus', function(leads, pipelineTitle) {
+hbs.registerHelper("countLeadsByStatus", function (leads, pipelineTitle) {
   // Check if leads is defined and is an array
   if (!Array.isArray(leads)) {
     return 0; // Return 0 if leads is not an array
   }
 
-  const filteredLeads = leads.filter(lead => {
+  const filteredLeads = leads.filter((lead) => {
     return lead.status && lead.status.title === pipelineTitle;
   });
 
@@ -242,7 +263,7 @@ hbs.registerHelper("ifEquals", function (arg1, arg2, options) {
   return arg1 === arg2 ? options.fn(this) : options.inverse(this);
 });
 
-hbs.registerHelper('json', function(context) {
+hbs.registerHelper("json", function (context) {
   return JSON.stringify(context);
 });
 
@@ -257,13 +278,12 @@ app.use(cookieParser());
 
 app.use(express.static("template"));
 
-
 //logout the whtsapps
 // app.get("/logoutWA", async(req, res) => {
 //   try {
 //     qrCodeData = "";
-//     await client.logout(); 
-//     isConnected = false; 
+//     await client.logout();
+//     isConnected = false;
 //     console.log("WhatsApp client logged out successfully.");
 //   } catch (error) {
 //     console.error("Error during logout:", error);
@@ -298,7 +318,7 @@ app.get("/logoutWA", async (req, res) => {
         console.error("Failed to delete session files:", error.message);
         if (retries > 1) {
           console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait before retrying
+          await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
         }
       }
     }
@@ -314,7 +334,7 @@ app.get("/logoutWA", async (req, res) => {
 // Serve QR code via HTTP
 app.get("/qr", isAdminLoggedIn, (req, res) => {
   const user = req.user;
-console.log(qrCodeData);
+  console.log(qrCodeData);
 
   // Render the QR page with the current connection status
   res.render("qr", {
@@ -323,7 +343,6 @@ console.log(qrCodeData);
     isConnected, // Pass the connection status to the template
   });
 });
-
 
 // Passport.js Google Strategy
 passport.use(
@@ -404,7 +423,6 @@ app.get("/apps", isAdminLoggedIn, (req, res) => {
 
 app.get("/template", isAdminLoggedIn, async (req, res) => {
   let user;
-  console.log(req.user);
 
   if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id);
@@ -419,7 +437,8 @@ app.get("/template", isAdminLoggedIn, async (req, res) => {
   res.render("template", { user, templates });
 });
 
-app.post("/template/update/:id",
+app.post(
+  "/template/update/:id",
   isAdminLoggedIn,
   upload.fields([{ name: "image" }, { name: "pdf" }]),
   async (req, res) => {
@@ -428,36 +447,34 @@ app.post("/template/update/:id",
 
     let { title, text, client, team } = req.body;
 
-    const imageFile = req.files["image"] ? req.files["image"][0].filename : "";
-    const pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
-    console.log(imageFile);
-
     template.title = title;
     template.text = text;
 
     template.client = client === "on" ? true : false;
     template.team = team === "on" ? true : false;
+    let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
+    let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
 
-    const filePath1 = path.join(
-      __dirname,
-      "..",
-      "template",
-      "images",
-      "uploads",
-      "whatsapp",
-      template.image
-    );
-    const filePath2 = path.join(
-      __dirname,
-      "..",
-      "template",
-      "images",
-      "uploads",
-      "whatsapp",
-      template.pdf
-    );
-    if (template.image != "") {
-      fs.unlink(filePath1, (err) => {
+    // console.log("from form");
+    // console.log(imageFile);
+    // console.log(pdfFile);
+
+    // console.log("template");
+    // console.log(template.image);
+    // console.log(template.pdf);
+
+    if (imageFile !== "" && template.image !== "") {
+      const imagePath = path.join(
+        __dirname,
+        "..",
+        "template",
+        "images",
+        "uploads",
+        "whatsapp",
+        template.image
+      );
+
+      fs.unlink(imagePath, (err) => {
         if (err) {
           console.log("Error removing file", err);
           return;
@@ -465,21 +482,31 @@ app.post("/template/update/:id",
         console.log("file removed successfully");
       });
       template.image = imageFile;
-    } else {
+    } else if (imageFile !== "") {
       template.image = imageFile;
     }
 
-    if (template.pdf != "") {
-      fs.unlink(filePath2, (err) => {
+    if (pdfFile !== "" && template.pdf !== "") {
+      const pdfPath = path.join(
+        __dirname,
+        "..",
+        "template",
+        "images",
+        "uploads",
+        "whatsapp",
+        template.pdf
+      );
+
+      fs.unlink(pdfPath, (err) => {
         if (err) {
           console.log("Error removing file", err);
           return;
         }
         console.log("file removed successfully");
       });
-      template.pdf = imageFile;
-    } else {
-      template.pdf = imageFile;
+      template.pdf = pdfFile;
+    } else if (pdfFile !== "") {
+      template.pdf = pdfFile;
     }
 
     await template.save();
@@ -488,10 +515,12 @@ app.post("/template/update/:id",
   }
 );
 
+// profile update
+
 // team
 app.get("/team", isAdminLoggedIn, async (req, res) => {
   let user;
-  if (user.role === "admin") {
+  if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id).populate("teams");
   } else {
     user = await memberModel.findById(req.user.id).populate("owner_id");
@@ -501,16 +530,18 @@ app.get("/team", isAdminLoggedIn, async (req, res) => {
 });
 
 app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
-  const user = req.user;
-  const { name, email, mobile } = req.query;
-  const password = otpGenerator.generate(8, {
-    digits: true,
-    lowerCaseAlphabets: true,
-    upperCaseAlphabets: true,
-    specialChars: false,
-  });
+  try {
+    const user = await logIncollection.findById(req.user.id);
 
-  const mailMsg = `
+    const { name, email, mobile, countryCode } = req.query;
+    const password = otpGenerator.generate(8, {
+      digits: true,
+      lowerCaseAlphabets: true,
+      upperCaseAlphabets: true,
+      specialChars: false,
+    });
+
+    const mailMsg = `
     <div style="font-family: Arial, sans-serif; color: #333;">
       <div style="text-align: center;">
         <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
@@ -533,24 +564,27 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
       <p>Regards,<br>Web Soft Valley Technology</p>
     </div>
   `;
-  const subject = `Invitation from ${user.name}`;
-  const isSent = await sendMail(email, mailMsg, subject);
-  console.log(isSent);
+    const subject = `Invitation from ${user.name}`;
+    const isSent = await sendMail(email, mailMsg, subject);
+    console.log(isSent);
 
-  if (isSent[0].res === "okk") {
-    const newMember = new memberModel({
-      name,
-      email,
-      mobile,
-      password,
-      cid: user.cid,
-      owner_id: user._id,
-    });
-    await newMember.save();
-    user.teams.push(newMember._id);
-    await user.save();
+    if (isSent[0].res === "okk") {
+      const newMember = new memberModel({
+        name,
+        email,
+        password,
+        countryCode,
+        mobile,
+        cid: user.cid,
+        owner_id: user._id,
+      });
+      await newMember.save();
+      user.teams.push(newMember._id);
+      await user.save();
+    }
+  } catch (error) {
+    console.log(error);
   }
-
   return res.redirect("/team");
 });
 
@@ -589,32 +623,34 @@ app.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
   const { title, color, defaultVal } = req.body;
 
   let pipeline = await pipelineModel.findById(id);
-  
+
   pipeline.color = color;
   pipeline.title = title;
-  
+
   if (defaultVal == "on") {
     console.log(defaultVal);
-    await pipelineModel.updateMany({ uid: req.user.id }, { $set: { defaultVal: false } });
+    await pipelineModel.updateMany(
+      { uid: req.user.id },
+      { $set: { defaultVal: false } }
+    );
     req.session.pipe = id;
 
     await pipeline.save();
-    return res.redirect('/pipe/abc')
+    return res.redirect("/pipe/abc");
   }
-  
+
   return res.redirect("/dashboard");
 });
-app.get('/pipe/abc', async (req,res)=>{
-
-  let pipe = await pipelineModel.findById(req.session.pipe)
+app.get("/pipe/abc", async (req, res) => {
+  let pipe = await pipelineModel.findById(req.session.pipe);
   pipe.defaultVal = true;
-  await pipe.save()
+  await pipe.save();
 
   delete req.session.pipe;
   req.session.save();
 
-  res.redirect('/dashboard')
-})
+  res.redirect("/dashboard");
+});
 
 app.get("/profile", isAdminLoggedIn, async (req, res) => {
   const user = await logIncollection.findById(req.user.id);
@@ -622,12 +658,33 @@ app.get("/profile", isAdminLoggedIn, async (req, res) => {
   res.render("profile", { user });
 });
 
+app.post("/user/update/profile", isAdminLoggedIn, async (req, res) => {
+  let user;
+  const { name, mobile, countryCode, address, city, state } = req.body;
+  try {
+    if (req.user.role === "admin")
+      user = await logIncollection.findById(req.user.id);
+    else user = await memberModel.findById(req.user.id);
+
+    user.name = name;
+    user.mobile = mobile;
+    user.countryCode = countryCode;
+    user.address = address;
+    user.city = city;
+    user.state = state;
+    await user.save();
+    res.redirect("/profile");
+  } catch (err) {
+    console.log("error in /user/update/profile route ---- :", err);
+    res.redirect("/profile");
+  }
+});
+
 app.get("/gethelp", isAdminLoggedIn, async (req, res) => {
   const user = await logIncollection.findById(req.user.id);
 
   res.render("gethelp", { user });
 });
-
 
 app.post("/submit-form", async (req, res) => {
   try {
@@ -640,7 +697,7 @@ app.post("/submit-form", async (req, res) => {
     if (user) {
       res.send({ message: "Form submitted successfully", id: user._id });
     } else {
-      res.status(404).send({ message: "User not found" })
+      res.status(404).send({ message: "User not found" });
     }
   } catch (error) {
     res.status(500).send("Internal error");
@@ -649,9 +706,9 @@ app.post("/submit-form", async (req, res) => {
 //UPDATE-USER
 app.post("/update-user", async (req, res) => {
   try {
-    const id = req.body.id;
-    const organizationName = req.body.organizationName;
-    const sector = req.body.sector;
+    console.log(req.body);
+
+    const { id, organizationName, sector } = req.body;
 
     await logIncollection.findByIdAndUpdate(id, {
       organizationName,
@@ -668,19 +725,22 @@ app.post("/update-user", async (req, res) => {
 app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   try {
     console.log("dashboard");
-    
-    const user = await logIncollection.findById(req.user.id).populate("myleads");
+
+    const user = await logIncollection
+      .findById(req.user.id)
+      .populate("myleads");
     if (!user.organizationName) {
       return res.render("dashboard", { showForm: true });
     }
- 
-    const pipes = await pipelineModel.find({ cid: user.cid }).sort({ defaultVal: -1 }).exec();
-    const leads = await leadsModel.find({ cid: user.cid }).populate("status")
-    
-    
-    res.render("dashboard", { user, pipes, leads});
-    // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
 
+    const pipes = await pipelineModel
+      .find({ cid: user.cid })
+      .sort({ defaultVal: -1 })
+      .exec();
+    const leads = await leadsModel.find({ cid: user.cid }).populate("status");
+
+    res.render("dashboard", { user, pipes, leads });
+    // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
   } catch (error) {
     res.status(500).send("Internal error");
   }
@@ -709,68 +769,81 @@ app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
 // });
 
 // Google Authentication Routes
-app.get("/auth/google",
+app.get(
+  "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] }),
-  (req, res) => { }
+  (req, res) => {}
 );
 
-app.get("/auth/google/callback",
+app.get(
+  "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/signup" }),
   async (req, res) => {
     console.log(req.user);
 
-    let user = await logIncollection.findOne({ email: req.user.email })
+    let user = await logIncollection.findOne({ email: req.user.email });
     const cid = uuidv4();
     user.cid = cid;
-    user.role = "admin"
-    await user.save()
+    user.role = "admin";
+    await user.save();
 
     const pipelines = [
-      { title: 'win', color: '#28A745' },
-      { title: 'loss', color: '#DC3545' },
-      { title: 'held', color: '#007BFF' },
-      { title: 'pending', color: '#FFC107' },
-    ].map(pipelineData => new pipelineModel({
-      uid: user._id,
-      color: pipelineData.color,
-      title: pipelineData.title,
-      cid: user.cid,
-    }));
+      { title: "win", color: "#28A745" },
+      { title: "loss", color: "#DC3545" },
+      { title: "held", color: "#007BFF" },
+      { title: "pending", color: "#FFC107" },
+    ].map(
+      (pipelineData) =>
+        new pipelineModel({
+          uid: user._id,
+          color: pipelineData.color,
+          title: pipelineData.title,
+          cid: user.cid,
+        })
+    );
 
     // Save all pipelines in parallel
-    await Promise.all(pipelines.map(pipeline => pipeline.save()));
+    await Promise.all(pipelines.map((pipeline) => pipeline.save()));
 
     const templates = [
       {
-        title: 'welcome',
+        title: "welcome",
         text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
-        client: true, team: false
+        client: true,
+        team: false,
+        num: 1,
       },
 
       {
-        title: 'after call',
+        title: "after call",
         text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
         client: true,
         team: false,
+        num: 2,
       },
 
       {
-        title: 'before call',
-        text: '',
+        title: "before call",
+        text: "",
         client: false,
-        team: false
-      }
-    ].map(temp => new templateModel({
-      uid: user._id,
-      title: temp.title,
-      text: temp.text,
-      client: temp.client,
-      team: temp.team,
-      cid: user.cid,
-    }));
+        team: false,
+        num: 3,
+      },
+    ].map(
+      (temp) =>
+        new templateModel({
+          uid: user._id,
+          title: temp.title,
+          text: temp.text,
+          num: temp.num,
+          client: temp.client,
+          team: temp.team,
+          cid: user.cid,
+        })
+    );
 
     // Save all pipelines in parallel
-    await Promise.all(templates.map(temp => temp.save()));
+    await Promise.all(templates.map((temp) => temp.save()));
 
     const token = await generateToken(user);
 
@@ -804,51 +877,62 @@ app.post("/signup", async (req, res) => {
     await newUser.save();
 
     const pipelines = [
-      { title: 'win', color: '#28A745' },
-      { title: 'loss', color: '#DC3545' },
-      { title: 'held', color: '#007BFF' },
-      { title: 'pending', color: '#FFC107' },
-    ].map(pipelineData => new pipelineModel({
-      uid: user._id,
-      color: pipelineData.color,
-      title: pipelineData.title,
-      cid: user.cid,
-    }));
+      { title: "win", color: "#28A745" },
+      { title: "loss", color: "#DC3545" },
+      { title: "held", color: "#007BFF" },
+      { title: "pending", color: "#FFC107" },
+    ].map(
+      (pipelineData) =>
+        new pipelineModel({
+          uid: user._id,
+          color: pipelineData.color,
+          title: pipelineData.title,
+          cid: user.cid,
+        })
+    );
 
     // Save all pipelines in parallel
-    await Promise.all(pipelines.map(pipeline => pipeline.save()));
+    await Promise.all(pipelines.map((pipeline) => pipeline.save()));
 
     const templates = [
       {
-        title: 'welcome',
+        title: "welcome",
         text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
-        client: true, team: false
+        client: true,
+        team: false,
+        num: 1,
       },
 
       {
-        title: 'after call',
+        title: "after call",
         text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
         client: true,
         team: false,
+        num: 2,
       },
 
       {
-        title: 'before call',
-        text: '',
+        title: "before call",
+        text: "",
         client: false,
-        team: false
-      }
-    ].map(temp => new templateModel({
-      uid: user._id,
-      title: temp.title,
-      text: temp.text,
-      client: temp.client,
-      team: temp.team,
-      cid: user.cid,
-    }));
+        team: false,
+        num: 3,
+      },
+    ].map(
+      (temp) =>
+        new templateModel({
+          uid: user._id,
+          title: temp.title,
+          text: temp.text,
+          num: temp.num,
+          client: temp.client,
+          team: temp.team,
+          cid: user.cid,
+        })
+    );
 
     // Save all pipelines in parallel
-    await Promise.all(templates.map(temp => temp.save()));
+    await Promise.all(templates.map((temp) => temp.save()));
 
     const token = await generateToken(newUser);
 
@@ -1006,9 +1090,8 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       }
     });
 
-    if (chalteRahoId) 
-      clearInterval(chalteRahoId)
-    chalteRaho(accessToken);
+    if (chalteRahoId) clearInterval(chalteRahoId);
+    chalteRaho(accessToken, req);
 
     res.redirect("/leads");
   } catch (error) {
@@ -1020,17 +1103,18 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
 // Facebook Leads Fetch Route
 app.get("/leads", isAdminLoggedIn, async (req, res) => {
   try {
-    let user;
+    let admin;
     console.log("leads page");
 
     if (req.user.role === "admin") {
       user = await logIncollection.findById(req.user.id).populate({
         path: "myleads",
         populate: {
-          path: "status", // Ensure that leads' status is populated
+          path: "status", // Populate status from leads
         },
         populate: {
-          path: "remarks", // Populate status from leads
+          path: "remarks", // Populate remarks from leads
+          options: { sort: { createdAt: -1 } }, // Sorting remarks in descending order by createdAt
         },
       });
     } else {
@@ -1040,7 +1124,8 @@ app.get("/leads", isAdminLoggedIn, async (req, res) => {
           path: "status", // Populate status from leads
         },
         populate: {
-          path: "remarks", // Populate status from leads
+          path: "remarks",
+          options: { sort: { createdAt: -1 } },
         },
       });
     }
@@ -1048,7 +1133,6 @@ app.get("/leads", isAdminLoggedIn, async (req, res) => {
     let leads = await leadsModel.find({ cid: user.cid }).populate("status");
     let pipes = await pipelineModel.find({ cid: user.cid });
     // let remarks = await remarkModel.find({ uid: user._id }).sort({ createdAt: -1 });
-
 
     res.render("leads", { user, leads, pipes });
   } catch (error) {
@@ -1077,19 +1161,19 @@ app.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
     lead.uid = member._id;
     await member.save();
     await lead.save();
-    
+
     console.log("bokking the leads by ", member);
   }
   console.log("ready for message sending");
-  
-//   const interval = setInterval(() => {
-//     if (whatsappClientReady) {
-//       sendMessageOnWA('9755313770', 'Hello!');
-//         clearInterval(interval); // Stop checking once the message is sent
-//     } else {
-//         console.log('Waiting for WhatsApp client to be ready...');
-//     }
-// }, 5000);
+
+  //   const interval = setInterval(() => {
+  //     if (whatsappClientReady) {
+  //       sendMessageOnWA('9755313770', 'Hello!');
+  //         clearInterval(interval); // Stop checking once the message is sent
+  //     } else {
+  //         console.log('Waiting for WhatsApp client to be ready...');
+  //     }
+  // }, 5000);
 
   res.redirect("/leads");
 });
@@ -1105,12 +1189,16 @@ app.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
     let admin = await logIncollection.findById(req.user.id);
     admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
     lead.uid = "";
+    lead.remarks = []    
+
     await admin.save();
     await lead.save();
   } else {
     let member = await memberModel.findById(req.user.id);
     member.myleads.splice(member.myleads.indexOf(lead._id), 1);
     lead.uid = "";
+    lead.remarks = []
+
     await member.save();
     await lead.save();
 
@@ -1134,18 +1222,18 @@ app.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
   res.redirect("/leads");
 });
 
-app.post('/remark/add/:id',isAdminLoggedIn, async (req,res)=>{
-  const {id} = req.params;
-  const {text, time, date} = req.body;
-  let user ;
-  
-  if (req.user.role === 'admin') {
-    user = await logIncollection.findById(req.user.id)
-  }else 
-    user = await memberModel.findById(req.user.id)
+app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
+  const { id } = req.params;
+  const { text, time, date } = req.body;
+  let user;
 
-  console.log(req.body);
-  let lead = await leadsModel.findById(id)
+  if (req.user.role === "admin") {
+    user = await logIncollection.findById(req.user.id);
+  } else user = await memberModel.findById(req.user.id);
+
+  let userContact = user.mobile;
+  console.log(req.body, "====", userContact);
+  let lead = await leadsModel.findById(id);
 
   let remark = new remarkModel({
     uid: user._id,
@@ -1154,18 +1242,18 @@ app.post('/remark/add/:id',isAdminLoggedIn, async (req,res)=>{
     text,
     time,
     date,
-  })
-  await remark.save()
+  });
+  await remark.save();
 
-  lead.remarks.push(remark._id)
-  await lead.save()
+  lead.remarks.push(remark._id);
+  await lead.save();
   // console.log(lead);
 
   const mobileRegex = /^[6-9]\d{9}$/;
   let leadContactNo;
-  lead.leads_data.forEach(item => {
+  lead.leads_data.forEach((item) => {
     const answer = item.ans.trim();
-    
+
     if (mobileRegex.test(answer)) {
       console.log("Valid Mobile Number found:", answer);
       leadContactNo = answer;
@@ -1173,41 +1261,72 @@ app.post('/remark/add/:id',isAdminLoggedIn, async (req,res)=>{
   });
 
   console.log(leadContactNo);
-  leadContactNo = '9755313770'
+  leadContactNo = "9755313770";
   const remarkDateTime = new Date(`${date}T${time}:00`);
   const currentTime = new Date();
 
-  const timeDifference = remarkDateTime - currentTime;
-
+  let timeDifference = remarkDateTime - currentTime;
+  timeDifference -= (1000 * 60 * 30)
+  const reminderTemplate = await templateModel.findOne({ cid: req.user.cid, num: 3 });
+  const afterCallTemp = await templateModel.findOne({ cid: req.user.cid, num: 2 });
+  console.log(timeDifference);
+  
+  let reminderTempImagePath, reminderTempPdfPath, LeadTempImagePath,LeadTempPdfPath;
   if (timeDifference > 0) {
     setTimeout(() => {
-      console.log('Hello Dear');
-      sendMessageToLead(leadContactNo, `message for remainder to picup the call from 360followups`)
-      sendMessageToLead(user.mobile, `message for remainder to call your lead. mobile no.-  ${leadContactNo}`)
+
+      if (reminderTemplate.image !== "") { // img for user
+        reminderTempImagePath = path.join(
+          __dirname,
+          "../template/images/uploads/whatsapp/",
+          reminderTemplate.image
+        );
+      }
+      if (reminderTemplate.pdf !== "") { // pdf for user 
+        reminderTempPdfPath = path.join(
+          __dirname,
+          "../template/images/uploads/whatsapp/",
+          reminderTemplate.pdf
+        );
+      }
+      if (afterCallTemp.image !== "") {  // img for lead
+        LeadTempImagePath = path.join(
+          __dirname,
+          "../template/images/uploads/whatsapp/",
+          afterCallTemp.image
+        );
+      }
+      if (afterCallTemp.pdf !== "") { // pdf for lead
+        LeadTempPdfPath = path.join(
+          __dirname,
+          "../template/images/uploads/whatsapp/",
+          afterCallTemp.pdf
+        );
+      }
+
+      sendMessageToLead(leadContactNo, afterCallTemp.text, reminderTempImagePath, reminderTempPdfPath); // after temp msg sending to lead
     }, timeDifference);
-  } else {
-    console.log('The specified time is in the past. Cannot schedule.');
   }
-  
+  setTimeout(() => {
+    sendMessageToLead(userContact,reminderTemplate.text,LeadTempImagePath,LeadTempPdfPath) // reminder temp for user
+  }, 5000);
+
   return res.json(remark);
-  
-})
+});
 
-
-app.post('/save-fcm-token', isAdminLoggedIn,async (req, res) => {
+app.post("/save-fcm-token", isAdminLoggedIn, async (req, res) => {
   const fcmToken = req.body.token;
-  console.log('Received FCM Token:', fcmToken);
+  console.log("Received FCM Token:", fcmToken);
 
-  let user; 
-  if(req.user.role === 'admin')
-    user = await logIncollection.findById(req.user.id)
-  else
-    user = await memberModel.findById(req.user.id)
+  let user;
+  if (req.user.role === "admin")
+    user = await logIncollection.findById(req.user.id);
+  else user = await memberModel.findById(req.user.id);
 
   user.fcmToken = fcmToken;
   await user.save();
 
-  res.status(200).send('FCM token saved successfully.');
+  res.status(200).send("FCM token saved successfully.");
 });
 
 // Handle dynamic routes to serve pages without .html extension
@@ -1222,11 +1341,9 @@ app.get("/:page", (req, res) => {
   });
 });
 
-
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running at PORT:${port}`);
-  
 });
 
 function isAdminLoggedIn(req, res, next) {
@@ -1248,7 +1365,8 @@ function isAdminLoggedIn(req, res, next) {
   });
 }
 
-async function findNewLead(accessToken) {
+async function findNewLead(accessToken, req) {
+  let admin = await logIncollection.findById(req.user.id)
   let allNewLeads = [];
   const pagesResponse = await axios.get(
     `https://graph.facebook.com/v20.0/me/accounts`,
@@ -1307,10 +1425,56 @@ async function findNewLead(accessToken) {
         app: "facebook",
       });
       await newLead.save();
+
+      const mobileRegex = /^[6-9]\d{9}$/;
+      let leadContactNo;
+      newLead.leads_data.forEach((item) => {
+        const answer = item.ans.trim();
+
+        if (mobileRegex.test(answer)) {
+          console.log("Valid Mobile Number found:", answer);
+          leadContactNo = answer;
+        }
+      });
+
+      console.log(leadContactNo);
+      leadContactNo = "9755313770";
+
+      const wellcomeTemp = await templateModel.findOne({
+        cid: admin.cid,
+        num: 1,
+      });
+
+      setTimeout(() => {
+        let imagePath, pdfPath;
+        if (wellcomeTemp.image !== "") {
+          imagePath = path.join(
+            __dirname,
+            "../template/images/uploads/whatsapp/",
+            wellcomeTemp.image
+          );
+        }
+        if (wellcomeTemp.pdf !== "") {
+          pdfPath = path.join(
+            __dirname,
+            "../template/images/uploads/whatsapp/",
+            wellcomeTemp.pdf
+          );
+        }
+       
+        sendMessageToLead(leadContactNo, wellcomeTemp.text, imagePath, pdfPath);
+        
+      }, 5000);
+
+      setTimeout(() => {
+        let userContactNo = admin.countryCode+admin.mobile;
+        let userWAmsg = 'hii you have a new lead 🎉';
+        sendMessageToLead(userContactNo, userWAmsg);
+      }, 2000);
+
       allNewLeads.push(newLead);
 
       // console.log(leads_datas);
-
 
       // Send WhatsApp message to admin and members
       // const adminNumber = req.user.phoneNumber;
@@ -1323,8 +1487,8 @@ async function findNewLead(accessToken) {
       // const members = await memberModel.find({ cid: req.user.cid });
       // members.forEach((member) => {
       //   const memberNumber = member.phoneNumber;
-        // sendMessageToLead(memberNumber, `${adminName} added a new lead: ${lead.lead_id}`);
-        // sendMessageToLead(memberNumber, `added a new lead:`);
+      // sendMessageToLead(memberNumber, `${adminName} added a new lead: ${lead.lead_id}`);
+      // sendMessageToLead(memberNumber, `added a new lead:`);
 
       // });
 
@@ -1335,13 +1499,12 @@ async function findNewLead(accessToken) {
   return allLeads;
 }
 
-
 let chalteRahoId;
-function chalteRaho(token) {
+function chalteRaho(token, req) {
   let i = 0;
-  
+
   chalteRahoId = setInterval(() => {
-    findNewLead(token);
+    findNewLead(token, req);
     console.log("step", i++);
   }, 60000);
 }
