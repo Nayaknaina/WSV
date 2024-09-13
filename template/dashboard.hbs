@@ -60,43 +60,48 @@
 
 <style>
     .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 100000000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
+        display: none;
+        /* Hidden by default */
+        position: fixed;
+        z-index: 100000000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
 
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .modal-content {
-            background-color: #fff;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 300px;
-            text-align: center;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        #whatsappReadyMessage {
-            display: none;
-            color: green;
-            font-weight: bold;
-            margin-top: 10px;
-        }
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 300px;
+        text-align: center;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #whatsappReadyMessage {
+        display: none;
+        color: green;
+        font-weight: bold;
+        margin-top: 10px;
+    }
 </style>
 
 
@@ -166,7 +171,7 @@
                         </div>
                     </div>
 
-                   
+
                     <!--/.col-->
                     <div class="col-lg-3 col-md-6">
                         <div class="social-box facebook">
@@ -179,11 +184,10 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="social-box twitter">
                             <i class="fa fa-whatsapp"></i>
-                            {{!-- <a target="_blank" href="/qr" class="btn btn-outline-secondary border  font-15">connect
-                                now</a> --}}
-                                <a href="/qr" id="whatsapp-Connect-Btn" class="btn btn-outline-secondary border  font-15" > connect now</a>
+                           
+                            <a href="/qr" id="whatsapp-Connect-Btn" class="btn btn-outline-secondary border font-15">ConnectNow</a>
                         </div>
-                        <!--/social-box-->
+                       
                     </div>
                     <!--/.col-->
 
@@ -198,34 +202,34 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="social-box mailchimp">
-                           <i class="fab fa-mailchimp"></i>
+                            <i class="fab fa-mailchimp"></i>
                             <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
                         </div>
                         <!--/social-box-->
                     </div>
 
                     <div class="row col-12" style="flex-wrap: wrap;">
-                    {{#each pipes}}
-                     
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card text-white" style="background-color: {{color}};">
-                            <div class="card-body pb-0">
-                                <h4 class="mb-0">
-                                    <span class="count" style="font-size: x-large;">
-                                        {{countLeadsByStatus ../leads title}}
-                                    </span>
-                                </h4>
-                                <p style="font-size: x-large;" class="text-light">{{title}}</p>
+                        {{#each pipes}}
 
-                                <div class="chart-wrapper px-0" style="height:70px;" height="70">
-                                    <canvas id="widgetChart1"></canvas>
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card text-white" style="background-color: {{color}};">
+                                <div class="card-body pb-0">
+                                    <h4 class="mb-0">
+                                        <span class="count" style="font-size: x-large;">
+                                            {{countLeadsByStatus ../leads title}}
+                                        </span>
+                                    </h4>
+                                    <p style="font-size: x-large;" class="text-light">{{title}}</p>
+
+                                    <div class="chart-wrapper px-0" style="height:70px;" height="70">
+                                        <canvas id="widgetChart1"></canvas>
+                                    </div>
+
                                 </div>
 
                             </div>
-
                         </div>
-                    </div>
-                    {{/each}}
+                        {{/each}}
 
                     </div>
 
@@ -237,7 +241,7 @@
                                         <h4 class="card-title mb-0">Traffic</h4>
                                         <div class="small text-muted">Lead Analytics</div>
                                     </div>
-                                    
+
 
 
                                 </div>
@@ -297,18 +301,18 @@
                     </div>
 
                     <div class="col-xl-3 col-lg-6">
-                        <section class="card"  style="min-height: 400px;">
-                            <div class="profile-card" >
+                        <section class="card" style="min-height: 400px;">
+                            <div class="profile-card">
                                 <div href="/profile" class="corner-ribon black-ribon">
                                     <i class="fas fa-edit"></i>
                                 </div>
 
 
-                                <div class="media" >
+                                <div class="media">
 
                                     <div class="media-body">
                                         <div class="profile-details">
-                                            {{#if user.profilePicture}}  
+                                            {{#if user.profilePicture}}
                                             <img id="user_image" width="70" height="70" src="{{user.profilePicture}}"
                                                 class="rounded-circle">
                                             {{else}}
@@ -393,15 +397,17 @@
                             margin: 0;
                             border: none;
                         }
-                        #pipe-container-s::-webkit-scrollbar{
+
+                        #pipe-container-s::-webkit-scrollbar {
                             display: none;
                         }
                     </style>
 
                     <div class="col-xl-3 col-lg-6">
                         <div class="card">
-                            <div class="card-body" >
-                                <div class="stat-widget-one" id="pipe-container-s" style="height: 350px;max-height: 350px; overflow: auto;">
+                            <div class="card-body">
+                                <div class="stat-widget-one" id="pipe-container-s"
+                                    style="height: 350px;max-height: 350px; overflow: auto;">
                                     <form action="/pipeline" method="post">
                                         <input type="text" id="inputPassword2" name="title" placeholder="Enter Pipline">
                                         <input type="color" class="colorinp"
@@ -763,7 +769,9 @@
         });
 
     </script>
+<script>
 
+</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         console.log("hello ji")
@@ -841,6 +849,34 @@
         new Chart(ctx, config);
     </script>
 
+
+<script>
+    
+async function checkConnectionStatus() {
+  try {
+    const response = await fetch('/connection-status');
+    const data = await response.json();
+    const isConnected = data.isConnected;
+    const connectBtn = document.getElementById('whatsapp-Connect-Btn');
+    
+    if (isConnected) {
+      connectBtn.textContent = 'Connected';
+      connectBtn.classList.remove('btn-outline-secondary'); // Optionally change styling
+      connectBtn.classList.add('btn-success'); // Optionally change styling
+    } else {
+      connectBtn.textContent = 'Connect Now';
+      connectBtn.classList.remove('btn-success'); // Optionally change styling
+      connectBtn.classList.add('btn-outline-secondary'); // Optionally change styling
+    }
+  } catch (error) {
+    console.error('Error fetching connection status:', error);
+  }
+}
+
+// Call the function when the page loads
+document.addEventListener('DOMContentLoaded', checkConnectionStatus);
+
+</script>
 </body>
 
 </html>

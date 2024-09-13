@@ -23,12 +23,6 @@
             overflow: hidden;
         }
 
-
-
-
-
-
-
         /* Header for main content */
         .header {
             width: 100%;
@@ -94,6 +88,7 @@
             width: 180px;
             height: 180px;
         }
+        
 
         .status-message {
 
@@ -182,8 +177,7 @@
 
     <link rel="stylesheet" href="/assets/css/argon.css" type="text/css">
     <link rel="stylesheet" href="/assets/css/custom.css" type="text/css">
-    <link rel="stylesheet" type="text/css"
-        href="https://wasender.amcoders.com/assets/plugins/toastify-js/src/toastify.css">
+    <link rel="stylesheet" type="text/css" href="https://wasender.amcoders.com/assets/plugins/toastify-js/src/toastify.css">
     <link rel="stylesheet" type="text/css" href="/assets/css/qr-page.css">
 </head>
 
@@ -192,9 +186,6 @@
 
 
     <div class="main-content" id="panel">
-
-
-
         <div class="header pb-6">
             <div class="container-fluid">
                 <div class="header-body">
@@ -220,7 +211,9 @@
 
                                     <div class="qr-code">
                                         <img id="qrImage" src="{{qrCodeData}}">
+                                       
                                     </div>
+                                   
                                 </div>
 
                             </div>
@@ -246,15 +239,6 @@
 
                         </div>
 
-                        {{!-- <div class="card-footer">
-
-                            <div class="alert bg-gradient-red server_disconnect none text-white" role="alert">
-                                Opps! Server Disconnected 😭
-                            </div>
-                            <div class="alert bg-gradient-green logged-alert none text-white" role="alert">
-                                Device Connected <img src="https://wasender.amcoders.com/uploads/firework.png" alt>
-                            </div>
-                        </div> --}}
 
                     </div>
 
@@ -334,46 +318,109 @@
 
         </div>
     </div>
-    <script>
-        // Function to check connection status from the server
-        function checkConnectionStatus() {
-            fetch('/connection-status')
-                .then(response => response.json())
-                .then(data => {
-                    const statusMessage = document.querySelector('.status-message');
-                    const logoutContainer = document.getElementById('logoutContainer');
 
-                    // Update the status message based on the server's response
-                    if (data.isConnected) {
-                        statusMessage.textContent = 'Connected';
+<script>
+    let isTickMarkDisplayed = false;
 
-                        // Create a logout button if not already present
-                        if (!logoutContainer.querySelector('button')) {
-                            const logoutButton = document.createElement('button');
-                            logoutButton.textContent = 'Logout';
-                            logoutButton.onclick = () => {
+    // Function to update the display based on connection status
+    function updateDisplayOnConnection(isConnected) {
+        const qrCode = document.getElementById('qrImage');
+        const existingTickMark = document.getElementById('tickMark');
+
+        if (isConnected && !isTickMarkDisplayed) {
+            qrCode.style.display = 'none';
+
+            if (!existingTickMark) {
+                const tickMark = document.createElement('div');
+                tickMark.id = 'tickMark';
+                tickMark.innerHTML = '<i class="fa-solid fa-check"></i>';
+                tickMark.style.fontSize = '100px';
+                tickMark.style.color = 'green';
+                tickMark.style.display = 'flex';
+                tickMark.style.alignItems = 'center';
+                tickMark.style.justifyContent = 'center';
+                tickMark.style.backgroundColor = '#dcf7ffb3';
+                tickMark.style.width = '180px';
+                tickMark.style.height = '180px';
+                tickMark.style.borderRadius = '8px';
+
+                qrCode.parentElement.appendChild(tickMark);
+            }
+
+            isTickMarkDisplayed = true;
+        } else if (!isConnected) {
+            qrCode.style.display = 'block';
+            if (existingTickMark) {
+                existingTickMark.remove();
+            }
+            isTickMarkDisplayed = false;
+        }
+    }
+
+    // Function to check the connection status of WhatsApp
+    function checkConnectionStatus() {
+        fetch('/connection-status')
+            .then(response => response.json())
+            .then(data => {
+                const statusMessage = document.querySelector('.status-message');
+                const logoutContainer = document.getElementById('logoutContainer');
+
+                if (data.isConnected) {
+                    statusMessage.textContent = 'Connected';
+                    updateDisplayOnConnection(true);
+
+                    // Stop page refresh when connected
+                    clearInterval(pageRefreshInterval);
+
+                    // Add a logout button if it doesn't already exist
+                    if (!logoutContainer.querySelector('button')) {
+                        const logoutButton = document.createElement('button');
+                        logoutButton.textContent = 'Logout';
+                        logoutButton.onclick = () => {
+                            
                                 // Add functionality for logout here
                                 window.location.href = '/logoutWA'; // Adjust as per your routing
-                            };
-                            logoutContainer.appendChild(logoutButton);
-                        }
-                    } else {
-                        statusMessage.textContent = 'Waiting for your phone...';
-
-                        // Remove the logout button if present
-                        if (logoutContainer.querySelector('button')) {
-                            logoutContainer.innerHTML = '';
-                        }
+                        };
+                        logoutContainer.appendChild(logoutButton);
                     }
-                })
-                .catch(error => {
-                    console.error('Error checking connection status:', error);
-                });
-        }
+                } else {
+                    statusMessage.textContent = 'Waiting for your phone...';
+                    updateDisplayOnConnection(false);
 
-        // Check the connection status every 5 seconds
-        setInterval(checkConnectionStatus, 5000); // Adjust the interval as needed
-    </script>
+                    // Remove logout button when disconnected
+                    if (logoutContainer.querySelector('button')) {
+                        logoutContainer.innerHTML = '';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error checking connection status:', error);
+            });
+    }
+
+    // Set interval to check connection status every 5 seconds
+    setInterval(checkConnectionStatus, 5000);
+
+    // Refresh the page if disconnected to ensure QR code re-fetches
+    const pageRefreshInterval = setInterval(() => {
+        fetch('/connection-status')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.isConnected) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error during page refresh:', error);
+            });
+    }, 10000);
+
+   
+</script>
+
+
+
+
     {{!--
     <script src="https://wasender.amcoders.com/assets/vendor/jquery/dist/jquery.min.js"></script>
     <script src="https://wasender.amcoders.com/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
