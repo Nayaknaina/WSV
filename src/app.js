@@ -37,93 +37,102 @@ const memberRoute = require("./routes/members.route.js");
 const { log } = require("console");
 
 //Whatsapp-----------------------------------------
+
+
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qr = require("qr-image");
 
+
+// Initialize variables
 let qrCodeData = "";
 let whatsappClientReady = false;
 let isConnected = false;
 let connectedPhoneNumber = "";
 
-// Initialize WhatsApp Client
-const client = new Client({
+// Initialize the WhatsApp Client with Local Authentication
+let client = new Client({
   authStrategy: new LocalAuth(),
 });
 
-// Generate and store the QR code data
-client.on("qr", (qrCode) => {
-  try {
-    const qrImage = qr.imageSync(qrCode, { type: "png" });
-    qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
-  } catch (error) {
-    console.error("Error generating QR Code:", error);
-  }
-});
-
-// Event when client is authenticated and READY
-client.on("ready", async () => {
-  console.log("WhatsApp client is ready!");
-  whatsappClientReady = true;
-  isConnected = true;
-
-  // Fetch the connected WhatsApp account details
-  connectedPhoneNumber = client.info.wid.user;
-  console.log("Connected WhatsApp Number:", connectedPhoneNumber);
-});
-
-// Function to send a WhatsApp message
-async function sendMessageToLead(
-  phoneNumber,
-  message,
-  imagePath = "",
-  pdfPath = ""
-) {
-  console.log(
-    "Trying to send message. Client ready status:",
-    whatsappClientReady
-  );
-
-  // Check if WhatsApp client is ready
-  if (!whatsappClientReady) {
-    console.log("WhatsApp client is not ready. Queuing message.");
-    return;
-  }
-
-  try {
-    // If imagePath and captionText are provided, send image with caption
-    if (imagePath && pdfPath) {
-      // send image with text message And Pdf
-      const imageMedia = MessageMedia.fromFilePath(imagePath);
-      const pdfMedia = MessageMedia.fromFilePath(pdfPath);
-      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
-        caption: message,
-      });
-      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia);
-    } else if (imagePath && pdfPath === "") {
-      // send Only a image with text message
-      const imageMedia = MessageMedia.fromFilePath(imagePath);
-      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
-        caption: message,
-      });
-    } else if (pdfPath && imagePath === "") {
-      // send Only a pdf with text message
-      const pdfMedia = MessageMedia.fromFilePath(pdfPath);
-      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia, {
-        caption: message,
-      });
-    } else {
-      // Otherwise, send a regular text message
-      await client.sendMessage(`91${phoneNumber}@c.us`, message);
-      console.log("Text message sent successfully!");
-    }
-  } catch (error) {
-    console.error("Error sending message:", error);
+// Ensure QR Code Event Attachment
+function ensureQRCodeEvent() {
+  // Avoid attaching multiple QR listeners by checking if it's already attached
+  if (!client.listenerCount("qr")) {
+    client.on("qr", (qrCode) => {
+      try {
+        const qrImage = qr.imageSync(qrCode, { type: "png" });
+        qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
+        console.log("QR code generated and stored.");
+      } catch (error) {
+        console.error("Error generating QR Code:", error);
+      }
+    });
   }
 }
 
-// Function to re-initialize the WhatsApp client
+// Cleanup Session Files with Retry Logic
+async function cleanupSessionFiles() {
+  const sessionPath = path.join(__dirname, ".wwebjs_auth/session");
+  for (let retries = 5; retries > 0; retries--) {
+    try {
+      if (fs.existsSync(sessionPath)) {
+        fs.rmSync(sessionPath, { recursive: true, force: true });
+        console.log("Session files deleted successfully.");
+      }
+      break; // Exit loop if deletion is successful
+    } catch (error) {
+      console.error("Failed to delete session files:", error.message);
+      if (retries > 1) {
+        console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
+      }
+    }
+  }
+}
+
+
 function initializeWhatsAppClient() {
-  whatsappClientReady = false; // Ensure the ready status is reset
+  // Remove all existing listeners to avoid duplication
+  if (client) {
+    client.removeAllListeners();
+  }
+
+  // Recreate the client to ensure fresh state
+  client = new Client({
+    authStrategy: new LocalAuth(),
+  });
+
+  // Re-attach necessary event listeners
+  ensureQRCodeEvent();
+
+  client.on("ready", async () => {
+    console.log("WhatsApp client is ready!");
+    whatsappClientReady = true;
+    isConnected = true;
+    connectedPhoneNumber = client.info.wid.user;
+    console.log("Connected WhatsApp Number:", connectedPhoneNumber);
+  });
+
+  client.on("disconnected", async (reason) => {
+    console.log("WhatsApp client has been disconnected due to:", reason);
+    whatsappClientReady = false;
+    isConnected = false;
+    qrCodeData = ""; // Reset QR code data on disconnect
+    await cleanupSessionFiles();
+    initializeWhatsAppClient(); // Re-initialize to ensure fresh QR code generation
+  });
+
+  client.on("auth_failure", async (message) => {
+    console.error("Authentication failure:", message);
+    whatsappClientReady = false;
+    isConnected = false;
+    qrCodeData = ""; // Reset QR code data on authentication failure
+    await cleanupSessionFiles();
+    initializeWhatsAppClient(); // Re-initialize to re-trigger QR code generation
+  });
+
+  
+  whatsappClientReady = false; // Reset ready status
   client
     .initialize()
     .then(() => {
@@ -134,73 +143,36 @@ function initializeWhatsAppClient() {
     });
 }
 
-// Event when client is disconnected
-client.on("disconnected", async (reason) => {
-  console.log("WhatsApp client has been disconnected due to:", reason);
-  whatsappClientReady = false;
-  isConnected = false;
+// Function to Send a WhatsApp Message
+function sendMessageToLead(phoneNumber, message) {
+  console.log("Trying to send message. Client ready status:", whatsappClientReady);
 
-  // Retry cleanup logic
-  const sessionPath = path.join(__dirname, ".wwebjs_auth/session");
-  for (let retries = 5; retries > 0; retries--) {
-    try {
-      if (fs.existsSync(sessionPath)) {
-        fs.rmdirSync(sessionPath, { recursive: true });
-        console.log("Session files deleted successfully.");
-      }
-      break;
-    } catch (error) {
-      console.error("Failed to delete session files:", error.message);
-      if (retries > 1) {
-        console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
-      }
-    }
+  if (!whatsappClientReady) {
+    console.log("WhatsApp client is not ready. Queuing message.");
+    return;
   }
 
-  // Re-initialize the WhatsApp client
-  initializeWhatsAppClient();
-});
+  client
+    .sendMessage(`91${phoneNumber}@c.us`, message)
+    .then(() => {
+      console.log("Message sent successfully.");
+    })
+    .catch((error) => {
+      console.error("Error sending message:", error);
+    });
+}
 
-// Handle authentication failures
-client.on("auth_failure", async (message) => {
-  console.error("Authentication failure:", message);
 
-  // Clean up session files with retry logic
-  const sessionPath = path.join(__dirname, ".wwebjs_auth/session");
-  for (let retries = 5; retries > 0; retries--) {
-    try {
-      if (fs.existsSync(sessionPath)) {
-        fs.rmdirSync(sessionPath, { recursive: true });
-        console.log("Session files deleted successfully.");
-      }
-      break; // Exit loop if successful
-    } catch (error) {
-      console.error("Failed to delete session files:", error.message);
-      if (retries > 1) {
-        console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
-      }
-    }
-  }
-
-  // Re-initialize the WhatsApp client
-  initializeWhatsAppClient();
-});
-
-// Initialize the WhatsApp client
-client.initialize();
-
-app.get("/connection-status", (req, res) => {
+app.get('/connection-status', (req, res) => {
   res.json({ isConnected });
 });
 
+
+initializeWhatsAppClient();
+
+
 //-------------------------------------------
 
-// const testPhoneNumber = 
-
-// Send a message to the test number
-// sendMessageToLead(testPhoneNumber, 'hello:)');
 
 // Middleware
 const sessionStore =
@@ -278,27 +250,19 @@ app.use(cookieParser());
 
 app.use(express.static("template"));
 
-//logout the whtsapps
-// app.get("/logoutWA", async(req, res) => {
-//   try {
-//     qrCodeData = "";
-//     await client.logout();
-//     isConnected = false;
-//     console.log("WhatsApp client logged out successfully.");
-//   } catch (error) {
-//     console.error("Error during logout:", error);
-//   }
-//   res.redirect("/dashboard");
-// })
-// Route to handle WhatsApp logout
+
 app.get("/logoutWA", async (req, res) => {
   try {
-    // Attempt to log out the client
-    if (whatsappClientReady) {
-      await client.logout();
-      console.log("WhatsApp client logged out successfully.");
+    // Check if the client is ready before attempting logout
+    if (whatsappClientReady && client.pupPage && !client.pupPage.isClosed()) {
+      try {
+        await client.logout();
+        console.log("WhatsApp client logged out successfully.");
+      } catch (logoutError) {
+        console.error("Error during logout process:", logoutError);
+      }
     } else {
-      console.warn("WhatsApp client is not ready, skipping logout.");
+      console.warn("WhatsApp client is not ready or session already closed, skipping logout.");
     }
 
     // Mark client as disconnected
@@ -306,41 +270,30 @@ app.get("/logoutWA", async (req, res) => {
     isConnected = false;
 
     // Retry cleanup logic for session files
-    const sessionPath = path.join(__dirname, '.wwebjs_auth/session');
-    for (let retries = 5; retries > 0; retries--) {
-      try {
-        if (fs.existsSync(sessionPath)) {
-          fs.rmdirSync(sessionPath, { recursive: true });
-          console.log("Session files deleted successfully.");
-        }
-        break;
-      } catch (error) {
-        console.error("Failed to delete session files:", error.message);
-        if (retries > 1) {
-          console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
-          await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
-        }
-      }
-    }
+    await cleanupSessionFiles();
 
     // Redirect to dashboard or another appropriate page
     res.redirect("/dashboard");
   } catch (error) {
     console.error("Error during logout:", error);
     res.status(500).send("An error occurred during logout.");
+  } finally {
+    // Attempt to reinitialize the client in all cases
+    initializeWhatsAppClient();
   }
 });
 
-// Serve QR code via HTTP
+
+
 app.get("/qr", isAdminLoggedIn, (req, res) => {
   const user = req.user;
   console.log(qrCodeData);
 
-  // Render the QR page with the current connection status
+  
   res.render("qr", {
     user,
     qrCodeData,
-    isConnected, // Pass the connection status to the template
+    isConnected, 
   });
 });
 

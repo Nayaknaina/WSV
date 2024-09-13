@@ -256,11 +256,7 @@ pre[class*=language-] {
     background-color: #6658ea
 }
 
-.qr-code {
-    width: 100px;
-    height: 100px;
-    margin-top: 15px
-}
+
 
 .search-table button {
     border-radius: 0 5px 5px 0 !important
