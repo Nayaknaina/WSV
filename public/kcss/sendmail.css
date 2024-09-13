@@ -103,7 +103,7 @@ button {
 	width: 90%;
 	margin: 0px auto;
 }
-form#send input, form#send textarea{
+form#send input, form#send textarea, form#send select{
 	position: relative;
 	margin-bottom: 32px;
 	width: 100%;

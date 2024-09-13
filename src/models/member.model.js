@@ -11,10 +11,15 @@ const teamMemberSchema = new mongoose.Schema(
     },
     mobile:{
       type: String,
-      required: true,
+      default: "",
       trim: true,
-
     },
+    countryCode:{
+      type: String,
+      lowercase: true,
+      trim: true,
+    },
+    
     cid: {
       type: String
     },

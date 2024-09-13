@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 
 const templateSchema = new mongoose.Schema(
   {
-    title:{
-      type:String,
+    title: {
+      type: String,
       lowercase: true,
       trim: true,
-    },              
-    text:{
-      type:String,
+    },
+    text: {
+      type: String,
       lowercase: true,
       trim: true,
     },
@@ -16,24 +16,27 @@ const templateSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "logIncollection",
     },
-    cid:{
+    cid: {
       type: String,
     },
-    image:{
+    image: {
       type: String,
-      default: ''
+      default: "",
     },
-    pdf:{
+    pdf: {
       type: String,
-      default: ''
+      default: "",
     },
     client: {
       type: Boolean,
-      default: false
+      default: false,
     },
     team: {
       type: Boolean,
-      default: false
+      default: false,
+    },
+    num: {
+      type: Number,
     },
   },
   {

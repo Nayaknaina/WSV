@@ -14,14 +14,20 @@ router
 })
 .post(async (req, res) => {
   try {
+    
     const {email, password} = req.body;
+    
     const member = await memberModel.findOne({email})
     if (!member || member.password !== req.body.password) {
       return res.render("memberSignin", {
         errorMessage: "Invalid username or password",
       });
     }
-   
+    // member.countryCode = countryCode;
+    // member.mobile = mobile;
+    // member.countryName = countryName;
+    await member.save();
+
     const token = await generateToken(member);
     res.cookie("360Followers", token, { httpOnly: true, maxAge: 2 * 30 * 24 * 60 * 60 * 1000 });
     

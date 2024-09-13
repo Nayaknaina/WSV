@@ -6,6 +6,7 @@ const generateToken = async (user) => {
       id: user._id,
       name: user.name,
       email: user.email,
+      cid: user.cid,
       role: user.role
     };
   
