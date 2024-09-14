@@ -666,7 +666,7 @@
     background: #3b5998; }
   .social-box.twitter i {
     color: #fff;
-    background: #00aced; }
+    background:#25d366; }
   .social-box.linkedin i {
     color: #fff;
     background: #4875b4; }
@@ -728,9 +728,11 @@
       font-weight: normal;
       line-height: 40px;
       color: #212529; }
+      
     .horizontal-bars.type-2 li .value {
       float: right;
       font-weight: 600; }
+
     .horizontal-bars.type-2 li .bars {
       position: absolute;
       top: auto;
@@ -816,7 +818,7 @@
     .social.facebook:hover {
       background: #344e86; }
   .social.twitter {
-    background: #00aced; }
+    background:#25d366; }
     .social.twitter:hover {
       background: #0099d4; }
   .social.linkedin {
@@ -1687,7 +1689,7 @@ header .form-inline {
   background: url("../../images/twitter_corner_blue.png") no-repeat; }
 
   .profile-card {
-    background: linear-gradient(to right, #c49bf0 0%, #90b0e8 100%); /* Gradient background */
+    background: linear-gradient(to right, #160628 0%, #6081ba 100%); /* Gradient background */
     color: #fff;
     border-radius: 8px;
     padding: 20px;
@@ -1747,7 +1749,7 @@ header .form-inline {
   vertical-align: middle;
   -webkit-transition:all 0.15s ease-in-out;
   transition: all 0.15s ease-in-out;
-  border-radius: 0;
+  border-radius: 5px;
   cursor: pointer; }
 
 /* Icons */
@@ -1851,6 +1853,25 @@ header .form-inline {
 .login-form .checkbox label {
   text-transform: none; }
 
+  /* button {
+    border: none;
+    color: #fff;
+    background-image: linear-gradient(30deg, #0400ff, #4ce3f7);
+    border-radius: 20px;
+    background-size: 100% auto;
+    font-family: inherit;
+    font-size: 17px;
+    padding: 0.6em 1.5em;
+   }
+   
+   button:hover {
+    background-position: right center;
+    background-size: 200% auto;
+    -webkit-animation: pulse 2s infinite;
+    animation: pulse512 1.5s infinite;
+   } */
+  
+
 .login-form .btn {
   width: 100%;
   text-transform: uppercase;
@@ -1880,7 +1901,7 @@ header .form-inline {
     .social-button .facebook:hover {
       background: #344e86; }
   .social-button .twitter {
-    background: #00aced;
+    background: #25d366;
     color: #fff; }
     .social-button .twitter:hover {
       background: #0099d4; }
@@ -2021,6 +2042,8 @@ header .form-inline {
     border-color: #212529;
     color: #fff; }
 
+
+    
 .jqvmap-zoomin,
 .jqvmap-zoomout {
   width: 15px;
@@ -2263,7 +2286,7 @@ input, select {
   border-radius: 4px;
 }
 
-button {
+.connectionbtn {
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -2272,7 +2295,7 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+.connectionbtn:hover {
   background-color: #0056b3;
 }
 

@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -173,22 +174,23 @@
                 {{> NameHead}}
                 <div class="content ">
 
+                   {{#if successMSG}}
                     <div class="col-sm-12">
-                        <div class="alert  alert-success alert-dismissible fade show" role="alert">
-                            <span class="badge badge-pill badge-success">Success</span> You successfully read this
-                            important alert message.
+                        <div id="alert-success" class="alert  alert-success alert-dismissible fade show" role="alert">
+                            <span class="badge badge-pill badge-success">Success</span> {{successMSG}}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                     </div>
+                    {{/if}}
 
 
-
+                <div class="row">
                     <!--/.col-->
                     <div class="col-lg-3 col-md-6">
                         <div class="social-box facebook">
-                            <i class="fa fa-facebook"></i>
+                           <i class="fa-brands fa-square-facebook" ></i>
                             <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
                         </div>
                         <!--/social-box-->
@@ -196,7 +198,7 @@
 
                     <div class="col-lg-3 col-md-6">
                         <div class="social-box twitter">
-                            <i class="fa fa-whatsapp"></i>
+                          <i class="fa-brands fa-whatsapp"></i>
                            
                             <a href="/qr" id="whatsapp-Connect-Btn" class="btn btn-outline-secondary border font-15">ConnectNow</a>
                         </div>
@@ -216,14 +218,14 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="social-box mailchimp">
                             <i class="fab fa-mailchimp"></i>
-                            <i class="fab fa-mailchimp"></i>
+                         
                             <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
                         </div>
                         <!--/social-box-->
                     </div>
-
-                    <div class="row col-12" style="flex-wrap: wrap;">
-
+                </div>
+                    <div class="row ">
+                      
                         {{#each pipes}}
 
                         <div class="col-sm-6 col-lg-3">
@@ -236,22 +238,15 @@
                                     </h4>
                                     <p style="font-size: x-large;" class="text-light">{{title}}</p>
 
-                                    <div class="chart-wrapper px-0" style="height:70px;" height="70">
+                                    {{!-- <div class="chart-wrapper px-0" style="height:70px;" height="70">
                                         <canvas id="widgetChart1"></canvas>
-                                    </div>
-                                    <div class="chart-wrapper px-0" style="height:70px;" height="70">
-                                        <canvas id="widgetChart1"></canvas>
-                                    </div>
-
+                                    </div> --}}
                                 </div>
-                                </div>
-
+                              
                             </div>
                         </div>
                         {{/each}}
-                            </div>
-                        </div>
-                        {{/each}}
+                           
 
                     </div>
 
@@ -263,10 +258,6 @@
                                         <h4 class="card-title mb-0">Traffic</h4>
                                         <div class="small text-muted">Lead Analytics</div>
                                     </div>
-
-
-
-
                                 </div>
                                 <!--/.row-->
                                 <div class="chart-wrapper mt-4">
@@ -324,21 +315,18 @@
                     </div>
 
                     <div class="col-xl-3 col-lg-6">
-                        <section class="card" style="min-height: 400px;">
-                            <div class="profile-card">
+                       
                         <section class="card" style="min-height: 400px;">
                             <div class="profile-card">
                                 <div href="/profile" class="corner-ribon black-ribon">
                                     <i class="fas fa-edit"></i>
                                 </div>
 
-
-                                <div class="media">
                                 <div class="media">
 
                                     <div class="media-body">
                                         <div class="profile-details">
-                                            {{#if user.profilePicture}}
+                                       
                                             {{#if user.profilePicture}}
                                             <img id="user_image" width="70" height="70" src="{{user.profilePicture}}"
                                                 class="rounded-circle">
@@ -425,7 +413,7 @@
                             border: none;
                         }
 
-                        #pipe-container-s::-webkit-scrollbar {
+                      
 
                         #pipe-container-s::-webkit-scrollbar {
                             display: none;
@@ -434,9 +422,7 @@
 
                     <div class="col-xl-3 col-lg-6">
                         <div class="card">
-                            <div class="card-body">
-                                <div class="stat-widget-one" id="pipe-container-s"
-                                    style="height: 350px;max-height: 350px; overflow: auto;">
+                           
                             <div class="card-body">
                                 <div class="stat-widget-one" id="pipe-container-s"
                                     style="height: 350px;max-height: 350px; overflow: auto;">
@@ -801,9 +787,7 @@
         });
 
     </script>
-<script>
 
-</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         console.log("hello ji")
@@ -912,3 +896,5 @@ document.addEventListener('DOMContentLoaded', checkConnectionStatus);
 </body>
 
 </html>
+
+
