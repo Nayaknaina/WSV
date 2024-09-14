@@ -354,13 +354,13 @@
         <i class='bx bx-menu' id="btn"></i>
     </div>
     <ul class="nav-list">
-        <li>
+        {{!-- <li>
             <i class='bx bx-search'></i>
             <input type="text" placeholder="Search...">
             <span class="tooltip">Search</span>
-        </li>
+        </li> --}}
         <li>
-            <a href="/dashboard">
+            <a href="/user/dashboard">
                 <i class='bx bx-grid-alt'></i>
                 <span class="links_name">Home</span>
             </a>
@@ -382,11 +382,18 @@
             <span class="tooltip">Leads</span>
         </li>
         <li>
-            <a href="/apps">
-                <i class='bx bx-chat'></i>
-                <span class="links_name">All Apps</span>
+            <a href="/user/team">
+               <i class="fa-solid fa-people-group"></i>
+                <span class="links_name">Team</span>
             </a>
-            <span class="tooltip">All Apps</span>
+            <span class="tooltip">Team</span>
+        </li>
+        <li>
+            <a href="/template">
+                <i class='bx bx-chat'></i>
+                <span class="links_name">Templates</span>
+            </a>
+            <span class="tooltip">Templates</span>
         </li>
         <li>
             <a href="/gethelp">
@@ -395,14 +402,8 @@
             </a>
             <span class="tooltip">Get help</span>
         </li>
-        <li>
-            <a href="#">
-                <i class='bx bx-folder'></i>
-                <span class="links_name">Log</span>
-            </a>
-            <span class="tooltip">Files</span>
-        </li>
-        <li>
+        
+       {{!--  <li>
             <a href="#">
                 <i class='bx bx-cart-alt'></i>
                 <span class="links_name">Order</span>
@@ -422,7 +423,7 @@
                 <span class="links_name">Setting</span>
             </a>
             <span class="tooltip">Setting</span>
-        </li>
+        </li> --}}
         
         <li class="profile">
             <div class="profile-details">

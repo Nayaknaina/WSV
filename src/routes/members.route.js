@@ -3,7 +3,7 @@ const router = express.Router();
 const logIncollection = require("../models/admin.model.js");
 const memberModel = require("../models/member.model.js");
 const { generateToken } = require("../../utils/auth.js");
-
+const {isMemberLoggedIn} = require("../middilware/middilware.js");
 const jwt = require("jsonwebtoken");
 
 
@@ -48,22 +48,3 @@ router.get('/dashboard', isMemberLoggedIn ,async(req,res)=>{
 })
 
 module.exports = router;
-
-function isMemberLoggedIn(req,res,next){
-  // console.log("isAdminLoggedIn middilware");
-  const token = req.cookies["360Followers"];
-  
-  if (!token || token === undefined) {
-    return res.redirect("/member/login");
-  }
-  
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-     return res.redirect("/member/login");
-    }   
-    
-    req.user = decoded;
-    // console.log(req.user);
-   return next();
-  });
-}

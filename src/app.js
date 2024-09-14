@@ -13,7 +13,7 @@ const axios = require("axios");
 const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
-const { generateToken } = require("../utils/auth");
+const { generateToken } = require("../utils/auth.js");
 const querystring = require("querystring");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
@@ -34,6 +34,8 @@ const remarkModel = require("./models/remark.model.js");
 const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
 const memberRoute = require("./routes/members.route.js");
+const userRoute = require('./routes/users.route.js')
+const Route = require('./routes/index.route.js')
 const { log } = require("console");
 
 //Whatsapp-----------------------------------------
@@ -111,6 +113,7 @@ function initializeWhatsAppClient() {
     isConnected = true;
     connectedPhoneNumber = client.info.wid.user;
     console.log("Connected WhatsApp Number:", connectedPhoneNumber);
+    
   });
 
   client.on("disconnected", async (reason) => {
@@ -289,7 +292,9 @@ app.get("/qr", isAdminLoggedIn, (req, res) => {
   const user = req.user;
   console.log(qrCodeData);
 
-  
+  if (isConnected) {
+    req.session.successMSG = `Connected WhatsApp Number: ${connectedPhoneNumber}`
+  }
   res.render("qr", {
     user,
     qrCodeData,
@@ -352,7 +357,9 @@ passport.deserializeUser(async (id, done) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("/", Route);
 app.use("/member", memberRoute);
+app.use("/user", userRoute);
 
 // Handle root request
 app.get("/", (req, res) => {
@@ -374,270 +381,272 @@ app.get("/apps", isAdminLoggedIn, (req, res) => {
   res.render("app", { user });
 });
 
-app.get("/template", isAdminLoggedIn, async (req, res) => {
-  let user;
+// app.get("/template", isAdminLoggedIn, async (req, res) => {
+//   let user;
 
-  if (req.user.role === "admin") {
-    user = await logIncollection.findById(req.user.id);
-  } else {
-    user = await memberModel.findById(req.user.id);
-  }
+//   if (req.user.role === "admin") {
+//     user = await logIncollection.findById(req.user.id);
+//   } else {
+//     user = await memberModel.findById(req.user.id);
+//   }
 
-  let templates = await templateModel.find({ cid: user.cid });
-  console.log(templates);
+//   let templates = await templateModel.find({ cid: user.cid });
+//   console.log(templates);
 
 
-  res.render("template", { user, templates });
-});
+//   res.render("template", { user, templates });
+// });
 
-app.post(
-  "/template/update/:id",
-  isAdminLoggedIn,
-  upload.fields([{ name: "image" }, { name: "pdf" }]),
-  async (req, res) => {
-    let { id } = req.params;
-    let template = await templateModel.findById(id);
+// app.post(
+//   "/template/update/:id",
+//   isAdminLoggedIn,
+//   upload.fields([{ name: "image" }, { name: "pdf" }]),
+//   async (req, res) => {
+//     let { id } = req.params;
+//     let template = await templateModel.findById(id);
 
-    let { title, text, client, team } = req.body;
+//     let { title, text, client, team } = req.body;
 
-    template.title = title;
-    template.text = text;
+//     template.title = title;
+//     template.text = text;
 
-    template.client = client === "on" ? true : false;
-    template.team = team === "on" ? true : false;
-    let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
-    let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
+//     template.client = client === "on" ? true : false;
+//     template.team = team === "on" ? true : false;
+//     let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
+//     let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
 
-    // console.log("from form");
-    // console.log(imageFile);
-    // console.log(pdfFile);
+//     // console.log("from form");
+//     // console.log(imageFile);
+//     // console.log(pdfFile);
 
-    // console.log("template");
-    // console.log(template.image);
-    // console.log(template.pdf);
+//     // console.log("template");
+//     // console.log(template.image);
+//     // console.log(template.pdf);
 
-    if (imageFile !== "" && template.image !== "") {
-      const imagePath = path.join(
-        __dirname,
-        "..",
-        "template",
-        "images",
-        "uploads",
-        "whatsapp",
-        template.image
-      );
+//     if (imageFile !== "" && template.image !== "") {
+//       const imagePath = path.join(
+//         __dirname,
+//         "..",
+//         "template",
+//         "images",
+//         "uploads",
+//         "whatsapp",
+//         template.image
+//       );
 
-      fs.unlink(imagePath, (err) => {
-        if (err) {
-          console.log("Error removing file", err);
-          return;
-        }
-        console.log("file removed successfully");
-      });
-      template.image = imageFile;
-    } else if (imageFile !== "") {
-      template.image = imageFile;
-    }
+//       fs.unlink(imagePath, (err) => {
+//         if (err) {
+//           console.log("Error removing file", err);
+//           return;
+//         }
+//         console.log("file removed successfully");
+//       });
+//       template.image = imageFile;
+//     } else if (imageFile !== "") {
+//       template.image = imageFile;
+//     }
 
-    if (pdfFile !== "" && template.pdf !== "") {
-      const pdfPath = path.join(
-        __dirname,
-        "..",
-        "template",
-        "images",
-        "uploads",
-        "whatsapp",
-        template.pdf
-      );
+//     if (pdfFile !== "" && template.pdf !== "") {
+//       const pdfPath = path.join(
+//         __dirname,
+//         "..",
+//         "template",
+//         "images",
+//         "uploads",
+//         "whatsapp",
+//         template.pdf
+//       );
 
-      fs.unlink(pdfPath, (err) => {
-        if (err) {
-          console.log("Error removing file", err);
-          return;
-        }
-        console.log("file removed successfully");
-      });
-      template.pdf = pdfFile;
-    } else if (pdfFile !== "") {
-      template.pdf = pdfFile;
-    }
+//       fs.unlink(pdfPath, (err) => {
+//         if (err) {
+//           console.log("Error removing file", err);
+//           return;
+//         }
+//         console.log("file removed successfully");
+//       });
+//       template.pdf = pdfFile;
+//     } else if (pdfFile !== "") {
+//       template.pdf = pdfFile;
+//     }
 
-    await template.save();
-    // console.log(req.body);
-    res.redirect("/template");
-  }
-);
+//     await template.save();
+//     // console.log(req.body);
+//     res.redirect("/template");
+//   }
+// );
 
 // profile update
 
 // team
-app.get("/team", isAdminLoggedIn, async (req, res) => {
-  let user;
-  if (req.user.role === "admin") {
-    user = await logIncollection.findById(req.user.id).populate("teams");
-  } else {
-    user = await memberModel.findById(req.user.id).populate("owner_id");
-    console.log(user);
-  }
-  res.render("team", { user });
-});
+// app.get("/team", isAdminLoggedIn, async (req, res) => {
+//   let user;
+//   if (req.user.role === "admin") {
+//     user = await logIncollection.findById(req.user.id).populate("teams");
+//   } else {
+//     user = await memberModel.findById(req.user.id).populate("owner_id");
+//     console.log(user);
+//   }
+//   res.render("team", { user });
+// });
 
-app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
-  try {
-    const user = await logIncollection.findById(req.user.id);
+// app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     const user = await logIncollection.findById(req.user.id);
 
-    const { name, email, mobile, countryCode } = req.query;
-    const password = otpGenerator.generate(8, {
-      digits: true,
-      lowerCaseAlphabets: true,
-      upperCaseAlphabets: true,
-      specialChars: false,
-    });
+//     const { name, email, mobile, countryCode } = req.query;
+//     const password = otpGenerator.generate(8, {
+//       digits: true,
+//       lowerCaseAlphabets: true,
+//       upperCaseAlphabets: true,
+//       specialChars: false,
+//     });
 
-    const mailMsg = `
-    <div style="font-family: Arial, sans-serif; color: #333;">
-      <div style="text-align: center;">
-        <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
-        <h2>Web Soft Valley</h2>
-        <p>Developing Future</p>
-      </div>
+//     const mailMsg = `
+//     <div style="font-family: Arial, sans-serif; color: #333;">
+//       <div style="text-align: center;">
+//         <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
+//         <h2>Web Soft Valley</h2>
+//         <p>Developing Future</p>
+//       </div>
 
-      <h3>Hello ${name} !</h3>
-      <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
+//       <h3>Hello ${name} !</h3>
+//       <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
       
-      <p>Email: <a href="mailto:${email}">${email}</a></p>
-      <p>Password: <strong>${password}</strong></p>
+//       <p>Email: <a href="mailto:${email}">${email}</a></p>
+//       <p>Password: <strong>${password}</strong></p>
 
-      <div style="text-align: center;">
-        <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-          Login to Dashboard
-        </a>
-      </div>
+//       <div style="text-align: center;">
+//         <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+//           Login to Dashboard
+//         </a>
+//       </div>
 
-      <p>Regards,<br>Web Soft Valley Technology</p>
-    </div>
-  `;
-    const subject = `Invitation from ${user.name}`;
-    const isSent = await sendMail(email, mailMsg, subject);
-    console.log(isSent);
+//       <p>Regards,<br>Web Soft Valley Technology</p>
+//     </div>
+//   `;
+//     const subject = `Invitation from ${user.name}`;
+//     const isSent = await sendMail(email, mailMsg, subject);
+//     console.log(isSent);
 
-    if (isSent[0].res === "okk") {
-      const newMember = new memberModel({
-        name,
-        email,
-        password,
-        countryCode,
-        mobile,
-        cid: user.cid,
-        owner_id: user._id,
-      });
-      await newMember.save();
-      user.teams.push(newMember._id);
-      await user.save();
-    }
-  } catch (error) {
-    console.log(error);
-  }
-  return res.redirect("/team");
-});
+//     if (isSent[0].res === "okk") {
+//       const newMember = new memberModel({
+//         name,
+//         email,
+//         password,
+//         countryCode,
+//         mobile,
+//         cid: user.cid,
+//         owner_id: user._id,
+//       });
+//       await newMember.save();
+//       user.teams.push(newMember._id);
+//       await user.save();
+//     }
+//      req.session.successMSG = `you have invited ${name} as a team member !. `
+//   } catch (error) {
+//     console.log(error);
+//   }
+//   return res.redirect("/team");
+// });
 
-app.get("/signup", (req, res) => {
-  res.render("signup");
-});
+// app.get("/signup", (req, res) => {
+//   res.render("signup");
+// });
 
 // ! pipeline are here
 
-app.post("/pipeline", isAdminLoggedIn, async (req, res) => {
-  const { title, color } = req.body;
+// app.post("/pipeline", isAdminLoggedIn, async (req, res) => {
+//   const { title, color } = req.body;
 
-  const user = await logIncollection.findById(req.user.id);
+//   const user = await logIncollection.findById(req.user.id);
 
-  const pipeline = new pipelineModel({
-    uid: user._id,
-    color,
-    title,
-    cid: user.cid,
-  });
-  await pipeline.save();
-  // console.log(pipeline);
+//   const pipeline = new pipelineModel({
+//     uid: user._id,
+//     color,
+//     title,
+//     cid: user.cid,
+//   });
+//   await pipeline.save();
+//   // console.log(pipeline);
+//   req.session.successMSG = `${title} pipline creation success. `
+//   res.redirect("/dashboard");
+// });
 
-  res.redirect("/dashboard");
-});
+// app.get("/pipeline/del/:id", isAdminLoggedIn, async (req, res) => {
+//   const { id } = req.params;
+//   let pipeline = await pipelineModel.findByIdAndDelete(id);
+//   // console.log(pipeline);
+//    req.session.successMSG = `${pipeline.title} pipline deletion sucessfull !. `
+//   res.redirect("/dashboard");
+// });
 
-app.get("/pipeline/del/:id", isAdminLoggedIn, async (req, res) => {
-  const { id } = req.params;
-  let pipeline = await pipelineModel.findByIdAndDelete(id);
-  // console.log(pipeline);
-  res.redirect("/dashboard");
-});
+// app.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
+//   const { id } = req.params;
+//   const { title, color, defaultVal } = req.body;
 
-app.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
-  const { id } = req.params;
-  const { title, color, defaultVal } = req.body;
+//   let pipeline = await pipelineModel.findById(id);
 
-  let pipeline = await pipelineModel.findById(id);
+//   pipeline.color = color;
+//   pipeline.title = title;
 
-  pipeline.color = color;
-  pipeline.title = title;
+//   if (defaultVal == "on") {
+//     console.log(defaultVal);
+//     await pipelineModel.updateMany(
+//       { uid: req.user.id },
+//       { $set: { defaultVal: false } }
+//     );
+//     req.session.pipe = id;
 
-  if (defaultVal == "on") {
-    console.log(defaultVal);
-    await pipelineModel.updateMany(
-      { uid: req.user.id },
-      { $set: { defaultVal: false } }
-    );
-    req.session.pipe = id;
+//     await pipeline.save();
+//     return res.redirect("/pipe/abc");
+//   }
+//    req.session.successMSG = `${pipeline.title} pipline updatation successfully !. `
+//   return res.redirect("/dashboard");
+// });
+// app.get("/pipe/abc", async (req, res) => {
+//   let pipe = await pipelineModel.findById(req.session.pipe);
+//   pipe.defaultVal = true;
+//   await pipe.save();
 
-    await pipeline.save();
-    return res.redirect("/pipe/abc");
-  }
+//   delete req.session.pipe;
+//   req.session.save();
 
-  return res.redirect("/dashboard");
-});
-app.get("/pipe/abc", async (req, res) => {
-  let pipe = await pipelineModel.findById(req.session.pipe);
-  pipe.defaultVal = true;
-  await pipe.save();
+//   res.redirect("/dashboard");
+// });
 
-  delete req.session.pipe;
-  req.session.save();
+// app.get("/profile", isAdminLoggedIn, async (req, res) => {
+//   const user = await logIncollection.findById(req.user.id);
 
-  res.redirect("/dashboard");
-});
+//   res.render("profile", { user });
+// });
 
-app.get("/profile", isAdminLoggedIn, async (req, res) => {
-  const user = await logIncollection.findById(req.user.id);
+// app.post("/update/profile", isAdminLoggedIn, async (req, res) => {
+//   let user;
+//   const { name, mobile, countryCode, address, city, state } = req.body;
+//   try {
+//     if (req.user.role === "admin")
+//       user = await logIncollection.findById(req.user.id);
+//     else user = await memberModel.findById(req.user.id);
 
-  res.render("profile", { user });
-});
+//     user.name = name;
+//     user.mobile = mobile;
+//     user.countryCode = countryCode;
+//     user.address = address;
+//     user.city = city;
+//     user.state = state;
+//     await user.save();
+//     res.redirect("/profile");
+//   } catch (err) {
+//     console.log("error in /user/update/profile route ---- :", err);
+//     res.redirect("/profile");
+//   }
+// });
 
-app.post("/user/update/profile", isAdminLoggedIn, async (req, res) => {
-  let user;
-  const { name, mobile, countryCode, address, city, state } = req.body;
-  try {
-    if (req.user.role === "admin")
-      user = await logIncollection.findById(req.user.id);
-    else user = await memberModel.findById(req.user.id);
+// app.get("/gethelp", isAdminLoggedIn, async (req, res) => {
+//   const user = await logIncollection.findById(req.user.id);
 
-    user.name = name;
-    user.mobile = mobile;
-    user.countryCode = countryCode;
-    user.address = address;
-    user.city = city;
-    user.state = state;
-    await user.save();
-    res.redirect("/profile");
-  } catch (err) {
-    console.log("error in /user/update/profile route ---- :", err);
-    res.redirect("/profile");
-  }
-});
-
-app.get("/gethelp", isAdminLoggedIn, async (req, res) => {
-  const user = await logIncollection.findById(req.user.id);
-
-  res.render("gethelp", { user });
-});
+//   res.render("gethelp", { user });
+// });
 
 app.post("/submit-form", async (req, res) => {
   try {
@@ -675,29 +684,31 @@ app.post("/update-user", async (req, res) => {
 });
 
 // Dashboard route
-app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
-  try {
-    console.log("dashboard");
+// app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     console.log("dashboard");
 
-    const user = await logIncollection
-      .findById(req.user.id)
-      .populate("myleads");
-    if (!user.organizationName) {
-      return res.render("dashboard", { showForm: true });
-    }
+//     const user = await logIncollection
+//       .findById(req.user.id)
+//       .populate("myleads");
+//     if (!user.organizationName) {
+//       return res.render("dashboard", { showForm: true });
+//     }
 
-    const pipes = await pipelineModel
-      .find({ cid: user.cid })
-      .sort({ defaultVal: -1 })
-      .exec();
-    const leads = await leadsModel.find({ cid: user.cid }).populate("status");
-
-    res.render("dashboard", { user, pipes, leads });
-    // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
-  } catch (error) {
-    res.status(500).send("Internal error");
-  }
-});
+//     const pipes = await pipelineModel
+//       .find({ cid: user.cid })
+//       .sort({ defaultVal: -1 })
+//       .exec();
+//     const leads = await leadsModel.find({ cid: user.cid }).populate("status");
+//     // res.json({})
+//     let msg = req.session.successMSG;
+//     delete req.session.successMSG;
+//     res.render("dashboard", { user, pipes, leads,successMSG : msg });
+//     // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
+//   } catch (error) {
+//     res.status(500).send("Internal error");
+//   }
+// });
 // app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
 //   try {
 //     const user = await logIncollection.findById(req.user.id);
@@ -810,122 +821,122 @@ app.get(
 
 // Signup handler
 
-app.post("/signup", async (req, res) => {
-  try {
-    const { name, email, password, confirmPassword } = req.body;
-    const user = await logIncollection.findOne({ email });
+// app.post("/signup", async (req, res) => {
+//   try {
+//     const { name, email, password, confirmPassword } = req.body;
+//     const user = await logIncollection.findOne({ email });
 
-    if (user)
-      return res.render("signup", { errorMessage: "User already exists" });
-    if (password !== confirmPassword)
-      return res.render("signup", { errorMessage: "Passwords do not match" });
-    const cid = uuidv4();
-    const newUser = new logIncollection({
-      name,
-      email,
-      password,
-      cid,
-      role: "admin",
-    });
-    await newUser.save();
+//     if (user)
+//       return res.render("signup", { errorMessage: "User already exists" });
+//     if (password !== confirmPassword)
+//       return res.render("signup", { errorMessage: "Passwords do not match" });
+//     const cid = uuidv4();
+//     const newUser = new logIncollection({
+//       name,
+//       email,
+//       password,
+//       cid,
+//       role: "admin",
+//     });
+//     await newUser.save();
 
-    const pipelines = [
-      { title: "win", color: "#28A745" },
-      { title: "loss", color: "#DC3545" },
-      { title: "held", color: "#007BFF" },
-      { title: "pending", color: "#FFC107" },
-    ].map(
-      (pipelineData) =>
-        new pipelineModel({
-          uid: user._id,
-          color: pipelineData.color,
-          title: pipelineData.title,
-          cid: user.cid,
-        })
-    );
+//     const pipelines = [
+//       { title: "win", color: "#28A745" },
+//       { title: "loss", color: "#DC3545" },
+//       { title: "held", color: "#007BFF" },
+//       { title: "pending", color: "#FFC107" },
+//     ].map(
+//       (pipelineData) =>
+//         new pipelineModel({
+//           uid: user._id,
+//           color: pipelineData.color,
+//           title: pipelineData.title,
+//           cid: user.cid,
+//         })
+//     );
 
-    // Save all pipelines in parallel
-    await Promise.all(pipelines.map((pipeline) => pipeline.save()));
+//     // Save all pipelines in parallel
+//     await Promise.all(pipelines.map((pipeline) => pipeline.save()));
 
-    const templates = [
-      {
-        title: "welcome",
-        text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
-        client: true,
-        team: false,
-        num: 1,
-      },
+//     const templates = [
+//       {
+//         title: "welcome",
+//         text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
+//         client: true,
+//         team: false,
+//         num: 1,
+//       },
 
-      {
-        title: "after call",
-        text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
-        client: true,
-        team: false,
-        num: 2,
-      },
+//       {
+//         title: "after call",
+//         text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
+//         client: true,
+//         team: false,
+//         num: 2,
+//       },
 
-      {
-        title: "before call",
-        text: "",
-        client: false,
-        team: false,
-        num: 3,
-      },
-    ].map(
-      (temp) =>
-        new templateModel({
-          uid: user._id,
-          title: temp.title,
-          text: temp.text,
-          num: temp.num,
-          client: temp.client,
-          team: temp.team,
-          cid: user.cid,
-        })
-    );
+//       {
+//         title: "before call",
+//         text: "",
+//         client: false,
+//         team: false,
+//         num: 3,
+//       },
+//     ].map(
+//       (temp) =>
+//         new templateModel({
+//           uid: user._id,
+//           title: temp.title,
+//           text: temp.text,
+//           num: temp.num,
+//           client: temp.client,
+//           team: temp.team,
+//           cid: user.cid,
+//         })
+//     );
 
-    // Save all pipelines in parallel
-    await Promise.all(templates.map((temp) => temp.save()));
+//     // Save all pipelines in parallel
+//     await Promise.all(templates.map((temp) => temp.save()));
 
-    const token = await generateToken(newUser);
+//     const token = await generateToken(newUser);
 
-    res.cookie("360Followers", token, {
-      httpOnly: true,
-      maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
-    });
-    res.redirect("/dashboard");
-  } catch (err) {
-    res.status(500).send("Error signing up");
-  }
-});
+//     res.cookie("360Followers", token, {
+//       httpOnly: true,
+//       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
+//     });
+//     res.redirect("/dashboard");
+//   } catch (err) {
+//     res.status(500).send("Error signing up");
+//   }
+// });
 
 // Login handler
-app.post("/login", async (req, res) => {
-  try {
-    const check = await logIncollection.findOne({ email: req.body.email });
+// app.post("/login", async (req, res) => {
+//   try {
+//     const check = await logIncollection.findOne({ email: req.body.email });
 
-    if (!check || check.password !== req.body.password) {
-      return res.render("signup", {
-        errorMessage: "Invalid username or password",
-      });
-    }
+//     if (!check || check.password !== req.body.password) {
+//       return res.render("signup", {
+//         errorMessage: "Invalid username or password",
+//       });
+//     }
 
-    const token = await generateToken(check);
-    res.cookie("360Followers", token, {
-      httpOnly: true,
-      maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
-    });
-    res.redirect("/dashboard");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error logging in");
-  }
-});
+//     const token = await generateToken(check);
+//     res.cookie("360Followers", token, {
+//       httpOnly: true,
+//       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
+//     });
+//     res.redirect("/dashboard");
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Error logging in");
+//   }
+// });
 
-app.get("/logout", (req, res) => {
-  res.clearCookie("360Followers");
-  res.redirect("/");
-});
+// app.get("/logout", (req, res) => {
+//   res.clearCookie("360Followers");
+//   res.redirect("/");
+// });
 
 // Facebook Login Route
 app.get("/auth/facebook", (req, res) => {
@@ -1045,7 +1056,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
 
     if (chalteRahoId) clearInterval(chalteRahoId);
     chalteRaho(accessToken, req);
-
+    req.session.successMSG = 'Connected to facebook account.'
     res.redirect("/leads");
   } catch (error) {
     console.error("Error fetching access token:", error);
@@ -1054,126 +1065,126 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
 });
 
 // Facebook Leads Fetch Route
-app.get("/leads", isAdminLoggedIn, async (req, res) => {
-  try {
-    let admin;
-    console.log("leads page");
+// app.get("/leads", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     let admin;
+//     console.log("leads page");
 
-    if (req.user.role === "admin") {
-      user = await logIncollection.findById(req.user.id).populate({
-        path: "myleads",
-        populate: {
-          path: "status", // Populate status from leads
-        },
-        populate: {
-          path: "remarks", // Populate remarks from leads
-          options: { sort: { createdAt: -1 } }, // Sorting remarks in descending order by createdAt
-        },
-      });
-    } else {
-      user = await memberModel.findById(req.user.id).populate({
-        path: "myleads",
-        populate: {
-          path: "status", // Populate status from leads
-        },
-        populate: {
-          path: "remarks",
-          options: { sort: { createdAt: -1 } },
-        },
-      });
-    }
+//     if (req.user.role === "admin") {
+//       user = await logIncollection.findById(req.user.id).populate({
+//         path: "myleads",
+//         populate: {
+//           path: "status", // Populate status from leads
+//         },
+//         populate: {
+//           path: "remarks", // Populate remarks from leads
+//           options: { sort: { createdAt: -1 } }, // Sorting remarks in descending order by createdAt
+//         },
+//       });
+//     } else {
+//       user = await memberModel.findById(req.user.id).populate({
+//         path: "myleads",
+//         populate: {
+//           path: "status", // Populate status from leads
+//         },
+//         populate: {
+//           path: "remarks",
+//           options: { sort: { createdAt: -1 } },
+//         },
+//       });
+//     }
 
-    let leads = await leadsModel.find({ cid: user.cid }).populate("status");
-    let pipes = await pipelineModel.find({ cid: user.cid });
-    // let remarks = await remarkModel.find({ uid: user._id }).sort({ createdAt: -1 });
+//     let leads = await leadsModel.find({ cid: user.cid }).populate("status");
+//     let pipes = await pipelineModel.find({ cid: user.cid });
+//     // let remarks = await remarkModel.find({ uid: user._id }).sort({ createdAt: -1 });
 
-    res.render("leads", { user, leads, pipes });
-  } catch (error) {
-    console.error("Error fetching leads:", error);
-    res.status(500).send("Error fetching leads");
-  }
-});
+//     res.render("leads", { user, leads, pipes });
+//   } catch (error) {
+//     console.error("Error fetching leads:", error);
+//     res.status(500).send("Error fetching leads");
+//   }
+// });
 
-app.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
-  let { id } = req.params;
+// app.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
+//   let { id } = req.params;
 
-  let lead = await leadsModel.findById(id);
-  if (!lead) {
-    return res.redirect("/leads");
-  }
+//   let lead = await leadsModel.findById(id);
+//   if (!lead) {
+//     return res.redirect("/leads");
+//   }
 
-  if (req.user.role === "admin") {
-    let admin = await logIncollection.findById(req.user.id);
-    admin.myleads.push(lead._id);
-    lead.uid = admin._id;
-    await admin.save();
-    await lead.save();
-  } else {
-    let member = await memberModel.findById(req.user.id);
-    member.myleads.push(lead._id);
-    lead.uid = member._id;
-    await member.save();
-    await lead.save();
+//   if (req.user.role === "admin") {
+//     let admin = await logIncollection.findById(req.user.id);
+//     admin.myleads.push(lead._id);
+//     lead.uid = admin._id;
+//     await admin.save();
+//     await lead.save();
+//   } else {
+//     let member = await memberModel.findById(req.user.id);
+//     member.myleads.push(lead._id);
+//     lead.uid = member._id;
+//     await member.save();
+//     await lead.save();
 
-    console.log("bokking the leads by ", member);
-  }
-  console.log("ready for message sending");
+//     console.log("bokking the leads by ", member);
+//   }
+//   console.log("ready for message sending");
 
-  //   const interval = setInterval(() => {
-  //     if (whatsappClientReady) {
-  //       sendMessageOnWA('9755313770', 'Hello!');
-  //         clearInterval(interval); // Stop checking once the message is sent
-  //     } else {
-  //         console.log('Waiting for WhatsApp client to be ready...');
-  //     }
-  // }, 5000);
+//   //   const interval = setInterval(() => {
+//   //     if (whatsappClientReady) {
+//   //       sendMessageOnWA('9755313770', 'Hello!');
+//   //         clearInterval(interval); // Stop checking once the message is sent
+//   //     } else {
+//   //         console.log('Waiting for WhatsApp client to be ready...');
+//   //     }
+//   // }, 5000);
 
-  res.redirect("/leads");
-});
+//   res.redirect("/leads");
+// });
 
-app.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
-  let { id } = req.params;
+// app.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
+//   let { id } = req.params;
 
-  let lead = await leadsModel.findById(id);
-  if (!lead) {
-    return res.redirect("/leads");
-  }
-  if (req.user.role === "admin") {
-    let admin = await logIncollection.findById(req.user.id);
-    admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
-    lead.uid = "";
-    lead.remarks = []    
+//   let lead = await leadsModel.findById(id);
+//   if (!lead) {
+//     return res.redirect("/leads");
+//   }
+//   if (req.user.role === "admin") {
+//     let admin = await logIncollection.findById(req.user.id);
+//     admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
+//     lead.uid = "";
+//     lead.remarks = []    
 
-    await admin.save();
-    await lead.save();
-  } else {
-    let member = await memberModel.findById(req.user.id);
-    member.myleads.splice(member.myleads.indexOf(lead._id), 1);
-    lead.uid = "";
-    lead.remarks = []
+//     await admin.save();
+//     await lead.save();
+//   } else {
+//     let member = await memberModel.findById(req.user.id);
+//     member.myleads.splice(member.myleads.indexOf(lead._id), 1);
+//     lead.uid = "";
+//     lead.remarks = []
 
-    await member.save();
-    await lead.save();
+//     await member.save();
+//     await lead.save();
 
-    console.log("bokking the leads by ", member);
-  }
-  res.redirect("/leads");
-});
+//     console.log("bokking the leads by ", member);
+//   }
+//   res.redirect("/leads");
+// });
 
-app.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
-  let { id } = req.params;
+// app.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
+//   let { id } = req.params;
 
-  let lead = await leadsModel.findById(id);
-  let pipe = await pipelineModel.findById(req.body.pipeId);
+//   let lead = await leadsModel.findById(id);
+//   let pipe = await pipelineModel.findById(req.body.pipeId);
 
-  if (!lead) {
-    return res.redirect("/leads");
-  }
-  lead.status = pipe._id;
-  await lead.save();
+//   if (!lead) {
+//     return res.redirect("/leads");
+//   }
+//   lead.status = pipe._id;
+//   await lead.save();
 
-  res.redirect("/leads");
-});
+//   res.redirect("/leads");
+// });
 
 app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
   const { id } = req.params;

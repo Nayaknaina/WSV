@@ -426,7 +426,7 @@
                             <div class="card-body">
                                 <div class="stat-widget-one" id="pipe-container-s"
                                     style="height: 350px;max-height: 350px; overflow: auto;">
-                                    <form action="/pipeline" method="post">
+                                    <form action="/user/pipeline" method="post">
                                         <input type="text" id="inputPassword2" name="title" placeholder="Enter Pipline">
                                         <input type="color" class="colorinp"
                                             style="width: 32px; height: 32px; border: none; padding: 0;" name="color">
@@ -440,7 +440,7 @@
                                         <li
                                             style="display: flex; border-radius: 4px; padding-right: 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
                                             <form style="display: flex; justify-content: space-between;"
-                                                action="/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
+                                                action="/user/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
 
                                                 <input type="text" disabled name="title" value="{{title}}"
                                                     id="title-{{_id}}">
@@ -463,7 +463,7 @@
                                                 style="display: flex; justify-content: center; align-items: center; gap: 4px;">
                                                 <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
                                                     class="fa-solid fa-pen-to-square"></i>
-                                                <a href="/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
+                                                <a href="/user/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
                                                         style="color: crimson;"></i></a>
                                             </span>
                                         </li>
@@ -476,7 +476,7 @@
                                         <li
                                             style="display: flex; border-radius: 4px; padding-right: 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
                                             <form style="display: flex; justify-content: space-between;"
-                                                action="/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
+                                                action="/user/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
 
                                                 <input type="text" disabled name="title" value="{{title}}"
                                                     id="title-{{_id}}">
@@ -499,7 +499,7 @@
                                                 style="display: flex; justify-content: center; align-items: center; gap: 4px;">
                                                 <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
                                                     class="fa-solid fa-pen-to-square"></i>
-                                                <a href="/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
+                                                <a href="/user/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
                                                         style="color: crimson;"></i></a>
                                             </span>
                                         </li>
