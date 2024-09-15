@@ -64,7 +64,7 @@ function ensureQRCodeEvent() {
       try {
         const qrImage = qr.imageSync(qrCode, { type: "png" });
         qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
-        console.log("QR code generated and stored.");
+        // console.log("QR code generated and stored.");
       } catch (error) {
         console.error("Error generating QR Code:", error);
       }
