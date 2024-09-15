@@ -79,7 +79,7 @@ async function cleanupSessionFiles() {
     try {
       if (fs.existsSync(sessionPath)) {
         fs.rmSync(sessionPath, { recursive: true, force: true });
-        console.log("Session files deleted successfully.");
+        // console.log("Session files deleted successfully.");
       }
       break; // Exit loop if deletion is successful
     } catch (error) {
