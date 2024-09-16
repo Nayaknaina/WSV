@@ -292,7 +292,7 @@ app.get("/logoutWA", async (req, res) => {
 
 app.get("/qr", isAdminLoggedIn, (req, res) => {
   const user = req.user;
-  console.log(qrCodeData);
+  // console.log(qrCodeData);
 
   if (isConnected) {
     req.session.successMSG = `Connected WhatsApp Number: ${connectedPhoneNumber}`
