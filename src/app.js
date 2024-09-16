@@ -64,7 +64,7 @@ function ensureQRCodeEvent() {
       try {
         const qrImage = qr.imageSync(qrCode, { type: "png" });
         qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
-        console.log("QR code generated and stored.");
+        // console.log("QR code generated and stored.");
       } catch (error) {
         console.error("Error generating QR Code:", error);
       }
@@ -79,7 +79,7 @@ async function cleanupSessionFiles() {
     try {
       if (fs.existsSync(sessionPath)) {
         fs.rmSync(sessionPath, { recursive: true, force: true });
-        console.log("Session files deleted successfully.");
+        // console.log("Session files deleted successfully.");
       }
       break; // Exit loop if deletion is successful
     } catch (error) {
