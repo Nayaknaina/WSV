@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html>
+
+<style>
+    fb\\:login-button {
+        display: block;
+        margin: 20px auto;
+        background-color: #4267B2;
+        color: white;
+        font-size: 16px;
+        border-radius: 5px;
+        padding: 10px 20px;
+    }
+</style>
+
+<head>
+    <title>
+        Connect
+    </title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="./" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
+
+    <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/custom.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" type="text/css" href="/styles/loader.css">
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
+        src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+    <link rel="stylesheet" href="/assets/css/remark.css">
+</head>
+
+<body class>
+
+    {{!-- {{> nav}} --}}
+
+
+    <div class="container-fluid">
+        <div class="row  justify-content-center">
+            {{> sidebar}}
+            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  home-section">
+                {{> NameHead}}
+                <div class="container-fluid bg-white shadow-sm m-b-40">
+                    <div class="row">
+                        {{!-- <div class="col-md-1 text-center"></div> --}}
+                        <div class="col-md-6 text-center py-2">
+                            <button id="all-lead-btn" onclick="showAllLeads()" type="button"
+                                class="btn btn-primary p-x-8">All leads</button>
+                            <!-- Add your Lead content here -->
+                        </div>
+                        <div class="col-md-6 text-center py-2">
+                            <!-- Add your My Leads content here -->
+                            <button id="my-lead-btn" onclick="showMyLeads()" type="button"
+                                class="btn btn-outline-primary p-x-8">my leads</button>
+
+                        </div>
+                        {{!-- <div class="col-md-1 text-center"></div> --}}
+                    </div>
+                </div>
+
+                <div class="container min-vh-100">
+
+                    <style>
+                        body {
+                            background-color: #ededed;
+                            font-family: "Open Sans", sans-serif;
+
+                        }
+
+
+
+                        ul {
+                            list-style-type: none;
+                            padding: 0;
+                        }
+
+                        nav {
+                            background: #d9d9d9;
+                            margin: 20px 0;
+                            border-radius: 8px;
+                            overflow: hidden;
+                            transition: max-height 0.4s ease;
+
+                        }
+
+                        nav label {
+                            display: block;
+                            padding: 7px;
+                            box-shadow: 0 0 0.3125rem 0 rgba(20, 12, 0, .06);
+                            background-image: radial-gradient(at 50% 100%, #fff 0%, rgb(206 229 255 / 50%) 100%), linear-gradient(to bottom, rgb(0 0 0 / 25%) 0%, rgb(196 182 182 / 40%) 100%);
+                            color: rgb(7, 7, 7);
+                            font-size: 1.2em;
+                            cursor: pointer;
+                            font-variant: small-caps;
+                        }
+
+                        .slide {
+                            max-height: 0;
+                            overflow: hidden;
+                            transition: max-height 0.4s ease;
+                            background-color: #f9f9f9;
+                            padding: 0 15px;
+                        }
+
+                        .slide li {
+                            padding: 10px 0;
+                            border-bottom: 1px solid #ddd;
+                        }
+
+                        .slide li:last-child {
+                            border-bottom: none;
+                        }
+
+                        input[type="checkbox"] {
+                            display: none;
+                        }
+
+                        input[type="checkbox"]:checked+.slide {
+                            max-height: 500px;
+                            /* Adjust as per content */
+                            padding: 15px;
+                        }
+
+                        .created-time-label {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 10px;
+                            background-color: #f8f9fa;
+                            border: 1px solid #1a0068;
+                            border-radius: 5px;
+                        }
+
+                        .icon-container {
+                            display: flex;
+                            gap: 20px;
+                            right: 10px;
+                            justify-content: space-between;
+                        }
+
+                        .status-circle {
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 50%;
+                            border: 2px solid black;
+                            background-color: #36383a;
+                            position: relative;
+                        }
+
+                        .created-time-icon {
+                            width: 20px;
+                            height: 20px;
+                        }
+
+                        #status-box {
+                            display: none;
+                            width: auto;
+                            height: auto;
+                            position: relative;
+                            top: 0%;
+                            z-index: 99999999;
+                            right: 0%;
+                        }
+
+                        .ul-box {
+                            width: auto;
+                            height: auto;
+                            position: absolute;
+                            top: 3rem;
+                            right: 1rem;
+                            display: none;
+                        }
+
+                        .ul-box.open {
+                            display: block;
+                        }
+
+                        .ul-box li {
+                            border: 2px solid rgb(124, 124, 124);
+                            width: auto;
+                            border-radius: 4px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 2px 8px;
+                            gap: 10px;
+                        }
+
+                        .drop-circle {
+                            width: 18px;
+                            height: 18px;
+                            border-radius: 50%;
+                            border: 2px solid rgb(0, 0, 0);
+                        }
+
+                        @media (max-width: 768px) {
+                            nav label {
+                                font-size: 1em;
+                                padding: 10px;
+                            }
+
+                            .slide li {
+                                font-size: 1.0em;
+                            }
+                        }
+
+                        @media (max-width: 480px) {
+                            nav label {
+                                font-size: 0.9em;
+                                padding: 8px;
+                            }
+
+                            .slide li {
+                                font-size: 0.8em;
+                            }
+                        }
+                    </style>
+
+                    <ul id="allLeads" style="display: block;">
+                        {{#if leads.length}}
+                        {{#each leads}}
+                        <li>
+                            <nav>
+                                <label for="touch-{{@index}}" class="created-time-label">
+                                    <strong>Created Time : {{formatDate income_time}}</strong>
+                                    <strong>Recived from : {{ app }}</strong>
+
+                                    <span class="icon-container">
+                                        {{#if uid}}
+                                        <!-- Double Check Icon when uid is not null -->
+                                        <i class="fa-solid fa-check-double" style="color: #0D6EFD;"></i>
+                                        {{else}}
+                                        <!-- Single Check Icon when uid is null -->
+                                        <a href="/lead/book/{{_id}}">
+                                            <i class="fa-solid fa-check" style="color: #36383a;"></i>
+                                        </a>
+                                        {{/if}}
+
+                                        {{#each leads_data}}
+                                        {{#if (containsPhoneNumber ans)}}
+                                        <a href="tel:{{ans}}">
+                                            <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
+                                        </a>
+                                        <a href="https://wa.me/{{ans}}" target="_blank">
+                                            <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                                        </a>
+                                        {{/if}}
+                                        {{/each}}
+                                        <span class="status-circle" onclick="toggleDropdown()"
+                                            style="background-color: {{status.color}};">
+                                            <div class="ul-box">
+                                                {{#each ../pipes}}
+                        <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                            <span>{{title}}</span>
+                            <span class="drop-circle" style="background-color: {{color}};"></span>
+                        </li>
+                        {{/each}}
+                </div>
+                </span>
+                </span>
+                </label>
+                <input type="checkbox" id="touch-{{@index}}">
+                <ul class="slide">
+                    {{#each leads_data}}
+                    <li>
+                        <strong>{{que}}:</strong> {{ans}}
+                    </li>
+                    {{/each}}
+                </ul>
+                </nav>
+                </li>
+                {{/each}}
+                {{else}}
+                <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
+                    added here</li>
+                {{/if}}
+                </ul>
+
+
+
+                <ul id="myLeads" style="display: none;">
+                    {{#if user.myleads.length}}
+                    {{#each user.myleads}}
+                    <li>
+                        <nav style="position: relative;">
+                            <label for="touch2-{{@index}}" class="created-time-label">
+                                <strong>Created Time : {{formatDate income_time}}</strong>
+                                <strong>Recived from : {{ app }}</strong>
+                                <span class="icon-container" style="display: flex; align-items: center;">
+                                    <a href="/lead/remove/{{_id}}">
+                                        <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
+                                    </a>
+                                    {{#each leads_data}}
+                                    {{#if (containsPhoneNumber ans)}}
+                                    <a href="tel:{{ans}}">
+                                        <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
+                                    </a>
+
+                                    <a href="https://wa.me/{{ans}}" target="_blank">
+                                        <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                                    </a>
+                                    {{/if}}
+
+                                    {{/each}}
+                                    <i onclick="openRemarkPopUp('{{_id}}')" class="fa-solid fa-file-pen"
+                                        style="color: #1E3050;"></i>
+
+                                    <span class="status-circle" onclick="toggleDropdown('{{_id}}')"
+                                        style="background-color: {{status.color}};">
+                                        <div class="ul-box">
+                                            {{#each ../pipes}}
+                    <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                        <span>{{title}}</span>
+                        <span class="drop-circle" style="background-color: {{color}};"></span>
+                    </li>
+                    {{/each}}
+            </div>
+            </span>
+
+            </span>
+            </label>
+
+            <section class="timeline" id="timeline{{_id}}" style="">
+                <ul id="timeline-ul-list">
+                    <h3 style="color: #28292a; text-align: center;">Your Remarks</h3>
+                    <li onclick="openAddRemarkForm('{{_id}}')" style="cursor: pointer;">
+                        <div class="content add-remark" id="add-remark-content">
+                            <h2><span class="add-remark-txt">add remark</span></h2>
+                        </div>
+                    </li>
+                    <li id="remark-form-list{{_id}}" style="display: none;">
+                        <div class="content">
+                            <form id="remarkForm" onsubmit="createNewRemark('{{_id}}')">
+                                <textarea placeholder="setting up next followup" required maxlength="150" name="text"
+                                    id="remark-form-text{{id}}" cols="30" rows="5"></textarea>
+                                <input type="time" min="current-time" name="time" id="remark-form-time{{id}}" required>
+                                <input type="date" min="current-date" name="date" id="remark-form-date{{id}}" required>
+                                <button class="btn btn-primary mt-1" id="add-btn" style="font-size: 12px;"
+                                    type="submit">add</button>
+                                <button class="btn btn-danger mt-1" id="add-btn" style="font-size: 12px;"
+                                    onclick="closeAddRemarkForm('{{_id}}')" type="button">cancel</button>
+                            </form>
+                        </div>
+                    </li>
+
+                    <span id="new-remark-down{{_id}}"></span>
+                    {{#each remarks}}
+                    <li>
+                        <div class="content">
+                            <div class="createdTime">{{formatTime createdAt}} {{formatDate createdAt}}</div>
+                            <p>{{text}}</p>
+                            <div class="createdTime">{{time}} {{formatDate date}}</div>
+                        </div>
+                    </li>
+                    {{/each}}
+                </ul>
+            </section>
+            <input type="checkbox" id="touch2-{{@index}}">
+            <ul class="slide">
+                {{#each leads_data}}
+                <li>
+                    <strong>{{que}}:</strong> {{ans}}
+                </li>
+                {{/each}}
+            </ul>
+            </nav>
+            </li>
+            {{/each}}
+            {{else}}
+            <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
+                added here</li>
+            {{/if}}
+            </ul>
+
+
+
+
+            <script>
+                // for leads drop-down
+                document.querySelectorAll('.lead-item').forEach(item => {
+                    item.addEventListener('click', function () {
+                        const currentOpenItem = document.querySelector('.lead-item.open');
+
+                        if (currentOpenItem && currentOpenItem !== this) {
+                            currentOpenItem.classList.remove('open');
+                            currentOpenItem.querySelector('.slide').style.height = '0px';
+                        }
+
+                        this.classList.toggle('open');
+                        const slide = this.querySelector('.slide');
+
+                        if (this.classList.contains('open')) {
+                            slide.style.height = slide.scrollHeight + 'px';
+                        } else {
+                            slide.style.height = '0px';
+                        }
+                    });
+                });
+
+                function toggleDropdown(id) {
+                    let boxs = document.querySelectorAll(".ul-box")
+                    boxs.forEach((box) => {
+                        box.classList.add('open');
+                    })
+
+                    let timelineBox = document.querySelector(`#timeline${id}`)
+                    timelineBox.classList.remove('openTimeline')
+
+                }
+
+
+                function submitForm(leadId, status, pipeId) {
+                    fetch(`/lead/status/update/${leadId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'  // Specify that we're sending JSON
+                        },
+                        body: JSON.stringify({ status, pipeId })  // Convert the status to a JSON string
+                    })
+                        .then(response => {
+                            // Ensure the response is JSON
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                            location.reload()
+                        })
+                        .then(data => {
+                            console.log('Success:', data);
+                        })
+                }
+
+
+                function showStatusBox() {
+                    let box = document.querySelector('#status-box')
+
+                    console.log(box)
+                    box.style.display = 'block'
+                }
+
+                function createNewRemark(id) {
+                    event.preventDefault(); // Prevent the default form submission
+
+                    const text = document.getElementById(`remark-form-text${id}`).value;
+                    const time = document.getElementById(`remark-form-time${id}`).value;
+                    const date = document.getElementById(`remark-form-date${id}`).value;
+
+                    const now = new Date();
+
+                    const selectedDateTime = new Date(`${date}T${time}`);
+
+                    // Check if the selected date and time is in the past
+                    if (selectedDateTime < now) {
+                        alert("You cannot select a past date or time.");
+                        return false; // Prevent form submission
+                    }
+
+                    const formData = {
+                        text: text,
+                        time: time,
+                        date: date
+                    };
+                    console.log(formData)
+
+                    fetch(`/remark/add/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json(); // Assuming server responds with JSON
+                        })
+                        .then(remark => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                            
+                                <div class="content">
+                                    <div class="createdTime">${formatDate(remark.createdAt)}</div>
+                                    <p>${remark.text}</p>
+                                    <div class="createdTime">${remark.time} ${formatDate(remark.date)}</div>
+                                </div>`;
+                            const span = document.getElementById(`new-remark-down${id}`);
+
+
+                            if (span) {
+                                span.insertAdjacentElement('afterend', li);
+                            }
+
+                            //  const timelineList = document.getElementById('timeline-ul-list');
+                            //  timelineList.innerHTML += liElem;
+
+                            document.getElementById('remarkForm').reset();
+                            closeAddRemarkForm(id)
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+
+                }
+
+
+                function formatDate(datetime) {
+
+                    if (!datetime) {
+                        return '';
+                    }
+
+                    const date = new Date(datetime);
+
+                    if (isNaN(date)) {
+                        console.warn('Invalid date:', datetime);
+                        return '';
+                    }
+                    return date.toISOString().split("T")[0];
+                }
+
+
+            </script>
+        </div>
+
+    </div>
+
+
+    <div class="fg-main-footer bg-white border-top w-100">
+        <div class="col-md-12">
+            <p class="sub_footer_text m-t-10 m-b-10 text-center"> Copyright © 2024. Web Soft Valley All Rights
+                Reserved
+            </p>
+        </div>
+    </div>
+
+    </div>
+    </div>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
+        crossorigin="anonymous"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/js/bootstrap-select.js"></script>
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+    <script src="/js/dependencies/sweetalert.min.js?nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="/assets/js/timezones.full.min.js"></script>
+
+    <script src="/assets/js/custom-new.js"></script>
+    <script>
+
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+        $(document).ready(function () {
+            $('#signup').on('submit', function () {
+                $('.loader-display').css('display', 'block');
+            });
+        });
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+        $(window).scroll(function () {
+            if ($(window).scrollTop() >= 72) {
+                $('#top_header').addClass('sticky');
+            } else {
+                $('#top_header').removeClass('sticky');
+            }
+        });
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+        $('#nav-tab a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+
+        // store the currently selected tab in the hash value
+        $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
+            var id = $(e.target).attr("href").substr(1);
+            console.log("id", id);
+            window.location.hash = id;
+        });
+
+        // on load of the page: switch to the currently selected tab
+        var hash = window.location.hash;
+        $('#nav-tab a[href="' + hash + '"]').tab('show');
+    </script>
+
+    <script>
+        function showMyLeads() {
+            let myLeadsBox = document.querySelector('#myLeads')
+            let allLeadsBox = document.querySelector('#allLeads')
+            let myBtn = document.querySelector('#my-lead-btn')
+            let allBtn = document.querySelector('#all-lead-btn')
+
+            myLeadsBox.style.display = 'block'
+            allLeadsBox.style.display = 'none'
+
+
+            myBtn.classList.remove('btn-outline-primary')
+            myBtn.classList.add('btn-primary')
+
+            allBtn.classList.add('btn-outline-primary')
+            allBtn.classList.remove('btn-primary')
+        }
+        function showAllLeads(t) {
+            let myLeadsBox = document.querySelector('#myLeads')
+            let allLeadsBox = document.querySelector('#allLeads')
+            let myBtn = document.querySelector('#my-lead-btn')
+            let allBtn = document.querySelector('#all-lead-btn')
+
+            allLeadsBox.style.display = 'block'
+            myLeadsBox.style.display = 'none'
+
+            myBtn.classList.remove('btn-primary')
+            myBtn.classList.add('btn-outline-primary')
+
+            allBtn.classList.remove('btn-outline-primary')
+            allBtn.classList.add('btn-primary')
+        }
+
+        function openRemarkPopUp(id) {
+            // console.log(id)
+            let timelineBox = document.querySelector(`#timeline${id}`)
+            timelineBox.classList.add('openTimeline')
+        }
+
+        function openAddRemarkForm(id) {
+            // console.log(id)
+            let form = document.querySelector(`#remark-form-list${id}`)
+            form.style.display = 'block'
+        }
+        function closeAddRemarkForm(id) {
+            let form = document.querySelector(`#remark-form-list${id}`)
+            form.style.display = 'none'
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>

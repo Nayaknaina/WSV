@@ -1,0 +1,81 @@
+.StandaloneLink_component__zcHIq {
+    text-decoration: none;
+    color: #060606;
+    transition: color;
+    transition-duration: .2s;
+    transition-timing-function: ease-out
+}
+
+.StandaloneLink_hasReversedLook__c0Qsw .StandaloneLink_component__zcHIq {
+    color: #fff
+}
+
+.StandaloneLink_component__zcHIq:hover {
+    color: #3c3c3c
+}
+
+.StandaloneLink_hasReversedLook__c0Qsw .StandaloneLink_component__zcHIq:hover {
+    color: #b2e032
+}
+
+[href]:focus .StandaloneLink_component__zcHIq,
+[href]:hover .StandaloneLink_component__zcHIq {
+    color: #3c3c3c
+}
+
+.StandaloneLink_hasReversedLook__c0Qsw [href]:focus .StandaloneLink_component__zcHIq,
+.StandaloneLink_hasReversedLook__c0Qsw [href]:hover .StandaloneLink_component__zcHIq {
+    color: #b2e032
+}
+
+.StandaloneLink_icon__40Dj_ {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-top: -10px;
+    margin-bottom: -10px;
+    line-height: inherit;
+    transition: margin;
+    transition-duration: .2s;
+    transition-timing-function: ease-out
+}
+
+.StandaloneLink_icon__40Dj_:first-child {
+    margin-right: .5em
+}
+
+.StandaloneLink_icon__40Dj_:last-child {
+    margin-left: .5em
+}
+
+[data-hoverable]:focus .StandaloneLink_icon__40Dj_:first-child,
+[data-hoverable]:hover .StandaloneLink_icon__40Dj_:first-child,
+[href]:focus .StandaloneLink_icon__40Dj_:first-child,
+[href]:hover .StandaloneLink_icon__40Dj_:first-child {
+    margin-right: .75em
+}
+
+[data-hoverable]:focus .StandaloneLink_icon__40Dj_:last-child,
+[data-hoverable]:hover .StandaloneLink_icon__40Dj_:last-child,
+[href]:focus .StandaloneLink_icon__40Dj_:last-child,
+[href]:hover .StandaloneLink_icon__40Dj_:last-child {
+    margin-left: .75em
+}
+
+.StandaloneLink_link__PTAsD {
+    line-height: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: margin, border-color;
+    transition-duration: .2s;
+    transition-timing-function: ease-out;
+    border-bottom: 1px solid
+}
+
+.StandaloneLink_link__PTAsD.StandaloneLink_hasReversedLook__c0Qsw {
+    color: #fff
+}
+
+.StandaloneLink_hasReversedLook__c0Qsw .StandaloneLink_link__PTAsD:focus,
+.StandaloneLink_hasReversedLook__c0Qsw .StandaloneLink_link__PTAsD:hover {
+    color: #b2e032
+}

@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Connect
+    </title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="./" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    {{!-- //dashboardcontent --}}
+    <link rel="stylesheet" href="vendors/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/vendors/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="vendors/themify-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="vendors/selectFX/css/cs-skin-elastic.css">
+    <link rel="stylesheet" href="vendors/jqvmap/dist/jqvmap.min.css">
+
+
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+
+
+    <link rel="stylesheet" type="text/css" href="/styles/loader.css">
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+        window.heap = window.heap || [], heap.load = function (e, t) {
+            window.heap.appid = e, window.heap.config = t = t || {};
+            var r = t.forceSSL || "https:" === document.location.protocol,
+                a = document.createElement("script");
+            a.type = "text/javascript", a.async = !0, a.src = (r ? "https:" : "http:") + "//cdn.heapanalytics.com/js/heap-" + e + ".js";
+            var n = document.getElementsByTagName("script")[0];
+            n.parentNode.insertBefore(a, n);
+            for (var o = function (e) {
+                return function () {
+                    heap.push([e].concat(Array.prototype.slice.call(arguments, 0)))
+                }
+            }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], c = 0; c < p.length; c++) heap[p[c]] = o(p[c])
+        };
+        heap.load("490363613");
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
+        src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+
+</head>
+
+<style>
+    .modal {
+        display: none;
+        /* Hidden by default */
+        position: fixed;
+        z-index: 100000000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        /* Hidden by default */
+        position: fixed;
+        z-index: 100000000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 300px;
+        text-align: center;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #whatsappReadyMessage {
+        display: none;
+        color: green;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+</style>
+
+
+<style>
+    #pipeline-bx li label {
+        width: 26px;
+        height: 26px;
+        border-radius: 50px;
+        margin: 5px 10px;
+    }
+
+    .pipeline-box {
+        margin-top: 10px;
+        display: none;
+    }
+</style>
+
+<body class>
+
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="
+            height="0" width="0" style="display:none;visibility:hidden;"></iframe></noscript>
+    {{#if showForm}}
+    <!-- Popup Form -->
+    <div id="popup-form">
+        <form id="org-form" action="/submit-form" method="post">
+            <h2>Fill the Form to Access Dashboard</h2>
+            <label for="email">Enter the registered EmailId:</label>
+            <input type="email" id="email" name="email" required>
+           
+            <label for="organizationName">Name of Organisation:</label>
+            <input type="text" id="organizationName" name="organizationName" required>
+
+            <label for="sector">Sector:</label>
+            <select id="sector" name="sector" required>
+                <option value="">Select Sector</option>
+                <option value="IT">IT</option>
+                <option value="Finance">Finance</option>
+                <option value="Education">Education</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Telecommunication">Telecommunication</option>
+                <option value="Realestate">Real Estate</option>
+                <option value="Consumer">Consumer Services</option>
+                <option value="Media">Media &amp; Entertainments</option>
+                <!-- Add more sectors as needed -->
+            </select>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    {{else}}
+    <div class="container-fluid" id="dashboard-content">
+        <div class="row">
+            {{> sidebar}}
+            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0 home-section ">
+                {{> NameHead}}
+                <div class="content ">
+
+                   {{#if successMSG}}
+                    <div class="col-sm-12">
+                        <div id="alert-success" class="alert  alert-success alert-dismissible fade show" role="alert">
+                            <span class="badge badge-pill badge-success">Success</span> {{successMSG}}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                    {{/if}}
+
+
+                <div class="row">
+                    <!--/.col-->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="social-box facebook">
+                           <i class="fa-brands fa-square-facebook" ></i>
+                            <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
+                        </div>
+                        <!--/social-box-->
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="social-box twitter">
+                          <i class="fa-brands fa-whatsapp"></i>
+                           
+                            <a href="/qr" id="whatsapp-Connect-Btn" class="btn btn-outline-secondary border font-15">ConnectNow</a>
+                        </div>
+                       
+                    </div>
+                    <!--/.col-->
+
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="social-box linkedin">
+                            <i class="fa fa-download"></i>
+                            <a target="_blank" href="/" class="btn btn-outline-secondary border font-15">Download
+                                Data</a>
+                        </div>
+                        <!--/social-box-->
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="social-box mailchimp">
+                            <i class="fab fa-mailchimp"></i>
+                         
+                            <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
+                        </div>
+                        <!--/social-box-->
+                    </div>
+                </div>
+                    <div class="row ">
+                      
+                        {{#each pipes}}
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card text-white" style="background-color: {{color}};">
+                                <div class="card-body pb-0">
+                                    <h4 class="mb-0">
+                                        <span class="count" style="font-size: x-large;">
+                                            {{countLeadsByStatus ../leads title}}
+                                        </span>
+                                    </h4>
+                                    <p style="font-size: x-large;" class="text-light">{{title}}</p>
+
+                                    {{!-- <div class="chart-wrapper px-0" style="height:70px;" height="70">
+                                        <canvas id="widgetChart1"></canvas>
+                                    </div> --}}
+                                </div>
+                              
+                            </div>
+                        </div>
+                        {{/each}}
+                           
+
+                    </div>
+
+                    <div class="col-xl-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <h4 class="card-title mb-0">Traffic</h4>
+                                        <div class="small text-muted">Lead Analytics</div>
+                                    </div>
+                                </div>
+                                <!--/.row-->
+                                <div class="chart-wrapper mt-4">
+                                    <canvas id="competitionGraph" style="width:800px; height:300px;"
+                                        height="300"></canvas>
+                                </div>
+
+                            </div>
+
+                            {{!-- <div class="card-footer">
+                                <ul>
+                                    <li>
+                                        <div class="text-muted">Visits</div>
+                                        <strong>29.703 Users (40%)</strong>
+                                        <div class="progress progress-xs mt-2" style="height: 5px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 40%;"
+                                                aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </li>
+                                    <li class="hidden-sm-down">
+                                        <div class="text-muted">Unique</div>
+                                        <strong>24.093 Users (20%)</strong>
+                                        <div class="progress progress-xs mt-2" style="height: 5px;">
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: 20%;"
+                                                aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="text-muted">Pageviews</div>
+                                        <strong>78.706 Views (60%)</strong>
+                                        <div class="progress progress-xs mt-2" style="height: 5px;">
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 60%;"
+                                                aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </li>
+                                    <li class="hidden-sm-down">
+                                        <div class="text-muted">New Users</div>
+                                        <strong>22.123 Users (80%)</strong>
+                                        <div class="progress progress-xs mt-2" style="height: 5px;">
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 80%;"
+                                                aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </li>
+                                    <li class="hidden-sm-down">
+                                        <div class="text-muted">Bounce Rate</div>
+                                        <strong>40.15%</strong>
+                                        <div class="progress progress-xs mt-2" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 40%;"
+                                                aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div> --}}
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-6">
+                       
+                        <section class="card" style="min-height: 400px;">
+                            <div class="profile-card">
+                                <div href="/profile" class="corner-ribon black-ribon">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+
+                                <div class="media">
+
+                                    <div class="media-body">
+                                        <div class="profile-details">
+                                       
+                                            {{#if user.profilePicture}}
+                                            <img id="user_image" width="70" height="70" src="{{user.profilePicture}}"
+                                                class="rounded-circle">
+                                            {{else}}
+                                            <img id="user_image" width="70" height="70"
+                                                src="//www.gravatar.com/avatar/9ef7cb630b294dc458d676560e96d060?d=http%3A%2F%2Faccounts.pabbly.com%2Fimages%2Fdefault-profile-pic.png"
+                                                class="rounded-circle">
+                                            {{/if}}
+
+                                        </div>
+                                        <h2 class="text-white display-6">{{user.name}}</h2>
+                                        <p class="text-light">{{user.email}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="weather-category twt-category">
+                                <ul>
+                                    <li class="active">
+                                        <h5>{{leads.length}}</h5>
+                                        Leads
+                                    </li>
+                                    <li>
+                                        <h5>{{user.myleads.length}}</h5>
+                                        my leads
+                                    </li>
+                                    <li>
+                                        <h5>{{user.teams.length}}</h5>
+                                        myteam
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="twt-write col-sm-12">
+                                <textarea placeholder="Write your Tweet and Enter" rows="1"
+                                    class="form-control t-text-area"></textarea>
+                            </div>
+                            <footer class="twt-footer">
+                                <a href="#"><i class="fa fa-camera"></i></a>
+                                <a href="#"><i class="fa fa-map-marker"></i></a>
+                                India
+                                <span class="pull-right">
+                                    32
+                                </span>
+                            </footer>
+                        </section>
+                    </div>
+
+                    <style>
+                        form {
+                            background: none;
+                            padding: 0;
+                            border-radius: 0;
+                            box-shadow: none;
+                            width: 100%;
+                            gap: 7px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+
+                        }
+
+                        form input {
+                            width: 65%;
+                        }
+
+                        .colorinp {
+                            display: block;
+                            cursor: pointer;
+                            border-radius: 50%;
+
+                        }
+
+                        #pipeAddBtn {
+                            font-size: 15px;
+                            border-radius: 4px;
+                        }
+
+                        li {
+                            list-style: none;
+                            margin: 0;
+                        }
+
+                        li form input {
+                            margin: 0;
+                            border: none;
+                        }
+
+                      
+
+                        #pipe-container-s::-webkit-scrollbar {
+                            display: none;
+                        }
+                    </style>
+
+                    <div class="col-xl-3 col-lg-6">
+                        <div class="card">
+                           
+                            <div class="card-body">
+                                <div class="stat-widget-one" id="pipe-container-s"
+                                    style="height: 350px;max-height: 350px; overflow: auto;">
+                                    <form action="/user/pipeline" method="post">
+                                        <input type="text" id="inputPassword2" name="title" placeholder="Enter Pipline">
+                                        <input type="color" class="colorinp"
+                                            style="width: 32px; height: 32px; border: none; padding: 0;" name="color">
+                                        <button type="submit" class="btn btn-primary" id="pipeAddBtn">Add</button>
+                                    </form>
+
+                                    <ul>
+                                        {{#each pipes}}
+                                        {{#if defaultVal}}
+                                        {{!-- Display the default document at the top --}}
+                                        <li
+                                            style="display: flex; border-radius: 4px; padding-right: 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
+                                            <form style="display: flex; justify-content: space-between;"
+                                                action="/user/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
+
+                                                <input type="text" disabled name="title" value="{{title}}"
+                                                    id="title-{{_id}}">
+
+                                                <input type="color" disabled class="colorinp" value="{{color}}"
+                                                    style="width: 28px; height: 28px; border: none; padding: 0;"
+                                                    name="color" id="color-{{_id}}">
+
+                                                <input type="checkbox" checked disabled class="colorinp"
+                                                    style="width: 20px; height: 20px; margin-right: 5px; border: none; padding: 0;"
+                                                    name="defaultVal" id="check-{{_id}}">
+
+
+                                                <i id="sub-{{_id}}"
+                                                    style="font-size: 23px; margin-right: 10px; cursor: pointer;" hidden
+                                                    onclick="submitForm('{{_id}}')"
+                                                    class="fa-solid fa-square-check"></i>
+                                            </form>
+                                            <span
+                                                style="display: flex; justify-content: center; align-items: center; gap: 4px;">
+                                                <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
+                                                    class="fa-solid fa-pen-to-square"></i>
+                                                <a href="/user/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
+                                                        style="color: crimson;"></i></a>
+                                            </span>
+                                        </li>
+                                        {{/if}}
+                                        {{/each}}
+
+                                        {{!-- Loop through again, this time displaying the non-default documents --}}
+                                        {{#each pipes}}
+                                        {{#unless defaultVal}}
+                                        <li
+                                            style="display: flex; border-radius: 4px; padding-right: 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
+                                            <form style="display: flex; justify-content: space-between;"
+                                                action="/user/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
+
+                                                <input type="text" disabled name="title" value="{{title}}"
+                                                    id="title-{{_id}}">
+
+                                                <input type="color" disabled class="colorinp" value="{{color}}"
+                                                    style="width: 28px; height: 28px; border: none; padding: 0;"
+                                                    name="color" id="color-{{_id}}">
+
+                                                <input type="checkbox" disabled class="colorinp"
+                                                    style="width: 20px; height: 20px; border: none; padding: 0;"
+                                                    name="defaultVal" id="check-{{_id}}">
+
+
+                                                <i id="sub-{{_id}}"
+                                                    style="font-size: 23px; margin-right: 10px; cursor: pointer;" hidden
+                                                    onclick="submitForm('{{_id}}')"
+                                                    class="fa-solid fa-square-check"></i>
+                                            </form>
+                                            <span
+                                                style="display: flex; justify-content: center; align-items: center; gap: 4px;">
+                                                <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
+                                                    class="fa-solid fa-pen-to-square"></i>
+                                                <a href="/user/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
+                                                        style="color: crimson;"></i></a>
+                                            </span>
+                                        </li>
+                                        {{/unless}}
+                                        {{/each}}
+
+
+                                    </ul>
+
+
+                                    {{!-- <div class="col-md-6">
+                                        <div class="card border-0">
+                                            <ul>
+                                                {{#each pipelines}}
+                                                <div style="display: flex; justify-content: space-between;">
+                                                    <li>
+                                                        <form style="display: flex; justify-content: space-between;"
+                                                            action="/pipeline/update/{{_id}}" method="post">
+                                                            <input type="text" disabled
+                                                                class="form-control update-input" name="title"
+                                                                value="{{title}}">
+
+                                                            <button type="submit" hidden class="sub-btn"><i
+                                                                    class="fa-solid fa-square-check"></i></button>
+                                                        </form>
+                                                    </li>
+                                                    <span>
+
+
+
+
+                                                        <span>
+                                                            <i onclick="updatePiplineForm({})"
+                                                                class="fa-solid fa-pen-to-square"></i>
+
+                                                            <a href="/pipeline/del/{{_id}}"><i
+                                                                    class="fa-regular fa-trash-can"></i></a>
+
+                                                            <i id="color-piker-btn" class="fa-solid fa-palette"></i>
+
+                                                        </span>
+
+                                                        <div id="color-piker-box">
+                                                            <span class="circle-red"></span>
+                                                            <span class="circle-pink"></span>
+                                                            <span class="circle-blue"></span>
+                                                            <span class="circle-yellow"></span>
+                                                            <span class="circle-green"></span>
+                                                            <span class="circle-purpul"></span>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                                {{/each}}
+                                            </ul>
+                                        </div>
+                                    </div> --}}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {{!-- <div class="col-xl-3 col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="stat-widget-one">
+                                    <div class="stat-icon dib"><i class="ti-user text-primary border-primary"></i></div>
+                                    <div class="stat-content dib">
+                                        <div class="stat-text">New Customer</div>
+                                        <div class="stat-digit">961</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="stat-widget-one">
+                                    <div class="stat-icon dib"><i
+                                            class="ti-layout-grid2 text-warning border-warning"></i></div>
+                                    <div class="stat-content dib">
+                                        <div class="stat-text">Active Projects</div>
+                                        <div class="stat-digit">770</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> --}}
+
+                    <div class="col-xl-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>World</h4>
+                            </div>
+                            <div class="Vector-map-js">
+                                <div id="vmap" class="vmap" style="height: 265px;"></div>
+                            </div>
+                        </div>
+                        <!-- /# card -->
+                    </div>
+
+
+                </div>
+            </div>
+
+
+            {{> footer}}
+
+        </div>
+    </div>
+    {{/if}}
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
+        crossorigin="anonymous"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/js/bootstrap-select.js"></script>
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+    <script src="/js/dependencies/sweetalert.min.js?nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="/assets/js/timezones.full.min.js"></script>
+
+    <script src="/assets/js/custom-new.js"></script>
+    <script>
+
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+        $(document).ready(function () {
+            $('#signup').on('submit', function () {
+                $('.loader-display').css('display', 'block');
+            });
+        });
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+        $(window).scroll(function () {
+            if ($(window).scrollTop() >= 72) {
+                $('#top_header').addClass('sticky');
+            } else {
+                $('#top_header').removeClass('sticky');
+            }
+        });
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+        $('#nav-tab a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+
+        // store the currently selected tab in the hash value
+        $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
+            var id = $(e.target).attr("href").substr(1);
+            console.log("id", id);
+            window.location.hash = id;
+        });
+
+        // on load of the page: switch to the currently selected tab
+        var hash = window.location.hash;
+        $('#nav-tab a[href="' + hash + '"]').tab('show');
+    </script>
+
+
+    <script>
+        function addPipelineForm() {
+            let popform = document.querySelector('#add-pipeline-form')
+            if (popform.style.display === 'none')
+                popform.style.display = 'block'
+            else
+                popform.style.display = 'none'
+
+        }
+
+        let flag = 0;
+        function updatePiplineForm(id) {
+            const titleInput = document.getElementById(`title-${id}`);
+            const colorInput = document.getElementById(`color-${id}`);
+            const defaultinp = document.getElementById(`check-${id}`);
+            const submitBtn = document.getElementById(`sub-${id}`);
+
+            console.log(titleInput)
+
+            if (titleInput.disabled && colorInput.disabled) {
+                // Enable editing
+                titleInput.disabled = false;
+                colorInput.disabled = false;
+                defaultinp.disabled = false;
+                submitBtn.hidden = false;
+            } else {
+                // Prevent further editing
+                titleInput.disabled = true;
+                colorInput.disabled = true;
+                defaultinp.disabled = true;
+
+                submitBtn.hidden = true;
+            }
+
+        }
+
+        function submitForm(id) {
+            let form = document.querySelector(`#form${id}`)
+            form.submit()
+        }
+
+        function LabelColorChanged(id) {
+            const colorLabel = document.querySelector(`#colorLabel${id}`);
+            const colorInput = document.querySelector(`#color${id}`);
+
+            colorInput.click();
+
+            const selectedColor = colorInput.value;
+            colorLabel.style.backgroundColor = selectedColor;
+
+        }
+
+
+
+        //popup form
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('org-form');
+            const popupForm = document.getElementById('popup-form');
+
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const formData = new FormData(form);
+                    const data = {
+                        email: formData.get('email'),
+                        organizationName: formData.get('organizationName'),
+                        sector: formData.get('sector')
+                    };
+
+                    try {
+                        const response = await fetch('/submit-form', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            alert(result.message);
+                            // Update the user document with organizationName and sector
+                            await fetch('/update-user', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    id: result.id,
+                                    organizationName: data.organizationName,
+                                    sector: data.sector
+                                })
+                            });
+
+                            // Hide form after successful submission
+                            popupForm.style.display = 'none';
+                            // Reload the page to show the dashboard
+                            window.location.reload();
+                        } else {
+                            alert(result.message); // Show error message
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Error submitting the form');
+                    }
+                });
+            }
+        });
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        console.log("hello ji")
+        const leads = {{{ json leads }}};
+        console.log(leads);
+        const pipelines = {{{ json pipes }}};
+        console.log(pipelines);
+
+        const pipelineMap = {};
+        pipelines.forEach(pipe => {
+            pipelineMap[pipe.title] = {
+                color: pipe.color + '40',
+                count: 0
+            };
+        });
+
+        console.log('pipe object =========', pipelineMap)
+
+        const processedData = {};
+
+        console.log('val of status', leads[1].status.title)
+        leads.forEach(lead => {
+            const date = new Date(lead.income_time).toISOString().split('T')[0];
+            const statusTitle = lead.status ? lead.status.title : 'Unknown'; // Default status title
+
+            if (!processedData[date]) {
+                processedData[date] = {};
+            }
+
+            if (pipelineMap[statusTitle]) {
+                if (!processedData[date][statusTitle]) {
+                    processedData[date][statusTitle] = 0;
+                }
+                processedData[date][statusTitle]++;
+            } else {
+                // Handle unknown status if needed
+                if (!processedData[date]['Unknown']) {
+                    processedData[date]['Unknown'] = 0;
+                }
+                processedData[date]['Unknown']++;
+            }
+        });
+        console.log("611====", processedData)
+        // Prepare data for the graph
+        const labels = Object.keys(processedData);
+        const datasets = Object.keys(pipelineMap).map(statusTitle => {
+            return {
+                label: statusTitle,
+                data: labels.map(date => processedData[date][statusTitle] || 0),
+                backgroundColor: pipelineMap[statusTitle].color, // Use backgroundColor for area chart
+                borderColor: pipelineMap[statusTitle].color, // Optional, to keep the border color
+                borderWidth: 4,
+                fill: true,
+                tension: .5, // Set fill to true for area chart
+            };
+        });
+
+        const ctx = document.getElementById('competitionGraph').getContext('2d');
+        const competitionData = {
+            labels: labels,
+            datasets: datasets
+        };
+
+        const config = {
+            type: 'line', // 'line' type can be used for area charts too
+            data: competitionData,
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Income Time' } },
+                    y: { title: { display: true, text: 'Number of Leads' } },
+                },
+            },
+        };
+
+        new Chart(ctx, config);
+    </script>
+
+
+<script>
+    
+async function checkConnectionStatus() {
+  try {
+    const response = await fetch('/connection-status');
+    const data = await response.json();
+    const isConnected = data.isConnected;
+    const connectBtn = document.getElementById('whatsapp-Connect-Btn');
+    
+    if (isConnected) {
+      connectBtn.textContent = 'Connected';
+      connectBtn.classList.remove('btn-outline-secondary'); // Optionally change styling
+      connectBtn.classList.add('btn-success'); // Optionally change styling
+    } else {
+      connectBtn.textContent = 'Connect Now';
+      connectBtn.classList.remove('btn-success'); // Optionally change styling
+      connectBtn.classList.add('btn-outline-secondary'); // Optionally change styling
+    }
+  } catch (error) {
+    console.error('Error fetching connection status:', error);
+  }
+}
+
+// Call the function when the page loads
+document.addEventListener('DOMContentLoaded', checkConnectionStatus);
+
+</script>
+</body>
+
+</html>
+
+
