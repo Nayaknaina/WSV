@@ -11,6 +11,11 @@ const { isAdminLoggedIn } = require("../middilware/middilware.js");
 
 const jwt = require("jsonwebtoken");
 
+router.get("/", (req, res) => {
+  res.sendFile(path.join(static_path, "index.html"));
+});
+
+
 router.get("/profile", isAdminLoggedIn, async (req, res) => {
   let user;
   if (req.user.role === "admin")
@@ -18,6 +23,22 @@ router.get("/profile", isAdminLoggedIn, async (req, res) => {
   else user = await memberModel.findById(req.user.id);
   
   res.render("profile", { user });
+});
+
+
+router.get("/connect", isAdminLoggedIn, async (req, res) => {
+  const user = req.user;
+  res.render("connect", { user, allLeads: null });
+});
+// Login and Signup routes
+router.get("/login", (req, res) => {
+  res.render("signup");
+});
+
+// router
+router.get("/apps", isAdminLoggedIn, (req, res) => {
+  const user = req.user;
+  res.render("app", { user });
 });
 
 

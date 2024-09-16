@@ -15,6 +15,8 @@ const { isAdminLoggedIn } = require("../middilware/middilware.js");
 const { generateToken } = require("../../utils/auth.js");
 const { upload } = require("../service/multer.js");
 const jwt = require("jsonwebtoken");
+const { v4: uuidv4 } = require("uuid");
+
 
 router.get("/team", isAdminLoggedIn, async (req, res) => {
   let user;
@@ -30,7 +32,14 @@ router.get("/team", isAdminLoggedIn, async (req, res) => {
 router.get("/team/invite", isAdminLoggedIn, async (req, res) => {
   try {
     const user = await logIncollection.findById(req.user.id);
-
+    if (user.teams.length >= 3) {
+      req.session.successMSG = `Cannot add more than 3 team members with free plan.`;
+      return res.redirect('/user/dashboard')
+    }
+    // if (user.teams.length >= 50) {
+    //   req.session.successMSG = `Cannot add more than 50 team members with pro plan.`;
+    //   return res.redirect('/user/dashboard')
+    // }
     const { name, email, mobile, countryCode } = req.query;
     const password = otpGenerator.generate(8, {
       digits: true,
@@ -213,95 +222,98 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-router.post(
-  "/template/update/:id",
-  isAdminLoggedIn,
-  upload.fields([{ name: "image" }, { name: "pdf" }]),
-  async (req, res) => {
-    let { id } = req.params;
-    let template = await templateModel.findById(id);
+// router.post(
+//   "/template/update/:id",
+//   isAdminLoggedIn,
+//   upload.fields([{ name: "image" }, { name: "pdf" }]),
+//   async (req, res) => {
+//     let { id } = req.params;
+//     let template = await templateModel.findById(id);
 
-    let { title, text, client, team } = req.body;
+//     let { title, text, client, team } = req.body;
 
-    template.title = title;
-    template.text = text;
+//     template.title = title;
+//     template.text = text;
 
-    template.client = client === "on" ? true : false;
-    template.team = team === "on" ? true : false;
-    let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
-    let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
+//     template.client = client === "on" ? true : false;
+//     template.team = team === "on" ? true : false;
+//     let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
+//     let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
 
-    // console.log("from form");
-    // console.log(imageFile);
-    // console.log(pdfFile);
+//     // console.log("from form");
+//     // console.log(imageFile);
+//     // console.log(pdfFile);
 
-    // console.log("template");
-    // console.log(template.image);
-    // console.log(template.pdf);
+//     // console.log("template");
+//     // console.log(template.image);
+//     // console.log(template.pdf);
 
-    if (imageFile !== "" && template.image !== "") {
-      const imagePath = path.join(
-        __dirname,
-        "..",
-        "template",
-        "images",
-        "uploads",
-        "whatsapp",
-        template.image
-      );
+//     if (imageFile !== "" && template.image !== "") {
+//       const imagePath = path.join(
+//         __dirname,
+//         "..",
+//         "template",
+//         "images",
+//         "uploads",
+//         "whatsapp",
+//         template.image
+//       );
 
-      fs.unlink(imagePath, (err) => {
-        if (err) {
-          console.log("Error removing file", err);
-          return;
-        }
-        console.log("file removed successfully");
-      });
-      template.image = imageFile;
-    } else if (imageFile !== "") {
-      template.image = imageFile;
-    }
+//       fs.unlink(imagePath, (err) => {
+//         if (err) {
+//           console.log("Error removing file", err);
+//           return;
+//         }
+//         console.log("file removed successfully");
+//       });
+//       template.image = imageFile;
+//     } else if (imageFile !== "") {
+//       template.image = imageFile;
+//     }
 
-    if (pdfFile !== "" && template.pdf !== "") {
-      const pdfPath = path.join(
-        __dirname,
-        "..",
-        "template",
-        "images",
-        "uploads",
-        "whatsapp",
-        template.pdf
-      );
+//     if (pdfFile !== "" && template.pdf !== "") {
+//       const pdfPath = path.join(
+//         __dirname,
+//         "..",
+//         "template",
+//         "images",
+//         "uploads",
+//         "whatsapp",
+//         template.pdf
+//       );
 
-      fs.unlink(pdfPath, (err) => {
-        if (err) {
-          console.log("Error removing file", err);
-          return;
-        }
-        console.log("file removed successfully");
-      });
-      template.pdf = pdfFile;
-    } else if (pdfFile !== "") {
-      template.pdf = pdfFile;
-    }
+//       fs.unlink(pdfPath, (err) => {
+//         if (err) {
+//           console.log("Error removing file", err);
+//           return;
+//         }
+//         console.log("file removed successfully");
+//       });
+//       template.pdf = pdfFile;
+//     } else if (pdfFile !== "") {
+//       template.pdf = pdfFile;
+//     }
 
-    await template.save();
-    // console.log(req.body);
-    res.redirect("/user/template");
-  }
-);
+//     await template.save();
+//     // console.log(req.body);
+//     res.redirect("/user/template");
+//   }
+// );
 
 // Signup handler
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
-    const user = await logIncollection.findOne({ email });
-
+    let user = await logIncollection.findOne({ email });
+    console.log(req.body);
+    
     if (user)
       return res.render("signup", { errorMessage: "User already exists" });
     if (password !== confirmPassword)
       return res.render("signup", { errorMessage: "Passwords do not match" });
     const cid = uuidv4();
+    console.log(cid, user);
+    
     const newUser = new logIncollection({
       name,
       email,
@@ -310,7 +322,8 @@ router.post("/signup", async (req, res) => {
       role: "admin",
     });
     await newUser.save();
-
+    console.log(newUser);
+    
     const pipelines = [
       { title: "win", color: "#28A745" },
       { title: "loss", color: "#DC3545" },
@@ -319,16 +332,17 @@ router.post("/signup", async (req, res) => {
     ].map(
       (pipelineData) =>
         new pipelineModel({
-          uid: user._id,
+          uid: newUser._id,
           color: pipelineData.color,
           title: pipelineData.title,
-          cid: user.cid,
+          cid: newUser.cid,
         })
     );
 
     // Save all pipelines in parallel
     await Promise.all(pipelines.map((pipeline) => pipeline.save()));
-
+    console.log("pipes builed");
+    
     const templates = [
       {
         title: "welcome",
@@ -356,27 +370,32 @@ router.post("/signup", async (req, res) => {
     ].map(
       (temp) =>
         new templateModel({
-          uid: user._id,
+          uid: newUser._id,
           title: temp.title,
           text: temp.text,
           num: temp.num,
           client: temp.client,
           team: temp.team,
-          cid: user.cid,
+          cid: newUser.cid,
         })
     );
 
     // Save all pipelines in parallel
     await Promise.all(templates.map((temp) => temp.save()));
 
+    console.log("temp saves");
+    
     const token = await generateToken(newUser);
-
+    console.log(token);
+    
     res.cookie("360Followers", token, {
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
     res.redirect("/user/dashboard");
   } catch (err) {
+    console.log(err);
+    
     res.status(500).send("Error signing up");
   }
 });

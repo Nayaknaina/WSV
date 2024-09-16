@@ -276,7 +276,9 @@ app.get("/logoutWA", async (req, res) => {
     await cleanupSessionFiles();
 
     // Redirect to dashboard or another appropriate page
-    res.redirect("/dashboard");
+    console.log("whatsapp logout here !");
+    
+    res.redirect("/user/dashboard");
   } catch (error) {
     console.error("Error during logout:", error);
     res.status(500).send("An error occurred during logout.");
@@ -362,118 +364,94 @@ app.use("/member", memberRoute);
 app.use("/user", userRoute);
 
 // Handle root request
-app.get("/", (req, res) => {
-  res.sendFile(path.join(static_path, "index.html"));
+
+
+app.get("/template", isAdminLoggedIn, async (req, res) => {
+  let user;
+
+  if (req.user.role === "admin") {
+    user = await logIncollection.findById(req.user.id);
+  } else {
+    user = await memberModel.findById(req.user.id);
+  }
+
+  let templates = await templateModel.find({ cid: user.cid });
+  console.log(templates);
+
+
+  res.render("template", { user, templates });
 });
 
-app.get("/connect", isAdminLoggedIn, async (req, res) => {
-  const user = req.user;
-  res.render("connect", { user, allLeads: null });
-});
-// Login and Signup routes
-app.get("/login", (req, res) => {
-  res.render("signup");
-});
+app.post(
+  "/template/update/:id",
+  isAdminLoggedIn,
+  upload.fields([{ name: "image" }, { name: "pdf" }]),
+  async (req, res) => {
+    let { id } = req.params;
+    let template = await templateModel.findById(id);
 
-// app
-app.get("/apps", isAdminLoggedIn, (req, res) => {
-  const user = req.user;
-  res.render("app", { user });
-});
+    let { title, text, client, team } = req.body;
 
-// app.get("/template", isAdminLoggedIn, async (req, res) => {
-//   let user;
+    template.title = title;
+    template.text = text;
 
-//   if (req.user.role === "admin") {
-//     user = await logIncollection.findById(req.user.id);
-//   } else {
-//     user = await memberModel.findById(req.user.id);
-//   }
-
-//   let templates = await templateModel.find({ cid: user.cid });
-//   console.log(templates);
+    template.client = client === "on" ? true : false;
+    template.team = team === "on" ? true : false;
+    let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
+    let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
 
 
-//   res.render("template", { user, templates });
-// });
+    if (imageFile !== "" && template.image !== "") {
+      const imagePath = path.join(
+        __dirname,
+        "..",
+        "template",
+        "images",
+        "uploads",
+        "whatsapp",
+        template.image
+      );
 
-// app.post(
-//   "/template/update/:id",
-//   isAdminLoggedIn,
-//   upload.fields([{ name: "image" }, { name: "pdf" }]),
-//   async (req, res) => {
-//     let { id } = req.params;
-//     let template = await templateModel.findById(id);
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.log("Error removing file", err);
+          return;
+        }
+        console.log("file removed successfully");
+      });
+      template.image = imageFile;
+    } else if (imageFile !== "") {
+      template.image = imageFile;
+    }
 
-//     let { title, text, client, team } = req.body;
+    if (pdfFile !== "" && template.pdf !== "") {
+      const pdfPath = path.join(
+        __dirname,
+        "..",
+        "template",
+        "images",
+        "uploads",
+        "whatsapp",
+        template.pdf
+      );
 
-//     template.title = title;
-//     template.text = text;
+      fs.unlink(pdfPath, (err) => {
+        if (err) {
+          console.log("Error removing file", err);
+          return;
+        }
+        console.log("file removed successfully");
+      });
+      template.pdf = pdfFile;
+    } else if (pdfFile !== "") {
+      template.pdf = pdfFile;
+    }
 
-//     template.client = client === "on" ? true : false;
-//     template.team = team === "on" ? true : false;
-//     let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
-//     let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
-
-//     // console.log("from form");
-//     // console.log(imageFile);
-//     // console.log(pdfFile);
-
-//     // console.log("template");
-//     // console.log(template.image);
-//     // console.log(template.pdf);
-
-//     if (imageFile !== "" && template.image !== "") {
-//       const imagePath = path.join(
-//         __dirname,
-//         "..",
-//         "template",
-//         "images",
-//         "uploads",
-//         "whatsapp",
-//         template.image
-//       );
-
-//       fs.unlink(imagePath, (err) => {
-//         if (err) {
-//           console.log("Error removing file", err);
-//           return;
-//         }
-//         console.log("file removed successfully");
-//       });
-//       template.image = imageFile;
-//     } else if (imageFile !== "") {
-//       template.image = imageFile;
-//     }
-
-//     if (pdfFile !== "" && template.pdf !== "") {
-//       const pdfPath = path.join(
-//         __dirname,
-//         "..",
-//         "template",
-//         "images",
-//         "uploads",
-//         "whatsapp",
-//         template.pdf
-//       );
-
-//       fs.unlink(pdfPath, (err) => {
-//         if (err) {
-//           console.log("Error removing file", err);
-//           return;
-//         }
-//         console.log("file removed successfully");
-//       });
-//       template.pdf = pdfFile;
-//     } else if (pdfFile !== "") {
-//       template.pdf = pdfFile;
-//     }
-
-//     await template.save();
-//     // console.log(req.body);
-//     res.redirect("/template");
-//   }
-// );
+    await template.save();
+    // console.log(req.body);
+    res.redirect("/template");
+  }
+);
 
 // profile update
 
@@ -619,7 +597,6 @@ app.get("/apps", isAdminLoggedIn, (req, res) => {
 
 //   res.render("profile", { user });
 // });
-
 // app.post("/update/profile", isAdminLoggedIn, async (req, res) => {
 //   let user;
 //   const { name, mobile, countryCode, address, city, state } = req.body;
@@ -815,7 +792,7 @@ app.get(
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
-    res.redirect("/dashboard");
+    res.redirect("/user/dashboard");
   }
 );
 
