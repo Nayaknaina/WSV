@@ -29,21 +29,19 @@ const fs = require("fs");
 const logIncollection = require("./models/admin.model.js");
 const pipelineModel = require("./models/pipeline.model.js");
 const memberModel = require("./models/member.model.js");
-// const WAmodel = require("./models/whatsappSession.model.js");
+// const WaModel = require("./models/wA.model.js");
 const remarkModel = require("./models/remark.model.js");
 const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
 const memberRoute = require("./routes/members.route.js");
-const userRoute = require('./routes/users.route.js')
-const Route = require('./routes/index.route.js')
+const userRoute = require("./routes/users.route.js");
+const Route = require("./routes/index.route.js");
 const { log } = require("console");
 
 //Whatsapp-----------------------------------------
 
-
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qr = require("qr-image");
-
 
 // Initialize variables
 let qrCodeData = "";
@@ -57,125 +55,8 @@ let client = new Client({
 });
 
 // Ensure QR Code Event Attachment
-function ensureQRCodeEvent() {
-  // Avoid attaching multiple QR listeners by checking if it's already attached
-  if (!client.listenerCount("qr")) {
-    client.on("qr", (qrCode) => {
-      try {
-        const qrImage = qr.imageSync(qrCode, { type: "png" });
-        qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
-        // console.log("QR code generated and stored.");
-      } catch (error) {
-        console.error("Error generating QR Code:", error);
-      }
-    });
-  }
-}
-
-// Cleanup Session Files with Retry Logic
-async function cleanupSessionFiles() {
-  const sessionPath = path.join(__dirname, ".wwebjs_auth/session");
-  for (let retries = 5; retries > 0; retries--) {
-    try {
-      if (fs.existsSync(sessionPath)) {
-        fs.rmSync(sessionPath, { recursive: true, force: true });
-        // console.log("Session files deleted successfully.");
-      }
-      break; // Exit loop if deletion is successful
-    } catch (error) {
-      console.error("Failed to delete session files:", error.message);
-      if (retries > 1) {
-        console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
-      }
-    }
-  }
-}
-
-
-function initializeWhatsAppClient() {
-  // Remove all existing listeners to avoid duplication
-  if (client) {
-    client.removeAllListeners();
-  }
-
-  // Recreate the client to ensure fresh state
-  client = new Client({
-    authStrategy: new LocalAuth(),
-  });
-
-  // Re-attach necessary event listeners
-  ensureQRCodeEvent();
-
-  client.on("ready", async () => {
-    console.log("WhatsApp client is ready!");
-    whatsappClientReady = true;
-    isConnected = true;
-    connectedPhoneNumber = client.info.wid.user;
-    console.log("Connected WhatsApp Number:", connectedPhoneNumber);
-    
-  });
-
-  client.on("disconnected", async (reason) => {
-    console.log("WhatsApp client has been disconnected due to:", reason);
-    whatsappClientReady = false;
-    isConnected = false;
-    qrCodeData = ""; // Reset QR code data on disconnect
-    await cleanupSessionFiles();
-    initializeWhatsAppClient(); // Re-initialize to ensure fresh QR code generation
-  });
-
-  client.on("auth_failure", async (message) => {
-    console.error("Authentication failure:", message);
-    whatsappClientReady = false;
-    isConnected = false;
-    qrCodeData = ""; // Reset QR code data on authentication failure
-    await cleanupSessionFiles();
-    initializeWhatsAppClient(); // Re-initialize to re-trigger QR code generation
-  });
-
-  
-  whatsappClientReady = false; // Reset ready status
-  client
-    .initialize()
-    .then(() => {
-      console.log("Client re-initialized");
-    })
-    .catch((error) => {
-      console.error("Error re-initializing client:", error);
-    });
-}
-
-// Function to Send a WhatsApp Message
-function sendMessageToLead(phoneNumber, message) {
-  console.log("Trying to send message. Client ready status:", whatsappClientReady);
-
-  if (!whatsappClientReady) {
-    console.log("WhatsApp client is not ready. Queuing message.");
-    return;
-  }
-
-  client
-    .sendMessage(`91${phoneNumber}@c.us`, message)
-    .then(() => {
-      console.log("Message sent successfully.");
-    })
-    .catch((error) => {
-      console.error("Error sending message:", error);
-    });
-}
-
-
-app.get('/connection-status', (req, res) => {
-  res.json({ isConnected });
-});
-
-
-initializeWhatsAppClient();
-
 
 //-------------------------------------------
-
 
 // Middleware
 const sessionStore =
@@ -253,94 +134,6 @@ app.use(cookieParser());
 
 app.use(express.static("template"));
 
-
-app.get("/logoutWA", async (req, res) => {
-  try {
-    // Check if the client is ready before attempting logout
-    if (whatsappClientReady && client.pupPage && !client.pupPage.isClosed()) {
-      try {
-        await client.logout();
-        console.log("WhatsApp client logged out successfully.");
-      } catch (logoutError) {
-        console.error("Error during logout process:", logoutError);
-      }
-    } else {
-      console.warn("WhatsApp client is not ready or session already closed, skipping logout.");
-    }
-
-    // Mark client as disconnected
-    whatsappClientReady = false;
-    isConnected = false;
-
-    // Retry cleanup logic for session files
-    await cleanupSessionFiles();
-
-    // Redirect to dashboard or another appropriate page
-    console.log("whatsapp logout here !");
-    
-    res.redirect("/user/dashboard");
-  } catch (error) {
-    console.error("Error during logout:", error);
-    res.status(500).send("An error occurred during logout.");
-  } finally {
-    // Attempt to reinitialize the client in all cases
-    initializeWhatsAppClient();
-  }
-});
-
-
-
-app.get("/qr", isAdminLoggedIn, (req, res) => {
-  const user = req.user;
-  // console.log(qrCodeData);
-
-  if (isConnected) {
-    req.session.successMSG = `Connected WhatsApp Number: ${connectedPhoneNumber}`
-  }
-  res.render("qr", {
-    user,
-    qrCodeData,
-    isConnected, 
-  });
-});
-
-// Passport.js Google Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK,
-      passReqToCallback: true,
-    },
-    async function (request, accessToken, refreshToken, profile, done) {
-      try {
-        let user = await logIncollection.findOne({ googleId: profile.id });
-
-        if (user) {
-          // Update the existing user
-          user.name = profile.displayName;
-          user.email = profile.email;
-          user.profilePicture = profile.photos[0].value;
-          await user.save();
-        } else {
-          // Create a new user
-          user = await logIncollection.create({
-            googleId: profile.id,
-            name: profile.displayName,
-            email: profile.email,
-            profilePicture: profile.photos[0].value,
-          });
-        }
-
-        done(null, user);
-      } catch (err) {
-        done(err, null);
-      }
-    }
-  )
-);
-
 // Passport.js serialize and deserialize user
 passport.serializeUser((user, done) => {
   done(null, user.id); // Serialize user by their unique ID
@@ -365,6 +158,100 @@ app.use("/user", userRoute);
 
 // Handle root request
 
+app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
+  const user = req.user;
+  let userWA = await WaModel.findOne({ cid: user.cid });
+  console.log(isConnected, user.name, "check connection//");
+
+  if (userWA) {
+    if (!userWA.isConnected && isConnected) {
+      isConnected = false;
+      userWA.isConnected = true;
+      userWA.whatsappClientReady = true;
+      userWA.connectedPhoneNumber = connectedPhoneNumber;
+      await userWA.save();
+      return res.json({ isConnected: userWA.isConnected });
+    }
+    console.log(userWA.isConnected);
+    return res.json({ isConnected: userWA.isConnected });
+  } else if (isConnected) {
+    isConnected = false;
+    userWA = new WaModel({
+      cid: user.cid,
+      isConnected: true,
+      whatsappClientReady: true,
+      connectedPhoneNumber: connectedPhoneNumber,
+    });
+    await userWA.save();
+    console.log("now we are blocking to refreshing qr page");
+
+    return res.json({ isConnected: userWA.isConnected });
+  }
+
+  // isConnected= false;
+  isConnected = false;
+  return res.json({ isConnected });
+});
+
+app.get("/qr", isAdminLoggedIn, async (req, res) => {
+  // console.log("qrCodeData genrated in /qr", req.user.name);
+  const user = req.user;
+  if (isConnected) {
+    req.session.successMSG = `Connected WhatsApp Number: ${connectedPhoneNumber}`;
+  }
+  if (qrCodeData) {
+    console.log("Qr genrated");
+  }
+  res.render("qr", {
+    user,
+    qrCodeData,
+    isConnected,
+  });
+});
+
+app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
+  try {
+    // Check if the client is ready before attempting logout
+    if (whatsappClientReady && client.pupPage && !client.pupPage.isClosed()) {
+      try {
+        await client.logout();
+        isConnected = false;
+        let userWA = await WaModel.findOne({ cid: req.user.cid });
+        if (userWA) {
+          userWA.isConnected = false;
+          userWA.whatsappClientReady = false;
+          userWA.connectedPhoneNumber = "";
+          await userWA.save();
+        }
+        console.log("WhatsApp client logged out successfully.");
+      } catch (logoutError) {
+        console.error("Error during logout process:", logoutError);
+      }
+    } else {
+      console.warn(
+        "WhatsApp client is not ready or session already closed, skipping logout."
+      );
+    }
+
+    // Mark client as disconnected
+    whatsappClientReady = false;
+    isConnected = false;
+
+    // Retry cleanup logic for session files
+    await cleanupSessionFiles();
+
+    // Redirect to dashboard or another appropriate page
+    console.log("whatsapp logout here !");
+
+    res.redirect("/user/dashboard");
+  } catch (error) {
+    console.error("Error during logout:", error);
+    res.status(500).send("An error occurred during logout.");
+  } finally {
+    // Attempt to reinitialize the client in all cases
+    initializeWhatsAppClient();
+  }
+});
 
 app.get("/template", isAdminLoggedIn, async (req, res) => {
   let user;
@@ -377,7 +264,6 @@ app.get("/template", isAdminLoggedIn, async (req, res) => {
 
   let templates = await templateModel.find({ cid: user.cid });
   console.log(templates);
-
 
   res.render("template", { user, templates });
 });
@@ -399,7 +285,6 @@ app.post(
     template.team = team === "on" ? true : false;
     let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
     let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
-
 
     if (imageFile !== "" && template.image !== "") {
       const imagePath = path.join(
@@ -455,176 +340,6 @@ app.post(
 
 // profile update
 
-// team
-// app.get("/team", isAdminLoggedIn, async (req, res) => {
-//   let user;
-//   if (req.user.role === "admin") {
-//     user = await logIncollection.findById(req.user.id).populate("teams");
-//   } else {
-//     user = await memberModel.findById(req.user.id).populate("owner_id");
-//     console.log(user);
-//   }
-//   res.render("team", { user });
-// });
-
-// app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     const user = await logIncollection.findById(req.user.id);
-
-//     const { name, email, mobile, countryCode } = req.query;
-//     const password = otpGenerator.generate(8, {
-//       digits: true,
-//       lowerCaseAlphabets: true,
-//       upperCaseAlphabets: true,
-//       specialChars: false,
-//     });
-
-//     const mailMsg = `
-//     <div style="font-family: Arial, sans-serif; color: #333;">
-//       <div style="text-align: center;">
-//         <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
-//         <h2>Web Soft Valley</h2>
-//         <p>Developing Future</p>
-//       </div>
-
-//       <h3>Hello ${name} !</h3>
-//       <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
-      
-//       <p>Email: <a href="mailto:${email}">${email}</a></p>
-//       <p>Password: <strong>${password}</strong></p>
-
-//       <div style="text-align: center;">
-//         <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-//           Login to Dashboard
-//         </a>
-//       </div>
-
-//       <p>Regards,<br>Web Soft Valley Technology</p>
-//     </div>
-//   `;
-//     const subject = `Invitation from ${user.name}`;
-//     const isSent = await sendMail(email, mailMsg, subject);
-//     console.log(isSent);
-
-//     if (isSent[0].res === "okk") {
-//       const newMember = new memberModel({
-//         name,
-//         email,
-//         password,
-//         countryCode,
-//         mobile,
-//         cid: user.cid,
-//         owner_id: user._id,
-//       });
-//       await newMember.save();
-//       user.teams.push(newMember._id);
-//       await user.save();
-//     }
-//      req.session.successMSG = `you have invited ${name} as a team member !. `
-//   } catch (error) {
-//     console.log(error);
-//   }
-//   return res.redirect("/team");
-// });
-
-// app.get("/signup", (req, res) => {
-//   res.render("signup");
-// });
-
-// ! pipeline are here
-
-// app.post("/pipeline", isAdminLoggedIn, async (req, res) => {
-//   const { title, color } = req.body;
-
-//   const user = await logIncollection.findById(req.user.id);
-
-//   const pipeline = new pipelineModel({
-//     uid: user._id,
-//     color,
-//     title,
-//     cid: user.cid,
-//   });
-//   await pipeline.save();
-//   // console.log(pipeline);
-//   req.session.successMSG = `${title} pipline creation success. `
-//   res.redirect("/dashboard");
-// });
-
-// app.get("/pipeline/del/:id", isAdminLoggedIn, async (req, res) => {
-//   const { id } = req.params;
-//   let pipeline = await pipelineModel.findByIdAndDelete(id);
-//   // console.log(pipeline);
-//    req.session.successMSG = `${pipeline.title} pipline deletion sucessfull !. `
-//   res.redirect("/dashboard");
-// });
-
-// app.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
-//   const { id } = req.params;
-//   const { title, color, defaultVal } = req.body;
-
-//   let pipeline = await pipelineModel.findById(id);
-
-//   pipeline.color = color;
-//   pipeline.title = title;
-
-//   if (defaultVal == "on") {
-//     console.log(defaultVal);
-//     await pipelineModel.updateMany(
-//       { uid: req.user.id },
-//       { $set: { defaultVal: false } }
-//     );
-//     req.session.pipe = id;
-
-//     await pipeline.save();
-//     return res.redirect("/pipe/abc");
-//   }
-//    req.session.successMSG = `${pipeline.title} pipline updatation successfully !. `
-//   return res.redirect("/dashboard");
-// });
-// app.get("/pipe/abc", async (req, res) => {
-//   let pipe = await pipelineModel.findById(req.session.pipe);
-//   pipe.defaultVal = true;
-//   await pipe.save();
-
-//   delete req.session.pipe;
-//   req.session.save();
-
-//   res.redirect("/dashboard");
-// });
-
-// app.get("/profile", isAdminLoggedIn, async (req, res) => {
-//   const user = await logIncollection.findById(req.user.id);
-
-//   res.render("profile", { user });
-// });
-// app.post("/update/profile", isAdminLoggedIn, async (req, res) => {
-//   let user;
-//   const { name, mobile, countryCode, address, city, state } = req.body;
-//   try {
-//     if (req.user.role === "admin")
-//       user = await logIncollection.findById(req.user.id);
-//     else user = await memberModel.findById(req.user.id);
-
-//     user.name = name;
-//     user.mobile = mobile;
-//     user.countryCode = countryCode;
-//     user.address = address;
-//     user.city = city;
-//     user.state = state;
-//     await user.save();
-//     res.redirect("/profile");
-//   } catch (err) {
-//     console.log("error in /user/update/profile route ---- :", err);
-//     res.redirect("/profile");
-//   }
-// });
-
-// app.get("/gethelp", isAdminLoggedIn, async (req, res) => {
-//   const user = await logIncollection.findById(req.user.id);
-
-//   res.render("gethelp", { user });
-// });
-
 app.post("/submit-form", async (req, res) => {
   try {
     const email = req.body.email;
@@ -659,55 +374,6 @@ app.post("/update-user", async (req, res) => {
     res.status(500).send({ message: "Error updating user" });
   }
 });
-
-// Dashboard route
-// app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     console.log("dashboard");
-
-//     const user = await logIncollection
-//       .findById(req.user.id)
-//       .populate("myleads");
-//     if (!user.organizationName) {
-//       return res.render("dashboard", { showForm: true });
-//     }
-
-//     const pipes = await pipelineModel
-//       .find({ cid: user.cid })
-//       .sort({ defaultVal: -1 })
-//       .exec();
-//     const leads = await leadsModel.find({ cid: user.cid }).populate("status");
-//     // res.json({})
-//     let msg = req.session.successMSG;
-//     delete req.session.successMSG;
-//     res.render("dashboard", { user, pipes, leads,successMSG : msg });
-//     // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
-//   } catch (error) {
-//     res.status(500).send("Internal error");
-//   }
-// });
-// app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     const user = await logIncollection.findById(req.user.id);
-//     const pipelines = await pipelineModel.find({ uid: user._id });
-//     // req.session.id = userData.id;
-//     res.render("dashboard", { user, pipelines });
-//   } catch (error) {
-//     res.status(500).send("Internal error");
-//   }
-// });
-// app.get("/dashboard", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     const user = await Organization.findOne({ email: req.user.email });
-//     let showForm = true;
-//     if (user) {
-//       showForm = !user.formSubmitted;
-//     }
-//     res.render("dashboard", { user, showForm });
-//   } catch (error) {
-//     res.status(500).send("Internal error");
-//   }
-// });
 
 // Google Authentication Routes
 app.get(
@@ -795,125 +461,6 @@ app.get(
     res.redirect("/user/dashboard");
   }
 );
-
-// Signup handler
-
-// app.post("/signup", async (req, res) => {
-//   try {
-//     const { name, email, password, confirmPassword } = req.body;
-//     const user = await logIncollection.findOne({ email });
-
-//     if (user)
-//       return res.render("signup", { errorMessage: "User already exists" });
-//     if (password !== confirmPassword)
-//       return res.render("signup", { errorMessage: "Passwords do not match" });
-//     const cid = uuidv4();
-//     const newUser = new logIncollection({
-//       name,
-//       email,
-//       password,
-//       cid,
-//       role: "admin",
-//     });
-//     await newUser.save();
-
-//     const pipelines = [
-//       { title: "win", color: "#28A745" },
-//       { title: "loss", color: "#DC3545" },
-//       { title: "held", color: "#007BFF" },
-//       { title: "pending", color: "#FFC107" },
-//     ].map(
-//       (pipelineData) =>
-//         new pipelineModel({
-//           uid: user._id,
-//           color: pipelineData.color,
-//           title: pipelineData.title,
-//           cid: user.cid,
-//         })
-//     );
-
-//     // Save all pipelines in parallel
-//     await Promise.all(pipelines.map((pipeline) => pipeline.save()));
-
-//     const templates = [
-//       {
-//         title: "welcome",
-//         text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
-//         client: true,
-//         team: false,
-//         num: 1,
-//       },
-
-//       {
-//         title: "after call",
-//         text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
-//         client: true,
-//         team: false,
-//         num: 2,
-//       },
-
-//       {
-//         title: "before call",
-//         text: "",
-//         client: false,
-//         team: false,
-//         num: 3,
-//       },
-//     ].map(
-//       (temp) =>
-//         new templateModel({
-//           uid: user._id,
-//           title: temp.title,
-//           text: temp.text,
-//           num: temp.num,
-//           client: temp.client,
-//           team: temp.team,
-//           cid: user.cid,
-//         })
-//     );
-
-//     // Save all pipelines in parallel
-//     await Promise.all(templates.map((temp) => temp.save()));
-
-//     const token = await generateToken(newUser);
-
-//     res.cookie("360Followers", token, {
-//       httpOnly: true,
-//       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
-//     });
-//     res.redirect("/dashboard");
-//   } catch (err) {
-//     res.status(500).send("Error signing up");
-//   }
-// });
-
-// Login handler
-// app.post("/login", async (req, res) => {
-//   try {
-//     const check = await logIncollection.findOne({ email: req.body.email });
-
-//     if (!check || check.password !== req.body.password) {
-//       return res.render("signup", {
-//         errorMessage: "Invalid username or password",
-//       });
-//     }
-
-//     const token = await generateToken(check);
-//     res.cookie("360Followers", token, {
-//       httpOnly: true,
-//       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
-//     });
-//     res.redirect("/dashboard");
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Error logging in");
-//   }
-// });
-
-// app.get("/logout", (req, res) => {
-//   res.clearCookie("360Followers");
-//   res.redirect("/");
-// });
 
 // Facebook Login Route
 app.get("/auth/facebook", (req, res) => {
@@ -1033,135 +580,13 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
 
     if (chalteRahoId) clearInterval(chalteRahoId);
     chalteRaho(accessToken, req);
-    req.session.successMSG = 'Connected to facebook account.'
+    req.session.successMSG = "Connected to facebook account.";
     res.redirect("/leads");
   } catch (error) {
     console.error("Error fetching access token:", error);
     res.status(500).send("Error logging in with Facebook.");
   }
 });
-
-// Facebook Leads Fetch Route
-// app.get("/leads", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     let admin;
-//     console.log("leads page");
-
-//     if (req.user.role === "admin") {
-//       user = await logIncollection.findById(req.user.id).populate({
-//         path: "myleads",
-//         populate: {
-//           path: "status", // Populate status from leads
-//         },
-//         populate: {
-//           path: "remarks", // Populate remarks from leads
-//           options: { sort: { createdAt: -1 } }, // Sorting remarks in descending order by createdAt
-//         },
-//       });
-//     } else {
-//       user = await memberModel.findById(req.user.id).populate({
-//         path: "myleads",
-//         populate: {
-//           path: "status", // Populate status from leads
-//         },
-//         populate: {
-//           path: "remarks",
-//           options: { sort: { createdAt: -1 } },
-//         },
-//       });
-//     }
-
-//     let leads = await leadsModel.find({ cid: user.cid }).populate("status");
-//     let pipes = await pipelineModel.find({ cid: user.cid });
-//     // let remarks = await remarkModel.find({ uid: user._id }).sort({ createdAt: -1 });
-
-//     res.render("leads", { user, leads, pipes });
-//   } catch (error) {
-//     console.error("Error fetching leads:", error);
-//     res.status(500).send("Error fetching leads");
-//   }
-// });
-
-// app.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
-//   let { id } = req.params;
-
-//   let lead = await leadsModel.findById(id);
-//   if (!lead) {
-//     return res.redirect("/leads");
-//   }
-
-//   if (req.user.role === "admin") {
-//     let admin = await logIncollection.findById(req.user.id);
-//     admin.myleads.push(lead._id);
-//     lead.uid = admin._id;
-//     await admin.save();
-//     await lead.save();
-//   } else {
-//     let member = await memberModel.findById(req.user.id);
-//     member.myleads.push(lead._id);
-//     lead.uid = member._id;
-//     await member.save();
-//     await lead.save();
-
-//     console.log("bokking the leads by ", member);
-//   }
-//   console.log("ready for message sending");
-
-//   //   const interval = setInterval(() => {
-//   //     if (whatsappClientReady) {
-//   //       sendMessageOnWA('9755313770', 'Hello!');
-//   //         clearInterval(interval); // Stop checking once the message is sent
-//   //     } else {
-//   //         console.log('Waiting for WhatsApp client to be ready...');
-//   //     }
-//   // }, 5000);
-
-//   res.redirect("/leads");
-// });
-
-// app.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
-//   let { id } = req.params;
-
-//   let lead = await leadsModel.findById(id);
-//   if (!lead) {
-//     return res.redirect("/leads");
-//   }
-//   if (req.user.role === "admin") {
-//     let admin = await logIncollection.findById(req.user.id);
-//     admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
-//     lead.uid = "";
-//     lead.remarks = []    
-
-//     await admin.save();
-//     await lead.save();
-//   } else {
-//     let member = await memberModel.findById(req.user.id);
-//     member.myleads.splice(member.myleads.indexOf(lead._id), 1);
-//     lead.uid = "";
-//     lead.remarks = []
-
-//     await member.save();
-//     await lead.save();
-
-//     console.log("bokking the leads by ", member);
-//   }
-//   res.redirect("/leads");
-// });
-
-// app.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
-//   let { id } = req.params;
-
-//   let lead = await leadsModel.findById(id);
-//   let pipe = await pipelineModel.findById(req.body.pipeId);
-
-//   if (!lead) {
-//     return res.redirect("/leads");
-//   }
-//   lead.status = pipe._id;
-//   await lead.save();
-
-//   res.redirect("/leads");
-// });
 
 app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
   const { id } = req.params;
@@ -1207,37 +632,49 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
   const currentTime = new Date();
 
   let timeDifference = remarkDateTime - currentTime;
-  timeDifference -= (1000 * 60 * 30)
-  const reminderTemplate = await templateModel.findOne({ cid: req.user.cid, num: 3 });
-  const afterCallTemp = await templateModel.findOne({ cid: req.user.cid, num: 2 });
+  timeDifference -= 1000 * 60 * 30;
+  const reminderTemplate = await templateModel.findOne({
+    cid: req.user.cid,
+    num: 3,
+  });
+  const afterCallTemp = await templateModel.findOne({
+    cid: req.user.cid,
+    num: 2,
+  });
   console.log(timeDifference);
-  
-  let reminderTempImagePath, reminderTempPdfPath, LeadTempImagePath,LeadTempPdfPath;
+
+  let reminderTempImagePath,
+    reminderTempPdfPath,
+    LeadTempImagePath,
+    LeadTempPdfPath;
   if (timeDifference > 0) {
     setTimeout(() => {
-
-      if (reminderTemplate.image !== "") { // img for user
+      if (reminderTemplate.image !== "") {
+        // img for user
         reminderTempImagePath = path.join(
           __dirname,
           "../template/images/uploads/whatsapp/",
           reminderTemplate.image
         );
       }
-      if (reminderTemplate.pdf !== "") { // pdf for user 
+      if (reminderTemplate.pdf !== "") {
+        // pdf for user
         reminderTempPdfPath = path.join(
           __dirname,
           "../template/images/uploads/whatsapp/",
           reminderTemplate.pdf
         );
       }
-      if (afterCallTemp.image !== "") {  // img for lead
+      if (afterCallTemp.image !== "") {
+        // img for lead
         LeadTempImagePath = path.join(
           __dirname,
           "../template/images/uploads/whatsapp/",
           afterCallTemp.image
         );
       }
-      if (afterCallTemp.pdf !== "") { // pdf for lead
+      if (afterCallTemp.pdf !== "") {
+        // pdf for lead
         LeadTempPdfPath = path.join(
           __dirname,
           "../template/images/uploads/whatsapp/",
@@ -1245,11 +682,21 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
         );
       }
 
-      sendMessageToLead(leadContactNo, afterCallTemp.text, reminderTempImagePath, reminderTempPdfPath); // after temp msg sending to lead
+      sendMessageToLead(
+        leadContactNo,
+        afterCallTemp.text,
+        reminderTempImagePath,
+        reminderTempPdfPath
+      ); // after temp msg sending to lead
     }, timeDifference);
   }
   setTimeout(() => {
-    sendMessageToLead(userContact,reminderTemplate.text,LeadTempImagePath,LeadTempPdfPath) // reminder temp for user
+    sendMessageToLead(
+      userContact,
+      reminderTemplate.text,
+      LeadTempImagePath,
+      LeadTempPdfPath
+    ); // reminder temp for user
   }, 5000);
 
   return res.json(remark);
@@ -1271,6 +718,7 @@ app.post("/save-fcm-token", isAdminLoggedIn, async (req, res) => {
 });
 
 // Handle dynamic routes to serve pages without .html extension
+
 app.get("/:page", (req, res) => {
   const page = req.params.page;
   const filePath = path.join(static_path, `${page}.html`);
@@ -1307,7 +755,7 @@ function isAdminLoggedIn(req, res, next) {
 }
 
 async function findNewLead(accessToken, req) {
-  let admin = await logIncollection.findById(req.user.id)
+  let admin = await logIncollection.findById(req.user.id);
   let allNewLeads = [];
   const pagesResponse = await axios.get(
     `https://graph.facebook.com/v20.0/me/accounts`,
@@ -1402,14 +850,13 @@ async function findNewLead(accessToken, req) {
             wellcomeTemp.pdf
           );
         }
-       
+
         sendMessageToLead(leadContactNo, wellcomeTemp.text, imagePath, pdfPath);
-        
       }, 5000);
 
       setTimeout(() => {
-        let userContactNo = admin.countryCode+admin.mobile;
-        let userWAmsg = 'hii you have a new lead 🎉';
+        let userContactNo = admin.countryCode + admin.mobile;
+        let userWAmsg = "hii you have a new lead 🎉";
         sendMessageToLead(userContactNo, userWAmsg);
       }, 2000);
 
@@ -1450,6 +897,21 @@ function chalteRaho(token, req) {
   }, 60000);
 }
 
+function ensureQRCodeEvent() {
+  // Avoid attaching multiple QR listeners by checking if it's already attached
+  if (!client.listenerCount("qr")) {
+    client.on("qr", (qrCode) => {
+      try {
+        const qrImage = qr.imageSync(qrCode, { type: "png" });
+        qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
+        // console.log("QR code generated and stored.");
+      } catch (error) {
+        console.error("Error generating QR Code:", error);
+      }
+    });
+  }
+}
+
 // async function sendPushNotification(fcmToken, title, body) {
 //   const msg = {
 //     notification: {
@@ -1467,3 +929,98 @@ function chalteRaho(token, req) {
 //     console.error('Error sending message:', err);
 //   }
 // }
+
+// Cleanup Session Files with Retry Logic
+async function cleanupSessionFiles() {
+  const sessionPath = path.join(__dirname, ".wwebjs_auth/session");
+  for (let retries = 5; retries > 0; retries--) {
+    try {
+      if (fs.existsSync(sessionPath)) {
+        fs.rmSync(sessionPath, { recursive: true, force: true });
+        // console.log("Session files deleted successfully.");
+      }
+      break; // Exit loop if deletion is successful
+    } catch (error) {
+      console.error("Failed to delete session files:", error.message);
+      if (retries > 1) {
+        console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
+      }
+    }
+  }
+}
+
+function initializeWhatsAppClient() {
+  // Remove all existing listeners to avoid duplication
+  if (client) {
+    client.removeAllListeners();
+  }
+
+  // Recreate the client to ensure fresh state
+  client = new Client({
+    authStrategy: new LocalAuth(),
+  });
+
+  // Re-attach necessary event listeners
+  ensureQRCodeEvent();
+
+  client.on("ready", async () => {
+    console.log("WhatsApp client is ready!");
+    whatsappClientReady = true;
+    isConnected = true;
+    connectedPhoneNumber = client.info.wid.user;
+    console.log("Connected WhatsApp Number:", connectedPhoneNumber);
+  });
+
+  client.on("disconnected", async (reason) => {
+    console.log("WhatsApp client has been disconnected due to:", reason);
+    whatsappClientReady = false;
+    isConnected = false;
+    qrCodeData = ""; // Reset QR code data on disconnect
+    await cleanupSessionFiles();
+    initializeWhatsAppClient(); // Re-initialize to ensure fresh QR code generation
+  });
+
+  client.on("auth_failure", async (message) => {
+    console.error("Authentication failure:", message);
+    whatsappClientReady = false;
+    isConnected = false;
+    qrCodeData = ""; // Reset QR code data on authentication failure
+    await cleanupSessionFiles();
+    initializeWhatsAppClient(); // Re-initialize to re-trigger QR code generation
+  });
+
+  whatsappClientReady = false; // Reset ready status
+  client
+    .initialize()
+    .then(() => {
+      console.log("Client re-initialized");
+    })
+    .catch((error) => {
+      console.error("Error re-initializing client:", error);
+    });
+}
+
+// Function to Send a WhatsApp Message
+function sendMessageToLead(phoneNumber, message) {
+  console.log(
+    "Trying to send message. Client ready status:",
+    whatsappClientReady
+  );
+
+  if (!whatsappClientReady) {
+    console.log("WhatsApp client is not ready. Queuing message.");
+    return;
+  }
+
+  client
+    .sendMessage(`91${phoneNumber}@c.us`, message)
+    .then(() => {
+      console.log("Message sent successfully.");
+    })
+    .catch((error) => {
+      console.error("Error sending message:", error);
+    });
+}
+
+initializeWhatsAppClient();
