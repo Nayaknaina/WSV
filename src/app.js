@@ -63,7 +63,7 @@ const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({
         mongoUrl:
-          "mongodb+srv://nainanayak288:Dkccg5NaZMANqu7F@wsvconnect.bpxfx.mongodb.net/",
+          "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
       }) // Replace with your MongoDB connection URI
     : new session.MemoryStore();
 
