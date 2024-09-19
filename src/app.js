@@ -29,10 +29,11 @@ const fs = require("fs");
 const logIncollection = require("./models/admin.model.js");
 const pipelineModel = require("./models/pipeline.model.js");
 const memberModel = require("./models/member.model.js");
-
 const remarkModel = require("./models/remark.model.js");
 const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
+
+const WaModel=require("./models/wA.model.js");
 const memberRoute = require("./routes/members.route.js");
 const userRoute = require("./routes/users.route.js");
 const Route = require("./routes/index.route.js");
@@ -134,6 +135,42 @@ app.use(cookieParser());
 
 app.use(express.static("template"));
 
+// Passport.js Google Strategy
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK,
+      passReqToCallback: true,
+    },
+    async function (request, accessToken, refreshToken, profile, done) {
+      try {
+        let user = await logIncollection.findOne({ googleId: profile.id });
+
+        if (user) {
+          // Update the existing user
+          user.name = profile.displayName;
+          user.email = profile.email;
+          user.profilePicture = profile.photos[0].value;
+          await user.save();
+        } else {
+          // Create a new user
+          user = await logIncollection.create({
+            googleId: profile.id,
+            name: profile.displayName,
+            email: profile.email,
+            profilePicture: profile.photos[0].value,
+          });
+        }
+
+        done(null, user);
+      } catch (err) {
+        done(err, null);
+      }
+    }
+  )
+);
 // Passport.js serialize and deserialize user
 passport.serializeUser((user, done) => {
   done(null, user.id); // Serialize user by their unique ID
