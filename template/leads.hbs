@@ -248,7 +248,7 @@
                                         </a>
                                         {{/if}}
 
-                                        {{#each leads_data}}
+                                        {{!-- {{#each leads_data}}
                                         {{#if (containsPhoneNumber ans)}}
                                         <a href="tel:{{ans}}">
                                             <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
@@ -257,17 +257,17 @@
                                             <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
                                         </a>
                                         {{/if}}
-                                        {{/each}}
-                                        <span class="status-circle" onclick="toggleDropdown()"
-                                            style="background-color: {{status.color}};">
-                                            <div class="ul-box">
+                                        {{/each}} --}}
+                                        {{!-- <span class="status-circle" onclick="toggleDropdown()"
+                                            style="background-color: {{status.color}};"> --}}
+                                            {{!-- <div class="ul-box">
                                                 {{#each ../pipes}}
                         <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
                             <span>{{title}}</span>
                             <span class="drop-circle" style="background-color: {{color}};"></span>
                         </li>
                         {{/each}}
-                </div>
+                </div> --}}
                 </span>
                 </span>
                 </label>
@@ -284,7 +284,7 @@
                 {{/each}}
                 {{else}}
                 <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
-                    added here</li>
+                    added here <br> please connect your app first</li>
                 {{/if}}
                 </ul>
 
@@ -308,16 +308,16 @@
                                         <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
                                     </a>
 
-                                    <a href="https://wa.me/{{ans}}" target="_blank">
+                                    {{!-- <a href="https://wa.me/{{ans}}" target="_blank">
                                         <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
-                                    </a>
+                                    </a> --}}
                                     {{/if}}
 
                                     {{/each}}
                                     <i onclick="openRemarkPopUp('{{_id}}')" class="fa-solid fa-file-pen"
                                         style="color: #1E3050;"></i>
 
-                                    <span class="status-circle" onclick="toggleDropdown('{{_id}}')"
+                                    <span id="st-box{{_id}}" class="status-circle" onclick="toggleDropdown('{{_id}}')"
                                         style="background-color: {{status.color}};">
                                         <div class="ul-box">
                                             {{#each ../pipes}}
@@ -388,6 +388,31 @@
 
 
             <script>
+                function submitForm(leadId, status, pipeId) {
+                    fetch(`/lead/status/update/${leadId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'  // Specify that we're sending JSON
+                        },
+                        body: JSON.stringify({ status, pipeId })  // Convert the status to a JSON string
+                    })
+                        .then(response => {
+                            // Ensure the response is JSON
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                            // location.reload()
+                        })
+                        .then(data => {
+                            let circle = document.querySelector(`#st-box${leadId}`);
+                            circle.style.backgroundColor = data.color;
+                            
+                        })
+                }
+
+
                 // for leads drop-down
                 document.querySelectorAll('.lead-item').forEach(item => {
                     item.addEventListener('click', function () {
@@ -421,29 +446,6 @@
                 }
 
 
-                function submitForm(leadId, status, pipeId) {
-                    fetch(`/lead/status/update/${leadId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'  // Specify that we're sending JSON
-                        },
-                        body: JSON.stringify({ status, pipeId })  // Convert the status to a JSON string
-                    })
-                        .then(response => {
-                            // Ensure the response is JSON
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                            location.reload()
-                        })
-                        .then(data => {
-                            console.log('Success:', data);
-                        })
-                }
-
-
                 function showStatusBox() {
                     let box = document.querySelector('#status-box')
 
@@ -473,7 +475,7 @@
                         time: time,
                         date: date
                     };
-                    console.log(formData)
+                    // console.log(formData)
 
                     fetch(`/remark/add/${id}`, {
                         method: 'POST',

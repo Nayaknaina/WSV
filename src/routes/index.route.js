@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const logIncollection = require("../models/admin.model.js");
-const pipelineModel = require("../models/admin.model.js");
+const pipelineModel = require("../models/pipeline.model.js");
 const memberModel = require("../models/member.model.js");
 // const WAmodel = require("./models/whatsappSession.model.js");
 const remarkModel = require("../models/remark.model.js");
@@ -15,16 +15,14 @@ router.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
 
-
 router.get("/profile", isAdminLoggedIn, async (req, res) => {
   let user;
   if (req.user.role === "admin")
     user = await logIncollection.findById(req.user.id);
   else user = await memberModel.findById(req.user.id);
-  
+
   res.render("profile", { user });
 });
-
 
 router.get("/connect", isAdminLoggedIn, async (req, res) => {
   const user = req.user;
@@ -40,7 +38,6 @@ router.get("/apps", isAdminLoggedIn, (req, res) => {
   const user = req.user;
   res.render("app", { user });
 });
-
 
 router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
   let user;
@@ -64,7 +61,6 @@ router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-
 router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
   let user;
   if (req.user.role === "admin")
@@ -74,40 +70,35 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
   res.render("gethelp", { user });
 });
 
-
 // Facebook Leads Fetch Route
 router.get("/leads", isAdminLoggedIn, async (req, res) => {
   try {
-    let admin;
+    let user;
     console.log("leads page");
 
     if (req.user.role === "admin") {
       user = await logIncollection.findById(req.user.id).populate({
-        path: "myleads",
-        populate: {
-          path: "status", // Populate status from leads
-        },
-        populate: {
-          path: "remarks", // Populate remarks from leads
-          options: { sort: { createdAt: -1 } }, // Sorting remarks in descending order by createdAt
-        },
+        path: "myleads", // Populating 'myleads' field from user
+        populate: [
+          { path: "status" }, // Populate the 'status' field inside each lead
+          { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
+        ],
       });
     } else {
       user = await memberModel.findById(req.user.id).populate({
-        path: "myleads",
-        populate: {
-          path: "status", // Populate status from leads
-        },
-        populate: {
-          path: "remarks",
-          options: { sort: { createdAt: -1 } },
-        },
+        path: "myleads", // Populating 'myleads' field from user
+        populate: [
+          { path: "status" }, // Populate the 'status' field inside each lead
+          { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
+        ],
       });
     }
-
-    let leads = await leadsModel.find({ cid: user.cid }).populate("status");
+    let leads = await leadsModel
+      .find({ cid: user.cid })
+      .populate("status") // Ensure that 'status' is populated
+      .sort({ createdAt: -1 });
     let pipes = await pipelineModel.find({ cid: user.cid });
-    // let remarks = await remarkModel.find({ uid: user._id }).sort({ createdAt: -1 });
+    // console.log(user.myleads[0].status);
 
     res.render("leads", { user, leads, pipes });
   } catch (error) {
@@ -139,7 +130,7 @@ router.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
 
     console.log("bokking the leads by ", member);
   }
-    res.redirect("/leads");
+  res.redirect("/leads");
 });
 
 router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
@@ -153,7 +144,7 @@ router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
     let admin = await logIncollection.findById(req.user.id);
     admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
     lead.uid = "";
-    lead.remarks = []    
+    lead.remarks = [];
 
     await admin.save();
     await lead.save();
@@ -161,7 +152,7 @@ router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
     let member = await memberModel.findById(req.user.id);
     member.myleads.splice(member.myleads.indexOf(lead._id), 1);
     lead.uid = "";
-    lead.remarks = []
+    lead.remarks = [];
 
     await member.save();
     await lead.save();
@@ -174,7 +165,7 @@ router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
 router.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
   let { id } = req.params;
 
-  let lead = await leadsModel.findById(id);
+  let lead = await leadsModel.findById(id).populate("status");
   let pipe = await pipelineModel.findById(req.body.pipeId);
 
   if (!lead) {
@@ -182,8 +173,9 @@ router.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
   }
   lead.status = pipe._id;
   await lead.save();
+  console.log(pipe.color);
 
-  res.redirect("/leads");
+  res.json({ color: pipe.color });
 });
 
 // router.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
@@ -234,7 +226,7 @@ router.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
 //   const reminderTemplate = await templateModel.findOne({ cid: req.user.cid, num: 3 });
 //   const afterCallTemp = await templateModel.findOne({ cid: req.user.cid, num: 2 });
 //   console.log(timeDifference);
-  
+
 //   let reminderTempImagePath, reminderTempPdfPath, LeadTempImagePath,LeadTempPdfPath;
 //   if (timeDifference > 0) {
 //     setTimeout(() => {
@@ -246,7 +238,7 @@ router.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
 //           reminderTemplate.image
 //         );
 //       }
-//       if (reminderTemplate.pdf !== "") { // pdf for user 
+//       if (reminderTemplate.pdf !== "") { // pdf for user
 //         reminderTempPdfPath = path.join(
 //           __dirname,
 //           "../template/images/uploads/whatsapp/",
@@ -277,6 +269,5 @@ router.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
 
 //   return res.json(remark);
 // });
-
 
 module.exports = router;

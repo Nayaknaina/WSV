@@ -491,26 +491,22 @@ form.sign-in-form {
              
             <input type="submit"  value="Submit" class="btn solid" />
 
-          <p class="social-text">Or Sign Up With </p>
-          <div class="social-container">
-
-            <a href="/auth/google" class="social-icon"><i class="fa fa-google fa-fw">
-              </i> Login with Google+
-            </a>
-
-          
-          
-          </div>  
-        <div class="social-container">
-
-            <a href="/member/login" class="social-icon">
-              </i> Already a Team Member?
-            </a>
-
-          
-          
-          </div> 
-        </form>
+            <p class="social-text">Or Sign Up With </p>
+            <div class="social-container">
+              {{!-- <a href="#" class="social-icon">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-twitter"></i>
+              </a> --}}
+               <a href="/auth/google" class="social-icon"><i class="fa fa-google fa-fw">
+          </i> Login with Google+
+        </a>
+              {{!-- <a href="#" class="social-icon">
+                <i class="fab fa-linkedin-in"></i>
+              </a> --}}
+            </div>
+          </form>
 
 
 
@@ -595,8 +591,8 @@ form.sign-in-form {
       </div>
     </div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
       {{#if errorMessage}}

@@ -839,9 +839,12 @@
                 data: labels.map(date => processedData[date][statusTitle] || 0),
                 backgroundColor: pipelineMap[statusTitle].color, // Use backgroundColor for area chart
                 borderColor: pipelineMap[statusTitle].color, // Optional, to keep the border color
-                borderWidth: 4,
+                borderWidth: 1,
+                outerWidth: 1,
+                innerWidth: 1,
+                
                 fill: true,
-                tension: .5, // Set fill to true for area chart
+                tension: 1, // Set fill to true for area chart
             };
         });
 
@@ -852,13 +855,14 @@
         };
 
         const config = {
-            type: 'line', // 'line' type can be used for area charts too
+            type: 'bar', // 'line' type can be used for area charts too
             data: competitionData,
             options: {
                 scales: {
                     x: { title: { display: true, text: 'Income Time' } },
                     y: { title: { display: true, text: 'Number of Leads' } },
                 },
+                
             },
         };
 
