@@ -44,56 +44,11 @@
     src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
 
   <link rel="stylesheet" href="/kcss/sendmail.css">
-
+  <link rel="stylesheet"  href="/assets/css/team.css">
 </head>
 
-<style>
-  .feature-box {
-    padding: 20px 15px;
-    height: 100%;
-    box-shadow: 0 0 0.3125rem 0 rgba(20, 12, 0, .06);
-    background-image: radial-gradient(at 50% 100%, #fff 0%, rgb(99 156 220 / 50%) 100%), linear-gradient(to bottom, rgba(168, 181, 243, 0.25) 0%, rgb(196 182 182 / 40%) 100%);
-    border-radius: 10px;
-  }
 
-  .feature-box .icon {
-    position: relative;
-    z-index: 0;
-    margin-bottom: 15px;
-    background-color: #2a3bf8;
-    padding: 20px;
-    border-radius: 72px;
-    height: 52px;
-    width: 52px;
-    text-align: center;
-    overflow: hidden;
-  }
-
-  .feature-box .icon:before {
-    content: '';
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    bottom: 3px;
-    border-radius: 72px;
-    background: -moz-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%);
-    background: -webkit-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%);
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#00ffffff', GradientType=0);
-    transform: rotate(145deg);
-    opacity: .2;
-
-  }
-
-  .feature-box .icon i {
-    font-size: 30px;
-    color: #ffffff;
-    position: relative;
-    z-index: 1;
-  }
-</style>
-
-<body class>
+<body class="naina">
   <div id="popup-reg" class="popup">
     <div id="popup-reg" class="popup-content">
 
@@ -342,24 +297,11 @@
     </div>
   </div>
 
-  {{> nav}}
-
   <div class="container-fluid">
     <div class="row">
       {{> sidebar}}
-      <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0">
-        <div class="container-fluid bg-white shadow-sm m-b-20">
-          <div class="container">
-            <div class="row page-titles p-t-35 p-b-15">
-              <div class="col-md-12 col-12 align-self-center">
-                <h1 class="text-bodycolor">Welcome To 360followups Apps<b> {{user.name}} </b></h1>
-                <p class="text-secondary font-14">Click 'Access Now' to start using any 360followups
-                  application. You can enjoy complete access with a single 360followups Plus plan. <a target="_blank"
-                    rel="noopener noreferrer" href="https://www.pabbly.com/#pricing"><u>Learn more</u></a></p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0 home-section">
+       {{> NameHead}}
 
         {{#if successMSG}}
         <div class="col-sm-12">
@@ -384,12 +326,48 @@
 
           </div>
         </div>
+      
+          <table>
+  
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Leads</th>
+      <th scope="col">Win Leads</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td data-label="Account">Visa - 3412</td>
+      <td data-label="Due Date">04/01/2016</td>
+      <td data-label="Amount">$1,190</td>
+      <td data-label="Period">03/01/2016 - 03/31/2016</td>
+    </tr>
+    <tr>
+      <td scope="row" data-label="Account">Visa - 6076</td>
+      <td data-label="Due Date">03/01/2016</td>
+      <td data-label="Amount">$2,443</td>
+      <td data-label="Period">02/01/2016 - 02/29/2016</td>
+    </tr>
+    <tr>
+      <td scope="row" data-label="Account">Corporate AMEX</td>
+      <td data-label="Due Date">03/01/2016</td>
+      <td data-label="Amount">$1,181</td>
+      <td data-label="Period">02/01/2016 - 02/29/2016</td>
+    </tr>
+    <tr>
+      <td scope="row" data-label="Acount">Visa - 3412</td>
+      <td data-label="Due Date">02/01/2016</td>
+      <td data-label="Amount">$842</td>
+      <td data-label="Period">01/01/2016 - 01/31/2016</td>
+    </tr>
+  </tbody>
+        </table>
 
+        
 
-
-
-
-        <div class="row col-11 ml-5">
+        {{!-- <div class="row col-11 ml-5">
           <div class="col">
             <h2>Your team members</h2>
           </div>
@@ -401,9 +379,6 @@
             <i class="fa-solid fa-trash-can"></i>
           </div>
         </div>
-
-
-
         <div class="row col-11 ml-5">
           <table class="table m-0">
             <thead class="thead-dark">
@@ -426,7 +401,7 @@
 
             </tbody>
           </table>
-        </div>
+        </div> --}}
 
 
 
@@ -434,13 +409,6 @@
 
 
 
-        <div class="fg-main-footer bg-white border-top w-100">
-          <div class="col-md-12">
-            <p class="sub_footer_text m-t-10 m-b-10 text-center"> Copyright © 2024. Web Soft Valley All Rights
-              Reserved
-            </p>
-          </div>
-        </div>
 
       </div>
     </div>
