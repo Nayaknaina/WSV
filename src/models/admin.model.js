@@ -18,14 +18,28 @@ const logInSchema = new mongoose.Schema({
     type:String,
   },
   fcmToken: String,
+
   teams: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'teamMember',
   }],
+
+  myPipelines: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'pipeline',
+  }],
+
   myleads:[{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'lead'
   }],
+
+  myTemplates:[{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'template'
+  }],
+
+
   name: {
     type: String,
     trim: true,
@@ -84,8 +98,8 @@ const logInSchema = new mongoose.Schema({
 
 logInSchema.pre('save', function (next) {
   const maxTeams = {
-    free: 4,
-    basic: 50,
+    free: 3,
+    basic: 7,
     premium: 1000
   };
 
