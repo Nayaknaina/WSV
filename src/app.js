@@ -340,6 +340,283 @@ app.post(
   }
 );
 
+// app.get("/get/data", isAdminLoggedIn, async (req, res) => {
+//   const admin = await logIncollection.findById(req.user.id);
+//   let allLeads = [
+//     {
+//       id: "509fc6df-7864-41fb-bbdf-42416ced777e",
+//       created_time: "2024-08-31T03:14:54+0000",
+//       field_data: [
+//         {
+//           name: "आप_निम्नलिखित_में_से_कोनसी_सर्विस_लेना_चाहते_हैं?",
+//           values: ["वेबसाइट_डेवलपमेंट"],
+//         },
+//         {
+//           name: "कृपया_अपने_प्रोजेक्ट_के_बारे_में_कुछ_जानकारी_साझा_करें:",
+//           values: ["E commerce"],
+//         },
+//         {
+//           name: "आपने_इस_प्रोजेक्ट_के_लिए_कितना_बजट_निर्धारित_किया_है?",
+//           values: ["50000"],
+//         },
+//         {
+//           name: "हमें_आपको_कॉल_करने_के_लिए_उपयुक्त_तारीख_और_समय_बताएं:",
+//           values: ["2024-09-18T06:18:54+0000"],
+//         },
+//         {
+//           name: "आपका_नाम:",
+//           values: ["AJAY DORIYA"],
+//         },
+//         {
+//           name: "मोबाइल_नंबर:",
+//           values: ["8070820053"],
+//         },
+//         {
+//           name: "शहर_का_नाम:",
+//           values: ["Indore"],
+//         },
+//       ],
+//     },
+//     {
+//       id: "a2facec4-deab-49ff-966f-f91c48dcbfaa",
+//       created_time: "2024-09-07T17:24:54+0000",
+//       field_data: [
+//         {
+//           name: "आप_निम्नलिखित_में_से_कोनसी_सर्विस_लेना_चाहते_हैं?",
+//           values: ["SEO"],
+//         },
+//         {
+//           name: "कृपया_अपने_प्रोजेक्ट_के_बारे_में_कुछ_जानकारी_साझा_करें:",
+//           values: ["Education Platform"],
+//         },
+//         {
+//           name: "आपने_इस_प्रोजेक्ट_के_लिए_कितना_बजट_निर्धारित_किया_है?",
+//           values: ["50000"],
+//         },
+//         {
+//           name: "हमें_आपको_कॉल_करने_के_लिए_उपयुक्त_तारीख_और_समय_बताएं:",
+//           values: ["2024-09-07T11:09:54+0000"],
+//         },
+//         {
+//           name: "आपका_नाम:",
+//           values: ["Pankaj"],
+//         },
+//         {
+//           name: "मोबाइल_नंबर:",
+//           values: ["9341850155"],
+//         },
+//         {
+//           name: "शहर_का_नाम:",
+//           values: ["Gwalior"],
+//         },
+//       ],
+//     },
+//     {
+//       id: "ec60db22-dc07-42fd-b618-9b5bbb458466",
+//       created_time: "2024-09-19T13:59:54+0000",
+//       field_data: [
+//         {
+//           name: "आप_निम्नलिखित_में_से_कोनसी_सर्विस_लेना_चाहते_हैं?",
+//           values: ["मोबाइल_एप्लीकेशन"],
+//         },
+//         {
+//           name: "कृपया_अपने_प्रोजेक्ट_के_बारे_में_कुछ_जानकारी_साझा_करें:",
+//           values: ["Banking System"],
+//         },
+//         {
+//           name: "आपने_इस_प्रोजेक्ट_के_लिए_कितना_बजट_निर्धारित_किया_है?",
+//           values: ["2cr"],
+//         },
+//         {
+//           name: "हमें_आपको_कॉल_करने_के_लिए_उपयुक्त_तारीख_और_समय_बताएं:",
+//           values: ["2024-09-07T00:57:54+0000"],
+//         },
+//         {
+//           name: "आपका_नाम:",
+//           values: ["Ravi"],
+//         },
+//         {
+//           name: "मोबाइल_नंबर:",
+//           values: ["7174721330"],
+//         },
+//         {
+//           name: "शहर_का_नाम:",
+//           values: ["Indore"],
+//         },
+//       ],
+//     },
+//     {
+//       id: "6f06ce62-8703-4db2-860b-a68b500a4c9a",
+//       created_time: "2024-08-20T11:20:54+0000",
+//       field_data: [
+//         {
+//           name: "आप_निम्नलिखित_में_से_कोनसी_सर्विस_लेना_चाहते_हैं?",
+//           values: ["सॉफ़्टवेयर_इंस्टॉलेशन"],
+//         },
+//         {
+//           name: "कृपया_अपने_प्रोजेक्ट_के_बारे_में_कुछ_जानकारी_साझा_करें:",
+//           values: ["REAL ESTATE"],
+//         },
+//         {
+//           name: "आपने_इस_प्रोजेक्ट_के_लिए_कितना_बजट_निर्धारित_किया_है?",
+//           values: ["75000"],
+//         },
+//         {
+//           name: "हमें_आपको_कॉल_करने_के_लिए_उपयुक्त_तारीख_और_समय_बताएं:",
+//           values: ["2024-08-31T22:36:54+0000"],
+//         },
+//         {
+//           name: "आपका_नाम:",
+//           values: ["Ravi"],
+//         },
+//         {
+//           name: "मोबाइल_नंबर:",
+//           values: ["9535612947"],
+//         },
+//         {
+//           name: "शहर_का_नाम:",
+//           values: ["Delhi"],
+//         },
+//       ],
+//     },
+//     {
+//       id: "6d3b1a46-7992-45c6-b817-e8df86fd1f7c",
+//       created_time: "2024-09-10T09:25:54+0000",
+//       field_data: [
+//         {
+//           name: "आप_निम्नलिखित_में_से_कोनसी_सर्विस_लेना_चाहते_हैं?",
+//           values: ["SEO"],
+//         },
+//         {
+//           name: "कृपया_अपने_प्रोजेक्ट_के_बारे_में_कुछ_जानकारी_साझा_करें:",
+//           values: ["Hospital Management"],
+//         },
+//         {
+//           name: "आपने_इस_प्रोजेक्ट_के_लिए_कितना_बजट_निर्धारित_किया_है?",
+//           values: ["25000"],
+//         },
+//         {
+//           name: "हमें_आपको_कॉल_करने_के_लिए_उपयुक्त_तारीख_और_समय_बताएं:",
+//           values: ["2024-09-05T05:16:54+0000"],
+//         },
+//         {
+//           name: "आपका_नाम:",
+//           values: ["Jitendra"],
+//         },
+//         {
+//           name: "मोबाइल_नंबर:",
+//           values: ["8451098696"],
+//         },
+//         {
+//           name: "शहर_का_नाम:",
+//           values: ["Mumbai"],
+//         },
+//       ],
+//     },
+//     {
+//       id: "32ba3f8a-c5c6-4ab8-906b-4086c2951c7e",
+//       created_time: "2024-08-23T01:14:54+0000",
+//       field_data: [
+//         {
+//           name: "आप_निम्नलिखित_में_से_कोनसी_सर्विस_लेना_चाहते_हैं?",
+//           values: ["वेबसाइट_डेवलपमेंट"],
+//         },
+//         {
+//           name: "कृपया_अपने_प्रोजेक्ट_के_बारे_में_कुछ_जानकारी_साझा_करें:",
+//           values: ["REAL ESTATE"],
+//         },
+//         {
+//           name: "आपने_इस_प्रोजेक्ट_के_लिए_कितना_बजट_निर्धारित_किया_है?",
+//           values: ["50000"],
+//         },
+//         {
+//           name: "हमें_आपको_कॉल_करने_के_लिए_उपयुक्त_तारीख_और_समय_बताएं:",
+//           values: ["2024-09-18T06:53:54+0000"],
+//         },
+//         {
+//           name: "आपका_नाम:",
+//           values: ["AJAY DORIYA"],
+//         },
+//         {
+//           name: "मोबाइल_नंबर:",
+//           values: ["9996446449"],
+//         },
+//         {
+//           name: "शहर_का_नाम:",
+//           values: ["Mumbai"],
+//         },
+//       ],
+//     },
+//     {
+//       id: "a8cff0d2-a4d2-4555-ae53-3e96f426b4ad",
+//       created_time: "2024-08-24T12:42:54+0000",
+//       field_data: [
+//         {
+//           name: "आप_निम्नलिखित_में_से_कोनसी_सर्विस_लेना_चाहते_हैं?",
+//           values: ["मोबाइल_एप्लीकेशन"],
+//         },
+//         {
+//           name: "कृपया_अपने_प्रोजेक्ट_के_बारे_में_कुछ_जानकारी_साझा_करें:",
+//           values: ["REAL ESTATE"],
+//         },
+//         {
+//           name: "आपने_इस_प्रोजेक्ट_के_लिए_कितना_बजट_निर्धारित_किया_है?",
+//           values: ["25000"],
+//         },
+//         {
+//           name: "हमें_आपको_कॉल_करने_के_लिए_उपयुक्त_तारीख_और_समय_बताएं:",
+//           values: ["2024-09-06T11:05:54+0000"],
+//         },
+//         {
+//           name: "आपका_नाम:",
+//           values: ["Suresh"],
+//         },
+//         {
+//           name: "मोबाइल_नंबर:",
+//           values: ["7577203184"],
+//         },
+//         {
+//           name: "शहर_का_नाम:",
+//           values: ["Mumbai"],
+//         },
+//       ],
+//     },
+//   ];
+
+//   if (!admin) {
+//     return res.redirect("/login");
+//   }
+
+//   console.log(allLeads);
+
+//   allLeads.forEach(async (lead) => {
+//     const perLead = await leadsModel.findOne({ lead_id: lead.id });
+
+//     if (!perLead) {
+//       let leads_datas = [];
+
+//       lead.field_data.forEach((data) => {
+//         leads_datas.push({ que: data.name, ans: data.values[0] });
+//       });
+
+//       const newLead = new leadsModel({
+//         lead_id: lead.id,
+//         income_time: lead.created_time,
+//         cid: admin.cid,
+//         leads_data: leads_datas,
+//         app: "facebook",
+//       });
+//       await newLead.save();
+//       console.log("data created");
+//     }
+//   });
+
+//   if (chalokiID) clearInterval(chalokiID);
+//   chalo(req.user);
+//   req.session.successMSG = "Connected to facebook account.";
+//   res.redirect("/leads");
+// });
+
 // profile update
 
 app.post("/submit-form", async (req, res) => {
@@ -412,7 +689,12 @@ app.get(
     );
 
     // Save all pipelines in parallel
-    await Promise.all(pipelines.map((pipeline) => pipeline.save()));
+    await Promise.all(
+      pipelines.map(async (pipeline) => {
+        await pipeline.save();
+        user.myPipelines.push(pipeline._id);
+      })
+    );
 
     const templates = [
       {
@@ -452,8 +734,13 @@ app.get(
     );
 
     // Save all pipelines in parallel
-    await Promise.all(templates.map((temp) => temp.save()));
-
+    await Promise.all(
+      templates.map(async (temp) => {
+        await temp.save();
+        user.myTemplates.push(temp._id);
+      })
+    );
+    await user.save();
     const token = await generateToken(user);
 
     res.cookie("360Followers", token, {
@@ -556,7 +843,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       return res.redirect("/login");
     }
 
-    console.log(allLeads.length);
+    console.log(allLeads);
 
     allLeads.forEach(async (lead) => {
       const perLead = await leadsModel.findOne({ lead_id: lead.id });
@@ -704,23 +991,6 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
   return res.json(remark);
 });
 
-app.post("/save-fcm-token", isAdminLoggedIn, async (req, res) => {
-  const fcmToken = req.body.token;
-  console.log("Received FCM Token:", fcmToken);
-
-  let user;
-  if (req.user.role === "admin")
-    user = await logIncollection.findById(req.user.id);
-  else user = await memberModel.findById(req.user.id);
-
-  user.fcmToken = fcmToken;
-  await user.save();
-
-  res.status(200).send("FCM token saved successfully.");
-});
-
-// Handle dynamic routes to serve pages without .html extension
-
 app.get("/:page", (req, res) => {
   const page = req.params.page;
   const filePath = path.join(static_path, `${page}.html`);
@@ -756,8 +1026,8 @@ function isAdminLoggedIn(req, res, next) {
   });
 }
 
-async function findNewLead(accessToken, req) {
-  let admin = await logIncollection.findById(req.user.id);
+async function findNewLead(accessToken, user) {
+  let admin = await logIncollection.findById(user.id);
   let allNewLeads = [];
   const pagesResponse = await axios.get(
     `https://graph.facebook.com/v20.0/me/accounts`,
@@ -867,14 +1137,14 @@ async function findNewLead(accessToken, req) {
       // console.log(leads_datas);
 
       // Send WhatsApp message to admin and members
-      // const adminNumber = req.user.phoneNumber;
-      // const adminName = req.user.name;
+      // const adminNumber = user.user.phoneNumber;
+      // const adminName = user.user.name;
       // const message = `A new lead has been added:\n\nLead ID: ${lead.lead_id}\nIncome Time: ${lead.income_time}\nApp: ${lead.app}`;
       // sendMessageToLead('919755313770@c.us', `${adminName}, ${message}`);
       // sendMessageToLead(adminNumber, `${adminName}, ${message}`);
 
       // Get members of the admin
-      // const members = await memberModel.find({ cid: req.user.cid });
+      // const members = await memberModel.find({ cid: user.user.cid });
       // members.forEach((member) => {
       //   const memberNumber = member.phoneNumber;
       // sendMessageToLead(memberNumber, `${adminName} added a new lead: ${lead.lead_id}`);
@@ -890,7 +1160,7 @@ async function findNewLead(accessToken, req) {
 }
 
 let chalteRahoId;
-function chalteRaho(token, req) {
+function chalteRaho(token, user) {
   let i = 0;
 
   chalteRahoId = setInterval(() => {
@@ -1026,3 +1296,72 @@ function sendMessageToLead(phoneNumber, message) {
 }
 
 initializeWhatsAppClient();
+
+// const readJsonFile = () => {
+//   const filePath = "./src/generated_data.json";
+//   const data = fs.readFileSync(filePath, "utf8");
+//   return JSON.parse(data); // Return the parsed JSON data
+// };
+
+// const insertData = async (dataChunk) => {
+//   // Collection name
+//   for (const item of dataChunk) {
+//     const exists = await leadsModel.findOne({ lead_id: item.id });
+//     if (!exists) {
+//       await leadsModel.insertOne(item);
+//       console.log(`Inserted: ${item.id}`);
+//     } else {
+//       console.log(`Already exists: ${item.id}`);
+//     }
+//   }
+// };
+
+// let i = 0;
+
+// function fileSeNewLeadLao() {
+//   let arr = readJsonFile();
+//   return [arr[i], arr[i + 1], arr[i + 2]];
+// }
+
+// async function okkk(user) {
+//   console.log("inetrval fun call : ", i);
+//   let admin = await logIncollection.findById(user.id);
+//   let allLeads = fileSeNewLeadLao();
+//   i += 3;
+
+//   allLeads.forEach(async (lead) => {
+//     const perLead = await leadsModel.findOne({ lead_id: lead.id });
+
+//     if (!perLead) {
+//       let leads_datas = [];
+
+//       lead.field_data.forEach((data) => {
+//         leads_datas.push({ que: data.name, ans: data.values[0] });
+//       });
+
+//       const newLead = new leadsModel({
+//         lead_id: lead.id,
+//         income_time: lead.created_time,
+//         cid: admin.cid,
+//         leads_data: leads_datas,
+//         app: "facebook",
+//       });
+//       await newLead.save();
+//       console.log("new lead created");
+//     } else {
+//       console.log("no new lead");
+//     }
+//   });
+// }
+
+
+
+// let chalokiID;
+// function chalo(user) {
+//   let i = 0;
+
+//    chalokiID = setInterval(() => {
+//     okkk(user);
+//     console.log("step chalo ki ", i++);
+//   }, 60000);
+// }

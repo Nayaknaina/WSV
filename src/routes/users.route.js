@@ -101,6 +101,109 @@ router.get("/signup", (req, res) => {
   res.render("signup");
 });
 
+
+router.post("/signup", async (req, res) => {
+  try {
+    const { name, email, password, confirmPassword } = req.body;
+    const user = await logIncollection.findOne({ email });
+
+    if (user)
+      return res.render("signup", { errorMessage: "User already exists" });
+    if (password !== confirmPassword)
+      return res.render("signup", { errorMessage: "Passwords do not match" });
+
+    const cid = uuidv4();
+    const newUser = new logIncollection({
+      name,
+      email,
+      password,
+      cid,
+      role: "admin",
+    });
+    await newUser.save();
+    console.log(newUser);
+    
+    const pipelines = [
+      { title: "win", color: "#28A745" },
+      { title: "loss", color: "#DC3545" },
+      { title: "held", color: "#007BFF" },
+      { title: "pending", color: "#FFC107" },
+    ].map(
+      (pipelineData) =>
+        new pipelineModel({
+          uid: newUser._id,
+          color: pipelineData.color,
+          title: pipelineData.title,
+          cid: newUser.cid,
+        })
+    );
+
+    // Save all pipelines in parallel
+    await Promise.all(
+      pipelines.map(async (pipeline) => {
+        await pipeline.save();
+        newUser.myPipelines.push(pipeline._id);
+      })
+    );
+
+    const templates = [
+      {
+        title: "welcome",
+        text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
+        client: true,
+        team: false,
+        num: 1,
+      },
+
+      {
+        title: "after call",
+        text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
+        client: true,
+        team: false,
+        num: 2,
+      },
+
+      {
+        title: "before call",
+        text: "",
+        client: false,
+        team: false,
+        num: 3,
+      },
+    ].map(
+      (temp) =>
+        new templateModel({
+          uid: newUser._id,
+          title: temp.title,
+          text: temp.text,
+          num: temp.num,
+          client: temp.client,
+          team: temp.team,
+          cid: newUser.cid,
+        })
+    );
+
+    // Save all pipelines in parallel
+    await Promise.all(
+      templates.map(async (temp) => {
+        await temp.save();
+        newUser.myTemplates.push(temp._id);
+      })
+    );
+    await newUser.save();
+
+    const token = await generateToken(newUser);
+
+    res.cookie("360Followers", token, {
+      httpOnly: true,
+      maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
+    });
+    res.redirect("/user/dashboard");
+  } catch (err) {
+    res.status(500).send("Error signing up");
+  }
+});
+
 // ! pipeline are here
 
 router.post("/pipeline", isAdminLoggedIn, async (req, res) => {
@@ -306,20 +409,20 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
 // Login handler
 router.post("/login", async (req, res) => {
   try {
-    const check = await logIncollection.findOne({ email: req.body.email });
+    const user = await logIncollection.findOne({ email: req.body.email });
 
-    if (!check || check.password !== req.body.password) {
+    if (!user || user.password !== req.body.password) {
       return res.render("signup", {
         errorMessage: "Invalid username or password",
       });
     }
 
-    const token = await generateToken(check);
+    const token = await generateToken(user);
     res.cookie("360Followers", token, {
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
-    res.redirect("/user/dashboard");
+   res.redirect("/user/dashboard");
   } catch (err) {
     console.error(err);
     res.status(500).send("Error logging in");
