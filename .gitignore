@@ -3,3 +3,5 @@
 demo
 node_modules
 .wwebjs_auth
+src/app3.js
+.gitignore
