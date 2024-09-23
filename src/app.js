@@ -258,6 +258,7 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
         if (userWA) {
           userWA.isConnected = false;
           userWA.whatsappClientReady = false;
+          req.session.successMSG = `Dis-Connected WhatsApp Number: ${connectedPhoneNumber}`;
           userWA.connectedPhoneNumber = "";
           await userWA.save();
         }
@@ -375,6 +376,116 @@ app.post(
     res.redirect("/template");
   }
 );
+
+
+app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
+  try {
+    const user = await logIncollection.findById(req.user.id);
+    if (user.teams.length >= 3) {
+      req.session.successMSG = `Cannot add more than 3 team members with free plan.`;
+      return res.redirect("/user/dashboard");
+    }
+
+    const { name, email, mobile, countryCode } = req.query;
+    const password = otpGenerator.generate(8, {
+      digits: true,
+      lowerCaseAlphabets: true,
+      upperCaseAlphabets: true,
+      specialChars: false,
+    });
+
+    const mailMsg = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="text-align: center;">
+        <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
+        <h2>Web Soft Valley</h2>
+        <p>Developing Future</p>
+      </div>
+
+      <h3>Hello ${name} !</h3>
+      <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
+
+      <p>Email: <a href="mailto:${email}">${email}</a></p>
+      <p>Password: <strong>${password}</strong></p>
+
+      <div style="text-align: center;">
+        <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+          Login to Dashboard
+        </a>
+      </div>
+
+      <p>Regards,<br>Web Soft Valley Technology</p>
+    </div>
+  `;
+    const subject = `Invitation from ${user.name}`;
+    const isSent = await sendMail(email, mailMsg, subject);
+    console.log(isSent);
+
+    const leadContactNo = mobile;
+    const text = `Hello ${name}!\n\nCongratulations! Your account has been created successfully. You can log in now and start using our service.
+    \n\n Your email: ${email}
+    \n\n Your password : ${password}
+    \n\n[Click here to login](https://360followups.com/member/login)`;
+
+    setTimeout(() => {
+      // if (reminderTemplate.image !== "") {
+      //   // img for user
+      //   reminderTempImagePath = path.join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     reminderTemplate.image
+      //   );
+      // }
+      // if (reminderTemplate.pdf !== "") {
+      //   // pdf for user
+      //   reminderTempPdfPath = path.join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     reminderTemplate.pdf
+      //   );
+      // }
+      // if (afterCallTemp.image !== "") {
+      //   // img for lead
+      //   LeadTempImagePath = path.join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     afterCallTemp.image
+      //   );
+      // }
+      // if (afterCallTemp.pdf !== "") {
+      //   // pdf for lead
+      //   LeadTempPdfPath = path.join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     afterCallTemp.pdf
+      //   );
+      // }     
+
+      sendMessageToLead(
+        leadContactNo,
+        text
+      ); // after temp msg sending to lead
+    }, 4000);
+
+    const newMember = new memberModel({
+      name,
+      email,
+      password,
+      countryCode,
+      mobile,
+      cid: user.cid,
+      owner_id: user._id,
+    });
+    await newMember.save();
+    user.teams.push(newMember._id);
+    await user.save();
+
+    req.session.successMSG = `you have invited ${name} as a team member !. `;
+  } catch (error) {
+    console.log(error);
+  }
+  return res.redirect("/user/team");
+});
 
 // app.get("/get/data", isAdminLoggedIn, async (req, res) => {
 //   const admin = await logIncollection.findById(req.user.id);
@@ -1400,4 +1511,9 @@ initializeWhatsAppClient();
 //     okkk(user);
 //     console.log("step chalo ki ", i++);
 //   }, 60000);
+// }
+
+
+// module.exports = {
+//   sendMessageToLead
 // }

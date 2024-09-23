@@ -227,10 +227,75 @@
                             }
                         }
                     </style>
-
+                    {{#ifEquals user.role 'admin'}}
                     <ul id="allLeads" style="display: block;">
                         {{#if leads.length}}
                         {{#each leads}}
+                        <li>
+                            <nav>
+                                <label for="touch-{{@index}}" class="created-time-label">
+                                    <strong>Created Time : {{formatDate income_time}}</strong>
+                                    <strong>Recived from : {{ app }}</strong>
+
+                                    <span class="icon-container">
+                                        {{#if uid}}
+                                        <!-- Double Check Icon when uid is not null -->
+                                        <i class="fa-solid fa-check-double" style="color: #0D6EFD;"></i>
+                                        <p>{{uid.name}}</p>
+                                        {{else}}
+                                        <!-- Single Check Icon when uid is null -->
+                                        <a href="/lead/book/{{_id}}">
+                                            <i class="fa-solid fa-check" style="color: #36383a;"></i>
+                                        </a>
+                                        {{/if}}
+
+                                        {{!-- {{#each leads_data}}
+                                        {{#if (containsPhoneNumber ans)}}
+                                        <a href="tel:{{ans}}">
+                                            <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
+                                        </a>
+                                        <a href="https://wa.me/{{ans}}" target="_blank">
+                                            <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                                        </a>
+                                        {{/if}}
+                                        {{/each}} --}}
+                                        {{!-- <span class="status-circle" onclick="toggleDropdown()"
+                                            style="background-color: {{status.color}};"> --}}
+                                            {{!-- <div class="ul-box">
+                                                {{#each ../pipes}}
+                        <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                            <span>{{title}}</span>
+                            <span class="drop-circle" style="background-color: {{color}};"></span>
+                        </li>
+                        {{/each}}
+                </div> --}}
+                </span>
+                </span>
+                </label>
+                <input type="checkbox" id="touch-{{@index}}">
+                <ul class="slide">
+                    {{#each leads_data}}
+                    <li>
+                        <strong>{{que}}:</strong> {{ans}}
+                    </li>
+                    {{/each}}
+                </ul>
+                </nav>
+                </li>
+                {{/each}}
+                {{else}}
+                <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
+                    added here <br> please connect your app first</li>
+                {{/if}}
+                </ul>
+                {{/ifEquals}}
+
+
+
+                    {{#ifEquals user.role 'member'}}
+                    <ul id="allLeads" style="display: block;">
+                        {{#if (filterLeadsForMember leads)}}
+                        {{#each (filterLeadsForMember leads)}}
                         <li>
                             <nav>
                                 <label for="touch-{{@index}}" class="created-time-label">
@@ -287,6 +352,7 @@
                     added here <br> please connect your app first</li>
                 {{/if}}
                 </ul>
+                {{/ifEquals}}
 
 
 
@@ -299,9 +365,9 @@
                                 <strong>Created Time : {{formatDate income_time}}</strong>
                                 <strong>Recived from : {{ app }}</strong>
                                 <span class="icon-container" style="display: flex; align-items: center;">
-                                    <a href="/lead/remove/{{_id}}">
+                                    {{!-- <a href="/lead/remove/{{_id}}">
                                         <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
-                                    </a>
+                                    </a> --}}
                                     {{#each leads_data}}
                                     {{#if (containsPhoneNumber ans)}}
                                     <a href="tel:{{ans}}">
@@ -659,8 +725,6 @@
             let form = document.querySelector(`#remark-form-list${id}`)
             form.style.display = 'none'
         }
-
-
     </script>
 
 

@@ -119,41 +119,14 @@ router.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
     let admin = await logIncollection.findById(req.user.id);
     admin.myleads.push(lead._id);
     lead.uid = admin._id;
+    lead.userType = "logIncollection";
     await admin.save();
     await lead.save();
   } else {
     let member = await memberModel.findById(req.user.id);
     member.myleads.push(lead._id);
     lead.uid = member._id;
-    await member.save();
-    await lead.save();
-
-    console.log("bokking the leads by ", member);
-  }
-  res.redirect("/leads");
-});
-
-router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
-  let { id } = req.params;
-
-  let lead = await leadsModel.findById(id);
-  if (!lead) {
-    return res.redirect("/leads");
-  }
-  if (req.user.role === "admin") {
-    let admin = await logIncollection.findById(req.user.id);
-    admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
-    lead.uid = "";
-    lead.remarks = [];
-
-    await admin.save();
-    await lead.save();
-  } else {
-    let member = await memberModel.findById(req.user.id);
-    member.myleads.splice(member.myleads.indexOf(lead._id), 1);
-    lead.uid = "";
-    lead.remarks = [];
-
+    lead.userType = "teamMember";
     await member.save();
     await lead.save();
 
@@ -178,6 +151,7 @@ router.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
   res.json({ color: pipe.color });
 });
 
+/*
 // router.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
 //   const { id } = req.params;
 //   const { text, time, date } = req.body;
@@ -269,5 +243,6 @@ router.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
 
 //   return res.json(remark);
 // });
+*/
 
 module.exports = router;

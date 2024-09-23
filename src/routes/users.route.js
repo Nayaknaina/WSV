@@ -22,79 +22,221 @@ router.get("/team", isAdminLoggedIn, async (req, res) => {
   let user;
   if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id).populate("teams");
-  } else {
-    user = await memberModel.findById(req.user.id).populate("owner_id");
-    console.log(user);
   }
-  res.render("team", { user });
+  let msg = req.session.successMSG;
+    delete req.session.successMSG;
+  res.render("team", { user, successMSG:msg });
 });
 
-router.get("/team/invite", isAdminLoggedIn, async (req, res) => {
+router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
+  let { id } = req.params;
+
+  let lead = await leadsModel.findById(id);
+  if (!lead) {
+    return res.redirect("/leads");
+  }
+ 
+    let admin = await logIncollection.findById(req.user.id);
+    admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
+    lead.uid = null;
+    lead.userType = null;
+    // lead.remarks = [];
+
+    await admin.save();
+    await lead.save();
+ 
+  res.redirect("/leads");
+});
+
+router.get('/member/blocked/:id', isAdminLoggedIn,async(req,res)=>{
   try {
-    const user = await logIncollection.findById(req.user.id);
-    if (user.teams.length >= 3) {
-      req.session.successMSG = `Cannot add more than 3 team members with free plan.`;
-      return res.redirect('/user/dashboard')
-    }
-    // if (user.teams.length >= 50) {
-    //   req.session.successMSG = `Cannot add more than 50 team members with pro plan.`;
-    //   return res.redirect('/user/dashboard')
-    // }
-    const { name, email, mobile, countryCode } = req.query;
-    const password = otpGenerator.generate(8, {
-      digits: true,
-      lowerCaseAlphabets: true,
-      upperCaseAlphabets: true,
-      specialChars: false,
-    });
-
-    const mailMsg = `
-    <div style="font-family: Arial, sans-serif; color: #333;">
-      <div style="text-align: center;">
-        <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
-        <h2>Web Soft Valley</h2>
-        <p>Developing Future</p>
-      </div>
-
-      <h3>Hello ${name} !</h3>
-      <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
-      
-      <p>Email: <a href="mailto:${email}">${email}</a></p>
-      <p>Password: <strong>${password}</strong></p>
-
-      <div style="text-align: center;">
-        <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-          Login to Dashboard
-        </a>
-      </div>
-
-      <p>Regards,<br>Web Soft Valley Technology</p>
-    </div>
-  `;
-    const subject = `Invitation from ${user.name}`;
-    const isSent = await sendMail(email, mailMsg, subject);
-    console.log(isSent);
-
-    if (isSent[0].res === "okk") {
-      const newMember = new memberModel({
-        name,
-        email,
-        password,
-        countryCode,
-        mobile,
-        cid: user.cid,
-        owner_id: user._id,
-      });
-      await newMember.save();
-      user.teams.push(newMember._id);
-      await user.save();
-    }
-    req.session.successMSG = `you have invited ${name} as a team member !. `;
-  } catch (error) {
-    console.log(error);
+    let member = await memberModel.findById(req.params.id)
+    member.blocked = true;
+    await member.save()
+    req.session.successMSG = `Now ${member.name} is blocked`
+    res.redirect('/user/team')
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal error")
   }
-  return res.redirect("/user/team");
-});
+})
+
+// router.get("/team/invite", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     const user = await logIncollection.findById(req.user.id);
+//     if (user.teams.length > 3) {
+//       req.session.successMSG = `Cannot add more than 3 team members with free plan.`;
+//       return res.redirect("/user/dashboard");
+//     }
+
+//     const { name, email, mobile, countryCode } = req.query;
+//     const password = otpGenerator.generate(8, {
+//       digits: true,
+//       lowerCaseAlphabets: true,
+//       upperCaseAlphabets: true,
+//       specialChars: false,
+//     });
+
+//     const mailMsg = `
+//     <div style="font-family: Arial, sans-serif; color: #333;">
+//       <div style="text-align: center;">
+//         <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
+//         <h2>Web Soft Valley</h2>
+//         <p>Developing Future</p>
+//       </div>
+
+//       <h3>Hello ${name} !</h3>
+//       <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
+
+//       <p>Email: <a href="mailto:${email}">${email}</a></p>
+//       <p>Password: <strong>${password}</strong></p>
+
+//       <div style="text-align: center;">
+//         <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+//           Login to Dashboard
+//         </a>
+//       </div>
+
+//       <p>Regards,<br>Web Soft Valley Technology</p>
+//     </div>
+//   `;
+//     const subject = `Invitation from ${user.name}`;
+//     const isSent = await sendMail(email, mailMsg, subject);
+//     console.log(isSent);
+
+//     const leadContactNo = mobile;
+//     const text = `Hello ${name}!\n\nCongratulations! Your account has been created successfully. You can log in now and start using our service.
+//     \n\n Your email: ${email}
+//     \n\n Your password : ${password}
+//     \n\n[Click here to login](https://360followups.com/member/login)`;
+
+//     setTimeout(() => {
+//       // if (reminderTemplate.image !== "") {
+//       //   // img for user
+//       //   reminderTempImagePath = path.join(
+//       //     __dirname,
+//       //     "../template/images/uploads/whatsapp/",
+//       //     reminderTemplate.image
+//       //   );
+//       // }
+//       // if (reminderTemplate.pdf !== "") {
+//       //   // pdf for user
+//       //   reminderTempPdfPath = path.join(
+//       //     __dirname,
+//       //     "../template/images/uploads/whatsapp/",
+//       //     reminderTemplate.pdf
+//       //   );
+//       // }
+//       // if (afterCallTemp.image !== "") {
+//       //   // img for lead
+//       //   LeadTempImagePath = path.join(
+//       //     __dirname,
+//       //     "../template/images/uploads/whatsapp/",
+//       //     afterCallTemp.image
+//       //   );
+//       // }
+//       // if (afterCallTemp.pdf !== "") {
+//       //   // pdf for lead
+//       //   LeadTempPdfPath = path.join(
+//       //     __dirname,
+//       //     "../template/images/uploads/whatsapp/",
+//       //     afterCallTemp.pdf
+//       //   );
+//       // }     
+
+//       sendMessageToLead(
+//         leadContactNo,
+//         text
+//       ); // after temp msg sending to lead
+//     }, 4000);
+
+//     const newMember = new memberModel({
+//       name,
+//       email,
+//       password,
+//       countryCode,
+//       mobile,
+//       cid: user.cid,
+//       owner_id: user._id,
+//     });
+//     await newMember.save();
+//     user.teams.push(newMember._id);
+//     await user.save();
+
+//     req.session.successMSG = `you have invited ${name} as a team member !. `;
+//   } catch (error) {
+//     console.log(error);
+//   }
+//   return res.redirect("/user/team");
+// });
+
+
+// router.get("/team/invite", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     const user = await logIncollection.findById(req.user.id);
+//     if (user.teams.length >= 3) {
+//       req.session.successMSG = `Cannot add more than 3 team members with free plan.`;
+//       return res.redirect('/user/dashboard')
+//     }
+//     // if (user.teams.length >= 50) {
+//     //   req.session.successMSG = `Cannot add more than 50 team members with pro plan.`;
+//     //   return res.redirect('/user/dashboard')
+//     // }
+//     const { name, email, mobile, countryCode } = req.query;
+//     const password = otpGenerator.generate(8, {
+//       digits: true,
+//       lowerCaseAlphabets: true,
+//       upperCaseAlphabets: true,
+//       specialChars: false,
+//     });
+
+//     const mailMsg = `
+//     <div style="font-family: Arial, sans-serif; color: #333;">
+//       <div style="text-align: center;">
+//         <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
+//         <h2>Web Soft Valley</h2>
+//         <p>Developing Future</p>
+//       </div>
+
+//       <h3>Hello ${name} !</h3>
+//       <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
+      
+//       <p>Email: <a href="mailto:${email}">${email}</a></p>
+//       <p>Password: <strong>${password}</strong></p>
+
+//       <div style="text-align: center;">
+//         <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+//           Login to Dashboard
+//         </a>
+//       </div>
+
+//       <p>Regards,<br>Web Soft Valley Technology</p>
+//     </div>
+//   `;
+//     const subject = `Invitation from ${user.name}`;
+//     const isSent = await sendMail(email, mailMsg, subject);
+//     console.log(isSent);
+
+//     if (isSent[0].res === "okk") {
+//       const newMember = new memberModel({
+//         name,
+//         email,
+//         password,
+//         countryCode,
+//         mobile,
+//         cid: user.cid,
+//         owner_id: user._id,
+//       });
+//       await newMember.save();
+//       user.teams.push(newMember._id);
+//       await user.save();
+//     }
+//     req.session.successMSG = `you have invited ${name} as a team member !. `;
+//   } catch (error) {
+//     console.log(error);
+//   }
+//   return res.redirect("/user/team");
+// });
 
 router.get("/signup", (req, res) => {
   res.render("signup");
@@ -121,7 +263,7 @@ router.post("/signup", async (req, res) => {
     });
     await newUser.save();
     console.log(newUser);
-    
+
     const pipelines = [
       { title: "win", color: "#28A745" },
       { title: "loss", color: "#DC3545" },
@@ -212,6 +354,7 @@ router.post("/pipeline", isAdminLoggedIn, async (req, res) => {
   const pipes = await pipelineModel.find({cid: req.user.cid});
 
   if (pipes.length > 5) {
+    req.session.errorMSG = `you cant add more then 5 pipelines status`;
     return res.redirect("/user/dashboard");
   }
 
@@ -315,7 +458,9 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
     // res.json({})
     let msg = req.session.successMSG;
     delete req.session.successMSG;
-    res.render("dashboard", { user, pipes, leads, successMSG: msg });
+    let errMsg = req.session.errorMSG
+    delete req.session.errorMSG;
+    res.render("dashboard", { user, pipes, leads, successMSG: msg, errorMSG : errMsg });
     // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
   } catch (error) {
     console.log("error in dashboard",error);

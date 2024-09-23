@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+const memberModel = require("../models/member.model.js");
+
 
 function isAdminLoggedIn(req, res, next) {
   console.log("isAdminLoggedIn middilware");
@@ -39,7 +41,18 @@ function isMemberLoggedIn(req,res,next){
   });
 }
 
+
+
+async function isMemberBlocked(req, res, next) {
+  const token = req.cookies["360Followers"];
+  const member = await memberModel.findById(verifyToken(token));
+  if (member.blocked) {
+    res.redirect("/member/login");
+  } else next();
+}
+
 module.exports = {
   isAdminLoggedIn,
-  isMemberLoggedIn
+  isMemberLoggedIn,
+  isMemberBlocked
 }

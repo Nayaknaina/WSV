@@ -4,13 +4,23 @@ const leadsSchema = new mongoose.Schema(
   {
     lead_id: {
       type: String,
+      default: ''
     },
 
     uid: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      refPath: 'userType',  // Dynamic reference based on userType
+      default: null,        // Allow `uid` to be null at the time of creation
     },
+    userType: {
+      type: String,
+      enum: ['teamMember', 'logIncollection'],
+      default: null,        // Optional, can be set later
+    },
+
     cid: {
       type: String,
+      default: ''
     },
 
     income_time: {
@@ -33,7 +43,10 @@ const leadsSchema = new mongoose.Schema(
         ans: String,
       },
     ],
-    app:String,
+    app:{
+      type: String,
+      default: ''
+    },
     
   },
   {

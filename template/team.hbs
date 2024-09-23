@@ -327,41 +327,34 @@
           </div>
         </div>
       
-          <table>
+         <table>
   
   <thead>
     <tr>
       <th scope="col">Name</th>
       <th scope="col">Email</th>
-      <th scope="col">Leads</th>
-      <th scope="col">Win Leads</th>
+      <th scope="col">Mobile</th>
+      <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody>
+    {{#each user.teams}}
     <tr>
-      <td data-label="Account">Visa - 3412</td>
-      <td data-label="Due Date">04/01/2016</td>
-      <td data-label="Amount">$1,190</td>
-      <td data-label="Period">03/01/2016 - 03/31/2016</td>
+      <td data-label="Account">{{name}}</td>
+      <td data-label="Due Date">{{email}}</td>
+      <td data-label="Period">{{mobile}}</td>
+      {{!-- <td data-label="Amount">{{myleads.length}}</td> --}}
+      {{!-- <td ><a href="/member/blocked/{{_id}}"><i class="fa-solid fa-ban" style="color: #ff0000;"></i></a></td> --}}
+      <td >
+        {{#if blocked}}
+        <a href="/member/un-blocked/{{_id}}"><button type="button" class="btn btn-success btn-sm">Un-Block</button></a>
+        {{else}}
+        <a href="/member/blocked/{{_id}}"><button type="button" class="btn btn-danger btn-sm">Block</button></a>
+        {{/if}}
+      </td>
     </tr>
-    <tr>
-      <td scope="row" data-label="Account">Visa - 6076</td>
-      <td data-label="Due Date">03/01/2016</td>
-      <td data-label="Amount">$2,443</td>
-      <td data-label="Period">02/01/2016 - 02/29/2016</td>
-    </tr>
-    <tr>
-      <td scope="row" data-label="Account">Corporate AMEX</td>
-      <td data-label="Due Date">03/01/2016</td>
-      <td data-label="Amount">$1,181</td>
-      <td data-label="Period">02/01/2016 - 02/29/2016</td>
-    </tr>
-    <tr>
-      <td scope="row" data-label="Acount">Visa - 3412</td>
-      <td data-label="Due Date">02/01/2016</td>
-      <td data-label="Amount">$842</td>
-      <td data-label="Period">01/01/2016 - 01/31/2016</td>
-    </tr>
+    {{/each }}
+   
   </tbody>
         </table>
 

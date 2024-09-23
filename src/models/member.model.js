@@ -6,6 +6,10 @@ const teamMemberSchema = new mongoose.Schema(
       type: String,
       default: 'member'
     },
+    blocked: {
+      type: Boolean,
+      default: false,
+    },
     name: {
       type: String,
     },
