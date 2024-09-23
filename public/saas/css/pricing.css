@@ -1,16 +1,23 @@
 
-*,
-:after,
-:before {
-    box-sizing: border-box;
-    border: 0 solid
+:root {
+    --main-color: #2a3bf8;
+    --main-home-background:#2a36bb;
+    --primary-color: #fefffb;
+  --gradient-color: linear-gradient(180deg, #d2ff00 0%, #00d2ff 100%);
+  }
+  .figure {
+    display: inline-block;
 }
-
-:after,
-:before {
-    --tw-content: ""
+.highlight-background {
+    position: absolute;
+    overflow: hidden;
+    max-width: 100%;
+    top: 0;
 }
-
+.highlight-background--lean-right {
+    right: 0;
+    opacity: 0.14;
+}
 .navigation-bar {
     padding: 12px 0;
     position: fixed;
