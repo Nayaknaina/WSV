@@ -187,8 +187,8 @@
                     
                    {{#if errorMSG}}
                     <div class="col-sm-12">
-                        <div id="alert-success" class="alert  alert-success alert-dismissible fade show" role="alert">
-                            <span class="badge badge-pill badge-danger">Success</span> {{successMSG}}
+                        <div id="alert-error" class="alert  alert-danger alert-dismissible fade show" role="alert">
+                            <span class="badge badge-pill badge-danger">Success</span> {{errorMSG}}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -218,24 +218,28 @@
                     <!--/.col-->
 
 
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-3 col-md-6" style="opacity: 0.3;">
                         <div class="social-box linkedin">
                             <i class="fa fa-download"></i>
-                            <a target="_blank" href="/" class="btn btn-outline-secondary border font-15">Download
+                            {{!-- <a class="btn btn-outline-secondary border  font-15" href="#">Download
+                                Data </a> --}}
+                            <a href="#" class="btn border font-15">Download
                                 Data</a>
                         </div>
                         <!--/social-box-->
                     </div>
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-3 col-md-6" style="opacity: 0.3;">
                         <div class="social-box mailchimp">
                             <i class="fab fa-mailchimp"></i>
                          
-                            <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
+                            {{!-- <a class="btn btn-outline-secondary border  font-15" href="#">connect now </a> --}}
+                            <a class="btn border  font-15" href="#">connect now </a>
                         </div>
                         <!--/social-box-->
                     </div>
                 </div>
                     <div class="row ">
+                        
                       
                         {{#each pipes}}
 
@@ -265,13 +269,13 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-sm-4">
-                                        <h4 class="card-title mb-0">Traffic</h4>
-                                        <div class="small text-muted">Lead Analytics</div>
+                                    <div class="col">
+                                        <h4 class="card-title mb-0">Graphical lead performance insights</h4>
+                                        {{!-- <div class="small text-muted">Lead Analytics</div> --}}
                                     </div>
                                 </div>
                                 <!--/.row-->
-                                 <div class="chart-wrapper mt-4">
+                                  <div class="chart-wrapper mt-4">
                                     <canvas id="competitionGraph" style="width:800px; height:300px;"
                                         height="300"></canvas>
                                 </div>
@@ -326,11 +330,13 @@
                     </div>
 
                     <div class="col-xl-3 col-lg-6">
-                       
+                       <form action="/user/profile/image" hidden id="user-image-change-form" enctype="multipart/form-data" method="post">
+                        <input onchange="changeProfileImage()" type="file" name="userImage" id="user-profile-image-input" accept="image/*" required>
+                       </form>
                         <section class="card" style="min-height: 400px;">
                             <div class="profile-card">
-                                <div href="/profile" class="corner-ribon black-ribon">
-                                    <a href="/profile"><i class="fas fa-edit"></i></a>
+                                <div class="corner-ribon black-ribon">
+                                    <label for="user-profile-image-input"><i class="fas fa-edit"></i></label>
                                 </div>
 
                                 <div class="media">
@@ -339,7 +345,7 @@
                                         <div class="profile-details">
                                        
                                             {{#if user.profilePicture}}
-                                            <img id="user_image" width="70" height="70" src="{{user.profilePicture}}"
+                                            <img id="user_image" width="70" height="70" src="/images/uploads/profile/admin/{{user.profilePicture}}"
                                                 class="rounded-circle">
                                             {{else}}
                                             <img id="user_image" width="70" height="70"
@@ -371,11 +377,11 @@
                             </div>
                             <a href="/profile" id="acc-Btn" class="btn btn-secondary border ml-4 mr-4 font-15">update profile</a>
                             <footer class="twt-footer">
-                                <a href="#"><i class="fa fa-camera"></i></a>
+                                {{!-- <a href="#"><i class="fa fa-camera"></i></a> --}}
                                 <a href="#"><i class="fa fa-map-marker"></i></a>
-                                India
-                                <span class="pull-right">
-                                    32
+                                <a id="location-title"></a>
+                                <span id="location-localtime" class="pull-right">
+                                    
                                 </span>
                             </footer>
                         </section>
@@ -434,6 +440,7 @@
                             <div class="card-body">
                                 <div class="stat-widget-one" id="pipe-container-s"
                                     style="height: 350px;max-height: 350px; overflow: auto;">
+                                <p style="font-size: 14px; color: #1a1a1a;font-weight: 500; margin: 0;">Integrate your personalized pipelines</p>
                                     <form action="/user/pipeline" method="post">
                                         <input type="text" id="inputPassword2" name="title" placeholder="Enter Pipline">
                                         <input type="color" class="colorinp"
@@ -798,11 +805,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        console.log("hello ji")
-        const leads = {{{ json leads }}};
-        console.log(leads);
+        // console.log("hello ji")
+        const leads = {{{ json user.myleads }}};
+        // console.log(leads);
         const pipelines = {{{ json pipes }}};
-        console.log(pipelines);
+        // console.log(pipelines);
 
         const pipelineMap = {};
         pipelines.forEach(pipe => {
@@ -850,7 +857,7 @@
                 borderWidth: 1,
                 outerWidth: 1,
                 innerWidth: 1,
-                
+
                 fill: true,
                 tension: 1, // Set fill to true for area chart
             };
@@ -870,7 +877,7 @@
                     x: { title: { display: true, text: 'Income Time' } },
                     y: { title: { display: true, text: 'Number of Leads' } },
                 },
-                
+
             },
         };
 
@@ -905,6 +912,40 @@ async function checkConnectionStatus() {
 document.addEventListener('DOMContentLoaded', checkConnectionStatus);
 
 </script>
+{{!--todo profile card current location with local time --}}
+ <script>
+    async function getLocation(leti,logi) {
+      const data = await fetch(`https://api.weatherapi.com/v1/current.json?key=fffb3eafa2394421ae9120857242309&q=${leti},${logi}&api=yes`)
+      let city = await data.json()
+      console.log(city);
+
+    let space = document.querySelector('#location-title')
+    let spacetime = document.querySelector('#location-localtime')
+    space.innerHTML = `${city.location.name},${city.location.country}`
+    spacetime.innerHTML = `${city.location.localtime}`
+    }
+    
+    function getData(position) {
+      console.log(position);
+      getLocation(position.coords.latitude,position.coords.longitude)
+    }
+    function getErr() {
+      console.log("Oops, Somehing went wrong !");
+    }
+
+    document.addEventListener('DOMContentLoaded', async()=>{
+      navigator.geolocation.getCurrentPosition(getData,getErr)
+    })
+  </script>
+
+  <script>
+    function changeProfileImage(){
+    let imageInpForm = document.querySelector('#user-image-change-form');
+       
+        imageInpForm.submit()
+
+    }
+  </script>
 </body>
 
 </html>

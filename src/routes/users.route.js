@@ -8,6 +8,7 @@ const memberModel = require("../models/member.model.js");
 const remarkModel = require("../models/remark.model.js");
 const leadsModel = require("../models/leads.model.js");
 const templateModel = require("../models/temlate.model.js");
+const WaModel = require("../models/wA.model.js");
 const otpGenerator = require("otp-generator");
 
 const { sendMail } = require("../service/mailSender.js");
@@ -15,8 +16,10 @@ const { isAdminLoggedIn } = require("../middilware/middilware.js");
 const { generateToken } = require("../../utils/auth.js");
 const { upload } = require("../service/multer.js");
 const jwt = require("jsonwebtoken");
+const path = require('path')
+const fs = require('fs')
 const { v4: uuidv4 } = require("uuid");
-
+const { uploadAdminsPro } = require("../service/multer.js");
 
 router.get("/team", isAdminLoggedIn, async (req, res) => {
   let user;
@@ -24,8 +27,8 @@ router.get("/team", isAdminLoggedIn, async (req, res) => {
     user = await logIncollection.findById(req.user.id).populate("teams");
   }
   let msg = req.session.successMSG;
-    delete req.session.successMSG;
-  res.render("team", { user, successMSG:msg });
+  delete req.session.successMSG;
+  res.render("team", { user, successMSG: msg });
 });
 
 router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
@@ -35,31 +38,18 @@ router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
   if (!lead) {
     return res.redirect("/leads");
   }
- 
-    let admin = await logIncollection.findById(req.user.id);
-    admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
-    lead.uid = null;
-    lead.userType = null;
-    // lead.remarks = [];
 
-    await admin.save();
-    await lead.save();
- 
+  let admin = await logIncollection.findById(req.user.id);
+  admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
+  lead.uid = null;
+  lead.userType = null;
+  // lead.remarks = [];
+
+  await admin.save();
+  await lead.save();
+
   res.redirect("/leads");
 });
-
-router.get('/member/blocked/:id', isAdminLoggedIn,async(req,res)=>{
-  try {
-    let member = await memberModel.findById(req.params.id)
-    member.blocked = true;
-    await member.save()
-    req.session.successMSG = `Now ${member.name} is blocked`
-    res.redirect('/user/team')
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Internal error")
-  }
-})
 
 // router.get("/team/invite", isAdminLoggedIn, async (req, res) => {
 //   try {
@@ -142,7 +132,7 @@ router.get('/member/blocked/:id', isAdminLoggedIn,async(req,res)=>{
 //       //     "../template/images/uploads/whatsapp/",
 //       //     afterCallTemp.pdf
 //       //   );
-//       // }     
+//       // }
 
 //       sendMessageToLead(
 //         leadContactNo,
@@ -169,7 +159,6 @@ router.get('/member/blocked/:id', isAdminLoggedIn,async(req,res)=>{
 //   }
 //   return res.redirect("/user/team");
 // });
-
 
 // router.get("/team/invite", isAdminLoggedIn, async (req, res) => {
 //   try {
@@ -200,7 +189,7 @@ router.get('/member/blocked/:id', isAdminLoggedIn,async(req,res)=>{
 
 //       <h3>Hello ${name} !</h3>
 //       <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
-      
+
 //       <p>Email: <a href="mailto:${email}">${email}</a></p>
 //       <p>Password: <strong>${password}</strong></p>
 
@@ -242,6 +231,42 @@ router.get("/signup", (req, res) => {
   res.render("signup");
 });
 
+router.post("/profile/image", isAdminLoggedIn, uploadAdminsPro.single("userImage"), async (req, res) => {
+    try {
+      let user = await logIncollection.findById(req.user.id);
+
+      if (!req.file) {
+        console.log("File not exists");
+        return res.status(404).send("No file was given");
+      } 
+      
+      console.log("File exists");
+      if (user.profilePicture) {
+        const oldImagePath = path.join(
+          __dirname,
+          "../../template/images/uploads/profile/admin/",
+          user.profilePicture
+        );
+
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.error("Error deleting old image:", err);
+          } else {
+            console.log("Old image deleted successfully.");
+          }
+        });
+      }
+
+      console.log(req.file.filename);
+      user.profilePicture = req.file.filename;
+      await user.save();
+      
+      res.redirect("/user/dashboard");
+    } catch (err) {
+      console.log("error in /member/profile/image", err);
+    }
+  }
+);
 
 router.post("/signup", async (req, res) => {
   try {
@@ -351,7 +376,7 @@ router.post("/pipeline", isAdminLoggedIn, async (req, res) => {
   const { title, color } = req.body;
 
   const user = await logIncollection.findById(req.user.id);
-  const pipes = await pipelineModel.find({cid: req.user.cid});
+  const pipes = await pipelineModel.find({ cid: req.user.cid });
 
   if (pipes.length > 5) {
     req.session.errorMSG = `you cant add more then 5 pipelines status`;
@@ -388,7 +413,6 @@ router.get("/pipe/abc", async (req, res) => {
   res.redirect("/user/dashboard");
 });
 router.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
-  
   const { id } = req.params;
   const { title, color, defaultVal } = req.body;
 
@@ -443,9 +467,14 @@ router.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
 router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   try {
     console.log("we are in a /user/dashboard");
-    const user = await logIncollection
-      .findById(req.user.id)
-      .populate("myleads");
+    const user = await logIncollection.findById(req.user.id).populate({
+      path: "myleads", // Populating 'myleads' field from user
+      populate: [
+        { path: "status" }, // Populate the 'status' field inside each lead
+        { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
+      ],
+    });
+
     if (!user.organizationName) {
       return res.render("dashboard", { showForm: true });
     }
@@ -456,14 +485,26 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       .exec();
     const leads = await leadsModel.find({ cid: user.cid }).populate("status");
     // res.json({})
+    // console.log(req.session.successMSG);
     let msg = req.session.successMSG;
+    // console.log(req.session.successMSG);
+
+    let errMsg = req.session.errorMSG;
+
     delete req.session.successMSG;
-    let errMsg = req.session.errorMSG
     delete req.session.errorMSG;
-    res.render("dashboard", { user, pipes, leads, successMSG: msg, errorMSG : errMsg });
+    console.log(msg, errMsg);
+
+    res.render("dashboard", {
+      user,
+      pipes,
+      leads,
+      successMSG: msg,
+      errorMSG: errMsg,
+    });
     // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
   } catch (error) {
-    console.log("error in dashboard",error);
+    console.log("error in dashboard", error);
 
     res.status(500).send("Internal error");
   }
@@ -549,7 +590,6 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
 
 // Signup handler
 
-
 // Login handler
 router.post("/login", async (req, res) => {
   try {
@@ -566,7 +606,7 @@ router.post("/login", async (req, res) => {
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
-   res.redirect("/user/dashboard");
+    res.redirect("/user/dashboard");
   } catch (err) {
     console.error(err);
     res.status(500).send("Error logging in");
@@ -576,6 +616,74 @@ router.post("/login", async (req, res) => {
 router.get("/logout", (req, res) => {
   res.clearCookie("360Followers");
   res.redirect("/");
+});
+
+// router.get('/member/dashboard/:memId', isAdminLoggedIn, (req,res)=>{
+//   req.session.memId = req.params.memId;
+//   res.redirect('/user/member/dashboard');
+// })
+
+// router.get('/member/dashboard', isAdminLoggedIn, async (req,res)=>{
+//   try {
+//     let user = await memberModel.findById(req.session.memId).populate({
+//       path: "myleads", // Populating 'myleads' field from user
+//       populate: [
+//         { path: "status" }, // Populate the 'status' field inside each lead
+//         { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
+//       ],
+//     })
+
+//     // delete req.session.memId;
+//     // console.log(user);
+
+//     let whtsConn = await WaModel.findOne({cid:user.cid})
+//     let pipes = await pipelineModel.find({cid:user.cid})
+//     let leads = await leadsModel.find({cid:user.cid})
+
+//     let admin = await logIncollection.findById(req.user.id)
+
+//     res.render('memberDashboard',{
+//       leads,
+//       admin,
+//       user,
+//       whtsConn,
+//       pipes
+//     });
+//   } catch (err) {
+//     console.log("Error in /user/member/dashboard with error :- ", err);
+//     res.status(500).send("Internal error")
+//   }
+
+// })
+
+router.get("/member/blocked/:id", isAdminLoggedIn, async (req, res) => {
+  try {
+    let member = await memberModel.findById(req.params.id);
+    console.log(member);
+
+    member.blocked = true;
+    await member.save();
+    req.session.successMSG = `Now ${member.name} is blocked`;
+    res.redirect("/user/team");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal error");
+  }
+});
+
+router.get("/member/un-blocked/:id", isAdminLoggedIn, async (req, res) => {
+  try {
+    let member = await memberModel.findById(req.params.id);
+    console.log(member);
+
+    member.blocked = false;
+    await member.save();
+    req.session.successMSG = `Now ${member.name} is Un-blocked`;
+    res.redirect("/user/team");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal error");
+  }
 });
 
 module.exports = router;

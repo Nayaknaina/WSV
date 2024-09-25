@@ -11,6 +11,7 @@ const { isAdminLoggedIn } = require("../middilware/middilware.js");
 
 const jwt = require("jsonwebtoken");
 
+
 router.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
@@ -76,16 +77,18 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
     let user;
     console.log("leads page");
 
-    if (req.user.role === "admin") {
+    if (req.user.role == "admin") {
       user = await logIncollection.findById(req.user.id).populate({
         path: "myleads", // Populating 'myleads' field from user
         populate: [
           { path: "status" }, // Populate the 'status' field inside each lead
+          // { path: "uid" }, // Populate the 'status' field inside each lead
           { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
         ],
       });
     } else {
-      user = await memberModel.findById(req.user.id).populate({
+      user = await memberModel.findById(req.user.id)
+      .populate({
         path: "myleads", // Populating 'myleads' field from user
         populate: [
           { path: "status" }, // Populate the 'status' field inside each lead
@@ -95,10 +98,15 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
     }
     let leads = await leadsModel
       .find({ cid: user.cid })
-      .populate("status") // Ensure that 'status' is populated
+      .populate("status").populate("uid") // Ensure that 'status' is populated
       .sort({ createdAt: -1 });
+
+    // let lead = await leadsModel
+    //   .findById('66ed6c684e1f1c79f01999a1')
+    //   .populate("uid") // Ensure that 'status' is populated
+
     let pipes = await pipelineModel.find({ cid: user.cid });
-    // console.log(user.myleads[0].status);
+    // console.log(lead,"asdfghjkl");
 
     res.render("leads", { user, leads, pipes });
   } catch (error) {

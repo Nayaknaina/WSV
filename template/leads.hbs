@@ -76,10 +76,7 @@
                         body {
                             background-color: #ededed;
                             font-family: "Open Sans", sans-serif;
-
                         }
-
-
 
                         ul {
                             list-style-type: none;
@@ -88,14 +85,20 @@
 
                         nav {
                             background: #d9d9d9;
-                            margin: 20px 0;
+                            margin: 1px 0;
                             border-radius: 8px;
                             overflow: hidden;
                             transition: max-height 0.4s ease;
 
                         }
 
-                        nav label {
+                        nav .fa-chevron-down {
+                            cursor: pointer;
+                            font-weight: 800;
+                            font-size: 22px;
+                        }
+
+                        nav>label {
                             display: block;
                             padding: 7px;
                             box-shadow: 0 0 0.3125rem 0 rgba(20, 12, 0, .06);
@@ -146,6 +149,7 @@
                         .icon-container {
                             display: flex;
                             gap: 20px;
+                            align-items: center;
                             right: 10px;
                             justify-content: space-between;
                         }
@@ -181,6 +185,11 @@
                             top: 3rem;
                             right: 1rem;
                             display: none;
+                            border-radius: 11px;
+                            background-color: rgb(255, 255, 255);
+                            overflow-y: auto;
+                            box-shadow: 1px 1px 20px 0 gray;
+                            padding: 10px 8px;
                         }
 
                         .ul-box.open {
@@ -205,6 +214,10 @@
                             border: 2px solid rgb(0, 0, 0);
                         }
 
+                        .fa-square-facebook {
+                            margin-left: 15px;
+                        }
+
                         @media (max-width: 768px) {
                             nav label {
                                 font-size: 1em;
@@ -213,6 +226,18 @@
 
                             .slide li {
                                 font-size: 1.0em;
+                            }
+
+                            .fa-square-facebook {
+                                margin-left: 8px;
+                            }
+
+                            .icon-container {
+                                gap: 10px;
+                            }
+
+                            .icon-container i {
+                                font-size: 20px;
                             }
                         }
 
@@ -233,15 +258,36 @@
                         {{#each leads}}
                         <li>
                             <nav>
-                                <label for="touch-{{@index}}" class="created-time-label">
-                                    <strong>Created Time : {{formatDate income_time}}</strong>
-                                    <strong>Recived from : {{ app }}</strong>
+                                <label class="created-time-label">
+                                    <label for="touch-{{@index}}" style="margin-bottom: 0; display: flex; gap: 10px;">
+                                        <strong class="
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        ">At- {{formatDate income_time}}</strong>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                        <i class="fa-brands fa-square-{{app}}"
+                                            style="font-size: 22px; color: #316ff6;"></i>
+                                    </label>
+
 
                                     <span class="icon-container">
                                         {{#if uid}}
                                         <!-- Double Check Icon when uid is not null -->
                                         <i class="fa-solid fa-check-double" style="color: #0D6EFD;"></i>
-                                        <p>{{uid.name}}</p>
+                                        <p style="margin-bottom: 0;">{{uid.name}}</p>
                                         {{else}}
                                         <!-- Single Check Icon when uid is null -->
                                         <a href="/lead/book/{{_id}}">
@@ -268,72 +314,8 @@
                             <span class="drop-circle" style="background-color: {{color}};"></span>
                         </li>
                         {{/each}}
-                </div> --}}
-                </span>
-                </span>
-                </label>
-                <input type="checkbox" id="touch-{{@index}}">
-                <ul class="slide">
-                    {{#each leads_data}}
-                    <li>
-                        <strong>{{que}}:</strong> {{ans}}
-                    </li>
-                    {{/each}}
-                </ul>
-                </nav>
-                </li>
-                {{/each}}
-                {{else}}
-                <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
-                    added here <br> please connect your app first</li>
-                {{/if}}
-                </ul>
-                {{/ifEquals}}
-
-
-
-                    {{#ifEquals user.role 'member'}}
-                    <ul id="allLeads" style="display: block;">
-                        {{#if (filterLeadsForMember leads)}}
-                        {{#each (filterLeadsForMember leads)}}
-                        <li>
-                            <nav>
-                                <label for="touch-{{@index}}" class="created-time-label">
-                                    <strong>Created Time : {{formatDate income_time}}</strong>
-                                    <strong>Recived from : {{ app }}</strong>
-
-                                    <span class="icon-container">
-                                        {{#if uid}}
-                                        <!-- Double Check Icon when uid is not null -->
-                                        <i class="fa-solid fa-check-double" style="color: #0D6EFD;"></i>
-                                        {{else}}
-                                        <!-- Single Check Icon when uid is null -->
-                                        <a href="/lead/book/{{_id}}">
-                                            <i class="fa-solid fa-check" style="color: #36383a;"></i>
-                                        </a>
-                                        {{/if}}
-
-                                        {{!-- {{#each leads_data}}
-                                        {{#if (containsPhoneNumber ans)}}
-                                        <a href="tel:{{ans}}">
-                                            <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
-                                        </a>
-                                        <a href="https://wa.me/{{ans}}" target="_blank">
-                                            <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
-                                        </a>
-                                        {{/if}}
-                                        {{/each}} --}}
-                                        {{!-- <span class="status-circle" onclick="toggleDropdown()"
-                                            style="background-color: {{status.color}};"> --}}
-                                            {{!-- <div class="ul-box">
-                                                {{#each ../pipes}}
-                        <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
-                            <span>{{title}}</span>
-                            <span class="drop-circle" style="background-color: {{color}};"></span>
-                        </li>
-                        {{/each}}
-                </div> --}}
-                </span>
+                </div>
+                </span>--}}
                 </span>
                 </label>
                 <input type="checkbox" id="touch-{{@index}}">
@@ -356,36 +338,46 @@
 
 
 
-                <ul id="myLeads" style="display: none;">
-                    {{#if user.myleads.length}}
-                    {{#each user.myleads}}
+                {{#ifEquals user.role 'member'}}
+                <ul id="allLeads" style="display: block;">
+                    {{#if (filterLeadsForMember leads)}}
+                    {{#each (filterLeadsForMember leads)}}
                     <li>
-                        <nav style="position: relative;">
-                            <label for="touch2-{{@index}}" class="created-time-label">
-                                <strong>Created Time : {{formatDate income_time}}</strong>
-                                <strong>Recived from : {{ app }}</strong>
-                                <span class="icon-container" style="display: flex; align-items: center;">
-                                    {{!-- <a href="/lead/remove/{{_id}}">
-                                        <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
-                                    </a> --}}
-                                    {{#each leads_data}}
+                        <nav>
+                            <label class="created-time-label">
+                                <label for="touch-{{@index}}" style="margin-bottom: 0; display: flex; gap: 10px;">
+                                    <strong class="dateFormat">At- {{formatDate income_time}}</strong>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                    <i class="fa-brands fa-square-{{app}}" style="font-size: 22px; color: #316ff6;"></i>
+                                </label>
+
+
+                                <span class="icon-container">
+
+                                    {{#if uid}}
+                                    <!-- Double Check Icon when uid is not null -->
+                                    <i class="fa-solid fa-check-double" style="color: #0D6EFD;"></i>
+                                    {{else}}
+                                    <!-- Single Check Icon when uid is null -->
+                                    <a href="/lead/book/{{_id}}">
+                                        <i class="fa-solid fa-check" style="color: #36383a;"></i>
+                                    </a>
+                                    {{/if}}
+
+
+                                    {{!-- {{#each leads_data}}
                                     {{#if (containsPhoneNumber ans)}}
                                     <a href="tel:{{ans}}">
                                         <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
                                     </a>
-
-                                    {{!-- <a href="https://wa.me/{{ans}}" target="_blank">
+                                    <a href="https://wa.me/{{ans}}" target="_blank">
                                         <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
-                                    </a> --}}
+                                    </a>
                                     {{/if}}
-
-                                    {{/each}}
-                                    <i onclick="openRemarkPopUp('{{_id}}')" class="fa-solid fa-file-pen"
-                                        style="color: #1E3050;"></i>
-
-                                    <span id="st-box{{_id}}" class="status-circle" onclick="toggleDropdown('{{_id}}')"
-                                        style="background-color: {{status.color}};">
-                                        <div class="ul-box">
+                                    {{/each}} --}}
+                                    {{!-- <span class="status-circle" onclick="toggleDropdown()"
+                                        style="background-color: {{status.color}};"> --}}
+                                        {{!-- <div class="ul-box">
                                             {{#each ../pipes}}
                     <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
                         <span>{{title}}</span>
@@ -393,47 +385,10 @@
                     </li>
                     {{/each}}
             </div>
-            </span>
-
+            </span>--}}
             </span>
             </label>
-
-            <section class="timeline" id="timeline{{_id}}" style="">
-                <ul id="timeline-ul-list">
-                    <h3 style="color: #28292a; text-align: center;">Your Remarks</h3>
-                    <li onclick="openAddRemarkForm('{{_id}}')" style="cursor: pointer;">
-                        <div class="content add-remark" id="add-remark-content">
-                            <h2><span class="add-remark-txt">add remark</span></h2>
-                        </div>
-                    </li>
-                    <li id="remark-form-list{{_id}}" style="display: none;">
-                        <div class="content">
-                            <form id="remarkForm" onsubmit="createNewRemark('{{_id}}')">
-                                <textarea placeholder="setting up next followup" required maxlength="150" name="text"
-                                    id="remark-form-text{{id}}" cols="30" rows="5"></textarea>
-                                <input type="time" min="current-time" name="time" id="remark-form-time{{id}}" required>
-                                <input type="date" min="current-date" name="date" id="remark-form-date{{id}}" required>
-                                <button class="btn btn-primary mt-1" id="add-btn" style="font-size: 12px;"
-                                    type="submit">add</button>
-                                <button class="btn btn-danger mt-1" id="add-btn" style="font-size: 12px;"
-                                    onclick="closeAddRemarkForm('{{_id}}')" type="button">cancel</button>
-                            </form>
-                        </div>
-                    </li>
-
-                    <span id="new-remark-down{{_id}}"></span>
-                    {{#each remarks}}
-                    <li>
-                        <div class="content">
-                            <div class="createdTime">{{formatTime createdAt}} {{formatDate createdAt}}</div>
-                            <p>{{text}}</p>
-                            <div class="createdTime">{{time}} {{formatDate date}}</div>
-                        </div>
-                    </li>
-                    {{/each}}
-                </ul>
-            </section>
-            <input type="checkbox" id="touch2-{{@index}}">
+            <input type="checkbox" id="touch-{{@index}}">
             <ul class="slide">
                 {{#each leads_data}}
                 <li>
@@ -446,164 +401,267 @@
             {{/each}}
             {{else}}
             <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
-                added here</li>
+                added here <br> please connect your app first</li>
             {{/if}}
             </ul>
+            {{/ifEquals}}
+
+
+
+            <ul id="myLeads" style="display: none;">
+                {{#if user.myleads.length}}
+                {{#each user.myleads}}
+                <li>
+                    <nav style="position: relative;">
+                        <label class="created-time-label display: flex; gap: 10px;">
+                            <label for="touch2-{{@index}}" style="margin-bottom: 0;">
+                                <strong class="dateFormat">At- {{formatDate income_time}}</strong>
+                                <i class="fa-solid fa-chevron-down"></i>
+                                <i class="fa-brands fa-square-{{app}}"
+                                    style="font-size: 22px; margin-left: 10px; color: #316ff6;"></i>
+                            </label>
+
+                            <span class="icon-container" style="display: flex; align-items: center;">
+                                {{!-- <a href="/lead/remove/{{_id}}">
+                                    <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
+                                </a> --}}
+
+                                {{#each leads_data}}
+                                {{#if (containsPhoneNumber ans)}}
+                                <a href="tel:{{ans}}">
+                                    <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
+                                </a>
+
+                                {{!-- <a href="https://wa.me/{{ans}}" target="_blank">
+                                    <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                                </a> --}}
+                                {{/if}}
+
+                                {{/each}}
+                                <i onclick="openRemarkPopUp('{{_id}}')" class="fa-solid fa-file-pen"
+                                    style="color: #1E3050;"></i>
+
+                                <span id="st-box{{_id}}" class="status-circle" onclick="toggleDropdown('{{_id}}')"
+                                    style="background-color: {{status.color}};">
+                                    <div class="ul-box" id="ul-box{{_id}}">
+                                        {{#each ../pipes}}
+                <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                    <span>{{title}}</span>
+                    <span class="drop-circle" style="background-color: {{color}};"></span>
+                </li>
+                {{/each}}
+        </div>
+        </span>
+
+        </span>
+        </label>
+
+        <section class="timeline" id="timeline{{_id}}" style="">
+            <ul id="timeline-ul-list">
+                <h3 style="color: #28292a; text-align: center;">Your Remarks</h3>
+                <li onclick="openAddRemarkForm('{{_id}}')" style="cursor: pointer;">
+                    <div class="content add-remark" id="add-remark-content">
+                        <h2><span class="add-remark-txt">click to add remark</span></h2>
+                    </div>
+                </li>
+                <li id="remark-form-list{{_id}}" style="display: none;">
+                    <div class="content">
+                        <form id="remarkForm" onsubmit="createNewRemark('{{_id}}')">
+                            <textarea placeholder="setting up next followup" required maxlength="150" name="text"
+                                id="remark-form-text{{id}}" cols="30" rows="5"></textarea>
+                            <input type="time" min="current-time" name="time" id="remark-form-time{{id}}" class="time"
+                                required>
+                            <input type="date" min="current-date" name="date" id="remark-form-date{{id}}" class="date"
+                                required>
+                            <button class="btn btn-primary mt-1" id="add-btn" style="font-size: 12px;"
+                                type="submit">add</button>
+                            <button class="btn btn-danger mt-1" id="add-btn" style="font-size: 12px;"
+                                onclick="closeAddRemarkForm('{{_id}}')" type="button">cancel</button>
+                        </form>
+                    </div>
+                </li>
+
+                <span id="new-remark-down{{_id}}"></span>
+                {{#each remarks}}
+                <li>
+                    <div class="content">
+                        <div class="createdTime">CreatedAt {{formatTime createdAt}} {{formatDate createdAt}}</div>
+                        <p>{{text}}</p>
+                        <div class="createdTime">AlertAt {{time}} {{formatDate date}}</div>
+                    </div>
+                </li>
+                {{/each}}
+            </ul>
+        </section>
+        <input type="checkbox" id="touch2-{{@index}}">
+        <ul class="slide">
+            {{#each leads_data}}
+            <li>
+                <strong>{{que}}:</strong> {{ans}}
+            </li>
+            {{/each}}
+        </ul>
+        </nav>
+        </li>
+        {{/each}}
+        {{else}}
+        <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
+            added here</li>
+        {{/if}}
+        </ul>
 
 
 
 
-            <script>
-                function submitForm(leadId, status, pipeId) {
-                    fetch(`/lead/status/update/${leadId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'  // Specify that we're sending JSON
-                        },
-                        body: JSON.stringify({ status, pipeId })  // Convert the status to a JSON string
-                    })
-                        .then(response => {
-                            // Ensure the response is JSON
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                            // location.reload()
-                        })
-                        .then(data => {
-                            let circle = document.querySelector(`#st-box${leadId}`);
-                            circle.style.backgroundColor = data.color;
-                            
-                        })
-                }
-
-
-                // for leads drop-down
-                document.querySelectorAll('.lead-item').forEach(item => {
-                    item.addEventListener('click', function () {
-                        const currentOpenItem = document.querySelector('.lead-item.open');
-
-                        if (currentOpenItem && currentOpenItem !== this) {
-                            currentOpenItem.classList.remove('open');
-                            currentOpenItem.querySelector('.slide').style.height = '0px';
+        <script>
+            function submitForm(leadId, status, pipeId) {
+                fetch(`/lead/status/update/${leadId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'  // Specify that we're sending JSON
+                    },
+                    body: JSON.stringify({ status, pipeId })  // Convert the status to a JSON string
+                })
+                    .then(response => {
+                        // Ensure the response is JSON
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
-
-                        this.classList.toggle('open');
-                        const slide = this.querySelector('.slide');
-
-                        if (this.classList.contains('open')) {
-                            slide.style.height = slide.scrollHeight + 'px';
-                        } else {
-                            slide.style.height = '0px';
-                        }
-                    });
-                });
-
-                function toggleDropdown(id) {
-                    let boxs = document.querySelectorAll(".ul-box")
-                    boxs.forEach((box) => {
-                        box.classList.add('open');
+                        return response.json();
+                        // location.reload()
                     })
+                    .then(data => {
+                        let circle = document.querySelector(`#st-box${leadId}`);
+                        circle.style.backgroundColor = data.color;
 
-                    let timelineBox = document.querySelector(`#timeline${id}`)
-                    timelineBox.classList.remove('openTimeline')
-
-                }
+                    })
+            }
 
 
-                function showStatusBox() {
-                    let box = document.querySelector('#status-box')
+            // for leads drop-down
+            document.querySelectorAll('.lead-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    const currentOpenItem = document.querySelector('.lead-item.open');
 
-                    console.log(box)
-                    box.style.display = 'block'
-                }
-
-                function createNewRemark(id) {
-                    event.preventDefault(); // Prevent the default form submission
-
-                    const text = document.getElementById(`remark-form-text${id}`).value;
-                    const time = document.getElementById(`remark-form-time${id}`).value;
-                    const date = document.getElementById(`remark-form-date${id}`).value;
-
-                    const now = new Date();
-
-                    const selectedDateTime = new Date(`${date}T${time}`);
-
-                    // Check if the selected date and time is in the past
-                    if (selectedDateTime < now) {
-                        alert("You cannot select a past date or time.");
-                        return false; // Prevent form submission
+                    if (currentOpenItem && currentOpenItem !== this) {
+                        currentOpenItem.classList.remove('open');
+                        currentOpenItem.querySelector('.slide').style.height = '0px';
                     }
 
-                    const formData = {
-                        text: text,
-                        time: time,
-                        date: date
-                    };
-                    // console.log(formData)
+                    this.classList.toggle('open');
+                    const slide = this.querySelector('.slide');
 
-                    fetch(`/remark/add/${id}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(formData)
+                    if (this.classList.contains('open')) {
+                        slide.style.height = slide.scrollHeight + 'px';
+                    } else {
+                        slide.style.height = '0px';
+                    }
+                });
+            });
+
+            function toggleDropdown(id) {
+                let box = document.querySelector(`#ul-box${id}`)
+                box.classList.toggle('open')
+
+                let timelineBox = document.querySelector(`#timeline${id}`)
+                timelineBox.classList.remove('openTimeline')
+
+            }
+
+
+            function showStatusBox() {
+                let box = document.querySelector('#status-box')
+
+                console.log(box)
+                box.style.display = 'block'
+            }
+
+            function createNewRemark(id) {
+                event.preventDefault(); // Prevent the default form submission
+
+                const text = document.getElementById(`remark-form-text${id}`).value;
+                const time = document.getElementById(`remark-form-time${id}`).value;
+                const date = document.getElementById(`remark-form-date${id}`).value;
+
+                const now = new Date();
+
+                const selectedDateTime = new Date(`${date}T${time}`);
+
+                // Check if the selected date and time is in the past
+                if (selectedDateTime < now) {
+                    alert("You cannot select a past date or time.");
+                    return false; // Prevent form submission
+                }
+
+                const formData = {
+                    text: text,
+                    time: time,
+                    date: date
+                };
+                // console.log(formData)
+
+                fetch(`/remark/add/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json(); // Assuming server responds with JSON
                     })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json(); // Assuming server responds with JSON
-                        })
-                        .then(remark => {
-                            const li = document.createElement('li');
-                            li.innerHTML = `
+                    .then(remark => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
                             
                                 <div class="content">
                                     <div class="createdTime">${formatDate(remark.createdAt)}</div>
                                     <p>${remark.text}</p>
                                     <div class="createdTime">${remark.time} ${formatDate(remark.date)}</div>
                                 </div>`;
-                            const span = document.getElementById(`new-remark-down${id}`);
+                        const span = document.getElementById(`new-remark-down${id}`);
 
 
-                            if (span) {
-                                span.insertAdjacentElement('afterend', li);
-                            }
+                        if (span) {
+                            span.insertAdjacentElement('afterend', li);
+                        }
 
-                            //  const timelineList = document.getElementById('timeline-ul-list');
-                            //  timelineList.innerHTML += liElem;
+                        //  const timelineList = document.getElementById('timeline-ul-list');
+                        //  timelineList.innerHTML += liElem;
 
-                            document.getElementById('remarkForm').reset();
-                            closeAddRemarkForm(id)
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
+                        document.getElementById('remarkForm').reset();
+                        closeAddRemarkForm(id)
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
 
 
+            }
+
+
+            function formatDate(datetime) {
+
+                if (!datetime) {
+                    return '';
                 }
 
+                const date = new Date(datetime);
 
-                function formatDate(datetime) {
-
-                    if (!datetime) {
-                        return '';
-                    }
-
-                    const date = new Date(datetime);
-
-                    if (isNaN(date)) {
-                        console.warn('Invalid date:', datetime);
-                        return '';
-                    }
-                    return date.toISOString().split("T")[0];
+                if (isNaN(date)) {
+                    console.warn('Invalid date:', datetime);
+                    return '';
                 }
+                return date.toISOString().split("T")[0];
+            }
 
 
-            </script>
-        </div>
+        </script>
+    </div>
 
     </div>
 
@@ -713,7 +771,7 @@
         function openRemarkPopUp(id) {
             // console.log(id)
             let timelineBox = document.querySelector(`#timeline${id}`)
-            timelineBox.classList.add('openTimeline')
+            timelineBox.classList.toggle('openTimeline')
         }
 
         function openAddRemarkForm(id) {

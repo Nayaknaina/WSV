@@ -1729,7 +1729,7 @@ header .form-inline {
   margin-top: 10px;
   width: 100%; }
   .twt-category ul li {
-    color: #bdbdbd;
+    color: #2f2f2f;
     font-size: 13px; }
 
 .twt-footer {
@@ -1737,7 +1737,7 @@ header .form-inline {
 
 .twt-footer,
 .twt-footer a {
-  color: #d2d2d2; }
+  color: #444444; }
 
 /* Button Reset */
 .btn,

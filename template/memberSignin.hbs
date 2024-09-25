@@ -502,10 +502,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
   <script>
-    { { #if errorMessage } }
+    {{#if errorMessage }}
     console.log("Error message:", "{{errorMessage}}");
     toastr.error("{{errorMessage}}");
-    { {/if } }
+    {{/if }}
   </script>
   <script>
     //eye icon-toggle password

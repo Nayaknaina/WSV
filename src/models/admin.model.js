@@ -59,6 +59,7 @@ const logInSchema = new mongoose.Schema({
   profilePicture: {
     type: String,
     trim: true, 
+   
   },
   password: {
     type: String,

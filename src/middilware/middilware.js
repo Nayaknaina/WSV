@@ -44,8 +44,7 @@ function isMemberLoggedIn(req,res,next){
 
 
 async function isMemberBlocked(req, res, next) {
-  const token = req.cookies["360Followers"];
-  const member = await memberModel.findById(verifyToken(token));
+  const member = await memberModel.findById(req.user.id);
   if (member.blocked) {
     res.redirect("/member/login");
   } else next();

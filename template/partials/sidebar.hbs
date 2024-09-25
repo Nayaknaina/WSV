@@ -360,10 +360,19 @@
             <span class="tooltip">Search</span>
         </li> --}}
         <li>
+            {{#ifEquals user.role 'admin'}}
             <a href="/user/dashboard">
                 <i class='bx bx-grid-alt'></i>
                 <span class="links_name">Home</span>
             </a>
+            {{/ifEquals}}
+            {{#ifEquals user.role 'member'}}
+            <a href="/member/dashboard">
+                <i class='bx bx-grid-alt'></i>
+                <span class="links_name">Home</span>
+            </a>
+            {{/ifEquals}}
+            
             <span class="tooltip">Home</span>
         </li>
         <li>
@@ -381,6 +390,7 @@
             </a>
             <span class="tooltip">Leads</span>
         </li>
+        {{#ifEquals user.role 'admin'}}
         <li>
             <a href="/user/team">
                <i class="fa-solid fa-people-group"></i>
@@ -388,6 +398,7 @@
             </a>
             <span class="tooltip">Team</span>
         </li>
+        {{/ifEquals}}
         <li>
             <a href="/template">
                 <i class='bx bx-chat'></i>

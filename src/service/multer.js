@@ -37,6 +37,45 @@ const upload = multer({
   }
 });
 
+// for profile image admin
+const storageForAdmin = multer.diskStorage({
+  destination: function (req, file, cb) {
+      const adminDir = path.join(__dirname, '../../template/images/uploads/profile/admin');
+      
+      // Check if the directory exists
+      if (!fs.existsSync(adminDir)) {
+          fs.mkdirSync(adminDir, { recursive: true });
+      }
+      
+      cb(null, adminDir);
+  },
+  filename: function (req, file, cb) {
+      cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+const uploadAdminsPro = multer({ storage: storageForAdmin });
+
+// for members image
+const storageForMember = multer.diskStorage({
+  destination: function (req, file, cb) {
+      const memberDir = path.join(__dirname, '../../template/images/uploads/profile/member');
+      
+      // Check if the directory exists
+      if (!fs.existsSync(memberDir)) {
+          fs.mkdirSync(memberDir, { recursive: true });
+      }
+      
+      cb(null, memberDir);
+  },
+  filename: function (req, file, cb) {
+      cb(null, `${Date.now()}-${file.originalname}`);
+  }
+})
+const uploadMemberPro = multer({storage: storageForMember});
+
+
 module.exports = {
   upload,
+  uploadAdminsPro,
+  uploadMemberPro,
 };

@@ -134,7 +134,7 @@ section {
 
 #add-remark-content {
   padding: 8px 2px 2px 2px;
-  width: 100px;
+  width: 135px;
 }
 
 .add-remark-txt {
@@ -190,3 +190,25 @@ section {
   border-radius: 10px;
   background: #a4a2a2; 
 } */
+
+@media (max-width: 768px) {
+section {
+  width: 200px;
+  right: 8px;
+  height: 78%;
+}
+.timeline ul li .content {
+  width: 170px;
+  padding: 5px 11px;
+  left: 16px;
+}
+.timeline ul li .content:before {
+  top: 48%;
+  width: 11px;
+  height: 11px;
+}
+
+.ul-box {
+  right: 10px;
+}
+}
