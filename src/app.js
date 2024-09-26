@@ -35,6 +35,9 @@ const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
 const WaModel = require("./models/wA.model.js");
 
+//payment gateway routes
+const paymentRoute = require('./routes/payment.route.js');
+
 const memberRoute = require("./routes/members.route.js");
 const userRoute = require("./routes/users.route.js");
 const Route = require("./routes/index.route.js");
@@ -207,6 +210,7 @@ app.use(passport.session());
 app.use("/", Route);
 app.use("/member", memberRoute);
 app.use("/user", userRoute);
+app.use("/payment", paymentRoute);
 
 // Handle root request
 

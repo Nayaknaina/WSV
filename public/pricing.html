@@ -199,7 +199,7 @@
                         <h2 class="text-thd-color-violet-90 thd-heading-lg ">Followup Lite</h2>
                         <p class="text-thd-color-violet-80 mb-lg thd-body-lg">For individuals</p>
                         <div class="flex items-center mb-2xl"><span
-                                class="text-thd-color-violet-90 thd-heading-md">Free</span></div> <a href="/signup"
+                                class="text-thd-color-violet-90 thd-heading-md">Free</span></div> <a href="#"
                             class="btn btn-lg btn-primary wow pulse" data-wow-delay="0.4s">
                             Get Started</a>
                         <p class="font-bold mb-fixed-sm my-16 ">Includes:</p>
@@ -311,9 +311,11 @@
                         class="bg-thd-color-white flex flex-col items-start   thd-card-float thd-card-flat flex-grow w-full max-w-screen-sm">
                         <h2 class="text-thd-color-black thd-heading-lg mb-sm ">Folloups Pro</h2>
                         <p class="text-thd-color-grey-60 mb-lg thd-body-lg">For team</p>
-                        <div class="flex items-center "></div> <a href="/signup"
+                        <div class="flex items-center "></div>
+                        <form id="form1" action="/pricing/pay" hidden method="post"><input type="text" value="buy"></form>
+                         <button onclick="submitForm()"
                             class="btn btn-lg btn-primary wow pulse" data-wow-delay="0.4s">
-                            Get Started</a>
+                            Get Started</button>
                         <div class="flex items-center "><span
                                 class="text-thd-color-violet-90 my-16 thd-heading-md">$15.00</span>
                             <p class="text-thd-color-grey-60 thd-body-lg mt-12">/ month</p>
@@ -616,6 +618,17 @@
     </div>
     
     </div>
+
+
+
+    <script>
+        function submitForm() {
+            console.log("hheeellooo");
+            
+            let form = document.querySelector('#form1')
+            form.submit();
+        }
+    </script>
 
 </body>
 
