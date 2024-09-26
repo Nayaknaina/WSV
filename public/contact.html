@@ -35,7 +35,7 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://worksuite.uffyeh.com/public/vendor/css/bootstrap-icons.css">
     <!-- Template CSS -->
-    <link type="text/css" rel="stylesheet" media="all" href="https://worksuite.uffyeh.com/public/saas/css/main.css">
+    <link type="text/css" rel="stylesheet" media="all" href="\saas\css\main.css">
     <!-- Template Font Family  -->
 
     <link type="text/css" rel="stylesheet" media="all" href="https://worksuite.uffyeh.com/public/saas/vendor/material-design-iconic-font/css/material-design-iconic-font.min.css">
@@ -180,9 +180,9 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="contact-info">
-                                <div class="mobile-device"><span class="fa fa-home fa-fw style"></span><span class="heading-info">Address</span>
+                                <!-- <div class="mobile-device"><span class="fa fa-home fa-fw style"></span><span class="heading-info">Address</span>
                                     <div class="address-content">J.R. MIG-40, E-3, Arera Colony Bhopal</div>
-                                </div>
+                                </div> -->
                                 <div class="mobile-device"><span class="fa fa-envelope fa-fw style"></span><span class="heading-info">Email</span>
                                     <div class="address-content">info@websoftvalley.com</div>
                                 </div>
@@ -377,25 +377,7 @@
 
     <!-- Global Required JS -->
 
-    <script>
-        $('#contact-submit').click(function() {
-
-            $.easyAjax({
-                url: "https://worksuite.uffyeh.com/public/contact-us",
-                container: '#contactUs',
-                blockUI: true,
-                type: "POST",
-                data: $('#contactUs').serialize(),
-                messagePosition: "inline",
-                success: function(response) {
-                    if (response.status === 'success') {
-                        $('#contactUsBox').remove();
-                    }
-                }
-            })
-        });
-    </script>
-
+  
 
 
     <script defer src="https://worksuite.uffyeh.com/public/saas/js/cookieconsent.js"></script>
