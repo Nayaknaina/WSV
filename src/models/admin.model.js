@@ -18,7 +18,10 @@ const logInSchema = new mongoose.Schema({
     type:String,
   },
   fcmToken: String,
-
+  paymentProof:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Payment',
+  },
   teams: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'teamMember',
