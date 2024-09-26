@@ -433,27 +433,12 @@ app.post(
 app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
   try {
     const user = await logIncollection.findById(req.user.id);
-    if (user.teams.length >= 3 && user.subscriptionLevel === 'free' ) {
-      req.session.successMSG = `free`;
-      return res.redirect("/user/team");
-    }
-    if (user.teams.length >= 7 && user.subscriptionLevel === 'basic') {
-      req.session.successMSG = `basic`;
-      return res.redirect("/user/team");
+    if (user.teams.length >= 3) {
+      req.session.successMSG = `Cannot add more than 3 team members with free plan.`;
+      return res.redirect("/user/dashboard");
     }
 
     const { name, email, mobile, countryCode } = req.query;
-    let preMem = await memberModel.findOne({email: email})
-    if (preMem !== null) {
-      req.session.successMSG = `This email ID is already registered.`;
-    return res.redirect("/user/team");
-    }
-    preMem = await logIncollection.findOne({email:email}); 
-    if (preMem !== null) {
-      req.session.successMSG = `This email ID is already registered.`;
-    return res.redirect("/user/team");
-    }
-
     const password = otpGenerator.generate(8, {
       digits: true,
       lowerCaseAlphabets: true,
