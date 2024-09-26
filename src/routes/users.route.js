@@ -51,6 +51,38 @@ router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
   res.redirect("/leads");
 });
 
+// lead ownership assign other member by admin
+router.post('/change/lead/owner/:leadId', isAdminLoggedIn, async(req,res)=>{
+  try {
+    let lead = await leadsModel.findById(req.params.leadId)
+    let currentLeadOwner = await memberModel.findById(req.body.currentMemId)
+    let nextLeadOwner = await memberModel.findById(req.body.assignMemId)
+
+    if(!currentLeadOwner)
+      currentLeadOwner = await logIncollection.findById(req.body.currentMemId)
+
+    if (lead && currentLeadOwner && nextLeadOwner) {
+      lead.uid = nextLeadOwner._id;
+      lead.userType = nextLeadOwner.role === 'admin' ? 'logIncollection' : 'teamMember' ;
+
+      if(currentLeadOwner._id !== nextLeadOwner._id)
+      currentLeadOwner.myleads.splice(currentLeadOwner.myleads.indexOf(lead._id),1)
+      nextLeadOwner.myleads.push(lead._id);
+    }
+
+    await lead.save()
+    await currentLeadOwner.save()
+    await nextLeadOwner.save()
+
+   return res.json({name:nextLeadOwner.name})
+    
+  } catch (err) {
+    console.log("Error in /user/change/lead/owner/:leadId",err);
+    res.status(500).send("Ooops, Some Internal Error")
+  }
+})
+
+
 // router.get("/team/invite", isAdminLoggedIn, async (req, res) => {
 //   try {
 //     const user = await logIncollection.findById(req.user.id);
@@ -422,7 +454,7 @@ router.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
   pipeline.title = title;
 
   if (defaultVal == "on") {
-    console.log(defaultVal);
+    // console.log(defaultVal);
     await pipelineModel.updateMany(
       { uid: req.user.id },
       { $set: { defaultVal: false } }

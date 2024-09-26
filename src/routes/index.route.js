@@ -85,7 +85,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
           // { path: "uid" }, // Populate the 'status' field inside each lead
           { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
         ],
-      });
+      }).populate('teams')
     } else {
       user = await memberModel.findById(req.user.id)
       .populate({
@@ -106,9 +106,10 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
     //   .populate("uid") // Ensure that 'status' is populated
 
     let pipes = await pipelineModel.find({ cid: user.cid });
-    // console.log(lead,"asdfghjkl");
+    let members = await memberModel.find({ cid: user.cid });
+    // console.log(user,"asdfghjkl");
 
-    res.render("leads", { user, leads, pipes });
+    res.render("leads", { user, leads, pipes,members });
   } catch (error) {
     console.error("Error fetching leads:", error);
     res.status(500).send("Error fetching leads");
@@ -154,7 +155,7 @@ router.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
   }
   lead.status = pipe._id;
   await lead.save();
-  console.log(pipe.color);
+  // console.log(pipe.color);
 
   res.json({ color: pipe.color });
 });
