@@ -306,7 +306,20 @@
         {{#if successMSG}}
         <div class="col-sm-12">
           <div id="alert-success" class="alert  alert-success alert-dismissible fade show" role="alert">
-            <span class="badge badge-pill badge-success">Success</span> {{successMSG}}
+            <span class="badge badge-pill badge-success">Success</span>
+             {{#ifEquals successMSG 'free' }}
+             Cannot add more than 3 team members with free plan
+              <a href="/pricing">check out here.</a>
+              {{else}}
+                
+                {{#ifEquals successMSG 'basic' }}
+                  Cannot add more than 7 team members with free plan
+                  <a href="/pricing">check out here.</a>
+                {{else}}
+                  {{successMSG}}
+                {{/ifEquals}}
+              {{/ifEquals}}
+              
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -326,9 +339,8 @@
 
           </div>
         </div>
-      
+      {{#if user.teams}}
          <table>
-  
   <thead>
     <tr>
       <th scope="col">Name</th>
@@ -341,12 +353,12 @@
     {{#each user.teams}}
     <tr>
       {{!-- <td data-label="Account"><a href="/user/member/dashboard/{{_id}}">{{name}}</a></td> --}}
-      <td data-label="Account"><a href="#">{{name}}</a></td>
-      <td data-label="Due Date">{{email}}</td>
-      <td data-label="Period">{{mobile}}</td>
+      <td data-label="Name"><a href="#">{{name}}</a></td>
+      <td data-label="Email">{{email}}</td>
+      <td data-label="Mobile">{{mobile}}</td>
       {{!-- <td data-label="Amount">{{myleads.length}}</td> --}}
       {{!-- <td ><a href="/member/blocked/{{_id}}"><i class="fa-solid fa-ban" style="color: #ff0000;"></i></a></td> --}}
-      <td >
+      <td data-label="Actions" >
         {{#if blocked}}
         <a href="/user/member/un-blocked/{{_id}}"><button type="button" class="btn btn-success btn-sm">Un-Block</button></a>
         {{else}}
@@ -358,50 +370,14 @@
    
   </tbody>
         </table>
-
-        
-
-        {{!-- <div class="row col-11 ml-5">
-          <div class="col">
-            <h2>Your team members</h2>
-          </div>
-          <div class="col-6">
-            2 of 3 (wider)
-          </div>
-          <div class="col">
-            <i class="fa-solid fa-ban"></i>
-            <i class="fa-solid fa-trash-can"></i>
-          </div>
-        </div>
-        <div class="row col-11 ml-5">
-          <table class="table m-0">
-            <thead class="thead-dark">
-              <tr>
-                <th scope="col">no.</th>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td> <i class="fa-solid fa-ban"></i>
-                  <i class="fa-solid fa-trash-can"></i>
-                </td>
-              </tr>
-
-            </tbody>
-          </table>
-        </div> --}}
-
-
-
-
-
-
+      {{else}}
+      <h1 style="
+      text-align: center;
+      padding: 40px 70px;
+    font-size: 30px !important;
+    color: #36383a89;
+      ">You dont have any team member.</h1>
+      {{/if}}
 
 
       </div>
