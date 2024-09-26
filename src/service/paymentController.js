@@ -1,131 +1,116 @@
-const paypal = require('paypal-rest-sdk');
-let path = require('path')
-const logIncollection = require('../models/admin.model.js')
+const paypal = require('@paypal/checkout-server-sdk');
+const path = require('path');
+const logIncollection = require('../models/admin.model.js');
 
-const { PAYPAL_MODE, PAYPAL_CLIENT_KEY, PAYPAL_SECRET_KEY } = process.env;
-// const static_path = path.join(__dirname, "../public");
-paypal.configure({
-  'mode': PAYPAL_MODE, //sandbox or live
-  'client_id': PAYPAL_CLIENT_KEY,
-  'client_secret': PAYPAL_SECRET_KEY
-});
+// PayPal environment setup for Sandbox
+const { PAYPAL_CLIENT_KEY, PAYPAL_SECRET_KEY } = process.env;
 
-const renderBuyPage = async(req,res)=>{
+function environment() {
+    return new paypal.core.SandboxEnvironment(PAYPAL_CLIENT_KEY, PAYPAL_SECRET_KEY);
+}
 
+function client() {
+    return new paypal.core.PayPalHttpClient(environment());
+}
+
+const renderBuyPage = async (req, res) => {
     try {
-        
-        res.sendFile(path.join(static_path, "pricing.html"));
-
+        res.sendFile(path.join(__dirname, "../public/pricing.html"));
     } catch (error) {
         console.log(error.message);
     }
+};
 
-}
-
-const payProduct = async(req,res)=>{
-            console.log("hello");
-            
+// PayPal Payment Route
+const payProduct = async (req, res) => {
     try {
-        
-        const create_payment_json = {
-            "intent": "sale",
-            "payer": {
-                "payment_method": "paypal"
-            },
-            "redirect_urls": {
-                "return_url": "http://localhost:8000/payment/success",
-                "cancel_url": "http://localhost:8000/payment/cancel"
-            },
-            "transactions": [{
-                "item_list": {
-                    "items": [{
-                        "name": "Book",
-                        "sku": "001",
-                        "price": "25.00",
-                        "currency": "USD",
-                        "quantity": 1
-                    }]
+        console.log("Initiating PayPal payment...");
+
+        const request = new paypal.orders.OrdersCreateRequest();
+        request.prefer("return=representation");
+        request.requestBody({
+            intent: "CAPTURE",
+            purchase_units: [{
+                amount: {
+                    currency_code: "USD",
+                    value: "25.00",
+                    breakdown: {
+                        item_total: {
+                            currency_code: "USD",
+                            value: "25.00"
+                        }
+                    }
                 },
-                "amount": {
-                    "currency": "USD",
-                    "total": "25.00"
-                },
-                "description": "Hat for the best team ever"
-            }]
-        };
-
-        paypal.payment.create(create_payment_json, function (error, payment) {
-            if (error) {
-                throw error;
-            } else {
-                for(let i = 0;i < payment.links.length;i++){
-                  if(payment.links[i].rel === 'approval_url'){
-                    res.redirect(payment.links[i].href);
-                  }
-                }
-            }
-          });
-
-    } catch (error) {
-        console.log(error.message);
-    }
-
-}
-
-const successPage = async (req,res)=>{
-
-    try {
-        
-        const payerId = req.query.PayerID;
-        const paymentId = req.query.paymentId;
-
-        const execute_payment_json = {
-            "payer_id": payerId,
-            "transactions": [{
-                "amount": {
-                    "currency": "USD",
-                    "total": "25.00"
-                }
-            }]
-        };
-
-        paypal.payment.execute(paymentId, execute_payment_json, async function (error, payment) {
-            if (error) {
-                console.log(error.response);
-                throw error;
-            } else {
-                console.log(JSON.stringify(payment));
-                // my logic for free to pro 
-                
-                let admin = await logIncollection.findById(req.user.id)
-                admin.subscriptionLevel = 'basic'
-                await admin.save()
-                res.send('<h1>payment success</h1>')
-                // res.render('success');
+                description: "Book for the best team ever",
+                items: [{
+                    name: "Book",
+                    sku: "001",
+                    unit_amount: {
+                        currency_code: "USD",
+                        value: "25.00"
+                    },
+                    quantity: "1"
+                }]
+            }],
+            application_context: {
+                return_url: "http://localhost:8000/payment/success",
+                cancel_url: "http://localhost:8000/payment/cancel"
             }
         });
 
+        const order = await client().execute(request);
+        const approvalUrl = order.result.links.find(link => link.rel === 'approve').href;
+
+        // Redirecting user to PayPal for approval
+        res.redirect(approvalUrl);
+
     } catch (error) {
-        console.log(error.message);
+        console.log("Error creating PayPal payment: ", error.message);
+        res.status(500).send("Error creating PayPal payment");
     }
+};
 
-}
-
-const cancelPage = async(req,res)=>{
-
+// PayPal Success Page Route
+const successPage = async (req, res) => {
     try {
-        res.send('<h1>payment canceled</h1>')
-        // res.render('cancel');
+        const { token } = req.query;  // token is the order ID (order ID = token in sandbox)
 
+        const request = new paypal.orders.OrdersCaptureRequest(token);
+        request.requestBody({}); // Empty body needed for the request
+
+        const capture = await client().execute(request);
+
+        if (capture.result.status === "COMPLETED") {
+            console.log('Payment captured successfully:', JSON.stringify(capture.result));
+
+            // Your logic to upgrade user subscription level to 'basic'
+            let admin = await logIncollection.findById(req.user.id);
+            admin.subscriptionLevel = 'basic';
+            await admin.save();
+
+            res.send('<h1>Payment Success</h1>');
+        } else {
+            res.send('<h1>Payment Failed</h1>');
+        }
+
+    } catch (error) {
+        console.log("Error capturing PayPal payment: ", error.message);
+        res.status(500).send("Error capturing PayPal payment");
+    }
+};
+
+// PayPal Cancel Page Route
+const cancelPage = async (req, res) => {
+    try {
+        res.send('<h1>Payment Canceled</h1>');
     } catch (error) {
         console.log(error.message);
     }
-
-}
+};
 
 module.exports = {
     renderBuyPage,
     payProduct,
     successPage,
     cancelPage
-}
+};
