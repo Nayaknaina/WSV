@@ -44,8 +44,15 @@
     src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
 
   <link rel="stylesheet" href="/kcss/sendmail.css">
-  <link rel="stylesheet"  href="/assets/css/team.css">
+  <link rel="stylesheet" href="/assets/css/team.css">
 </head>
+
+<style>
+  html,body{
+    width: 100vw;
+    height: 100vh;
+  }
+</style>
 
 
 <body class="naina">
@@ -301,25 +308,25 @@
     <div class="row">
       {{> sidebar}}
       <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0 home-section">
-       {{> NameHead}}
+        {{> NameHead}}
 
         {{#if successMSG}}
         <div class="col-sm-12">
           <div id="alert-success" class="alert  alert-success alert-dismissible fade show" role="alert">
             <span class="badge badge-pill badge-success">Success</span>
-             {{#ifEquals successMSG 'free' }}
-             Cannot add more than 3 team members with free plan
-              <a href="/pricing">check out here.</a>
-              {{else}}
-                
-                {{#ifEquals successMSG 'basic' }}
-                  Cannot add more than 7 team members with free plan
-                  <a href="/pricing">check out here.</a>
-                {{else}}
-                  {{successMSG}}
-                {{/ifEquals}}
-              {{/ifEquals}}
-              
+            {{#ifEquals successMSG 'free' }}
+            Cannot add more than 3 team members with free plan
+            <a href="/pricing">check out here.</a>
+            {{else}}
+
+            {{#ifEquals successMSG 'basic' }}
+            Cannot add more than 7 team members with free plan
+            <a href="/pricing">check out here.</a>
+            {{else}}
+            {{successMSG}}
+            {{/ifEquals}}
+            {{/ifEquals}}
+
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -339,49 +346,53 @@
 
           </div>
         </div>
-      {{#if user.teams}}
-         <table>
-  <thead>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Email</th>
-      <th scope="col">Mobile</th>
-      <th scope="col">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each user.teams}}
-    <tr>
-      {{!-- <td data-label="Account"><a href="/user/member/dashboard/{{_id}}">{{name}}</a></td> --}}
-      <td data-label="Name"><a href="#">{{name}}</a></td>
-      <td data-label="Email">{{email}}</td>
-      <td data-label="Mobile">{{mobile}}</td>
-      {{!-- <td data-label="Amount">{{myleads.length}}</td> --}}
-      {{!-- <td ><a href="/member/blocked/{{_id}}"><i class="fa-solid fa-ban" style="color: #ff0000;"></i></a></td> --}}
-      <td data-label="Actions" >
-        {{#if blocked}}
-        <a href="/user/member/un-blocked/{{_id}}"><button type="button" class="btn btn-success btn-sm">Un-Block</button></a>
-        {{else}}
-        <a href="/user/member/blocked/{{_id}}"><button type="button" class="btn btn-danger btn-sm">Block</button></a>
-        {{/if}}
-      </td>
-    </tr>
-    {{/each }}
-   
-  </tbody>
+        {{#if user.teams}}
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Mobile</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each user.teams}}
+            <tr>
+              {{!-- <td data-label="Account"><a href="/user/member/dashboard/{{_id}}">{{name}}</a></td> --}}
+              <td data-label="Name"><a href="#">{{name}}</a></td>
+              <td data-label="Email">{{email}}</td>
+              <td data-label="Mobile">{{mobile}}</td>
+              {{!-- <td data-label="Amount">{{myleads.length}}</td> --}}
+              {{!-- <td><a href="/member/blocked/{{_id}}"><i class="fa-solid fa-ban" style="color: #ff0000;"></i></a>
+              </td> --}}
+              <td data-label="Actions">
+                {{#if blocked}}
+                <a href="/user/member/un-blocked/{{_id}}"><button type="button"
+                    class="btn btn-success btn-sm">Un-Block</button></a>
+                {{else}}
+                <a href="/user/member/blocked/{{_id}}"><button type="button"
+                    class="btn btn-danger btn-sm">Block</button></a>
+                {{/if}}
+              </td>
+            </tr>
+            {{/each }}
+
+          </tbody>
         </table>
-      {{else}}
-      <h1 style="
+        {{else}}
+        <h1 style="
       text-align: center;
       padding: 40px 70px;
     font-size: 30px !important;
     color: #36383a89;
       ">You dont have any team member.</h1>
-      {{/if}}
+        {{/if}}
 
 
       </div>
     </div>
+  </div>
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
       crossorigin="anonymous"></script>
@@ -396,17 +407,9 @@
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
       src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
     <script src="/js/dependencies/sweetalert.min.js?nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
-
-
-
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
     <script src="/assets/js/timezones.full.min.js"></script>
-
     <script src="/assets/js/custom-new.js"></script>
-    <script>
-
-    </script>
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
       $(document).ready(function () {
         $('#signup').on('submit', function () {
@@ -472,13 +475,13 @@
 
       // document.getElementById('registerForm').addEventListener('submit', function (e) {
       //   e.preventDefault(); // Prevent default form submission
-      // 
+      //
       //   const email = document.getElementById('email').value;
       //   const mobile = document.getElementById('mobile').value;
       //   const password = document.getElementById('password').value;
       //   const countryCode = document.getElementById('countryCode').value;
       //   const countryName = document.getElementById('countryCode').options[document.getElementById('countryCode').selectedIndex].text.split(' ')[0];
-      // 
+      //
       //   const data = {
       //     email: email,
       //     password: password,
@@ -486,9 +489,9 @@
       //     countryCode: countryCode,
       //     countryName: countryName
       //   };
-      // 
+      //
       //   console.log(data)
-      // 
+      //
       //   fetch('/member/login', {
       //     method: 'POST',
       //     headers: {
