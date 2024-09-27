@@ -599,7 +599,8 @@ app.get(
     user.cid = cid;
     user.role = "admin";
     await user.save();
-
+    if (!(user.myPipelines.length >= 4)) {
+   
     const pipelines = [
       { title: "win", color: "#28A745" },
       { title: "loss", color: "#DC3545" },
@@ -668,6 +669,8 @@ app.get(
       })
     );
     await user.save();
+  
+  }
     const token = await generateToken(user);
 
     res.cookie("360Followers", token, {
