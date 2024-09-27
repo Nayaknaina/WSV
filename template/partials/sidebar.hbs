@@ -1,58 +1,4 @@
-{{!-- <div class="fg-main-sidebar-wrap col-xl-1 col-lg-1 col-md-1 p-l-0 p-r-0 d-lg-block d-none"></div>
-    <div id="fg-sidebar" class="bg-bodycolor h-100">
-        <ul class="fg-sidebar-menu p-0 sticky">
-            <li id="dashboard" class="sidebar-list-item text-center">
-                <a href="/dashboard" class="fg-list-item p-t-15 p-b-15 d-block">
-                    <i class="fa fa-home text-white font-20"></i>
 
-                    <span class="m-t-5 text-center d-block text-white font-12">Home</span>
-                </a>
-            </li>
-            <li id="apps" class="sidebar-list-item text-center ">
-                <a href="/apps" class="fg-list-item p-t-15 p-b-15 d-block">
-                    <i class="fas fa-globe text-white font-20"></i>
-                    <span class="m-t-5 text-center d-block text-white font-12">All Apps</span>
-                </a>
-            </li>
-            <li id="profile" class="sidebar-list-item text-center">
-                <a href="/profile" class="fg-list-item p-t-15 p-b-15 d-block">
-                    <i class="fas fa-user-circle text-white font-20"></i>
-                    <span class="m-t-5 text-center d-block text-white font-12">Account</span>
-                </a>
-            </li>
-            <li id="" class="sidebar-list-item text-center">
-                <a href="/team" class="fg-list-item p-t-15 p-b-15 d-block">
-                    <i class="fas fa-user-plus text-white font-20"></i>
-                    <span class="m-t-5 text-center d-block text-white font-12">Team</span>
-                </a>
-            </li>
-            <li id="gethelp" class="sidebar-list-item text-center">
-                <a href="/gethelp" class="fg-list-item p-t-15 p-b-15 d-block">
-                    <i class="fas fa-user-cog text-white font-20"></i>
-                    <span class="m-t-5 text-center d-block text-white font-12">Get help</span>
-                </a>
-            </li>
-            <li id="" class="sidebar-list-item text-center">
-                <a href="/logout" class="fg-list-item p-t-15 p-b-15 d-block">
-                    <i class="fas fa-power-off text-white font-20"></i>
-                    <span class="m-t-5 text-center d-block text-white font-12">Logout</span>
-                </a>
-            </li>
-
-
-        </ul>
-    </div>
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
-        $(document).ready(function () {
-            var pathname = window.location.pathname;
-            console.log(pathname)
-            var path = pathname.replace('/', '');
-            // $('ul.fg-sidebar-menu li#' + path).addClass('active');
-            $(`#${path}`).addClass('active');
-        });
-    </script>
-</div> --}}
 <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <div class="sidebar">
@@ -444,7 +390,7 @@
                 <img id="user_image" width="70" height="70"
                     src="//www.gravatar.com/avatar/9ef7cb630b294dc458d676560e96d060?d=http%3A%2F%2Faccounts.pabbly.com%2Fimages%2Fdefault-profile-pic.png"
                     class="rounded-circle">
-                    {{/if}}
+                {{/if}}
                 <div class="name_job">
                     <div class="name"> {{user.name}}</div>
                     <div class="job">{{user.email}}</div>
