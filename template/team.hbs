@@ -48,7 +48,8 @@
 </head>
 
 <style>
-  html,body{
+  html,
+  body {
     width: 100vw;
     height: 100vh;
   }
@@ -334,6 +335,29 @@
         </div>
         {{/if}}
 
+        {{#if errorMSG}}
+        <div class="col-sm-12"> 
+          <div id="alert-error" class="alert  alert-danger alert-dismissible fade show" role="alert">
+            <span class="badge badge-pill badge-danger">Alert</span>
+             {{#ifEquals errorMSG 'free' }}
+            Cannot add more than 3 team members with free plan
+            <a href="/pricing">check out here.</a>
+            {{else}}
+
+            {{#ifEquals errorMSG 'basic' }}
+            Cannot add more than 7 team members with free plan
+            <a href="/pricing">check out here.</a>
+            {{else}}
+            {{errorMSG}}
+            {{/ifEquals}}
+            {{/ifEquals}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+        {{/if}}
+
 
         <div class="row col-11 ml-5">
           <div class="col-8"></div>
@@ -393,125 +417,125 @@
       </div>
     </div>
   </div>
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
-      integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
-      crossorigin="anonymous"></script>
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
-      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
+    crossorigin="anonymous"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
-      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/js/bootstrap-select.js"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/js/bootstrap-select.js"></script>
 
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
-      src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
-    <script src="/js/dependencies/sweetalert.min.js?nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="/assets/js/timezones.full.min.js"></script>
-    <script src="/assets/js/custom-new.js"></script>
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
-      $(document).ready(function () {
-        $('#signup').on('submit', function () {
-          $('.loader-display').css('display', 'block');
-        });
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+    src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+  <script src="/js/dependencies/sweetalert.min.js?nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="/assets/js/timezones.full.min.js"></script>
+  <script src="/assets/js/custom-new.js"></script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+    $(document).ready(function () {
+      $('#signup').on('submit', function () {
+        $('.loader-display').css('display', 'block');
       });
-    </script>
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
-      $(window).scroll(function () {
-        if ($(window).scrollTop() >= 72) {
-          $('#top_header').addClass('sticky');
-        } else {
-          $('#top_header').removeClass('sticky');
-        }
-      });
-    </script>
-    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
-      $('#nav-tab a').click(function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-      });
-
-      // store the currently selected tab in the hash value
-      $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
-        var id = $(e.target).attr("href").substr(1);
-        console.log("id", id);
-        window.location.hash = id;
-      });
-
-      // on load of the page: switch to the currently selected tab
-      var hash = window.location.hash;
-      $('#nav-tab a[href="' + hash + '"]').tab('show');
-    </script>
-
-    {{!-- facebooklogin sdk --}}
-
-    <script src="/kjs/sendmail.js"></script>
-
-    <script>
-      async function populateCountryCodes() {
-        try {
-          const response = await fetch('https://restcountries.com/v3.1/all');
-          const countries = await response.json();
-
-          const selectElement = document.getElementById('countryCode');
-
-          countries.forEach(country => {
-            if (country.idd && country.idd.root) {
-              const countryCode = country.idd.root + (country.idd.suffixes ? country.idd.suffixes[0] : '');
-              const option = document.createElement('option');
-              option.value = countryCode;
-              option.text = `${country.name.common} (${countryCode})`;
-              selectElement.appendChild(option);
-            }
-          });
-        } catch (error) {
-          console.error('Error fetching country data:', error);
-        }
+    });
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+    $(window).scroll(function () {
+      if ($(window).scrollTop() >= 72) {
+        $('#top_header').addClass('sticky');
+      } else {
+        $('#top_header').removeClass('sticky');
       }
+    });
+  </script>
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+    $('#nav-tab a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
 
-      // Call the function to populate country codes when the page loads
-      window.onload = populateCountryCodes;
+    // store the currently selected tab in the hash value
+    $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
+      var id = $(e.target).attr("href").substr(1);
+      console.log("id", id);
+      window.location.hash = id;
+    });
 
-      // document.getElementById('registerForm').addEventListener('submit', function (e) {
-      //   e.preventDefault(); // Prevent default form submission
-      //
-      //   const email = document.getElementById('email').value;
-      //   const mobile = document.getElementById('mobile').value;
-      //   const password = document.getElementById('password').value;
-      //   const countryCode = document.getElementById('countryCode').value;
-      //   const countryName = document.getElementById('countryCode').options[document.getElementById('countryCode').selectedIndex].text.split(' ')[0];
-      //
-      //   const data = {
-      //     email: email,
-      //     password: password,
-      //     mobile: mobile,
-      //     countryCode: countryCode,
-      //     countryName: countryName
-      //   };
-      //
-      //   console.log(data)
-      //
-      //   fetch('/member/login', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json'
-      //     },
-      //     body: JSON.stringify(data)
-      //   })
-      //     .then(response => response.json())
-      //     .then(data => {
-      //       console.log('Success:', data);
-      //       alert('Registration Successful!');
-      //       window.location('/member/dashboard')
-      //     })
-      //     .catch((error) => {
-      //       console.error('Error:', error);
-      //       alert('Registration Failed!');
-      //     });
-      // });
+    // on load of the page: switch to the currently selected tab
+    var hash = window.location.hash;
+    $('#nav-tab a[href="' + hash + '"]').tab('show');
+  </script>
 
-    </script>
+  {{!-- facebooklogin sdk --}}
+
+  <script src="/kjs/sendmail.js"></script>
+
+  <script>
+    async function populateCountryCodes() {
+      try {
+        const response = await fetch('https://restcountries.com/v3.1/all');
+        const countries = await response.json();
+
+        const selectElement = document.getElementById('countryCode');
+
+        countries.forEach(country => {
+          if (country.idd && country.idd.root) {
+            const countryCode = country.idd.root + (country.idd.suffixes ? country.idd.suffixes[0] : '');
+            const option = document.createElement('option');
+            option.value = countryCode;
+            option.text = `${country.name.common} (${countryCode})`;
+            selectElement.appendChild(option);
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching country data:', error);
+      }
+    }
+
+    // Call the function to populate country codes when the page loads
+    window.onload = populateCountryCodes;
+
+    // document.getElementById('registerForm').addEventListener('submit', function (e) {
+    //   e.preventDefault(); // Prevent default form submission
+    //
+    //   const email = document.getElementById('email').value;
+    //   const mobile = document.getElementById('mobile').value;
+    //   const password = document.getElementById('password').value;
+    //   const countryCode = document.getElementById('countryCode').value;
+    //   const countryName = document.getElementById('countryCode').options[document.getElementById('countryCode').selectedIndex].text.split(' ')[0];
+    //
+    //   const data = {
+    //     email: email,
+    //     password: password,
+    //     mobile: mobile,
+    //     countryCode: countryCode,
+    //     countryName: countryName
+    //   };
+    //
+    //   console.log(data)
+    //
+    //   fetch('/member/login', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(data)
+    //   })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //       console.log('Success:', data);
+    //       alert('Registration Successful!');
+    //       window.location('/member/dashboard')
+    //     })
+    //     .catch((error) => {
+    //       console.error('Error:', error);
+    //       alert('Registration Failed!');
+    //     });
+    // });
+
+  </script>
 </body>
 
 </html>

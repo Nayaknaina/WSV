@@ -432,24 +432,24 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
   try {
     const user = await logIncollection.findById(req.user.id);
     if (user.teams.length >= 3 && user.subscriptionLevel === "free") {
-      req.session.successMSG = `free`;
+      req.session.errorMSG = `free`;
       return res.redirect("/user/team");
     }
     if (user.teams.length >= 7 && user.subscriptionLevel === "basic") {
-      req.session.successMSG = `basic`;
+      req.session.errorMSG = `basic`;
       return res.redirect("/user/team");
     }
 
     const { name, email, mobile, countryCode } = req.query;
     let preMem = await memberModel.findOne({ email: email });
     if (preMem !== null) {
-      req.session.successMSG = `This email ID is already registered.`;
+      req.session.errorMSG = `This email ID is already registered.`;
       return res.redirect("/user/team");
       return res.redirect("/user/team");
     }
     preMem = await logIncollection.findOne({ email: email });
     if (preMem !== null) {
-      req.session.successMSG = `This email ID is already registered.`;
+      req.session.errorMSG = `This email ID is already registered.`;
       return res.redirect("/user/team");
       return res.redirect("/user/team");
     }
