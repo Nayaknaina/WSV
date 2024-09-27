@@ -15,7 +15,7 @@ const {
 const jwt = require("jsonwebtoken");
 const path = require('path')
 const fs = require('fs')
-const { uploadMemberPro } = require("../service/multer.js");
+const { uploadProfile } = require("../service/multer.js");
 
 router
   .route("/login")
@@ -59,7 +59,7 @@ router
 router.post(
   "/profile/image",
   isMemberLoggedIn,
-  uploadMemberPro.single("userImage"),
+  uploadProfile.single("userImage"),
   async (req, res) => {
     try {
       let user = await memberModel.findById(req.user.id);
@@ -74,7 +74,7 @@ router.post(
       if (user.profilePicture) {
         const oldImagePath = path.join(
           __dirname,
-          "../../template/images/uploads/profile/member/",
+          "../../template/",
           user.profilePicture
         );
 
@@ -88,7 +88,7 @@ router.post(
       }
 
       console.log(req.file.filename);
-      user.profilePicture = req.file.filename;
+      user.profilePicture = '/images/uploads/profile/' + req.file.filename;
       await user.save();
 
       res.redirect("/member/profile/image");

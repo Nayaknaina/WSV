@@ -38,9 +38,9 @@ const upload = multer({
 });
 
 // for profile image admin
-const storageForAdmin = multer.diskStorage({
+const storageForProfile = multer.diskStorage({
   destination: function (req, file, cb) {
-      const adminDir = path.join(__dirname, '../../template/images/uploads/profile/admin');
+      const adminDir = path.join(__dirname, '../../template/images/uploads/profile');
       
       // Check if the directory exists
       if (!fs.existsSync(adminDir)) {
@@ -53,29 +53,12 @@ const storageForAdmin = multer.diskStorage({
       cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
-const uploadAdminsPro = multer({ storage: storageForAdmin });
+const uploadProfile = multer({ storage: storageForProfile });
 
-// for members image
-const storageForMember = multer.diskStorage({
-  destination: function (req, file, cb) {
-      const memberDir = path.join(__dirname, '../../template/images/uploads/profile/member');
-      
-      // Check if the directory exists
-      if (!fs.existsSync(memberDir)) {
-          fs.mkdirSync(memberDir, { recursive: true });
-      }
-      
-      cb(null, memberDir);
-  },
-  filename: function (req, file, cb) {
-      cb(null, `${Date.now()}-${file.originalname}`);
-  }
-})
-const uploadMemberPro = multer({storage: storageForMember});
 
 
 module.exports = {
   upload,
-  uploadAdminsPro,
-  uploadMemberPro,
+  uploadProfile,
+  
 };
