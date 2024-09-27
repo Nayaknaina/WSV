@@ -1,6 +1,11 @@
 
 <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!-- Mobile Menu Button -->
+<i class='bx bx-menu mobile-menu-button'></i>
+
 <div class="sidebar">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
@@ -205,8 +210,8 @@
             position: fixed;
             height: 60px;
             width: 78px;
-            left: 0;
             bottom: -8px;
+            left: 0;
             padding: 10px 14px;
             background: #1d1b31;
             transition: all 0.5s ease;
@@ -214,7 +219,7 @@
         }
 
         .sidebar.open li.profile {
-            width: 250px;
+            width: 255px;
         }
 
         .sidebar li .profile-details {
@@ -261,8 +266,11 @@
             background: none;
         }
 
-        
-.home-section {
+        .mobile-menu-button {
+            display: none;
+        }
+
+        .home-section {
             position: relative;
             background: #E4E9F7;
             min-height: 100vh;
@@ -271,21 +279,86 @@
             width: calc(100% - 78px);
             transition: all 0.5s ease;
             z-index: 2;
-            
-  
-
         }
 
         .sidebar.open~.home-section {
             left: 90px;
             width: calc(100% - 100px);
         }
+
         .home-section .text {
             display: inline-block;
             color: #11101d;
             font-size: 25px;
             font-weight: 500;
             margin: 18px
+        }
+
+        /* Mobile View Styling */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                left: -250px;
+                /* Hide sidebar in mobile view */
+                position: fixed;
+                z-index: 99;
+                transition: all 0.5s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+                width: 100%;
+                /* Full page width */
+                background: rgba(0, 0, 0, 0.8);
+                /* Slight transparency */
+            }
+
+            .sidebar .nav-list {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 80vh;
+                padding: 0;
+            }
+
+            .sidebar li {
+                width: 100%;
+                margin: 15px 0;
+            }
+
+            .sidebar li a {
+                width: 100%;
+                text-align: center;
+            }
+
+            .home-section {
+                left: 0;
+                width: 100%;
+            }
+
+            /* Optional: Hide desktop menu button */
+            .sidebar .logo-details #btn {
+                display: none;
+            }
+
+            .sidebar li.profile {
+                left: auto;
+            }
+
+            /* New mobile menu button */
+            .mobile-menu-button {
+                display: block;
+                font-size: 30px;
+                position: fixed;
+                /*0top: 15px;*/
+                right: 15px;
+                color: #ffffff;
+                z-index: 100;
+                background: rgba(0, 0, 0, 0.8);
+                cursor: pointer;
+                border-radius: 2px;
+            }
         }
 
         @media (max-width: 420px) {
@@ -296,7 +369,7 @@
     </style>
     <div class="logo-details">
         <i class='bx bxl-c-plus-plus icon'></i>
-        <div class="logo_name">360followups</div>
+        <div class="logo_name">360followups-test</div>
         <i class='bx bx-menu' id="btn"></i>
     </div>
     <ul class="nav-list">
@@ -318,7 +391,7 @@
                 <span class="links_name">Home</span>
             </a>
             {{/ifEquals}}
-            
+
             <span class="tooltip">Home</span>
         </li>
         <li>
@@ -339,7 +412,7 @@
         {{#ifEquals user.role 'admin'}}
         <li>
             <a href="/user/team">
-               <i class="fa-solid fa-people-group"></i>
+                <i class="fa-solid fa-people-group"></i>
                 <span class="links_name">Team</span>
             </a>
             <span class="tooltip">Team</span>
@@ -359,8 +432,8 @@
             </a>
             <span class="tooltip">Get help</span>
         </li>
-        
-       {{!--  <li>
+
+        {{!-- <li>
             <a href="#">
                 <i class='bx bx-cart-alt'></i>
                 <span class="links_name">Order</span>
@@ -381,7 +454,7 @@
             </a>
             <span class="tooltip">Setting</span>
         </li> --}}
-        
+
         <li class="profile">
             <div class="profile-details">
                 {{#if user.profilePicture}}
@@ -396,29 +469,49 @@
                     <div class="job">{{user.email}}</div>
                 </div>
             </div>
-            <i class='bx bx-log-out' id="log_out"></i>
+            <a href="/user/logout">
+                <i class='bx bx-log-out' id="log_out"></i>
+            </a>
         </li>
     </ul>
 </div>
 
+
+
 <script>
-    let sidebar = document.querySelector(".sidebar");
+    // let body = document.querySelector('body')
+    // body.addEventListener('click',(t)=>{
+    // 
+    // console.log(t.target)
+    // })
+
     let closeBtn = document.querySelector("#btn");
-    let searchBtn = document.querySelector(".bx-search");
+    // let searchBtn = document.querySelector(".bx-search");
+    let mobileMenuBtn = document.querySelector(".mobile-menu-button");
+    let sidebar = document.querySelector(".sidebar");
+
+    console.log(mobileMenuBtn, sidebar, closeBtn)
+
+    mobileMenuBtn.addEventListener("click", () => {
+        console.log("hhhhh")
+        sidebar.classList.toggle("open");
+    });
+
+
     closeBtn.addEventListener("click", () => {
         sidebar.classList.toggle("open");
-        menuBtnChange();//calling the function(optional)
+        menuBtnChange(); // Calling the function (optional)
     });
-    searchBtn.addEventListener("click", () => { // Sidebar open when you click on the search iocn
-        sidebar.classList.toggle("open");
-        menuBtnChange(); //calling the function(optional)
-    });
-    // following are the code to change sidebar button(optional)
+
+    // Toggle sidebar in mobile view
+
+
+    // Following are the code to change sidebar button(optional)
     function menuBtnChange() {
         if (sidebar.classList.contains("open")) {
-            closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");//replacing the iocns class
+            closeBtn.classList.replace("bx-menu", "bx-menu-alt-right"); // Replacing the icons class
         } else {
-            closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");//replacing the iocns class
+            closeBtn.classList.replace("bx-menu-alt-right", "bx-menu"); // Replacing the icons class
         }
     }
 </script>
