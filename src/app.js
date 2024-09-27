@@ -446,12 +446,12 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
     let preMem = await memberModel.findOne({email: email})
     if (preMem !== null) {
       req.session.successMSG = `This email ID is already registered.`;
-    return res.redirect("/user/team");
+      return res.redirect("/user/team");
     }
     preMem = await logIncollection.findOne({email:email}); 
     if (preMem !== null) {
       req.session.successMSG = `This email ID is already registered.`;
-    return res.redirect("/user/team");
+      return res.redirect("/user/team");
     }
 
     const password = otpGenerator.generate(8, {
