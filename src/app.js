@@ -36,7 +36,7 @@ const templateModel = require("./models/temlate.model.js");
 const WaModel = require("./models/wA.model.js");
 
 //payment gateway routes
-const paymentRoute = require('./routes/payment.route.js');
+const paymentRoute = require("./routes/payment.route.js");
 
 const memberRoute = require("./routes/members.route.js");
 const userRoute = require("./routes/users.route.js");
@@ -121,16 +121,16 @@ hbs.registerHelper("countLeadsByStatus", function (leads, pipelineTitle) {
   return filteredLeads.length;
 });
 
-
-
 hbs.registerHelper("filterLeadsForMember", function (leads) {
   // Check if leads is defined and is an array
   if (!Array.isArray(leads)) {
     return 0; // Return 0 if leads is not an array
   }
-  const filteredLeads = leads.filter((lead) => lead.uid === '' || lead.uid === null );
+  const filteredLeads = leads.filter(
+    (lead) => lead.uid === "" || lead.uid === null
+  );
   // console.log(filteredLeads.length);
-  
+
   return filteredLeads;
 });
 
@@ -226,7 +226,7 @@ app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
       userWA.whatsappClientReady = true;
       userWA.connectedPhoneNumber = connectedPhoneNumber;
       await userWA.save();
-    req.session.successMSG = `Connected WhatsApp Number: ${connectedPhoneNumber}`;
+      req.session.successMSG = `Connected WhatsApp Number: ${connectedPhoneNumber}`;
       return res.json({ isConnected: userWA.isConnected });
     }
     console.log(userWA.isConnected);
@@ -253,7 +253,7 @@ app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
 app.get("/qr", isAdminLoggedIn, async (req, res) => {
   // console.log("qrCodeData genrated in /qr", req.user.name);
   const user = req.user;
-  
+
   if (qrCodeData) {
     console.log("Qr genrated");
   }
@@ -394,7 +394,6 @@ app.post(
   }
 );
 
-
 // app.get("/get/data", isAdminLoggedIn, async (req, res) => {
 //   const admin = await logIncollection.findById(req.user.id);
 //   let allLeads = readJsonFile()
@@ -429,24 +428,29 @@ app.post(
 
 //   res.redirect("/leads");
 // });
-
 app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
   try {
     const user = await logIncollection.findById(req.user.id);
-    if (user.teams.length >= 3) {
-      req.session.successMSG = `Cannot add more than 3 team members with free plan.`;
-      return res.redirect("/user/dashboard");
+    if (user.teams.length >= 3 && user.subscriptionLevel === "free") {
+      req.session.successMSG = `free`;
+      return res.redirect("/user/team");
+    }
+    if (user.teams.length >= 7 && user.subscriptionLevel === "basic") {
+      req.session.successMSG = `basic`;
+      return res.redirect("/user/team");
     }
 
     const { name, email, mobile, countryCode } = req.query;
-    let preMem = await memberModel.findOne({email: email})
+    let preMem = await memberModel.findOne({ email: email });
     if (preMem !== null) {
       req.session.successMSG = `This email ID is already registered.`;
       return res.redirect("/user/team");
+      return res.redirect("/user/team");
     }
-    preMem = await logIncollection.findOne({email:email}); 
+    preMem = await logIncollection.findOne({ email: email });
     if (preMem !== null) {
       req.session.successMSG = `This email ID is already registered.`;
+      return res.redirect("/user/team");
       return res.redirect("/user/team");
     }
 
@@ -464,19 +468,15 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
         <h2>Web Soft Valley</h2>
         <p>Developing Future</p>
       </div>
-
       <h3>Hello ${name} !</h3>
       <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
-
       <p>Email: <a href="mailto:${email}">${email}</a></p>
       <p>Password: <strong>${password}</strong></p>
-
       <div style="text-align: center;">
         <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
           Login to Dashboard
         </a>
       </div>
-
       <p>Regards,<br>Web Soft Valley Technology</p>
     </div>
   `;
@@ -522,12 +522,9 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
       //     "../template/images/uploads/whatsapp/",
       //     afterCallTemp.pdf
       //   );
-      // }     
+      // }
 
-      sendMessageToLead(
-        leadContactNo,
-        text
-      ); // after temp msg sending to lead
+      sendMessageToLead(leadContactNo, text); // after temp msg sending to lead
     }, 4000);
 
     const newMember = new memberModel({
@@ -549,7 +546,6 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
   }
   return res.redirect("/user/team");
 });
-
 app.post("/submit-form", async (req, res) => {
   try {
     const email = req.body.email;
@@ -1285,8 +1281,6 @@ const readJsonFile = () => {
 //   });
 // }
 
-
-
 // let chalokiID;
 // function chalo(user) {
 //   let i = 0;
@@ -1296,7 +1290,6 @@ const readJsonFile = () => {
 //     console.log("step chalo ki ", i++);
 //   }, 60000);
 // }
-
 
 // module.exports = {
 //   sendMessageToLead
