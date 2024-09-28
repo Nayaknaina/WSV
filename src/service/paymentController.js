@@ -80,6 +80,7 @@ const payProduct = async (req, res) => {
 };
 
 // PayPal Success Page Route
+// PayPal Success Page Route
 const successPage = async (req, res) => {
   try {
     const { token } = req.query; // token is the order ID (order ID = token in sandbox)
@@ -94,6 +95,7 @@ const successPage = async (req, res) => {
         "Payment captured successfully:",
         JSON.stringify(capture.result)
       );
+
       let admin = await logIncollection.findById(req.user.id);
       admin.subscriptionLevel = "basic";
       const payment = new Payment({
@@ -126,11 +128,15 @@ const successPage = async (req, res) => {
 
       await payment.save();
       await admin.save();
-      
 
-      res.send("<h1>Payment Success</h1>");
+     console.log("payment suceess");
+     
+      res.render('success', {
+        paymentDetails: payment, // Pass payment details to the template
+        adminDetails: admin, // Pass admin details to the template
+      });
     } else {
-      res.send("<h1>Payment Failed</h1>");
+      res.render('failure'); // Render a failure template in case payment is not completed
     }
   } catch (error) {
     console.log("Error capturing PayPal payment: ", error.message);
