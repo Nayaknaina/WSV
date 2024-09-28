@@ -803,7 +803,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
     if (chalteRahoId) clearInterval(chalteRahoId);
     chalteRaho(accessToken, req);
     req.session.successMSG = "Connected to facebook account.";
-    res.redirect("/leads");
+    res.redirect("/get/data");
   } catch (error) {
     console.error("Error fetching access token:", error);
     res.status(500).send("Error logging in with Facebook.");
