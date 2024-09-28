@@ -394,40 +394,41 @@ app.post(
   }
 );
 
-// app.get("/get/data", isAdminLoggedIn, async (req, res) => {
-//   const admin = await logIncollection.findById(req.user.id);
-//   let allLeads = readJsonFile()
+app.get("/get/data", isAdminLoggedIn, async (req, res) => {
+  const admin = await logIncollection.findById(req.user.id);
+  let allLeads = readJsonFile()
 
-//   if (!admin) {
-//     return res.redirect("/login");
-//   }
+  if (!admin) {
+    return res.redirect("/login");
+  }
 
-//   console.log(allLeads.length);
+  console.log(allLeads.length);
 
-//   allLeads.forEach(async (lead) => {
-//     const perLead = await leadsModel.findOne({ lead_id: lead.id });
+  allLeads.forEach(async (lead) => {
+    const perLead = await leadsModel.findOne({ lead_id: lead.id });
 
-//     if (!perLead) {
-//       let leads_datas = [];
+    if (!perLead) {
+      let leads_datas = [];
 
-//       lead.field_data.forEach((data) => {
-//         leads_datas.push({ que: data.name, ans: data.values[0] });
-//       });
+      lead.field_data.forEach((data) => {
+        leads_datas.push({ que: data.name, ans: data.values[0] });
+      });
 
-//       const newLead = new leadsModel({
-//         lead_id: lead.id,
-//         income_time: lead.created_time,
-//         cid: admin.cid,
-//         leads_data: leads_datas,
-//         app: "facebook",
-//       });
-//       await newLead.save();
-//       console.log("data created");
-//     }
-//   });
+      const newLead = new leadsModel({
+        lead_id: lead.id,
+        income_time: lead.created_time,
+        cid: admin.cid,
+        leads_data: leads_datas,
+        app: "facebook",
+      });
+      await newLead.save();
+      console.log("data created");
+    }
+  });
 
-//   res.redirect("/leads");
-// });
+  res.redirect("/leads");
+});
+
 app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
   try {
     const user = await logIncollection.findById(req.user.id);
@@ -595,10 +596,12 @@ app.get(
     console.log(req.user);
 
     let user = await logIncollection.findOne({ email: req.user.email });
-    const cid = uuidv4();
-    user.cid = cid;
-    user.role = "admin";
-    await user.save();
+    if (!user.cid) {
+      const cid = uuidv4();
+      user.cid = cid;
+      user.role = "admin";
+      await user.save();
+    }
     if (!(user.myPipelines.length >= 4)) {
    
     const pipelines = [

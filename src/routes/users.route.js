@@ -290,6 +290,7 @@ router.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
     await pipeline.save();
     return res.redirect("/user/pipe/abc");
   }
+  await pipeline.save();
   req.session.successMSG = `${pipeline.title} pipline updatation successfully !. `;
   return res.redirect("/user/dashboard");
 });
@@ -331,6 +332,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
         { path: "status" }, // Populate the 'status' field inside each lead
         { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
       ],
+      options: { sort: { "statusTime": -1 } }
     });
 
     if (!user.organizationName) {

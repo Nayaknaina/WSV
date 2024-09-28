@@ -148,12 +148,16 @@ router.post("/lead/status/update/:id", isAdminLoggedIn, async (req, res) => {
   let { id } = req.params;
 
   let lead = await leadsModel.findById(id).populate("status");
+  let leads = await leadsModel.find({ statusTime: { $ne: null } });
+  console.log(leads);
+  
   let pipe = await pipelineModel.findById(req.body.pipeId);
 
   if (!lead) {
     return res.redirect("/leads");
   }
   lead.status = pipe._id;
+  lead.statusTime = new Date();
   await lead.save();
   // console.log(pipe.color);
 

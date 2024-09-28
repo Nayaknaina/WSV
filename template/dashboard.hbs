@@ -17,7 +17,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -65,7 +67,7 @@
 <style>
     .modal {
         display: none;
-     
+
         position: fixed;
         z-index: 100000000;
         left: 0;
@@ -73,7 +75,7 @@
         width: 100%;
         height: 100%;
         display: none;
-        
+
         position: fixed;
         z-index: 100000000;
         left: 0;
@@ -142,7 +144,7 @@
             <h2>Fill the Form to Access Dashboard</h2>
             <label for="email">Enter the registered EmailId:</label>
             <input type="email" id="email" name="email" required>
-           
+
             <label for="organizationName">Name of Organisation:</label>
             <input type="text" id="organizationName" name="organizationName" required>
 
@@ -174,7 +176,7 @@
                 {{> NameHead}}
                 <div class="content ">
 
-                   {{#if successMSG}}
+                    {{#if successMSG}}
                     <div class="col-sm-12">
                         <div id="alert-success" class="alert  alert-success alert-dismissible fade show" role="alert">
                             <span class="badge badge-pill badge-success">Success</span> {{successMSG}}
@@ -184,8 +186,8 @@
                         </div>
                     </div>
                     {{/if}}
-                    
-                   {{#if errorMSG}}
+
+                    {{#if errorMSG}}
                     <div class="col-sm-12">
                         <div id="alert-error" class="alert  alert-danger alert-dismissible fade show" role="alert">
                             <span class="badge badge-pill badge-danger">Alert</span> {{errorMSG}}
@@ -197,50 +199,53 @@
                     {{/if}}
 
 
-                <div class="row">
-                    <!--/.col-->
-                    <div class="col-lg-3 col-md-6">
-                        <div class="social-box facebook">
-                           <i class="fa-brands fa-square-facebook" ></i>
-                            <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now </a>
+                    <div class="row">
+                        <!--/.col-->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="social-box facebook">
+                                <i class="fa-brands fa-square-facebook"></i>
+                                <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now
+                                </a>
+                            </div>
+                            <!--/social-box-->
                         </div>
-                        <!--/social-box-->
-                    </div>
 
-                    <div class="col-lg-3 col-md-6">
-                        <div class="social-box twitter">
-                          <i class="fa-brands fa-whatsapp"></i>
-                           
-                            <a href="/qr" id="whatsapp-Connect-Btn" class="btn btn-outline-secondary border font-15">Connect Now</a>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="social-box twitter">
+                                <i class="fa-brands fa-whatsapp"></i>
+
+                                <a href="/qr" id="whatsapp-Connect-Btn"
+                                    class="btn btn-outline-secondary border font-15">Connect Now</a>
+                            </div>
+
                         </div>
-                       
-                    </div>
-                    <!--/.col-->
+                        <!--/.col-->
 
 
-                    <div class="col-lg-3 col-md-6" style="opacity: 0.3;">
-                        <div class="social-box linkedin">
-                            <i class="fa fa-download"></i>
-                            {{!-- <a class="btn btn-outline-secondary border  font-15" href="#">Download
-                                Data </a> --}}
-                            <a href="#" class="btn border font-15">Download
-                                Data</a>
+                        <div class="col-lg-3 col-md-6" style="opacity: 0.3;">
+                            <div class="social-box linkedin">
+                                <i class="fa fa-download"></i>
+                                {{!-- <a class="btn btn-outline-secondary border  font-15" href="#">Download
+                                    Data </a> --}}
+                                <a href="#" class="btn border font-15">Download
+                                    Data</a>
+                            </div>
+                            <!--/social-box-->
                         </div>
-                        <!--/social-box-->
-                    </div>
-                    <div class="col-lg-3 col-md-6" style="opacity: 0.3;">
-                        <div class="social-box mailchimp">
-                            <i class="fab fa-mailchimp"></i>
-                         
-                            {{!-- <a class="btn btn-outline-secondary border  font-15" href="#">connect now </a> --}}
-                            <a class="btn border  font-15" href="#">connect now </a>
+                        <div class="col-lg-3 col-md-6" style="opacity: 0.3;">
+                            <div class="social-box mailchimp">
+                                <i class="fab fa-mailchimp"></i>
+
+                                {{!-- <a class="btn btn-outline-secondary border  font-15" href="#">connect now </a>
+                                --}}
+                                <a class="btn border  font-15" href="#">connect now </a>
+                            </div>
+                            <!--/social-box-->
                         </div>
-                        <!--/social-box-->
                     </div>
-                </div>
                     <div class="row ">
-                        
-                      
+
+
                         {{#each pipes}}
 
                         <div class="col-sm-6 col-lg-3">
@@ -257,11 +262,11 @@
                                         <canvas id="widgetChart1"></canvas>
                                     </div> --}}
                                 </div>
-                              
+
                             </div>
                         </div>
                         {{/each}}
-                           
+
 
                     </div>
 
@@ -272,10 +277,18 @@
                                     <div class="col">
                                         <h4 class="card-title mb-0">Graphical lead performance insights</h4>
                                         {{!-- <div class="small text-muted">Lead Analytics</div> --}}
+                                        <label for="timeRange">Select Time Range:</label>
+                                        <select id="timeRange" onchange="updateChart()">
+                                            <option value="today">Today</option>
+                                            <option value="yesterday">Yesterday</option>
+                                            <option value="lastWeek">Last Week</option>
+                                            <option value="lastMonth">Last Month</option>
+                                            <option value="lastYear">Last Year</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <!--/.row-->
-                                  <div class="chart-wrapper mt-4">
+                                <div class="chart-wrapper mt-4">
                                     <canvas id="competitionGraph" style="width:800px; height:300px;"
                                         height="300"></canvas>
                                 </div>
@@ -330,9 +343,11 @@
                     </div>
 
                     <div class="col-xl-3 col-lg-6">
-                       <form action="/user/profile/image" hidden id="user-image-change-form" enctype="multipart/form-data" method="post">
-                        <input onchange="changeProfileImage()" type="file" name="userImage" id="user-profile-image-input" accept="image/*" required>
-                       </form>
+                        <form action="/user/profile/image" hidden id="user-image-change-form"
+                            enctype="multipart/form-data" method="post">
+                            <input onchange="changeProfileImage()" type="file" name="userImage"
+                                id="user-profile-image-input" accept="image/*" required>
+                        </form>
                         <section class="card" style="min-height: 400px;">
                             <div class="profile-card">
                                 <div class="corner-ribon black-ribon">
@@ -343,7 +358,7 @@
 
                                     <div class="media-body">
                                         <div class="profile-details">
-                                       
+
                                             {{#if user.profilePicture}}
                                             <img id="user_image" width="70" height="70" src="{{user.profilePicture}}"
                                                 class="rounded-circle">
@@ -375,13 +390,14 @@
                                     </li>
                                 </ul>
                             </div>
-                            <a href="/profile" id="acc-Btn" class="btn btn-secondary border ml-4 mr-4 font-15">update profile</a>
+                            <a href="/profile" id="acc-Btn" class="btn btn-secondary border ml-4 mr-4 font-15">update
+                                profile</a>
                             <footer class="twt-footer">
                                 {{!-- <a href="#"><i class="fa fa-camera"></i></a> --}}
                                 <a href="#"><i class="fa fa-map-marker"></i></a>
                                 <a id="location-title"></a>
                                 <span id="location-localtime" class="pull-right">
-                                    
+
                                 </span>
                             </footer>
                         </section>
@@ -427,7 +443,7 @@
                             border: none;
                         }
 
-                      
+
 
                         #pipe-container-s::-webkit-scrollbar {
                             display: none;
@@ -436,11 +452,12 @@
 
                     <div class="col-xl-3 col-lg-6">
                         <div class="card">
-                           
+
                             <div class="card-body">
                                 <div class="stat-widget-one" id="pipe-container-s"
                                     style="height: 350px;max-height: 350px; overflow: auto;">
-                                <p style="font-size: 14px; color: #1a1a1a;font-weight: 500; margin: 0;">Integrate your personalized pipelines</p>
+                                    <p style="font-size: 14px; color: #1a1a1a;font-weight: 500; margin: 0;">Integrate
+                                        your personalized pipelines</p>
                                     <form action="/user/pipeline" method="post">
                                         <input type="text" id="inputPassword2" name="title" placeholder="Enter Pipline">
                                         <input type="color" class="colorinp"
@@ -804,6 +821,7 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{!--
     <script>
         // console.log("hello ji")
         const leads = {{{ json user.myleads }}};
@@ -882,72 +900,228 @@
         };
 
         new Chart(ctx, config);
-    </script>
-
+    </script> --}}
 
 <script>
-    
-async function checkConnectionStatus() {
-  try {
-    const response = await fetch('/connection-status');
-    const data = await response.json();
-    const isConnected = data.isConnected;
-    const connectBtn = document.getElementById('whatsapp-Connect-Btn');
-    
-    if (isConnected) {
-      connectBtn.textContent = 'Connected';
-      connectBtn.classList.remove('btn-outline-secondary'); // Optionally change styling
-      connectBtn.classList.add('btn-success'); // Optionally change styling
-    } else {
-      connectBtn.textContent = 'Connect Now';
-      connectBtn.classList.remove('btn-success'); // Optionally change styling
-      connectBtn.classList.add('btn-outline-secondary'); // Optionally change styling
+    const arr = {{{ json user.myleads }}}
+    const pipelines = {{{ json pipes }}};
+    const pipelineMap = {};
+    pipelines.forEach(pipe => {
+        pipelineMap[pipe.title] = {
+            color: pipe.color + 'dd',
+            count: 0
+        };
+    });
+
+    const leadsData = arr.map(item => ({
+        createdAt: item.statusTime,
+        status: item.status.title // Ensure that `status` is populated correctly
+    }));
+
+    function formatXaxis(range, date) {
+        const d = new Date(date);
+        if (range === 'today') {
+            //console.log(d.toTimeString().slice(0, 5))
+            return d.toTimeString().slice(0, 5); // Only show time (HH:MM)
+        } else if (range === 'yesterday') {
+            console.log(d.toLocaleDateString() + ' ' + d.toTimeString().slice(0, 5))
+            return d.toLocaleDateString() + ' ' + d.toTimeString().slice(0, 5); // Show date + time
+        } else if (range === 'lastWeek') {
+            return d.toLocaleDateString(); // Show only date (DD/MM/YYYY)
+        } else if (range === 'lastMonth') {
+            const day = d.getDate();
+            const startDay = Math.floor((day - 1) / 7) * 7 + 1;
+            const endDay = startDay + 6;
+            return `${d.getMonth() + 1}/${startDay}-${endDay}`; // E.g., 9/1-7
+        } else if (range === 'lastYear') {
+            return d.toLocaleString('default', { month: 'long' }) + ' ' + d.getFullYear(); // Show month and year
+        }
     }
-  } catch (error) {
-    console.error('Error fetching connection status:', error);
-  }
+
+    function processLeadsData(leads, range) {
+    const groupedData = {};
+    const currentDate = new Date();
+
+    leads.forEach(lead => {
+        const leadDate = new Date(lead.createdAt);
+
+        let label;
+        if (range === 'today') {
+            // Check if the lead date is today
+            const isToday = leadDate.toDateString() === currentDate.toDateString();
+            if (!isToday) return; // Skip if it's not today
+            label = formatXaxis(range, lead.createdAt);
+        } else if (range === 'yesterday') {
+            const isWithinLast24Hours = leadDate >= new Date(currentDate - 24 * 60 * 60 * 1000) && leadDate < currentDate;
+            if (!isWithinLast24Hours) return; // Skip if it's not within the last 24 hours
+            label = formatXaxis(range, lead.createdAt);
+        } else {
+            label = formatXaxis(range, lead.createdAt);
+        }
+
+        if (!groupedData[label]) {
+            groupedData[label] = {};
+            Object.keys(pipelineMap).forEach(status => {
+                groupedData[label][status] = 0; // Initialize counts for each status
+            });
+        }
+
+        groupedData[label][lead.status] = (groupedData[label][lead.status] || 0) + 1;
+    });
+
+    return groupedData;
 }
 
-// Call the function when the page loads
-document.addEventListener('DOMContentLoaded', checkConnectionStatus);
 
+    function getChartData(leads, range) {
+        const groupedData = processLeadsData(leads, range);
+        const labels = Object.keys(groupedData);
+        const datasets = [];
+
+        // Create datasets for each status dynamically
+        Object.keys(pipelineMap).forEach(status => {
+            const data = labels.map(label => groupedData[label][status] || 0);
+            datasets.push({
+                label: status.charAt(0).toUpperCase() + status.slice(1),
+                data: data,
+                backgroundColor: pipelineMap[status].color, // Adjust opacity if needed
+                borderColor: pipelineMap[status].color, // Full color for border
+                borderWidth: 1,
+                stack: 'stacked'
+            });
+        });
+
+        console.log(datasets)
+
+        return {
+            labels: labels,
+            datasets: datasets
+        };
+    }
+
+    // Initialize Chart.js
+    const ctx = document.getElementById('competitionGraph').getContext('2d');
+    let myChart = new Chart(ctx, {
+        type: 'bar',
+        data: getChartData(leadsData, 'today'), // Default to 'today'
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Leads'
+                    },
+                    stacked: true
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    },
+                    stacked: true
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            return `${tooltipItem.dataset.label}: ${tooltipItem.raw} leads`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Update chart when dropdown selection changes
+    function updateChart() {
+        const range = document.getElementById('timeRange').value;
+        const chartData = getChartData(leadsData, range);
+
+        myChart.data.labels = chartData.labels;
+        myChart.data.datasets.forEach((dataset, index) => {
+            dataset.data = chartData.datasets[index].data;
+        });
+
+        myChart.options.scales.x.title.text = getXaxisTitle(range);
+        myChart.update();
+    }
+
+    function getXaxisTitle(range) {
+        if (range === 'today' || range === 'yesterday') {
+            return 'Time';
+        } else if (range === 'lastWeek' || range === 'lastMonth') {
+            return 'Date';
+        } else if (range === 'lastYear') {
+            return 'Month';
+        }
+    }
 </script>
-{{!--todo profile card current location with local time --}}
- <script>
-    async function getLocation(leti,logi) {
-      const data = await fetch(`https://api.weatherapi.com/v1/current.json?key=fffb3eafa2394421ae9120857242309&q=${leti},${logi}&api=yes`)
-      let city = await data.json()
-      console.log(city);
 
-    let space = document.querySelector('#location-title')
-    let spacetime = document.querySelector('#location-localtime')
-    space.innerHTML = `${city.location.name},${city.location.country}`
-    spacetime.innerHTML = `${city.location.localtime}`
-    }
-    
-    function getData(position) {
-      console.log(position);
-      getLocation(position.coords.latitude,position.coords.longitude)
-    }
-    function getErr() {
-      console.log("Oops, Somehing went wrong !");
-    }
 
-    document.addEventListener('DOMContentLoaded', async()=>{
-      navigator.geolocation.getCurrentPosition(getData,getErr)
-    })
-  </script>
 
-  <script>
-    function changeProfileImage(){
-    let imageInpForm = document.querySelector('#user-image-change-form');
-       
-        imageInpForm.submit()
+    <script>
 
-    }
-  </script>
+        async function checkConnectionStatus() {
+            try {
+                const response = await fetch('/connection-status');
+                const data = await response.json();
+                const isConnected = data.isConnected;
+                const connectBtn = document.getElementById('whatsapp-Connect-Btn');
+
+                if (isConnected) {
+                    connectBtn.textContent = 'Connected';
+                    connectBtn.classList.remove('btn-outline-secondary'); // Optionally change styling
+                    connectBtn.classList.add('btn-success'); // Optionally change styling
+                } else {
+                    connectBtn.textContent = 'Connect Now';
+                    connectBtn.classList.remove('btn-success'); // Optionally change styling
+                    connectBtn.classList.add('btn-outline-secondary'); // Optionally change styling
+                }
+            } catch (error) {
+                console.error('Error fetching connection status:', error);
+            }
+        }
+
+        // Call the function when the page loads
+        document.addEventListener('DOMContentLoaded', checkConnectionStatus);
+
+    </script>
+    {{!--todo profile card current location with local time --}}
+    <script>
+        async function getLocation(leti, logi) {
+            const data = await fetch(`https://api.weatherapi.com/v1/current.json?key=fffb3eafa2394421ae9120857242309&q=${leti},${logi}&api=yes`)
+            let city = await data.json()
+            // console.log(city);
+
+            let space = document.querySelector('#location-title')
+            let spacetime = document.querySelector('#location-localtime')
+            space.innerHTML = `${city.location.name},${city.location.country}`
+            spacetime.innerHTML = `${city.location.localtime}`
+        }
+
+        function getData(position) {
+           // console.log(position);
+            getLocation(position.coords.latitude, position.coords.longitude)
+        }
+        function getErr() {
+            console.log("Oops, Somehing went wrong !");
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            navigator.geolocation.getCurrentPosition(getData, getErr)
+        })
+    </script>
+
+    <script>
+        function changeProfileImage() {
+            let imageInpForm = document.querySelector('#user-image-change-form');
+
+            imageInpForm.submit()
+
+        }
+    </script>
 </body>
 
 </html>
-
-

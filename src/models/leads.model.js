@@ -35,6 +35,10 @@ const leadsSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'pipeline',
     },             
+    statusTime: {
+      type: Date,
+      default: null,
+    },             
 
     leads_data: [
       {
