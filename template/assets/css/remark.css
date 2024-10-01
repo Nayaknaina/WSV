@@ -22,7 +22,9 @@ body {
 
 section {
   width: 300px;
-  height: 85%;
+ max-width: 300px;
+  height: 350px;
+  z-index: 9999999999;
   /* padding: px; */
   border-radius: 11px;
   background-color: rgb(255, 255, 255);
@@ -30,7 +32,8 @@ section {
   display: block;
   position: absolute;
   right: 2rem;
-  box-shadow: 1px 1px 20px 0 gray;
+  /* box-shadow: 1px 1px 20px 0 gray; */
+  box-shadow: 1px 1px 15px 3px #424242;
 }
 
 .timeline {
@@ -133,8 +136,8 @@ section {
 }
 
 #add-remark-content {
-  padding: 8px 2px 2px 2px;
-  width: 135px;
+  padding: 9px 2px 2px 2px;
+  width: 160px;
 }
 
 .add-remark-txt {
@@ -193,19 +196,21 @@ section {
 
 @media (max-width: 768px) {
 section {
-  width: 200px;
+  width: 95%;
   right: 8px;
-  height: 78%;
+  height: 370px;
+  
 }
 .timeline ul li .content {
-  width: 170px;
-  padding: 5px 11px;
+  min-width: 250px;
+  width: 270px;
+  padding: 11px 11px;
   left: 16px;
 }
 .timeline ul li .content:before {
-  top: 48%;
-  width: 11px;
-  height: 11px;
+  top: 55%;
+  width: 12px;
+  height: 12px;
 }
 
 .ul-box {
