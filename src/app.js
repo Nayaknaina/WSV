@@ -84,6 +84,9 @@ app.use(
 const static_path = path.join(__dirname, "../public");
 app.use(express.static(static_path));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());  
+app.use(cookieParser());
 
 app.set("view engine", "hbs");
 app.set("views", templatepath);
@@ -605,14 +608,15 @@ app.get(
     if (!(user.myPipelines.length >= 4)) {
    
     const pipelines = [
-      { title: "win", color: "#28A745" },
-      { title: "loss", color: "#DC3545" },
-      { title: "held", color: "#007BFF" },
-      { title: "pending", color: "#FFC107" },
+      { title: "win", color: "#28A745", defaultVal: false },
+      { title: "lost", color: "#DC3545", defaultVal: false },
+      { title: "on hold", color: "#007BFF", defaultVal: true },
+      { title: "pending", color: "#FFC107", defaultVal: false },
     ].map(
       (pipelineData) =>
         new pipelineModel({
           uid: user._id,
+          defaultVal: pipelineData.defaultVal,
           color: pipelineData.color,
           title: pipelineData.title,
           cid: user.cid,

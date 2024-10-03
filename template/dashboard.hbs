@@ -26,12 +26,17 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     {{!-- //dashboardcontent --}}
-    <link rel="stylesheet" href="vendors/bootstrap/dist/css/bootstrap.min.css">
+    {{!--
+    <link rel="stylesheet" href="vendors/bootstrap/dist/css/bootstrap.min.css"> --}}
     <link rel="stylesheet" href="/vendors/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="vendors/themify-icons/css/themify-icons.css">
-    <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css">
-    <link rel="stylesheet" href="vendors/selectFX/css/cs-skin-elastic.css">
-    <link rel="stylesheet" href="vendors/jqvmap/dist/jqvmap.min.css">
+    {{!--
+    <link rel="stylesheet" href="vendors/themify-icons/css/themify-icons.css"> --}}
+    {{!--
+    <link rel="stylesheet" href="vendors/flag-icon-css/css/flag-icon.min.css"> --}}
+    {{!--
+    <link rel="stylesheet" href="vendors/selectFX/css/cs-skin-elastic.css"> --}}
+    {{!--
+    <link rel="stylesheet" href="vendors/jqvmap/dist/jqvmap.min.css"> --}}
 
 
     <link rel="stylesheet" href="/assets/css/style.css">
@@ -39,7 +44,8 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 
 
-    <link rel="stylesheet" type="text/css" href="/styles/loader.css">
+    {{!--
+    <link rel="stylesheet" type="text/css" href="/styles/loader.css"> --}}
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
@@ -204,8 +210,16 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="social-box facebook">
                                 <i class="fa-brands fa-square-facebook"></i>
+                                {{#if user.facebookToken}}
+                                <div class="row d-flex justify-content-center mt-2" style="gap: 20px;">
+                                    <a class="btn btn-primary btn-sm me-3 pointer" href="#">Connected</a>
+                                    <a class="btn btn-danger btn-sm pointer" href="#">Logout</a>
+                                </div>
+
+                                {{else}}
                                 <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now
                                 </a>
+                                {{/if}}
                             </div>
                             <!--/social-box-->
                         </div>
@@ -270,6 +284,22 @@
 
                     </div>
 
+                    <style>
+                        #date1:before {
+                            content: attr(placeholder);
+                            color: #999;
+                            position: absolute;
+                            margin-right: 14px;
+                        }
+
+                        #date2:before {
+                            content: attr(placeholder);
+                            color: #999;
+                            position: absolute;
+                            margin-right: 14px;
+                        }
+                    </style>
+
                     <div class="col-xl-6">
                         <div class="card">
                             <div class="card-body">
@@ -277,19 +307,58 @@
                                     <div class="col">
                                         <h4 class="card-title mb-0">Graphical lead performance insights</h4>
                                         {{!-- <div class="small text-muted">Lead Analytics</div> --}}
-                                        <label for="timeRange">Select Time Range:</label>
-                                        <select id="timeRange" onchange="updateChart()">
+
+                                    </div>
+                                </div>
+                                <div class="row d-flex">
+                                    <div class="col-md-12 col-12">
+                                        <label style="margin-top: .6rem; margin-bottom: 0;" for="timeRange">Select
+                                            Time Range:</label>
+                                        <select style="margin: 0; padding: 6px;" id="timeRange"
+                                            onchange="updateChart()">
                                             <option value="today">Today</option>
                                             <option value="yesterday">Yesterday</option>
+                                            <option value="thisWeek">This Week</option>
                                             <option value="lastWeek">Last Week</option>
+                                            <option value="thisMonth">This Month</option>
                                             <option value="lastMonth">Last Month</option>
-                                            <option value="lastYear">Last Year</option>
+                                            <option value="thisYear">This Year</option>
+                                            <option value="custom">Custom Date</option>
                                         </select>
+                                    </div>
+                                    <div class="row flex px-4" id="customDateRange" style="display:none;">
+                                        {{!-- <div class="col-4"> --}}
+                                            {{!-- <label style="margin-bottom: 0;" for="startDate">Start Date:</label>
+                                            --}}
+                                            <input placeholder="Start date" id="date1"
+                                                style="min-width: 50px; width:100px; margin: 6px; padding: 6px;"
+                                                type="date" id="startDate">
+
+                                            {{!--
+                                        </div> --}}
+                                        {{!-- <div class="col-4"> --}}
+                                            {{!-- <label style="margin-bottom: 0;" for="endDate">End Date:</label> --}}
+                                            <input placeholder="End date" id="date2"
+                                                style="min-width: 50px; width:100px; margin: 6px; padding: 6px;"
+                                                type="date" id="endDate">
+                                            {{!--
+                                        </div> --}}
+
+
+
+                                        {{!-- <div class="col-2"
+                                            style="display: flex; justify-content: center; height: 100%; align-items: center;">
+                                            --}}
+                                            <button class="btn btn-primary btn-sm"
+                                                onclick="applyCustomDateRange()">Apply</button>
+                                            {{!--
+                                        </div> --}}
                                     </div>
                                 </div>
                                 <!--/.row-->
-                                <div class="chart-wrapper mt-4">
-                                    <canvas id="competitionGraph" style="width:800px; height:300px;"
+                                <div class="chart-wrapper mt-4" style="overflow: auto;">
+                                    <canvas id="competitionGraph"
+                                        style="min-width:400px; width:800px; min-height:200px; max-height: 300px;"
                                         height="300"></canvas>
                                 </div>
 
@@ -448,6 +517,23 @@
                         #pipe-container-s::-webkit-scrollbar {
                             display: none;
                         }
+
+                        .actionBar{
+                            width: fit-content;
+                            height: fit-content;
+                            padding: 8px 8px;
+                            background-color: #fff;
+                            box-shadow: 1px 1px 15px 3px #424242;
+                            border-radius: 4px;
+                            display: none;
+                            justify-content: center;
+                            align-items: center;
+                            flex-direction: column;
+                            gap: 13px;
+                            position: absolute;
+                            right: 2rem;
+                        }
+                       
                     </style>
 
                     <div class="col-xl-3 col-lg-6">
@@ -458,85 +544,110 @@
                                     style="height: 350px;max-height: 350px; overflow: auto;">
                                     <p style="font-size: 14px; color: #1a1a1a;font-weight: 500; margin: 0;">Integrate
                                         your personalized pipelines</p>
-                                    <form action="/user/pipeline" method="post">
+                                    <form id="addPipelineForm">
                                         <input type="text" id="inputPassword2" name="title" placeholder="Enter Pipline">
-                                        <input type="color" class="colorinp"
+                                        <input type="color" class="colorinp" id="colorinp2"
                                             style="width: 32px; height: 32px; border: none; padding: 0;" name="color">
-                                        <button type="submit" class="btn btn-primary" id="pipeAddBtn">Add</button>
+                                        <button type="submit" class="btn btn-primary" id="addPipelineBtn">Add</button>
                                     </form>
 
-                                    <ul>
+                                    <ul id="allPipesShowing">
                                         {{#each pipes}}
                                         {{#if defaultVal}}
                                         {{!-- Display the default document at the top --}}
                                         <li
-                                            style="display: flex; border-radius: 4px; padding-right: 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
-                                            <form style="display: flex; justify-content: space-between;"
+                                            style="display: flex; border-radius: 4px; padding: 0 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
+                                            <form class="updatePipesForm"
+                                                style="display: flex; justify-content: space-between; margin-right: 10px;"
                                                 action="/user/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
 
-                                                <input type="text" disabled name="title" value="{{title}}"
+                                                <input type="radio" checked disabled class="colorinp"
+                                                    style="width: 20px; height: 20px; margin-right: 5px; border: none; padding: 0;"
+                                                    name="defaultVal" id="check-{{_id}}">
+
+                                                <input type="text" disabled name="title"
+                                                    style="text-transform: capitalize;" value="{{title}}"
                                                     id="title-{{_id}}">
 
                                                 <input type="color" disabled class="colorinp" value="{{color}}"
                                                     style="width: 28px; height: 28px; border: none; padding: 0;"
                                                     name="color" id="color-{{_id}}">
 
-                                                <input type="checkbox" checked disabled class="colorinp"
-                                                    style="width: 20px; height: 20px; margin-right: 5px; border: none; padding: 0;"
-                                                    name="defaultVal" id="check-{{_id}}">
 
 
-                                                <i id="sub-{{_id}}"
+                                                {{!-- <i id="sub-{{_id}}"
                                                     style="font-size: 23px; margin-right: 10px; cursor: pointer;" hidden
                                                     onclick="submitForm('{{_id}}')"
-                                                    class="fa-solid fa-square-check"></i>
+                                                    class="fa-solid fa-square-check"></i> --}}
                                             </form>
                                             <span
-                                                style="display: flex; justify-content: center; align-items: center; gap: 4px;">
-                                                <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
-                                                    class="fa-solid fa-pen-to-square"></i>
-                                                <a href="/user/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
-                                                        style="color: crimson;"></i></a>
+                                                style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                                                <label style="margin: 0;" for="title-{{_id}}">
+                                                    <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
+                                                        class="fa-solid fa-pen-to-square"></i></label>
+
+                                                <a onclick="deletePipeFromAdmin('{{_id}}')"><i
+                                                        class="fa-regular fa-trash-can" style="color: crimson;"></i></a>
                                             </span>
                                         </li>
                                         {{/if}}
                                         {{/each}}
-
                                         {{!-- Loop through again, this time displaying the non-default documents --}}
                                         {{#each pipes}}
                                         {{#unless defaultVal}}
                                         <li
-                                            style="display: flex; border-radius: 4px; padding-right: 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
-                                            <form style="display: flex; justify-content: space-between;"
+                                            style="display: flex; border-radius: 4px; padding: 0 8px; border: 1px solid gray; justify-content: space-between; align-items: center; margin: 4px 0;">
+                                            <form class="updatePipesForm"
+                                                style="display: flex; justify-content: space-between; margin-right: 10px;"
                                                 action="/user/pipeline/update/{{_id}}" id="form{{_id}}" method="post">
 
-                                                <input type="text" disabled name="title" value="{{title}}"
+                                                <input type="radio" value="on" disabled class="colorinp"
+                                                    style="width: 20px; height: 20px; border: none; padding: 0;"
+                                                    name="defaultVal" id="check-{{_id}}">
+
+                                                <input type="text" disabled name="title"
+                                                    style="text-transform: capitalize;" value="{{title}}"
                                                     id="title-{{_id}}">
 
                                                 <input type="color" disabled class="colorinp" value="{{color}}"
                                                     style="width: 28px; height: 28px; border: none; padding: 0;"
                                                     name="color" id="color-{{_id}}">
 
-                                                <input type="checkbox" disabled class="colorinp"
-                                                    style="width: 20px; height: 20px; border: none; padding: 0;"
-                                                    name="defaultVal" id="check-{{_id}}">
 
 
-                                                <i id="sub-{{_id}}"
+                                                {{!-- <i id="sub-{{_id}}"
                                                     style="font-size: 23px; margin-right: 10px; cursor: pointer;" hidden
                                                     onclick="submitForm('{{_id}}')"
-                                                    class="fa-solid fa-square-check"></i>
+                                                    class="fa-solid fa-square-check"></i> --}}
                                             </form>
                                             <span
-                                                style="display: flex; justify-content: center; align-items: center; gap: 4px;">
-                                                <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
-                                                    class="fa-solid fa-pen-to-square"></i>
-                                                <a href="/user/pipeline/del/{{_id}}"><i class="fa-regular fa-trash-can"
-                                                        style="color: crimson;"></i></a>
+                                                style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                                                <label for="title-{{_id}}" style="margin: 0;">
+                                                    <i onclick="updatePiplineForm('{{_id}}')" style="cursor: pointer;"
+                                                        class="fa-solid fa-pen-to-square"></i>
+                                                </label>
+
+                                                <a href="#" onclick="deletePipeFromAdmin('{{_id}}')"><i
+                                                        class="fa-regular fa-trash-can" style="color: crimson;"></i></a>
                                             </span>
+
+                                            {{!-- <i style="margin-right: 10px; font-size: 1rem;" onclick="openActionBar('{{_id}}')" class="fa-solid fa-ellipsis-vertical"></i>
+                                            <div class="actionBar" id="actionBar-{{_id}}">
+                                               <label onclick="updatePiplineForm('{{_id}}')" for="title-{{_id}}" style="margin: 0;">
+                                               Edit <i style="cursor: pointer;"
+                                                    class="fa-solid fa-pen-to-square"></i>
+                                                </label>
+                                                
+                                                <a href="#" onclick="deletePipeFromAdmin('{{_id}}')">Delete<i
+                                                        class="fa-regular fa-trash-can" style="color: crimson;"></i></a>
+                                                
+                                            </div> --}}
                                         </li>
                                         {{/unless}}
                                         {{/each}}
+
+                                        <button id="submitAllPipesUpdatedForm" onclick="submitAllPipesUpdatedForm()"
+                                            class="btn btn-success btn-sm float-right mx-2 mt-2" hidden>Save</button>
 
 
                                     </ul>
@@ -614,7 +725,8 @@
                             <div class="card-body">
                                 <div class="stat-widget-one">
                                     <div class="stat-icon dib"><i
-                                            class="ti-layout-grid2 text-warning border-warning"></i></div>
+                                            class="ti-layout-grid2 text-warning border-warning"></i>
+                                    </div>
                                     <div class="stat-content dib">
                                         <div class="stat-text">Active Projects</div>
                                         <div class="stat-digit">770</div>
@@ -646,6 +758,8 @@
         </div>
     </div>
     {{/if}}
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
         crossorigin="anonymous"></script>
@@ -659,18 +773,15 @@
 
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
         src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
-    <script src="/js/dependencies/sweetalert.min.js?nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
 
 
 
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    <script src="/assets/js/timezones.full.min.js"></script>
-
-    <script src="/assets/js/custom-new.js"></script>
     <script>
 
     </script>
+    <script src="/assets/js/pipes.js"></script>
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
         $(document).ready(function () {
             $('#signup').on('submit', function () {
@@ -721,9 +832,9 @@
             const titleInput = document.getElementById(`title-${id}`);
             const colorInput = document.getElementById(`color-${id}`);
             const defaultinp = document.getElementById(`check-${id}`);
-            const submitBtn = document.getElementById(`sub-${id}`);
-
-            console.log(titleInput)
+            const submitBtn = document.getElementById(`submitAllPipesUpdatedForm`);
+            console.log(submitBtn.hidden)
+            console.log(id)
 
             if (titleInput.disabled && colorInput.disabled) {
                 // Enable editing
@@ -820,6 +931,26 @@
 
     </script>
 
+    <script>
+        function radioBtns() {
+            // Get all radio buttons with the same name
+            var radios = document.querySelectorAll('input[name="defaultVal"]');
+            console.log(radios)
+            // Add click event listener to each radio button
+            radios.forEach(function (radio) {
+                radio.addEventListener('click', function () {
+                    // Deselect all other radios except the clicked one
+                    radios.forEach(function (otherRadio) {
+                        if (otherRadio !== radio) {
+                            otherRadio.checked = false; // Deselect all other radios
+                        }
+                    });
+                });
+            });
+        }
+        radioBtns()
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {{!--
     <script>
@@ -902,162 +1033,226 @@
         new Chart(ctx, config);
     </script> --}}
 
-<script>
-    const arr = {{{ json user.myleads }}}
-    const pipelines = {{{ json pipes }}};
-    const pipelineMap = {};
-    pipelines.forEach(pipe => {
-        pipelineMap[pipe.title] = {
-            color: pipe.color + 'dd',
-            count: 0
-        };
-    });
-
-    const leadsData = arr.map(item => ({
-        createdAt: item.statusTime,
-        status: item.status.title // Ensure that `status` is populated correctly
-    }));
-
-    function formatXaxis(range, date) {
-        const d = new Date(date);
-        if (range === 'today') {
-            //console.log(d.toTimeString().slice(0, 5))
-            return d.toTimeString().slice(0, 5); // Only show time (HH:MM)
-        } else if (range === 'yesterday') {
-            console.log(d.toLocaleDateString() + ' ' + d.toTimeString().slice(0, 5))
-            return d.toLocaleDateString() + ' ' + d.toTimeString().slice(0, 5); // Show date + time
-        } else if (range === 'lastWeek') {
-            return d.toLocaleDateString(); // Show only date (DD/MM/YYYY)
-        } else if (range === 'lastMonth') {
-            const day = d.getDate();
-            const startDay = Math.floor((day - 1) / 7) * 7 + 1;
-            const endDay = startDay + 6;
-            return `${d.getMonth() + 1}/${startDay}-${endDay}`; // E.g., 9/1-7
-        } else if (range === 'lastYear') {
-            return d.toLocaleString('default', { month: 'long' }) + ' ' + d.getFullYear(); // Show month and year
-        }
-    }
-
-    function processLeadsData(leads, range) {
-    const groupedData = {};
-    const currentDate = new Date();
-
-    leads.forEach(lead => {
-        const leadDate = new Date(lead.createdAt);
-
-        let label;
-        if (range === 'today') {
-            // Check if the lead date is today
-            const isToday = leadDate.toDateString() === currentDate.toDateString();
-            if (!isToday) return; // Skip if it's not today
-            label = formatXaxis(range, lead.createdAt);
-        } else if (range === 'yesterday') {
-            const isWithinLast24Hours = leadDate >= new Date(currentDate - 24 * 60 * 60 * 1000) && leadDate < currentDate;
-            if (!isWithinLast24Hours) return; // Skip if it's not within the last 24 hours
-            label = formatXaxis(range, lead.createdAt);
-        } else {
-            label = formatXaxis(range, lead.createdAt);
-        }
-
-        if (!groupedData[label]) {
-            groupedData[label] = {};
-            Object.keys(pipelineMap).forEach(status => {
-                groupedData[label][status] = 0; // Initialize counts for each status
-            });
-        }
-
-        groupedData[label][lead.status] = (groupedData[label][lead.status] || 0) + 1;
-    });
-
-    return groupedData;
-}
-
-
-    function getChartData(leads, range) {
-        const groupedData = processLeadsData(leads, range);
-        const labels = Object.keys(groupedData);
-        const datasets = [];
-
-        // Create datasets for each status dynamically
-        Object.keys(pipelineMap).forEach(status => {
-            const data = labels.map(label => groupedData[label][status] || 0);
-            datasets.push({
-                label: status.charAt(0).toUpperCase() + status.slice(1),
-                data: data,
-                backgroundColor: pipelineMap[status].color, // Adjust opacity if needed
-                borderColor: pipelineMap[status].color, // Full color for border
-                borderWidth: 1,
-                stack: 'stacked'
-            });
+    {{!--
+    <script>
+        const arr = {{{ json user.myleads }}}
+        const pipelines = {{{ json pipes }}};
+        const pipelineMap = {};
+        pipelines.forEach(pipe => {
+            pipelineMap[pipe.title] = {
+                color: pipe.color + 'dd',
+                count: 0
+            };
         });
 
-        console.log(datasets)
+        const leadsData = arr.map(item => ({
+            createdAt: item.statusTime,
+            status: item.status.title // Ensure that `status` is populated correctly
+        }));
 
-        return {
-            labels: labels,
-            datasets: datasets
-        };
-    }
+        function formatXaxis(range, date, currentDate) {
+            const d = new Date(date);
 
-    // Initialize Chart.js
-    const ctx = document.getElementById('competitionGraph').getContext('2d');
-    let myChart = new Chart(ctx, {
-        type: 'bar',
-        data: getChartData(leadsData, 'today'), // Default to 'today'
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Number of Leads'
-                    },
-                    stacked: true
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Time'
-                    },
-                    stacked: true
+            // Ensure valid date object
+            if (isNaN(d.getTime())) {
+                return 'N/A';  // Return 'N/A' if date is invalid
+            }
+
+            if (range === 'today') {
+                return d.toTimeString().slice(0, 5); // Only show time (HH:MM)
+            } else if (range === 'yesterday') {
+                d.setDate(d.getDate() - 1);
+                console.log(d.toLocaleDateString() + ' ' + d.toTimeString().slice(0, 5))
+                return d.toLocaleDateString() + ' ' + d.toTimeString().slice(0, 5);
+            } else if (range === 'lastWeek') {
+                return d.toLocaleDateString();  // Show individual date within last week
+            } else if (range === 'lastMonth') {
+                const day = d.getDate();
+                const startDay = Math.floor((day - 1) / 7) * 7 + 1;
+                const endDay = startDay + 6;
+
+                // Get the month and year
+                const month = d.getMonth(); // zero-based index
+                const year = d.getFullYear();
+
+                // Format the start and end days
+                const formattedStart = `${String(startDay).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+                const formattedEnd = `${String(endDay).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+
+                return `${formattedStart}-${formattedEnd}`;  // E.g., 01/09/2024-07/09/2024
+            } else if (range === 'thisYear') {
+                return d.toLocaleString('default', { month: 'long' }) + ' ' + d.getFullYear();  // Show month and year
+            }
+
+            return 'N/A';  // Return 'N/A' for unknown range
+        }
+
+        function processLeadsData(leads, range) {
+            const groupedData = {};
+            const currentDate = new Date();
+
+            if (range === 'lastWeek') {
+                // Calculate last week's start and end dates
+                const dayOfWeek = currentDate.getDay();
+                const currentWeekStart = new Date(currentDate);
+                currentWeekStart.setDate(currentWeekStart.getDate() - dayOfWeek);  // Start of this week
+
+                const lastWeekStart = new Date(currentWeekStart);
+                lastWeekStart.setDate(lastWeekStart.getDate() - 7);  // Start of last week
+
+                const lastWeekEnd = new Date(lastWeekStart);
+                lastWeekEnd.setDate(lastWeekStart.getDate() + 6);  // End of last week
+
+                // Initialize groupedData with all 7 days of the last week
+                for (let i = 0; i < 7; i++) {
+                    const day = new Date(lastWeekStart);
+                    day.setDate(lastWeekStart.getDate() + i);
+                    const label = day.toLocaleDateString();  // Label is the date
+                    groupedData[label] = {};
+
+                    // Initialize each status for that day as 0
+                    Object.keys(pipelineMap).forEach(status => {
+                        groupedData[label][status] = 0;
+                    });
                 }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function (tooltipItem) {
-                            return `${tooltipItem.dataset.label}: ${tooltipItem.raw} leads`;
+
+                // Loop through leads and add them to the correct day
+                leads.forEach(lead => {
+                    const leadDate = new Date(lead.createdAt);
+
+                    // Make sure the lead is within the last week
+                    if (leadDate >= lastWeekStart && leadDate <= lastWeekEnd) {
+                        const label = leadDate.toLocaleDateString();  // Use individual date as label
+
+                        if (!groupedData[label]) {
+                            groupedData[label] = {};
+                            Object.keys(pipelineMap).forEach(status => {
+                                groupedData[label][status] = 0;
+                            });
+                        }
+
+                        // Increment the count for the lead's status
+                        groupedData[label][lead.status] = (groupedData[label][lead.status] || 0) + 1;
+                    }
+                });
+            } else {
+                // For other ranges, use the original logic
+                leads.forEach(lead => {
+                    const leadDate = new Date(lead.createdAt);
+
+                    let label;
+                    if (range === 'today') {
+                        const isToday = leadDate.toDateString() === currentDate.toDateString();
+                        console.log(isToday)
+                        if (!isToday) return;
+                        label = formatXaxis(range, lead.createdAt, currentDate);
+                    } else if (range === 'yesterday') {
+                        const isWithinLast24Hours = leadDate >= new Date(currentDate - 24 * 60 * 60 * 1000) && leadDate < currentDate;
+                        if (!isWithinLast24Hours) return;
+                        label = formatXaxis(range, lead.createdAt, currentDate);
+                        console.log(label)
+                    } else {
+                        label = formatXaxis(range, lead.createdAt, currentDate);
+                    }
+
+                    if (!groupedData[label]) {
+                        groupedData[label] = {};
+                        Object.keys(pipelineMap).forEach(status => {
+                            groupedData[label][status] = 0;
+                        });
+                    }
+
+                    groupedData[label][lead.status] = (groupedData[label][lead.status] || 0) + 1;
+                });
+            }
+
+            return groupedData;
+        }
+
+        function getChartData(leads, range) {
+            const groupedData = processLeadsData(leads, range);
+            const labels = Object.keys(groupedData);
+            const datasets = [];
+
+            // Create datasets for each status dynamically
+            Object.keys(pipelineMap).forEach(status => {
+                const data = labels.map(label => groupedData[label][status] || 0);
+                datasets.push({
+                    label: status.charAt(0).toUpperCase() + status.slice(1),
+                    data: data,
+                    backgroundColor: pipelineMap[status].color, // Adjust opacity if needed
+                    borderColor: pipelineMap[status].color, // Full color for border
+                    borderWidth: 1,
+                    stack: 'stacked'
+                });
+            });
+
+            return {
+                labels: labels,
+                datasets: datasets
+            };
+        }
+
+        function getXaxisTitle(range) {
+            if (range === 'today' || range === 'yesterday') {
+                return 'Time';
+            } else if (range === 'lastWeek' || range === 'lastMonth') {
+                return 'Date';
+            } else if (range === 'thisYear') {
+                return 'Month';
+            }
+        }
+
+        // Initialize Chart.js
+        const ctx = document.getElementById('competitionGraph').getContext('2d');
+        let myChart = new Chart(ctx, {
+            type: 'bar',
+            data: getChartData(leadsData, 'today'), // Default to 'today'
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Leads'
+                        },
+                        stacked: true
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        },
+                        stacked: true
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return `${tooltipItem.dataset.label}: ${tooltipItem.raw} leads`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
-
-    // Update chart when dropdown selection changes
-    function updateChart() {
-        const range = document.getElementById('timeRange').value;
-        const chartData = getChartData(leadsData, range);
-
-        myChart.data.labels = chartData.labels;
-        myChart.data.datasets.forEach((dataset, index) => {
-            dataset.data = chartData.datasets[index].data;
         });
 
-        myChart.options.scales.x.title.text = getXaxisTitle(range);
-        myChart.update();
-    }
+        // Update chart when dropdown selection changes
+        function updateChart() {
+            const range = document.getElementById('timeRange').value;
+            const chartData = getChartData(leadsData, range);
 
-    function getXaxisTitle(range) {
-        if (range === 'today' || range === 'yesterday') {
-            return 'Time';
-        } else if (range === 'lastWeek' || range === 'lastMonth') {
-            return 'Date';
-        } else if (range === 'lastYear') {
-            return 'Month';
+            myChart.data.labels = chartData.labels;
+            myChart.data.datasets.forEach((dataset, index) => {
+                dataset.data = chartData.datasets[index].data;
+            });
+
+            myChart.options.scales.x.title.text = getXaxisTitle(range);
+            myChart.update();
         }
-    }
-</script>
+
+    </script> --}}
 
 
 
@@ -1102,7 +1297,7 @@
         }
 
         function getData(position) {
-           // console.log(position);
+            // console.log(position);
             getLocation(position.coords.latitude, position.coords.longitude)
         }
         function getErr() {
@@ -1122,6 +1317,343 @@
 
         }
     </script>
+
+    <script>
+        const arr = {{{ json user.myleads }}};
+        const pipelines = {{{ json pipes }}};
+        const pipelineMap = {};
+
+        // Create a map of pipelines with status and colors
+        pipelines.forEach(pipe => {
+            pipelineMap[pipe.title] = {
+                color: pipe.color + '90', // Add some opacity to the color
+                count: 0
+            };
+        });
+
+        // Prepare lead data for charting
+        // const leadsData = arr.map(item => ({
+        //    createdAt: item.statusTime, // Ensure this is a date string or timestamp
+        //    status: item.status.title // Ensure the status is correctly populated
+        //}));
+        const leadsData = arr.map((item) => {
+            if (!item.status) return {}
+            return { createdAt: item.statusTime, status: item.status.title }
+            // Ensure the status is correctly populated
+        });
+        console.log(leadsData)
+
+        // Format X-axis labels based on selected range
+        function formatXaxis(range, date) {
+            const d = new Date(date);
+            if (isNaN(d.getTime())) return 'N/A'; // Handle invalid dates
+
+            if (range === 'today') {
+                return d.toTimeString().slice(0, 5); // HH:MM
+            } else if (range === 'yesterday') {
+                return d.toLocaleDateString() + ' ' + d.toTimeString().slice(0, 5); // Date and time for yesterday
+            } else if (range === 'lastWeek') {
+                return d.toLocaleDateString(); // Show only the date for last week
+            } else if (range === 'lastMonth') {
+                return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`; // DD/MM/YYYY format for last month
+            } else if (range === 'thisYear') {
+                return d.toLocaleString('default', { month: 'long' }) + ' ' + d.getFullYear(); // Show month and year
+            }
+
+            return 'N/A'; // Handle unknown range
+        }
+
+        // Process leads data and group it based on the selected range
+        function processLeadsData(leads, range) {
+            const groupedData = {};
+            const currentDate = new Date();
+
+            if (range === 'thisWeek') {
+                const currentWeekStart = new Date(currentDate);
+
+                currentWeekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Start of current week (Sunday)
+
+                const currentWeekEnd = new Date(currentWeekStart);
+                currentWeekEnd.setDate(currentWeekStart.getDate() + 6); // End of current week (Saturday)
+
+                // Initialize each day in the current week
+                for (let i = 0; i < 7; i++) {
+                    const day = new Date(currentWeekStart);
+                    day.setDate(currentWeekStart.getDate() + i);
+                    const label = day.toLocaleDateString();
+                    groupedData[label] = {};
+
+                    // Initialize pipeline statuses
+                    Object.keys(pipelineMap).forEach(status => {
+                        groupedData[label][status] = 0;
+                    });
+                }
+
+                // Add leads data to the correct day
+                leads.forEach(lead => {
+                    const leadDate = new Date(lead.createdAt);
+                    if (leadDate >= currentWeekStart && leadDate <= currentWeekEnd) {
+                        const label = leadDate.toLocaleDateString();
+                        groupedData[label][lead.status] = (groupedData[label][lead.status] || 0) + 1;
+                    }
+                });
+            }
+
+            else if (range === 'lastWeek') {
+                const currentWeekStart = new Date(currentDate);
+                currentWeekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Start of current week
+
+                const lastWeekStart = new Date(currentWeekStart);
+                lastWeekStart.setDate(lastWeekStart.getDate() - 7); // Start of last week
+                const lastWeekEnd = new Date(lastWeekStart);
+                lastWeekEnd.setDate(lastWeekStart.getDate() + 6); // End of last week
+
+                // Initialize each day in last week
+                for (let i = 0; i < 7; i++) {
+                    const day = new Date(lastWeekStart);
+                    day.setDate(lastWeekStart.getDate() + i);
+                    const label = day.toLocaleDateString();
+                    groupedData[label] = {};
+
+                    // Initialize pipeline statuses
+                    Object.keys(pipelineMap).forEach(status => {
+                        groupedData[label][status] = 0;
+                    });
+                }
+
+                // Add leads data to the correct day
+                leads.forEach(lead => {
+                    const leadDate = new Date(lead.createdAt);
+                    if (leadDate >= lastWeekStart && leadDate <= lastWeekEnd) {
+                        const label = leadDate.toLocaleDateString();
+                        groupedData[label][lead.status] = (groupedData[label][lead.status] || 0) + 1;
+                    }
+                });
+
+            }
+
+            else if (range === 'thisMonth') {
+                const currentMonthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // Start of current month
+                const currentMonthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // End of current month
+
+                // Set the end time to 23:59:59 for proper comparison
+                currentMonthEnd.setHours(23, 59, 59, 999);
+
+                console.log("Current Month Start: ", currentMonthStart);  // Debug log
+                console.log("Current Month End: ", currentMonthEnd);  // Debug log
+
+                // Initialize each day in the current month
+                for (let day = new Date(currentMonthStart); day <= currentMonthEnd; day.setDate(day.getDate() + 1)) {
+                    const label = day.toLocaleDateString();
+                    groupedData[label] = {};
+
+                    // Initialize pipeline statuses for each day
+                    Object.keys(pipelineMap).forEach(status => {
+                        groupedData[label][status] = 0;
+                    });
+                }
+
+                // Add leads data to the correct day
+                leads.forEach(lead => {
+                    const leadDate = new Date(lead.createdAt);
+                    console.log("Lead Date: ", leadDate);  // Debug log
+
+                    // Check if the lead date falls within the current month range
+                    if (leadDate >= currentMonthStart && leadDate <= currentMonthEnd) {
+                        const label = leadDate.toLocaleDateString();
+                        console.log("Adding to label: ", label, " with status: ", lead.status);  // Debug log
+
+                        // Increment the status count for the respective day
+                        groupedData[label][lead.status] = (groupedData[label][lead.status] || 0) + 1;
+                    } else {
+                        console.log("Lead is outside the current month range:", leadDate);  // Debug log
+                    }
+                });
+
+                console.log("Grouped Data for This Month: ", groupedData);  // Final output log
+            }
+
+            else if (range === 'lastMonth') {
+                const lastMonthStart = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1); // First day of last month
+                const lastMonthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0); // Last day of last month
+                const daysInLastMonth = lastMonthEnd.getDate();
+
+                // Initialize each day in last month
+                for (let i = 1; i <= daysInLastMonth; i++) {
+                    const day = new Date(lastMonthStart.getFullYear(), lastMonthStart.getMonth(), i);
+                    const label = day.toLocaleDateString();
+                    groupedData[label] = {};
+                    Object.keys(pipelineMap).forEach(status => {
+                        groupedData[label][status] = 0; // Initialize count to 0
+                    });
+                }
+
+                // Add leads data to the correct day
+                leads.forEach(lead => {
+                    const leadDate = new Date(lead.createdAt);
+                    if (leadDate >= lastMonthStart && leadDate <= lastMonthEnd) {
+                        const label = leadDate.toLocaleDateString();
+                        groupedData[label][lead.status] = (groupedData[label][lead.status] || 0) + 1;
+                    }
+                });
+            }
+
+            else {
+                // For other ranges, process the leads accordingly
+                leads.forEach(lead => {
+                    const leadDate = new Date(lead.createdAt);
+                    let label;
+
+                    if (range === 'today') {
+                        if (leadDate.toDateString() !== currentDate.toDateString()) return; // Skip leads not from today
+                        label = formatXaxis(range, lead.createdAt);
+                    } else if (range === 'yesterday') {
+                        const yesterday = new Date(currentDate);
+                        yesterday.setDate(currentDate.getDate() - 1);
+                        if (leadDate.toDateString() !== yesterday.toDateString()) return; // Skip leads not from yesterday
+                        label = formatXaxis(range, lead.createdAt);
+                    } else {
+                        label = formatXaxis(range, lead.createdAt);
+                    }
+
+                    if (!groupedData[label]) {
+                        groupedData[label] = {};
+                        Object.keys(pipelineMap).forEach(status => {
+                            groupedData[label][status] = 0;
+                        });
+                    }
+                    groupedData[label][lead.status] = (groupedData[label][lead.status] || 0) + 1;
+                });
+            }
+
+            return groupedData;
+        }
+
+        // Get chart data based on the processed leads data
+        function getChartData(leads, range) {
+            const groupedData = processLeadsData(leads, range);
+            const labels = Object.keys(groupedData);
+            const datasets = [];
+
+            // Create datasets dynamically for each status
+            Object.keys(pipelineMap).forEach(status => {
+                const data = labels.map(label => groupedData[label][status] || 0);
+                datasets.push({
+                    label: status.charAt(0).toUpperCase() + status.slice(1),
+                    data: data,
+                    backgroundColor: pipelineMap[status].color, // Adjusted with opacity
+                    borderColor: pipelineMap[status].color, // Solid border color
+                    borderWidth: 1,
+                    stack: 'stacked'
+                });
+            });
+
+            return {
+                labels: labels,
+                datasets: datasets
+            };
+        }
+
+        // Get the X-axis title based on the selected range
+        function getXaxisTitle(range) {
+            if (range === 'today' || range === 'yesterday') {
+                return 'Time';
+            } else if (range === 'lastWeek' || range === 'lastMonth') {
+                return 'Date';
+            } else if (range === 'thisYear') {
+                return 'Month';
+            }
+        }
+
+        // Initialize Chart.js
+        const ctx = document.getElementById('competitionGraph').getContext('2d');
+        let myChart = new Chart(ctx, {
+            type: 'bar',
+            data: getChartData(leadsData, 'today'), // Default to 'today'
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Leads'
+                        },
+                        stacked: true
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        },
+                        stacked: true
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return `${tooltipItem.dataset.label}: ${tooltipItem.raw} leads`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Update chart when dropdown selection changes
+        function updateChart() {
+            const range = document.getElementById('timeRange').value;
+            if (range === 'custom') {
+                document.getElementById('customDateRange').style.display = 'block';
+            } else {
+                document.getElementById('customDateRange').style.display = 'none';
+
+                const chartData = getChartData(leadsData, range);
+
+                myChart.data.labels = chartData.labels;
+                myChart.data.datasets.forEach((dataset, index) => {
+                    dataset.data = chartData.datasets[index].data;
+                });
+
+                myChart.options.scales.x.title.text = getXaxisTitle(range);
+                myChart.update();
+            }
+        }
+
+
+        function applyCustomDateRange() {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+
+            // Add end-of-day time for the end date to include all leads for that day
+            endDate.setHours(23, 59, 59, 999);
+
+            if (isNaN(startDate) || isNaN(endDate)) {
+                alert("Please select valid start and end dates.");
+                return;
+            }
+
+            // Filter the leads data based on the custom date range
+            const customLeads = leadsData.filter(lead => {
+                const leadDate = new Date(lead.createdAt);
+                return leadDate >= startDate && leadDate <= endDate;
+            });
+
+            const chartData = getChartData(customLeads, 'custom');
+
+            myChart.data.labels = chartData.labels;
+            myChart.data.datasets.forEach((dataset, index) => {
+                dataset.data = chartData.datasets[index].data;
+            });
+
+            myChart.options.scales.x.title.text = 'Date';
+            myChart.update();
+        }
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 </body>
 
 </html>

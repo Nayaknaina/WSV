@@ -128,6 +128,10 @@ router.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
     let admin = await logIncollection.findById(req.user.id);
     admin.myleads.push(lead._id);
     lead.uid = admin._id;
+    let defSt = await pipelineModel.findOne({defaultVal: true});
+    if (defSt) {
+      lead.status = defSt 
+    }
     lead.userType = "logIncollection";
     await admin.save();
     await lead.save();

@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
+// Apply middleware for parsing only on this router
+router.use(express.urlencoded({ extended: true })); // Parse form data
+router.use(express.json()); // Parse JSON data
 // const {initializeWhatsAppClient} = require("../app3.js");
 const logIncollection = require("../models/admin.model.js");
 const pipelineModel = require("../models/pipeline.model.js");
@@ -16,8 +19,8 @@ const { isAdminLoggedIn } = require("../middilware/middilware.js");
 const { generateToken } = require("../../utils/auth.js");
 const { upload } = require("../service/multer.js");
 const jwt = require("jsonwebtoken");
-const path = require('path')
-const fs = require('fs')
+const path = require("path");
+const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const { uploadProfile } = require("../service/multer.js");
 
@@ -30,7 +33,7 @@ router.get("/team", isAdminLoggedIn, async (req, res) => {
   delete req.session.successMSG;
   let errMsg = req.session.errorMSG;
   delete req.session.errorMSG;
-  res.render("team", { user, successMSG: msg,errorMSG: errMsg});
+  res.render("team", { user, successMSG: msg, errorMSG: errMsg });
 });
 
 router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
@@ -54,50 +57,56 @@ router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
 });
 
 // lead ownership assign other member by admin
-router.post('/change/lead/owner/:leadId', isAdminLoggedIn, async(req,res)=>{
+router.post("/change/lead/owner/:leadId", isAdminLoggedIn, async (req, res) => {
   try {
-    let lead = await leadsModel.findById(req.params.leadId)
-    let currentLeadOwner = await memberModel.findById(req.body.currentMemId)
-    let nextLeadOwner = await memberModel.findById(req.body.assignMemId)
+    let lead = await leadsModel.findById(req.params.leadId);
+    let currentLeadOwner = await memberModel.findById(req.body.currentMemId);
+    let nextLeadOwner = await memberModel.findById(req.body.assignMemId);
 
-    if(!currentLeadOwner)
-      currentLeadOwner = await logIncollection.findById(req.body.currentMemId)
+    if (!currentLeadOwner)
+      currentLeadOwner = await logIncollection.findById(req.body.currentMemId);
 
     if (lead && currentLeadOwner && nextLeadOwner) {
       lead.uid = nextLeadOwner._id;
-      lead.userType = nextLeadOwner.role === 'admin' ? 'logIncollection' : 'teamMember' ;
+      lead.userType =
+        nextLeadOwner.role === "admin" ? "logIncollection" : "teamMember";
 
-      if(currentLeadOwner._id !== nextLeadOwner._id)
-      currentLeadOwner.myleads.splice(currentLeadOwner.myleads.indexOf(lead._id),1)
+      if (currentLeadOwner._id !== nextLeadOwner._id)
+        currentLeadOwner.myleads.splice(
+          currentLeadOwner.myleads.indexOf(lead._id),
+          1
+        );
       nextLeadOwner.myleads.push(lead._id);
     }
 
-    await lead.save()
-    await currentLeadOwner.save()
-    await nextLeadOwner.save()
+    await lead.save();
+    await currentLeadOwner.save();
+    await nextLeadOwner.save();
 
-   return res.json({name:nextLeadOwner.name})
-    
+    return res.json({ name: nextLeadOwner.name });
   } catch (err) {
-    console.log("Error in /user/change/lead/owner/:leadId",err);
-    res.status(500).send("Ooops, Some Internal Error")
+    console.log("Error in /user/change/lead/owner/:leadId", err);
+    res.status(500).send("Ooops, Some Internal Error");
   }
-})
-
+});
 
 router.get("/signup", (req, res) => {
   res.render("signup");
 });
 
-router.post("/profile/image", isAdminLoggedIn, uploadProfile.single("userImage"), async (req, res) => {
+router.post(
+  "/profile/image",
+  isAdminLoggedIn,
+  uploadProfile.single("userImage"),
+  async (req, res) => {
     try {
       let user = await logIncollection.findById(req.user.id);
 
       if (!req.file) {
         console.log("File not exists");
         return res.status(404).send("No file was given");
-      } 
-      
+      }
+
       console.log("File exists");
       if (user.profilePicture) {
         const oldImagePath = path.join(
@@ -116,9 +125,9 @@ router.post("/profile/image", isAdminLoggedIn, uploadProfile.single("userImage")
       }
 
       console.log(req.file.filename);
-      user.profilePicture = '/images/uploads/profile/' + req.file.filename;
+      user.profilePicture = "/images/uploads/profile/" + req.file.filename;
       await user.save();
-      
+
       res.redirect("/user/dashboard");
     } catch (err) {
       console.log("error in /member/profile/image", err);
@@ -148,14 +157,15 @@ router.post("/signup", async (req, res) => {
     console.log(newUser);
 
     const pipelines = [
-      { title: "win", color: "#28A745" },
-      { title: "loss", color: "#DC3545" },
-      { title: "held", color: "#007BFF" },
-      { title: "pending", color: "#FFC107" },
+      { title: "win", color: "#28A745", defaultVal: false },
+      { title: "lost", color: "#DC3545", defaultVal: false },
+      { title: "on hold", color: "#007BFF", defaultVal: true },
+      { title: "pending", color: "#FFC107", defaultVal: false },
     ].map(
       (pipelineData) =>
         new pipelineModel({
           uid: newUser._id,
+          defaultVal: pipelineData.defaultVal,
           color: pipelineData.color,
           title: pipelineData.title,
           cid: newUser.cid,
@@ -232,13 +242,15 @@ router.post("/signup", async (req, res) => {
 
 router.post("/pipeline", isAdminLoggedIn, async (req, res) => {
   const { title, color } = req.body;
+  console.log(req.body);
 
   const user = await logIncollection.findById(req.user.id);
   const pipes = await pipelineModel.find({ cid: req.user.cid });
 
-  if (pipes.length > 5) {
-    req.session.errorMSG = `you cant add more then 5 pipelines status`;
-    return res.redirect("/user/dashboard");
+  if (pipes.length >= 5) {
+    // Correcting the condition to "greater than or equal to 5"
+    req.session.errorMSG = `You can't add more than 5 pipelines status`;
+    return res.status(400).json({ error: req.session.errorMSG });
   }
 
   const pipeline = new pipelineModel({
@@ -247,52 +259,68 @@ router.post("/pipeline", isAdminLoggedIn, async (req, res) => {
     title,
     cid: user.cid,
   });
+
   await pipeline.save();
-  // console.log(pipeline);
-  req.session.successMSG = `${title} pipline creation success. `;
-  res.redirect("/user/dashboard");
+
+  // Prepare the response object to send back
+  const responsePipeline = {
+    _id: pipeline._id,
+    title: pipeline.title,
+    color: pipeline.color,
+  };
+
+  req.session.successMSG = `${title} pipeline creation success.`;
+  res.status(201).json(responsePipeline); // Send JSON response with the new pipeline
 });
 
 router.get("/pipeline/del/:id", isAdminLoggedIn, async (req, res) => {
   const { id } = req.params;
   let pipeline = await pipelineModel.findByIdAndDelete(id);
   // console.log(pipeline);
+  let allPipes = await pipelineModel.find({cid: req.user.cid});
   req.session.successMSG = `${pipeline.title} pipline deletion sucessfull !. `;
-  res.redirect("/user/dashboard");
+  res.json(allPipes)
 });
-router.get("/pipe/abc", async (req, res) => {
-  let pipe = await pipelineModel.findById(req.session.pipe);
-  pipe.defaultVal = true;
-  await pipe.save();
+// router.get("/pipe/abc", isAdminLoggedIn, async (req, res) => {
+//   let pipe = await pipelineModel.findById(req.session.pipe);
+//   pipe.defaultVal = true;
+//   await pipe.save();
 
-  delete req.session.pipe;
-  req.session.save();
+//   delete req.session.pipe;
+//   req.session.save();
 
-  res.redirect("/user/dashboard");
-});
-router.post("/pipeline/update/:id", isAdminLoggedIn, async (req, res) => {
-  const { id } = req.params;
-  const { title, color, defaultVal } = req.body;
+//   let allPipes = await pipelineModel.find({ cid: req.user.cid });
+//   res.json(allPipes);
+//   // res.redirect("/user/dashboard");
+// });
+router.post("/pipeline/update", isAdminLoggedIn, async (req, res) => {
+  // const { title, color, defaultVal, id} = req.body;
+  console.log(req.body);
+  req.body.forEach(async (dataObj) => {
+    const { title, color, defaultVal, id } = dataObj;
 
-  let pipeline = await pipelineModel.findById(id);
+    let pipeline = await pipelineModel.findById(id);
 
-  pipeline.color = color;
-  pipeline.title = title;
+    pipeline.color = color;
+    pipeline.title = title;
 
-  if (defaultVal == "on") {
-    // console.log(defaultVal);
-    await pipelineModel.updateMany(
-      { uid: req.user.id },
-      { $set: { defaultVal: false } }
-    );
-    req.session.pipe = id;
+    if (defaultVal == "on") {
+      // console.log(defaultVal);
+      await pipelineModel.updateMany(
+        { uid: req.user.id },
+        { $set: { defaultVal: false } }
+      );
+
+      let pipe = await pipelineModel.findById(id);
+      pipe.defaultVal = true;
+      await pipe.save();
+    }
 
     await pipeline.save();
-    return res.redirect("/user/pipe/abc");
-  }
-  await pipeline.save();
-  req.session.successMSG = `${pipeline.title} pipline updatation successfully !. `;
-  return res.redirect("/user/dashboard");
+  });
+  req.session.successMSG = `pipline updatation successfully !. `;
+  let allPipes = await pipelineModel.find({ cid: req.user.cid });
+  return res.json(allPipes);
 });
 
 // router.get("/profile", isAdminLoggedIn, async (req, res) => {
@@ -332,7 +360,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
         { path: "status" }, // Populate the 'status' field inside each lead
         { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
       ],
-      options: { sort: { "statusTime": -1 } }
+      options: { sort: { statusTime: -1 } },
     });
 
     if (!user.organizationName) {
