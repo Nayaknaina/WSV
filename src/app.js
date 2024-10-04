@@ -59,14 +59,13 @@ let client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
+    executablePath: process.env.CHROME_BIN ,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage', // To avoid large memory usage
-      '--disable-accelerated-2d-canvas',
-      '--disable-gpu'
-    ]
-  }
+      '--disable-dev-shm-usage',
+    ],
+  },
 });
 
 // Ensure QR Code Event Attachment
