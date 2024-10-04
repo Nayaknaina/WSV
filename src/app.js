@@ -57,6 +57,16 @@ let connectedPhoneNumber = "";
 // Initialize the WhatsApp Client with Local Authentication
 let client = new Client({
   authStrategy: new LocalAuth(),
+  puppeteer: {
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage', // To avoid large memory usage
+      '--disable-accelerated-2d-canvas',
+      '--disable-gpu'
+    ]
+  }
 });
 
 // Ensure QR Code Event Attachment
