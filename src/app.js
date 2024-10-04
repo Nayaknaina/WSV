@@ -1170,6 +1170,9 @@ async function cleanupSessionFiles() {
 }
 
 function initializeWhatsAppClient() {
+  for (let id = 0; id < 25 ; id++) {
+    console.log("initializeWhatsAppClient function")   
+  }
   // Remove all existing listeners to avoid duplication
   if (client) {
     client.removeAllListeners();
