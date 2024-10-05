@@ -217,7 +217,7 @@
                                 </div>
 
                                 {{else}}
-                                <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">connect now
+                                <a class="btn btn-outline-secondary border  font-15" href="/auth/facebook">Connect now
                                 </a>
                                 {{/if}}
                             </div>
@@ -252,7 +252,7 @@
 
                                 {{!-- <a class="btn btn-outline-secondary border  font-15" href="#">connect now </a>
                                 --}}
-                                <a class="btn border  font-15" href="#">connect now </a>
+                                <a class="btn border  font-15" href="#">Connect now </a>
                             </div>
                             <!--/social-box-->
                         </div>
@@ -266,11 +266,11 @@
                             <div class="card text-white" style="background-color: {{color}};">
                                 <div class="card-body pb-0">
                                     <h4 class="mb-0">
-                                        <span class="count" style="font-size: x-large;">
+                                        <span class="count" style="text-transform: capitalize; font-size: x-large;">
                                             {{countLeadsByStatus ../leads title}}
                                         </span>
                                     </h4>
-                                    <p style="font-size: x-large;" class="text-light">{{title}}</p>
+                                    <p style="text-transform: capitalize; font-size: x-large;" class="text-light">{{title}}</p>
 
                                     {{!-- <div class="chart-wrapper px-0" style="height:70px;" height="70">
                                         <canvas id="widgetChart1"></canvas>
@@ -1622,34 +1622,48 @@
         }
 
 
-        function applyCustomDateRange() {
-            const startDate = new Date(document.getElementById('startDate').value);
-            const endDate = new Date(document.getElementById('endDate').value);
+    function applyCustomDateRange() {
+    const startDate = new Date(document.getElementById('date1').value);
+    const endDate = new Date(document.getElementById('date2').value);
 
-            // Add end-of-day time for the end date to include all leads for that day
-            endDate.setHours(23, 59, 59, 999);
+    // Add end-of-day time for the end date to include all leads for that day
+    endDate.setHours(23, 59, 59, 999);
 
-            if (isNaN(startDate) || isNaN(endDate)) {
-                alert("Please select valid start and end dates.");
-                return;
-            }
+    if (isNaN(startDate) || isNaN(endDate)) {
+        alert("Please select valid start and end dates.");
+        return;
+    }
 
-            // Filter the leads data based on the custom date range
-            const customLeads = leadsData.filter(lead => {
-                const leadDate = new Date(lead.createdAt);
-                return leadDate >= startDate && leadDate <= endDate;
-            });
+    // Calculate the difference in months between start and end date
+    const diffInMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12 + (endDate.getMonth() - startDate.getMonth());
 
-            const chartData = getChartData(customLeads, 'custom');
+    let range;
+    if (diffInMonths <= 1) {
+        // If the difference is 1 month or less, treat it as 'thisMonth'
+        range = 'thisMonth';
+    } else {
+        // If the difference is more than 1 month, treat it as 'thisYear'
+        range = 'thisYear';
+    }
 
-            myChart.data.labels = chartData.labels;
-            myChart.data.datasets.forEach((dataset, index) => {
-                dataset.data = chartData.datasets[index].data;
-            });
+    // Filter the leads data based on the custom date range
+    const customLeads = leadsData.filter(lead => {
+        const leadDate = new Date(lead.createdAt);
+        return leadDate >= startDate && leadDate <= endDate;
+    });
 
-            myChart.options.scales.x.title.text = 'Date';
-            myChart.update();
-        }
+    // Get chart data based on the detected range
+    const chartData = getChartData(customLeads, range);
+
+    myChart.data.labels = chartData.labels;
+    myChart.data.datasets.forEach((dataset, index) => {
+        dataset.data = chartData.datasets[index].data;
+    });
+
+    // Update the X-axis title based on the detected range
+    myChart.options.scales.x.title.text = getXaxisTitle(range);
+    myChart.update();
+}
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

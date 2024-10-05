@@ -617,12 +617,12 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+    {{#if errorMessage }}
   <script>
-    { { #if errorMessage } }
     console.log("Error message:", "{{errorMessage}}");
     toastr.error("{{errorMessage}}");
-    { {/if } }
   </script>
+    {{/if }}
   <script>
     const sign_in_btn = document.querySelector("#sign-in-btn");
     const sign_up_btn = document.querySelector("#sign-up-btn");

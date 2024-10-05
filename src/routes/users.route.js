@@ -12,8 +12,9 @@ const remarkModel = require("../models/remark.model.js");
 const leadsModel = require("../models/leads.model.js");
 const templateModel = require("../models/temlate.model.js");
 const WaModel = require("../models/wA.model.js");
-const otpGenerator = require("otp-generator");
+const manualLeadModel = require("../models/manualLeads.model.js");
 
+const otpGenerator = require("otp-generator");
 const { sendMail } = require("../service/mailSender.js");
 const { isAdminLoggedIn } = require("../middilware/middilware.js");
 const { generateToken } = require("../../utils/auth.js");
@@ -573,5 +574,43 @@ router.get("/member/un-blocked/:id", isAdminLoggedIn, async (req, res) => {
     res.status(500).send("Internal error");
   }
 });
+
+router.post('/manual/lead', isAdminLoggedIn, async (req,res)=>{
+  try {
+    let newManualLead = new manualLeadModel({
+      app: "manual",
+      cid: req.user.cid,
+      customerName: req.body.customerName,
+      mobile: req.body.mobile,
+      email: req.body.email || '',
+      city: req.body.city || '', // Optional field
+      state: req.body.state || '', // Optional field
+      alternateMobile1: req.body.alternateMobile1 || '',
+      alternateMobile2: req.body.alternateMobile2 || '', // Optional field
+      productService: req.body.productService || '' // Optional field
+  });
+  const remarkDateTime = new Date(req.body.remarkTime);
+  const remarkDate = remarkDateTime.toISOString().split('T')[0]; 
+  const remarkTime = remarkDateTime.toTimeString().split(' ')[0];
+  let remark = new remarkModel({
+    text: req.body.remark,
+    time: remarkTime,
+    date: remarkDate,
+    cid: req.user.cid,
+    uid: req.user.id,
+    lead_id: newManualLead._id
+  })
+  await remark.save();
+
+  newManualLead.remarks.push(remark._id);
+  await newManualLead.save();
+
+
+  res.redirect('/leads')
+
+  } catch (err) {
+    console.log("Error in /user/manual/lead :- ",err);
+  }
+})
 
 module.exports = router;
