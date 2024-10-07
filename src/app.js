@@ -1,4 +1,3 @@
-
 const express = require("express");
 const app = express();
 
@@ -57,13 +56,12 @@ let connectedPhoneNumber = "";
 
 // Initialize the WhatsApp Client with Local Authentication
 let client = new Client({
-    puppeteer: {
-        ignoreHTTPSErrors: true,
-        headless: true,
-        args: ['--no-sandbox',
-            '--disable-setuid-sandbox']
-    },
-    authStrategy: new LocalAuth(),
+  puppeteer: {
+    ignoreHTTPSErrors: true,
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  },
+  authStrategy: new LocalAuth(),
 });
 
 // Ensure QR Code Event Attachment
@@ -91,19 +89,17 @@ let client = new Client({
 const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({
-      mongoUrl: "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
-      collectionName: 'sessions', // Collection name for sessions
-    })
+        mongoUrl:
+          "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+        collectionName: "sessions", // Collection name for sessions
+      })
     : new session.MemoryStore();
-
-
-
 
 const static_path = path.join(__dirname, "../public");
 app.use(express.static(static_path));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());  
+// app.use(express.json());
 app.use(cookieParser());
 
 app.use(
@@ -114,13 +110,6 @@ app.use(
     store: sessionStore,
   })
 );
-
-const static_path = path.join(__dirname, "../public");
-app.use(express.static(static_path));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-app.use(cookieParser());
 
 app.set("view engine", "hbs");
 app.set("views", templatepath);
@@ -242,8 +231,6 @@ passport.deserializeUser(async (id, done) => {
     done(err, null);
   }
 });
-
-
 
 app.use("/", Route);
 app.use("/member", memberRoute);
@@ -1205,9 +1192,9 @@ function initializeWhatsAppClient() {
   // Recreate the client to ensure fresh state
   client = new Client({
     puppeteer: {
-        args: ['--no-sandbox'],
-        headless: true,
-        ignoreHTTPSErrors: true
+      args: ["--no-sandbox"],
+      headless: true,
+      ignoreHTTPSErrors: true,
     },
     authStrategy: new LocalAuth(),
   });
