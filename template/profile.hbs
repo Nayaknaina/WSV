@@ -328,7 +328,64 @@
               </div> --}}
 
 
-              <div class="col-12">
+             
+            </form>
+          </div>
+          <div class="container">
+            <div class="row page-titles p-b-15">
+              <div class="col-md-12 col-12 align-self-center">
+                <h1 class="text-bodycolor">Professional Details<b> </b></h1>
+                <p class="text-secondary font-14">View and manage all your account associated information.</p>
+              </div>
+            </div>
+
+            <form id="profile-form" action="/update/profile" method="post" class="row g-3">
+
+
+              {{!-- <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input disabled value="{{user.email}}" name="email" type="email" class="form-control input" id="email"
+                  placeholder="Email">
+              </div> --}}
+
+
+
+              <div class="col-6 mb-3">
+                <label for="organisation" class="form-label">Organization Name</label>
+                <input disabled placeholder="organisation" maxlength="10" value="{{user.organisation}}"
+                  name="organisation" id="organisation" type="tel" class="form-control input" required>
+
+              </div>
+              <div class="col-6 mb-3">
+                <label for="Sector" class="form-label">Sector</label>
+                <select disabled required id="sector" name="sector" class="form-control input">
+                  <option value="{{#if user.sector}}{{user.sector}}{{else}}''{{/if}}" selected>
+                    {{#if user.sector}}{{user.sector}}{{else}}select Sector{{/if}}
+                  </option>
+
+                  
+                  <option value="Technology">Technology</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Education">Education</option>
+                  <option value="Manufacturing">Manufacturing</option>
+                  <option value="Retail">Retail</option>
+                  <option value="Hospitality">Hospitality</option>
+                  <option value="Real Estate">Real Estate</option>
+                  <option value="Media">Media</option>
+                  <option value="Non-Profit">Non-Profit</option>
+                </select>
+              </div>
+
+
+              {{!-- <div class="col-md-6 mb-3">
+                <label for="inputCountry" class="form-label">Country</label>
+                <input disabled value="{{user.country}}" name="country" type="text" class="form-control input"
+                  id="inputCountry" placeholder="Country">
+              </div> --}}
+
+
+             <div class="col-12">
                 <button type="button" id="edit" class="btn btn-primary" onclick="updateProfileData()">Edit</button>
                 <button type="submit" id="save" disabled class="btn btn-secondary">Save</button>
               </div>

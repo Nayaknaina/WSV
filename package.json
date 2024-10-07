@@ -4,12 +4,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js"
+    
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.3",
     "axios": "^1.7.4",
@@ -38,5 +39,7 @@
     "qrcode": "^1.5.4",
     "uuid": "^10.0.0",
     "whatsapp-web.js": "^1.25.0"
-  }
+  },
+  "devDependencies": {},
+  "description": ""
 }

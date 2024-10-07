@@ -56,35 +56,15 @@ let connectedPhoneNumber = "";
 
 // Initialize the WhatsApp Client with Local Authentication
 let client = new Client({
-  puppeteer: {
-    ignoreHTTPSErrors: true,
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  },
-  authStrategy: new LocalAuth(),
+    puppeteer: {
+        headless: true,
+        ignoreHTTPSErrors: true,
+        args: ['--no-sandbox',
+            '--disable-setuid-sandbox']
+    },
+    authStrategy: new LocalAuth(),
 });
 
-// Ensure QR Code Event Attachment
-
-//-------------------------------------------
-
-// Middleware
-// const sessionStore =
-//   process.env.NODE_ENV === "production"
-//     ? MongoStore.create({
-//         mongoUrl:
-//           "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
-//       }) // Replace with your MongoDB connection URI
-//     : new session.MemoryStore();
-
-// app.use(
-//   session({
-//     secret: "your_secret_key", // Replace with your own secret key
-//     resave: false,
-//     saveUninitialized: true,
-//     store: sessionStore,
-//   })
-// );
 
 const sessionStore =
   process.env.NODE_ENV === "production"
@@ -1192,9 +1172,10 @@ function initializeWhatsAppClient() {
   // Recreate the client to ensure fresh state
   client = new Client({
     puppeteer: {
-      args: ["--no-sandbox"],
       headless: true,
       ignoreHTTPSErrors: true,
+      args: ['--no-sandbox',
+          '--disable-setuid-sandbox']
     },
     authStrategy: new LocalAuth(),
   });
