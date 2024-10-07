@@ -12,7 +12,7 @@ const remarkModel = require("../models/remark.model.js");
 const leadsModel = require("../models/leads.model.js");
 const templateModel = require("../models/temlate.model.js");
 const WaModel = require("../models/wA.model.js");
-const manualLeadModel = require("../models/manualLeads.model.js");
+// const manualLeadModel = require("../models/manualLeads.model.js");
 
 const otpGenerator = require("otp-generator");
 const { sendMail } = require("../service/mailSender.js");
@@ -278,9 +278,9 @@ router.get("/pipeline/del/:id", isAdminLoggedIn, async (req, res) => {
   const { id } = req.params;
   let pipeline = await pipelineModel.findByIdAndDelete(id);
   // console.log(pipeline);
-  let allPipes = await pipelineModel.find({cid: req.user.cid});
+  let allPipes = await pipelineModel.find({ cid: req.user.cid });
   req.session.successMSG = `${pipeline.title} pipline deletion sucessfull !. `;
-  res.json(allPipes)
+  res.json(allPipes);
 });
 // router.get("/pipe/abc", isAdminLoggedIn, async (req, res) => {
 //   let pipe = await pipelineModel.findById(req.session.pipe);
@@ -575,42 +575,56 @@ router.get("/member/un-blocked/:id", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-router.post('/manual/lead', isAdminLoggedIn, async (req,res)=>{
+router.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
   try {
-    let newManualLead = new manualLeadModel({
+    let user;
+    if (req.user.role === "admin") {
+      user = await logIncollection.findById(req.user.id);
+    } else {
+      user = await memberModel.findById(req.user.id);
+    }
+
+    const leads_data = Object.entries(req.body)
+      .filter(([key]) => key !== "remark" && key !== "remarktime") // Exclude 'remark' and 'remarktime'
+      .map(([key, value]) => ({
+        que: key,
+        ans: value,
+      }));
+    // console.log(req.body);
+    // console.log(leads_data);
+
+    let newManualLead = new leadsModel({
       app: "manual",
       cid: req.user.cid,
-      customerName: req.body.customerName,
-      mobile: req.body.mobile,
-      email: req.body.email || '',
-      city: req.body.city || '',
-      state: req.body.state || '',
-      alternateMobile1: req.body.alternateMobile1 || '',
-      alternateMobile2: req.body.alternateMobile2 || '',
-      productService: req.body.productService || ''
-  });
-  const remarkDateTime = new Date(req.body.remarkTime);
-  const remarkDate = remarkDateTime.toISOString().split('T')[0]; 
-  const remarkTime = remarkDateTime.toTimeString().split(' ')[0];
-  let remark = new remarkModel({
-    text: req.body.remark,
-    time: remarkTime,
-    date: remarkDate,
-    cid: req.user.cid,
-    uid: req.user.id,
-    lead_id: newManualLead._id
-  })
-  await remark.save();
-
-  newManualLead.remarks.push(remark._id);
-  await newManualLead.save();
-
-
-  res.redirect('/leads')
-
+      uid: req.user.id,
+      income_time: new Date(),
+      leads_data,
+      userType: "logIncollection",
+    });
+    const remarkDateTime = new Date(req.body.remarkTime);
+    const remarkDate = remarkDateTime.toISOString().split("T")[0];
+    const remarkTime = remarkDateTime.toTimeString().split(" ")[0];
+    let remark = new remarkModel({
+      text: req.body.remark,
+      time: remarkTime,
+      date: remarkDate,
+      cid: req.user.cid,
+      uid: req.user.id,
+      lead_id: newManualLead._id,
+    });
+    await remark.save();
+    user.myleads.push(newManualLead._id);
+    newManualLead.remarks.push(remark._id);
+    let defPipe = await pipelineModel.findOne({ defaultVal: true });
+    if (defPipe) {
+      newManualLead.status = defPipe._id;
+    }
+    await newManualLead.save();
+    await user.save();
+    res.redirect("/leads");
   } catch (err) {
-    console.log("Error in /user/manual/lead :- ",err);
+    console.log("Error in /user/manual/lead :- ", err);
   }
-})
+});
 
 module.exports = router;

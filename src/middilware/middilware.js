@@ -50,8 +50,18 @@ async function isMemberBlocked(req, res, next) {
   } else next();
 }
 
+function isSubscriptionValid(user) {
+  if (user.subscriptionLevel === 'free') {
+    const now = new Date();
+    return user.subscriptionExpiry > now; // Check if the subscription has expired
+  }
+  return true; // For other levels, assume the subscription is valid
+}
+
+
 module.exports = {
   isAdminLoggedIn,
   isMemberLoggedIn,
-  isMemberBlocked
+  isMemberBlocked,
+  isSubscriptionValid
 }

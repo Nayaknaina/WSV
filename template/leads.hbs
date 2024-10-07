@@ -258,8 +258,9 @@
                     <div class="row flex-row justify-content-around">
                         <div class="col-auto text-center py-2">
                             <button id="all-lead-btn" onclick="showAllLeads()" type="button"
-                                class="btn btn-primary p-x-8">All leads</button>
+                                class="btn btn-primary p-x-8">Leads</button>
                         </div>
+                        
                         <div class="col-auto text-center py-2">
                             <button id="my-lead-btn" onclick="showMyLeads()" type="button"
                                 class="btn btn-outline-primary p-x-8">My leads</button>
@@ -373,6 +374,7 @@
                         }
 
                         .ul-box {
+                            min-width: 150px;
                             width: auto;
                             height: auto;
                             position: absolute;
@@ -545,83 +547,7 @@
                         }
                     </style>
 
-                    <ul id="allLeads" style="display: block;">
-                        {{#if leads.length}}
-                        {{#each leads}}
-                        <li style="margin-bottom: 10px;">
-                            <nav>
-                                <label class="created-time-label">
-                                    <label class="start-drowp-app" for="touch-{{@index}}" style="margin-bottom: 0;">
-                                        <strong class="formateDate">At- {{formatDate income_time}}</strong>
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                        <i class="fa-brands fa-square-{{app}}"
-                                            style="font-size: 22px; color: #316ff6;"></i>
-                                    </label>
-
-
-                                    <span class="icon-container">
-                                        {{#if uid}}
-                                        <!-- Double Check Icon when uid is not null -->
-                                        <i class="fa-solid fa-check-double" style="color: #0D6EFD;"></i>
-                                        <span class="user-name" id="user-name-box{{uid._id}}"
-                                            onclick="toggleUserNameDropdown('{{@index}}')">
-                                            <span class="user-name-style" id="name-{{_id}}">{{uid.name}}
-
-                                                <div class="other-user-box" id="other-user-box{{@index}}">
-                                                    {{#each ../members}}
-                        <li onclick="assignToOtherUserForm('{{_id}}','{{../_id}}', '{{../uid._id}}','{{ index}}')">
-                            <span>{{name}}</span>
-                        </li>
-                        {{/each}}
-                </div>
-                </span>
-                {{else}}
-                <!-- Single Check Icon when uid is null -->
-                <a href="/lead/book/{{_id}}">
-                    <i class="fa-solid fa-check" style="color: #36383a;"></i>
-                </a>
-                {{/if}}
-
-                {{!-- {{#each leads_data}}
-                {{#if (containsPhoneNumber ans)}}
-                <a href="tel:{{ans}}">
-                    <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
-                </a>
-                <a href="https://wa.me/{{ans}}" target="_blank">
-                    <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
-                </a>
-                {{/if}}
-                {{/each}} --}}
-                {{!-- <span class="status-circle" onclick="toggleDropdown()"
-                    style="background-color: {{status.color}};">
-                    --}}
-                    {{!-- <div class="ul-box">
-                        {{#each ../pipes}}
-                        <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
-                            <span>{{title}}</span>
-                            <span class="drop-circle" style="background-color: {{color}};"></span>
-                        </li>
-                        {{/each}}
-                    </div>
-                </span>--}}
-                </span>
-                </label>
-                <input type="checkbox" id="touch-{{@index}}">
-                <ul class="slide">
-                    {{#each leads_data}}
-                    <li>
-                        <strong>{{que}}:</strong> {{ans}}
-                    </li>
-                    {{/each}}
-                </ul>
-                </nav>
-                </li>
-                {{/each}}
-                {{else}}
-                <li class="noLead">No leads
-                    added here <br> please connect your app first</li>
-                {{/if}}
-                </ul>
+                   
 
                     {{#ifEquals user.role 'admin'}}
                     <ul id="allLeads" style="display: block;">
@@ -771,7 +697,6 @@
             {{/if}}
             </ul>
             {{/ifEquals}}
-
 
 
             <ul id="myLeads" style="display: none;">
