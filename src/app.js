@@ -89,6 +89,23 @@ let client = new Client({
 //   })
 // );
 
+// const sessionStore =
+//   process.env.NODE_ENV === "production"
+//     ? MongoStore.create({
+//         mongoUrl:
+//           "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+//       }) // Replace with your MongoDB connection URI
+//     : new session.MemoryStore();
+
+// app.use(
+//   session({
+//     secret: "your_secret_key", // Replace with your own secret key
+//     resave: false,
+//     saveUninitialized: true,
+//     store: sessionStore,
+//   })
+// );
+
 const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({

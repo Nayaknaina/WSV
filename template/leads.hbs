@@ -35,12 +35,123 @@
     <link rel="stylesheet" type="text/css" href="/styles/loader.css">
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
 
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
         src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
 
     <link rel="stylesheet" href="/assets/css/remark.css">
 </head>
+<style>
+    /* Global reset and basic styling */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        padding: 20px;
+    }
+
+    /* Modal (Popup) Styling */
+    .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999999999999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 800px;
+        width: 100%;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+    }
+
+    .close-btn {
+        cursor: pointer;
+        font-size: 24px;
+        background: none;
+        border: none;
+        color: rgb(255, 255, 255);
+        background-color: #f00;
+        border-radius: 4px;
+        padding: 0px 10px;
+    }
+
+    /* Form Styling */
+    .form-group {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .form-group div {
+        width: 48%;
+        margin-bottom: 10px;
+    }
+
+    .form-group div label {
+        display: block;
+        margin-bottom: 0px;
+    }
+
+    .form-group div input {
+        width: 100%;
+        padding: 4px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .form-group div textarea {
+        width: 100%;
+        padding: 4px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    /* Custom validation styles */
+    input:invalid {
+        border-color: red;
+    }
+
+    input:valid {
+        border-color: green;
+    }
+
+    @media (max-width: 600px) {
+        .form-group div {
+            width: 100%;
+
+        }
+
+        .form-group {
+            overflow: auto;
+            max-height: 470px;
+        }
+    }
+</style>
 
 <body class>
 
@@ -52,7 +163,98 @@
             {{> sidebar}}
             <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  home-section">
                 {{> NameHead}}
-                <div class="container-fluid bg-white shadow-sm m-b-40">
+                <div class="container-fluid bg-white shadow-sm m-b-20">
+                    <div class="row flex-row justify-content-start px-3">
+                        <button type="button" class="btn my-2 mx-2 btn-outline-warning btn-sm">Filter <i
+                                class="ri-filter-3-fill"></i></button>
+                        {{!-- <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm">Add New
+                            Lead</button> --}}
+                        <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="openFormBtn">Add New
+                            Lead</button>
+                        <div class="custom-modal" id="customModal">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2>New Lead Information Form</h2>
+                                    <button class="close-btn" id="closeFormBtn">&times;</button>
+                                </div>
+                                <form action="/user/manual/lead" method="post" id="customerForm" novalidate>
+                                    <div class="form-group">
+                                        <!-- Customer Name -->
+                                        <div>
+                                            <label for="customerName">Customer Name</label>
+                                            <input type="text" placeholder="Customer Name" id="customerName"
+                                                name="customerName" required>
+                                        </div>
+
+                                        <!-- Mobile -->
+                                        <div>
+                                            <label for="mobile">Mobile Number</label>
+                                            <input type="tel" id="mobile" placeholder="Mobile Number" name="mobile"
+                                                pattern="[0-9]{10}" maxlength="10" required>
+                                        </div>
+
+                                        <!-- Email -->
+                                        <div>
+                                            <label for="email">Email</label>
+                                            <input type="email" placeholder="Email" id="email" name="email" >
+                                        </div>
+
+                                        <!-- City (Optional) -->
+                                        <div>
+                                            <label for="city">City (Optional)</label>
+                                            <input type="text" minlength="3" placeholder="city" id="City" name="city">
+                                        </div>
+
+                                        <!-- State (Optional) -->
+                                        <div>
+                                            <label for="state">State (Optional)</label>
+                                            <input type="text" placeholder="State" id="state" minlength="3" name="state">
+                                        </div>
+
+                                        <!-- Alternate Number 1 -->
+                                        <div>
+                                            <label for="alternate1">Alternate Number 1</label>
+                                            <input type="tel" id="alternate1" placeholder="Mobile Number"
+                                                name="alternateMobile1" pattern="[0-9]{10}" maxlength="10">
+                                        </div>
+
+                                        <!-- Alternate Number 2 (Optional) -->
+                                        <div>
+                                            <label for="alternate2">Alternate Number 2 (Optional)</label>
+                                            <input type="tel" id="alternate2" placeholder="Mobile Number"
+                                                name="alternateMobile2" pattern="[0-9]{10}" maxlength="10">
+                                        </div>
+
+                                        <!-- Remark (DateTime) -->
+                                        <div>
+                                            <label for="remark">Remark Text</label>
+                                            <textarea placeholder="Remark Text" id="remark" name="remark"
+                                                required></textarea>
+                                        </div>
+
+                                        <!-- Next Followup (DateTime) -->
+                                        <div>
+                                            <label for="nextFollowup">Next Followup (Date and Time)</label>
+                                            <input type="datetime-local" placeholder="Next Followup" id="nextFollowup"
+                                                name="remarkTime" required>
+                                        </div>
+
+                                        <!-- Product/Service (Optional) -->
+                                        <div>
+                                            <label for="productService">Product/Service (Optional)</label>
+                                            <input type="text" id="productService" placeholder="Product/Service"
+                                                name="productService">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="container-fluid bg-white shadow-sm m-b-20">
                     <div class="row flex-row justify-content-around">
                         <div class="col-auto text-center py-2">
                             <button id="all-lead-btn" onclick="showAllLeads()" type="button"
@@ -269,7 +471,19 @@
                             border-radius: 5px;
                         }
 
+                        .noLead {
+                            text-align: center;
+                            font-size: 35px;
+                            color: #36383a89;
+                            margin-top: 100px;
+
+                        }
+
                         @media (max-width: 768px) {
+                            .noLead {
+                                font-size: 27px;
+                            }
+
                             nav label {
                                 font-size: 1em;
                                 padding: 10px;
@@ -330,7 +544,7 @@
                             }
                         }
                     </style>
-                    {{#ifEquals user.role 'admin'}}
+
                     <ul id="allLeads" style="display: block;">
                         {{#if leads.length}}
                         {{#each leads}}
@@ -351,10 +565,7 @@
                                         <i class="fa-solid fa-check-double" style="color: #0D6EFD;"></i>
                                         <span class="user-name" id="user-name-box{{uid._id}}"
                                             onclick="toggleUserNameDropdown('{{@index}}')">
-                                            <span class="user-name-style" id="name-{{_id}}">{{uid.name}}</
-                                                    style="padding: 4px 10px; background-color: #fff; border: 1px solid black; border-radius: 5px;">
-                                                {{!-- <p style="margin-bottom: 0;"></p> --}}
-                                                {{!-- <p style="margin-bottom: 0;">{{uid._id}}</p> --}}
+                                            <span class="user-name-style" id="name-{{_id}}">{{uid.name}}
 
                                                 <div class="other-user-box" id="other-user-box{{@index}}">
                                                     {{#each ../members}}
@@ -382,7 +593,8 @@
                 {{/if}}
                 {{/each}} --}}
                 {{!-- <span class="status-circle" onclick="toggleDropdown()"
-                    style="background-color: {{status.color}};"> --}}
+                    style="background-color: {{status.color}};">
+                    --}}
                     {{!-- <div class="ul-box">
                         {{#each ../pipes}}
                         <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
@@ -406,7 +618,86 @@
                 </li>
                 {{/each}}
                 {{else}}
-                <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
+                <li class="noLead">No leads
+                    added here <br> please connect your app first</li>
+                {{/if}}
+                </ul>
+
+                    {{#ifEquals user.role 'admin'}}
+                    <ul id="allLeads" style="display: block;">
+                        {{#if leads.length}}
+                        {{#each leads}}
+                        <li style="margin-bottom: 10px;">
+                            <nav>
+                                <label class="created-time-label">
+                                    <label class="start-drowp-app" for="touch-{{@index}}" style="margin-bottom: 0;">
+                                        <strong class="formateDate">At- {{formatDate income_time}}</strong>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                        <i class="fa-brands fa-square-{{app}}"
+                                            style="font-size: 22px; color: #316ff6;"></i>
+                                    </label>
+
+
+                                    <span class="icon-container">
+                                        {{#if uid}}
+                                        <!-- Double Check Icon when uid is not null -->
+                                        <i class="fa-solid fa-check-double" style="color: #0D6EFD;"></i>
+                                        <span class="user-name" id="user-name-box{{uid._id}}"
+                                            onclick="toggleUserNameDropdown('{{@index}}')">
+                                            <span class="user-name-style" id="name-{{_id}}">{{uid.name}}
+
+                                                <div class="other-user-box" id="other-user-box{{@index}}">
+                                                    {{#each ../members}}
+                        <li onclick="assignToOtherUserForm('{{_id}}','{{../_id}}', '{{../uid._id}}','{{ index}}')">
+                            <span>{{name}}</span>
+                        </li>
+                        {{/each}}
+                </div>
+                </span>
+                {{else}}
+                <!-- Single Check Icon when uid is null -->
+                <a href="/lead/book/{{_id}}">
+                    <i class="fa-solid fa-check" style="color: #36383a;"></i>
+                </a>
+                {{/if}}
+
+                {{!-- {{#each leads_data}}
+                {{#if (containsPhoneNumber ans)}}
+                <a href="tel:{{ans}}">
+                    <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
+                </a>
+                <a href="https://wa.me/{{ans}}" target="_blank">
+                    <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                </a>
+                {{/if}}
+                {{/each}} --}}
+                {{!-- <span class="status-circle" onclick="toggleDropdown()"
+                    style="background-color: {{status.color}};">
+                    --}}
+                    {{!-- <div class="ul-box">
+                        {{#each ../pipes}}
+                        <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                            <span>{{title}}</span>
+                            <span class="drop-circle" style="background-color: {{color}};"></span>
+                        </li>
+                        {{/each}}
+                    </div>
+                </span>--}}
+                </span>
+                </label>
+                <input type="checkbox" id="touch-{{@index}}">
+                <ul class="slide">
+                    {{#each leads_data}}
+                    <li>
+                        <strong>{{que}}:</strong> {{ans}}
+                    </li>
+                    {{/each}}
+                </ul>
+                </nav>
+                </li>
+                {{/each}}
+                {{else}}
+                <li class="noLead">No leads
                     added here <br> please connect your app first</li>
                 {{/if}}
                 </ul>
@@ -476,8 +767,7 @@
             </li>
             {{/each}}
             {{else}}
-            <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
-                added here <br> please connect your app first</li>
+            <li class="noLead" leads added here <br> please connect your app first</li>
             {{/if}}
             </ul>
             {{/ifEquals}}
@@ -580,7 +870,7 @@
         </li>
         {{/each}}
         {{else}}
-        <li style="text-align: center; font-size: 50px; color: #36383a89; margin-top: 100px;">No leads
+        <li class="noLead">No leads
             added here</li>
         {{/if}}
         </ul>
@@ -897,6 +1187,38 @@
 
     </script>
 
+
+    <script>
+        // Get DOM elements
+        const openFormBtn = document.getElementById('openFormBtn');
+        const closeFormBtn = document.getElementById('closeFormBtn');
+        const customModal = document.getElementById('customModal');
+
+        // Open the modal
+        openFormBtn.addEventListener('click', function () {
+            customModal.style.display = 'flex'; // Display the modal as flex
+        });
+
+        // Close the modal when the close button is clicked
+        closeFormBtn.addEventListener('click', function () {
+            customModal.style.display = 'none'; // Hide the modal
+        });
+
+        // Close the modal if clicked outside the form content
+        window.onclick = function (event) {
+            if (event.target === customModal) {
+                customModal.style.display = 'none';
+            }
+        };
+
+        // Custom form validation
+        document.getElementById('customerForm').addEventListener('submit', function (event) {
+            if (!this.checkValidity()) {
+                event.preventDefault(); // Prevent form submission if invalid
+                alert('Please fill in all required fields correctly.');
+            }
+        });
+    </script>
 
 </body>
 

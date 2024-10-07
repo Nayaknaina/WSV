@@ -101,6 +101,11 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
       .populate("status").populate("uid") // Ensure that 'status' is populated
       .sort({ createdAt: -1 });
 
+    let Manualleads = await leadsModel
+      .find({ cid: user.cid })
+      .populate("status").populate("uid") // Ensure that 'status' is populated
+      .sort({ createdAt: -1 });
+
     // let lead = await leadsModel
     //   .findById('66ed6c684e1f1c79f01999a1')
     //   .populate("uid") // Ensure that 'status' is populated
