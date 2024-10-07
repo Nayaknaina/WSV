@@ -583,11 +583,11 @@ router.post('/manual/lead', isAdminLoggedIn, async (req,res)=>{
       customerName: req.body.customerName,
       mobile: req.body.mobile,
       email: req.body.email || '',
-      city: req.body.city || '', // Optional field
-      state: req.body.state || '', // Optional field
+      city: req.body.city || '',
+      state: req.body.state || '',
       alternateMobile1: req.body.alternateMobile1 || '',
-      alternateMobile2: req.body.alternateMobile2 || '', // Optional field
-      productService: req.body.productService || '' // Optional field
+      alternateMobile2: req.body.alternateMobile2 || '',
+      productService: req.body.productService || ''
   });
   const remarkDateTime = new Date(req.body.remarkTime);
   const remarkDate = remarkDateTime.toISOString().split('T')[0]; 
