@@ -15,6 +15,7 @@ router.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
 
+
 router.get("/profile", isAdminLoggedIn, async (req, res) => {
   let user;
   if (req.user.role === "admin")

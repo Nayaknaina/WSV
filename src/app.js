@@ -703,6 +703,7 @@ app.get("/auth/facebook", (req, res) => {
       response_type: "code",
     });
   console.log("redirected from /auth/fb");
+  
 
   res.redirect(facebookAuthUrl);
 });

@@ -502,6 +502,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
 router.get("/logout", (req, res) => {
   res.clearCookie("360Followers");
   res.redirect("/");
