@@ -1,3 +1,4 @@
+
 const express = require("express");
 const app = express();
 
@@ -56,7 +57,13 @@ let connectedPhoneNumber = "";
 
 // Initialize the WhatsApp Client with Local Authentication
 let client = new Client({
-  authStrategy: new LocalAuth(),
+    puppeteer: {
+        ignoreHTTPSErrors: true,
+        headless: true,
+        args: ['--no-sandbox',
+            '--disable-setuid-sandbox']
+    },
+    authStrategy: new LocalAuth(),
 });
 
 // Ensure QR Code Event Attachment
@@ -71,13 +78,7 @@ let client = new Client({
 //           "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
 //       }) // Replace with your MongoDB connection URI
 //     : new session.MemoryStore();
-const sessionStore =
-  process.env.NODE_ENV === "production"
-    ? MongoStore.create({
-      mongoUrl: "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
-      collectionName: 'sessions', // Collection name for sessions
-    })
-    : new session.MemoryStore();
+
 // app.use(
 //   session({
 //     secret: "your_secret_key", // Replace with your own secret key
@@ -86,6 +87,17 @@ const sessionStore =
 //     store: sessionStore,
 //   })
 // );
+
+const sessionStore =
+  process.env.NODE_ENV === "production"
+    ? MongoStore.create({
+      mongoUrl: "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+      collectionName: 'sessions', // Collection name for sessions
+    })
+    : new session.MemoryStore();
+
+
+
 
 const static_path = path.join(__dirname, "../public");
 app.use(express.static(static_path));
@@ -102,6 +114,7 @@ app.use(
     store: sessionStore,
   })
 );
+
 
 app.set("view engine", "hbs");
 app.set("views", templatepath);
@@ -605,7 +618,7 @@ app.post("/update-user", async (req, res) => {
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] }),
-  (req, res) => { }
+  (req, res) => {}
 );
 
 app.get(
@@ -622,78 +635,78 @@ app.get(
       await user.save();
     }
     if (!(user.myPipelines.length >= 4)) {
-
-      const pipelines = [
-        { title: "win", color: "#28A745", defaultVal: false },
-        { title: "lost", color: "#DC3545", defaultVal: false },
-        { title: "on hold", color: "#007BFF", defaultVal: true },
-        { title: "pending", color: "#FFC107", defaultVal: false },
-      ].map(
-        (pipelineData) =>
-          new pipelineModel({
-            uid: user._id,
-            defaultVal: pipelineData.defaultVal,
-            color: pipelineData.color,
-            title: pipelineData.title,
-            cid: user.cid,
-          })
-      );
-
-      // Save all pipelines in parallel
-      await Promise.all(
-        pipelines.map(async (pipeline) => {
-          await pipeline.save();
-          user.myPipelines.push(pipeline._id);
+   
+    const pipelines = [
+      { title: "win", color: "#28A745", defaultVal: false },
+      { title: "lost", color: "#DC3545", defaultVal: false },
+      { title: "on hold", color: "#007BFF", defaultVal: true },
+      { title: "pending", color: "#FFC107", defaultVal: false },
+    ].map(
+      (pipelineData) =>
+        new pipelineModel({
+          uid: user._id,
+          defaultVal: pipelineData.defaultVal,
+          color: pipelineData.color,
+          title: pipelineData.title,
+          cid: user.cid,
         })
-      );
+    );
 
-      const templates = [
-        {
-          title: "welcome",
-          text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
-          client: true,
-          team: false,
-          num: 1,
-        },
+    // Save all pipelines in parallel
+    await Promise.all(
+      pipelines.map(async (pipeline) => {
+        await pipeline.save();
+        user.myPipelines.push(pipeline._id);
+      })
+    );
 
-        {
-          title: "after call",
-          text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
-          client: true,
-          team: false,
-          num: 2,
-        },
+    const templates = [
+      {
+        title: "welcome",
+        text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
+        client: true,
+        team: false,
+        num: 1,
+      },
 
-        {
-          title: "before call",
-          text: "",
-          client: false,
-          team: false,
-          num: 3,
-        },
-      ].map(
-        (temp) =>
-          new templateModel({
-            uid: user._id,
-            title: temp.title,
-            text: temp.text,
-            num: temp.num,
-            client: temp.client,
-            team: temp.team,
-            cid: user.cid,
-          })
-      );
+      {
+        title: "after call",
+        text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
+        client: true,
+        team: false,
+        num: 2,
+      },
 
-      // Save all pipelines in parallel
-      await Promise.all(
-        templates.map(async (temp) => {
-          await temp.save();
-          user.myTemplates.push(temp._id);
+      {
+        title: "before call",
+        text: "",
+        client: false,
+        team: false,
+        num: 3,
+      },
+    ].map(
+      (temp) =>
+        new templateModel({
+          uid: user._id,
+          title: temp.title,
+          text: temp.text,
+          num: temp.num,
+          client: temp.client,
+          team: temp.team,
+          cid: user.cid,
         })
-      );
-      await user.save();
+    );
 
-    }
+    // Save all pipelines in parallel
+    await Promise.all(
+      templates.map(async (temp) => {
+        await temp.save();
+        user.myTemplates.push(temp._id);
+      })
+    );
+    await user.save();
+  
+  }
     const token = await generateToken(user);
 
     res.cookie("360Followers", token, {
@@ -1183,6 +1196,11 @@ function initializeWhatsAppClient() {
 
   // Recreate the client to ensure fresh state
   client = new Client({
+    puppeteer: {
+        args: ['--no-sandbox'],
+        headless: true,
+        ignoreHTTPSErrors: true
+    },
     authStrategy: new LocalAuth(),
   });
 
