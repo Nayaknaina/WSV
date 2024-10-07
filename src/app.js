@@ -64,13 +64,35 @@ let client = new Client({
 //-------------------------------------------
 
 // Middleware
+// const sessionStore =
+//   process.env.NODE_ENV === "production"
+//     ? MongoStore.create({
+//         mongoUrl:
+//           "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+//       }) // Replace with your MongoDB connection URI
+//     : new session.MemoryStore();
 const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({
-        mongoUrl:
-          "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
-      }) // Replace with your MongoDB connection URI
+      mongoUrl: "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+      collectionName: 'sessions', // Collection name for sessions
+    })
     : new session.MemoryStore();
+// app.use(
+//   session({
+//     secret: "your_secret_key", // Replace with your own secret key
+//     resave: false,
+//     saveUninitialized: true,
+//     store: sessionStore,
+//   })
+// );
+
+const static_path = path.join(__dirname, "../public");
+app.use(express.static(static_path));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());  
+app.use(cookieParser());
 
 app.use(
   session({
@@ -80,13 +102,6 @@ app.use(
     store: sessionStore,
   })
 );
-
-const static_path = path.join(__dirname, "../public");
-app.use(express.static(static_path));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());  
-app.use(cookieParser());
 
 app.set("view engine", "hbs");
 app.set("views", templatepath);
@@ -156,6 +171,8 @@ app.use(cookieParser());
 
 app.use(express.static("template"));
 
+app.use(passport.initialize());
+app.use(passport.session());
 // Passport.js Google Strategy
 passport.use(
   new GoogleStrategy(
@@ -207,8 +224,7 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-app.use(passport.initialize());
-app.use(passport.session());
+
 
 app.use("/", Route);
 app.use("/member", memberRoute);
@@ -589,7 +605,7 @@ app.post("/update-user", async (req, res) => {
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] }),
-  (req, res) => {}
+  (req, res) => { }
 );
 
 app.get(
@@ -606,78 +622,78 @@ app.get(
       await user.save();
     }
     if (!(user.myPipelines.length >= 4)) {
-   
-    const pipelines = [
-      { title: "win", color: "#28A745", defaultVal: false },
-      { title: "lost", color: "#DC3545", defaultVal: false },
-      { title: "on hold", color: "#007BFF", defaultVal: true },
-      { title: "pending", color: "#FFC107", defaultVal: false },
-    ].map(
-      (pipelineData) =>
-        new pipelineModel({
-          uid: user._id,
-          defaultVal: pipelineData.defaultVal,
-          color: pipelineData.color,
-          title: pipelineData.title,
-          cid: user.cid,
+
+      const pipelines = [
+        { title: "win", color: "#28A745", defaultVal: false },
+        { title: "lost", color: "#DC3545", defaultVal: false },
+        { title: "on hold", color: "#007BFF", defaultVal: true },
+        { title: "pending", color: "#FFC107", defaultVal: false },
+      ].map(
+        (pipelineData) =>
+          new pipelineModel({
+            uid: user._id,
+            defaultVal: pipelineData.defaultVal,
+            color: pipelineData.color,
+            title: pipelineData.title,
+            cid: user.cid,
+          })
+      );
+
+      // Save all pipelines in parallel
+      await Promise.all(
+        pipelines.map(async (pipeline) => {
+          await pipeline.save();
+          user.myPipelines.push(pipeline._id);
         })
-    );
+      );
 
-    // Save all pipelines in parallel
-    await Promise.all(
-      pipelines.map(async (pipeline) => {
-        await pipeline.save();
-        user.myPipelines.push(pipeline._id);
-      })
-    );
+      const templates = [
+        {
+          title: "welcome",
+          text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
+          client: true,
+          team: false,
+          num: 1,
+        },
 
-    const templates = [
-      {
-        title: "welcome",
-        text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
-        client: true,
-        team: false,
-        num: 1,
-      },
+        {
+          title: "after call",
+          text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
+          client: true,
+          team: false,
+          num: 2,
+        },
 
-      {
-        title: "after call",
-        text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
-        client: true,
-        team: false,
-        num: 2,
-      },
+        {
+          title: "before call",
+          text: "",
+          client: false,
+          team: false,
+          num: 3,
+        },
+      ].map(
+        (temp) =>
+          new templateModel({
+            uid: user._id,
+            title: temp.title,
+            text: temp.text,
+            num: temp.num,
+            client: temp.client,
+            team: temp.team,
+            cid: user.cid,
+          })
+      );
 
-      {
-        title: "before call",
-        text: "",
-        client: false,
-        team: false,
-        num: 3,
-      },
-    ].map(
-      (temp) =>
-        new templateModel({
-          uid: user._id,
-          title: temp.title,
-          text: temp.text,
-          num: temp.num,
-          client: temp.client,
-          team: temp.team,
-          cid: user.cid,
+      // Save all pipelines in parallel
+      await Promise.all(
+        templates.map(async (temp) => {
+          await temp.save();
+          user.myTemplates.push(temp._id);
         })
-    );
+      );
+      await user.save();
 
-    // Save all pipelines in parallel
-    await Promise.all(
-      templates.map(async (temp) => {
-        await temp.save();
-        user.myTemplates.push(temp._id);
-      })
-    );
-    await user.save();
-  
-  }
+    }
     const token = await generateToken(user);
 
     res.cookie("360Followers", token, {
