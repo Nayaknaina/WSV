@@ -1,3 +1,4 @@
+
 const express = require("express");
 const app = express();
 
@@ -56,30 +57,55 @@ let connectedPhoneNumber = "";
 
 // Initialize the WhatsApp Client with Local Authentication
 let client = new Client({
-  authStrategy: new LocalAuth(),
-  puppeteer: {
-    headless: true,
-    executablePath: process.env.CHROME_BIN ,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-    ],
-  },
+    puppeteer: {
+        headless: true,
+        ignoreHTTPSErrors: true,
+        args: ['--no-sandbox',
+            '--disable-setuid-sandbox']
+    },
+    authStrategy: new LocalAuth(),
 });
 
+// Ensure QR Code Event Attachment
 // Ensure QR Code Event Attachment
 
 //-------------------------------------------
 
 // Middleware
+// const sessionStore =
+//   process.env.NODE_ENV === "production"
+//     ? MongoStore.create({
+//         mongoUrl:
+//           "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+//       }) // Replace with your MongoDB connection URI
+//     : new session.MemoryStore();
+
+// app.use(
+//   session({
+//     secret: "your_secret_key", // Replace with your own secret key
+//     resave: false,
+//     saveUninitialized: true,
+//     store: sessionStore,
+//   })
+// );
+
 const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({
-        mongoUrl:
-          "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
-      }) // Replace with your MongoDB connection URI
+      mongoUrl: "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+      collectionName: 'sessions', // Collection name for sessions
+    })
     : new session.MemoryStore();
+
+
+
+
+const static_path = path.join(__dirname, "../public");
+app.use(express.static(static_path));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());  
+app.use(cookieParser());
 
 app.use(
   session({
@@ -90,12 +116,6 @@ app.use(
   })
 );
 
-const static_path = path.join(__dirname, "../public");
-app.use(express.static(static_path));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());  
-app.use(cookieParser());
 
 app.set("view engine", "hbs");
 app.set("views", templatepath);
@@ -165,6 +185,8 @@ app.use(cookieParser());
 
 app.use(express.static("template"));
 
+app.use(passport.initialize());
+app.use(passport.session());
 // Passport.js Google Strategy
 passport.use(
   new GoogleStrategy(
@@ -216,8 +238,7 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-app.use(passport.initialize());
-app.use(passport.session());
+
 
 app.use("/", Route);
 app.use("/member", memberRoute);
@@ -1169,9 +1190,6 @@ async function cleanupSessionFiles() {
 }
 
 function initializeWhatsAppClient() {
-  for (let id = 0; id < 25 ; id++) {
-    console.log("initializeWhatsAppClient function")   
-  }
   // Remove all existing listeners to avoid duplication
   if (client) {
     client.removeAllListeners();
@@ -1179,6 +1197,12 @@ function initializeWhatsAppClient() {
 
   // Recreate the client to ensure fresh state
   client = new Client({
+    puppeteer: {
+      headless: true,
+      ignoreHTTPSErrors: true,
+      args: ['--no-sandbox',
+          '--disable-setuid-sandbox']
+    },
     authStrategy: new LocalAuth(),
   });
 
