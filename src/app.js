@@ -822,6 +822,19 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
   }
 });
 
+
+app.get("/logoutfacebook", isAdminLoggedIn, async (req, res) => {
+  try {
+   
+    await logIncollection.findByIdAndUpdate(req.user.id, { facebookToken: null });
+    req.session.successMSG = "Facebook account disconnected.";
+    res.redirect("/dashboard");
+  } catch (err) {
+    console.error("Error clearing Facebook token:", err);
+    res.status(500).send("Error clearing Facebook token.");
+  }
+});
+
 app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
   const { id } = req.params;
   const { text, time, date } = req.body;
