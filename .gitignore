@@ -1,5 +1,5 @@
 .env
-package-lock.json
+
 demo
 node_modules
 .wwebjs_auth
@@ -19,3 +19,5 @@ card.html
 .wwebjs_cache/2.3000.1016500779.html
 .wwebjs_cache/2.3000.1016501243.html
 .wwebjs_cache
+package-lock.json
+package.json
