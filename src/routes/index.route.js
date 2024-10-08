@@ -42,7 +42,7 @@ router.get("/apps", isAdminLoggedIn, (req, res) => {
 
 router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
   let user;
-  const { name, mobile, countryCode, address, city, state } = req.body;
+  const { name, mobile, countryCode, address, city, state, organisation, sector } = req.body;
   try {
     if (req.user.role === "admin")
       user = await logIncollection.findById(req.user.id);
@@ -54,6 +54,8 @@ router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
     user.address = address;
     user.city = city;
     user.state = state;
+    user.organisation = organisation;
+    user.sector = sector;
     await user.save();
     res.redirect("/profile");
   } catch (err) {
