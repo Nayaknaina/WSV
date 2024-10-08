@@ -274,8 +274,9 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
       try {
         await client.logout();
         isConnected = false;
+        let userWA = await WaModel.findOne({ cid: req.user.cid });
         if (userWA) {
-          let userWA = await WaModel.findOne({ cid: req.user.cid });
+          
           userWA.isConnected = false;
           userWA.whatsappClientReady = false;
           req.session.errorMSG = `Dis-Connected WhatsApp Number: ${connectedPhoneNumber}`;
