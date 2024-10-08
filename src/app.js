@@ -146,6 +146,7 @@ hbs.registerHelper("json", function (context) {
   return JSON.stringify(context);
 });
 
+
 hbs.registerHelper("containsPhoneNumber", function (text) {
   // Regular expression for matching phone numbers
   const phoneNumberPattern = /(\+?\d{1,4}[ -]?)?(\(?\d{2,4}\)?[ -]?)?\d{6,12}/;

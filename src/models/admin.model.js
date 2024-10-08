@@ -125,6 +125,7 @@ logInSchema.pre("save", function (next) {
       `Cannot add more than ${maxAllowedTeams} team members with ${userSubscriptionLevel} plan.`
     );
     return next(err);
+    
   }
   if (userSubscriptionLevel === "free" && !this.subscriptionExpiry) {
     this.subscriptionExpiry = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000); // 15 days from now

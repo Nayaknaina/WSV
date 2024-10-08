@@ -71,6 +71,7 @@ router.post("/api/verify", async (req, res) => {
   }
 });
 
+
 app.get('/api/otp/verify',(req,res)=>{
   try {
     

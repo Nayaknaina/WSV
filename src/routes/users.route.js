@@ -330,6 +330,7 @@ router.post("/pipeline/update", isAdminLoggedIn, async (req, res) => {
 //   res.render("profile", { user });
 // });
 
+
 // router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
 //   let user;
 //   const { name, mobile, countryCode, address, city, state } = req.body;
