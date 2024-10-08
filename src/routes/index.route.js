@@ -78,6 +78,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
   try {
     let user;
     console.log("leads page");
+     
 
     if (req.user.role == "admin") {
       user = await logIncollection
