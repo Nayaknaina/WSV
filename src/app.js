@@ -267,6 +267,7 @@ app.get("/qr", isAdminLoggedIn, async (req, res) => {
   });
 });
 
+//logout whatsapp
 app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
   try {
     // Check if the client is ready before attempting logout
@@ -984,6 +985,19 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     res.redirect("/leads");
   } catch (err) {
     console.log("Error in /user/manual/lead :- ", err);
+  }
+});
+
+//logout facebook
+app.get("/logoutfacebook", isAdminLoggedIn, async (req, res) => {
+  try {
+   
+    await logIncollection.findByIdAndUpdate(req.user.id, { facebookToken: null });
+    req.session.successMSG = "Facebook account disconnected.";
+    res.redirect("/user/dashboard");
+  } catch (err) {
+    console.error("Error clearing Facebook token:", err);
+    res.status(500).send("Error clearing Facebook token.");
   }
 });
 

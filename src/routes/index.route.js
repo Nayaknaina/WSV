@@ -80,6 +80,7 @@ router.post('/api/otp/verify',(req,res)=>{
   }
 })
 
+
 router.get("/profile", isAdminLoggedIn, async (req, res) => {
   let user;
   if (req.user.role === "admin")

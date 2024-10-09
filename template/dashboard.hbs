@@ -207,6 +207,18 @@
 
                     <div class="row">
                         <!--/.col-->
+                        <style>
+                        .social-box .btn {
+                                width: 48%;
+                                margin-top: .4rem;
+                                
+                            }
+
+                            .d-flex.gap-2 {
+                                gap: 10px;
+                              
+                            }
+                            </style>
                         <div class="col-lg-3 col-md-6">
                             <div class="social-box facebook">
                                 <i class="fa-brands fa-square-facebook"></i>
@@ -230,6 +242,8 @@
 
                                 <a href="/qr" id="whatsapp-Connect-Btn"
                                     class="btn btn-outline-secondary border font-15">Connect Now</a>
+                                <a href="/logoutWA" id="whatsapp-Logout-Btn" class="btn btn-danger border font-15"
+                                    style="display: none;">Logout</a>
                             </div>
 
                         </div>
@@ -270,7 +284,8 @@
                                             {{countLeadsByStatus ../leads title}}
                                         </span>
                                     </h4>
-                                    <p style="text-transform: capitalize; font-size: x-large;" class="text-light">{{title}}</p>
+                                    <p style="text-transform: capitalize; font-size: x-large;" class="text-light">
+                                        {{title}}</p>
 
                                     {{!-- <div class="chart-wrapper px-0" style="height:70px;" height="70">
                                         <canvas id="widgetChart1"></canvas>
@@ -518,7 +533,7 @@
                             display: none;
                         }
 
-                        .actionBar{
+                        .actionBar {
                             width: fit-content;
                             height: fit-content;
                             padding: 8px 8px;
@@ -533,7 +548,6 @@
                             position: absolute;
                             right: 2rem;
                         }
-                       
                     </style>
 
                     <div class="col-xl-3 col-lg-6">
@@ -631,16 +645,19 @@
                                                         class="fa-regular fa-trash-can" style="color: crimson;"></i></a>
                                             </span>
 
-                                            {{!-- <i style="margin-right: 10px; font-size: 1rem;" onclick="openActionBar('{{_id}}')" class="fa-solid fa-ellipsis-vertical"></i>
+                                            {{!-- <i style="margin-right: 10px; font-size: 1rem;"
+                                                onclick="openActionBar('{{_id}}')"
+                                                class="fa-solid fa-ellipsis-vertical"></i>
                                             <div class="actionBar" id="actionBar-{{_id}}">
-                                               <label onclick="updatePiplineForm('{{_id}}')" for="title-{{_id}}" style="margin: 0;">
-                                               Edit <i style="cursor: pointer;"
-                                                    class="fa-solid fa-pen-to-square"></i>
+                                                <label onclick="updatePiplineForm('{{_id}}')" for="title-{{_id}}"
+                                                    style="margin: 0;">
+                                                    Edit <i style="cursor: pointer;"
+                                                        class="fa-solid fa-pen-to-square"></i>
                                                 </label>
-                                                
+
                                                 <a href="#" onclick="deletePipeFromAdmin('{{_id}}')">Delete<i
                                                         class="fa-regular fa-trash-can" style="color: crimson;"></i></a>
-                                                
+
                                             </div> --}}
                                         </li>
                                         {{/unless}}
@@ -1257,22 +1274,32 @@
 
 
     <script>
-
         async function checkConnectionStatus() {
             try {
                 const response = await fetch('/connection-status');
                 const data = await response.json();
                 const isConnected = data.isConnected;
                 const connectBtn = document.getElementById('whatsapp-Connect-Btn');
+                const logoutBtn = document.getElementById('whatsapp-Logout-Btn');
 
                 if (isConnected) {
+
                     connectBtn.textContent = 'Connected';
-                    connectBtn.classList.remove('btn-outline-secondary'); // Optionally change styling
-                    connectBtn.classList.add('btn-success'); // Optionally change styling
+                    connectBtn.classList.remove('btn-outline-secondary');
+                    connectBtn.classList.add('btn-success');
+                    connectBtn.setAttribute('disabled', true);
+
+                    // Show the Logout button
+                    logoutBtn.style.display = 'inline-block'; // Show the Logout button
                 } else {
+                    // Reset the Connect button to "Connect Now"
                     connectBtn.textContent = 'Connect Now';
-                    connectBtn.classList.remove('btn-success'); // Optionally change styling
-                    connectBtn.classList.add('btn-outline-secondary'); // Optionally change styling
+                    connectBtn.classList.remove('btn-success');
+                    connectBtn.classList.add('btn-outline-secondary');
+                    connectBtn.removeAttribute('disabled'); // Enable the Connect button again
+
+                    // Hide the Logout button
+                    logoutBtn.style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error fetching connection status:', error);
@@ -1281,7 +1308,6 @@
 
         // Call the function when the page loads
         document.addEventListener('DOMContentLoaded', checkConnectionStatus);
-
     </script>
     {{!--todo profile card current location with local time --}}
     <script>
@@ -1622,48 +1648,48 @@
         }
 
 
-    function applyCustomDateRange() {
-    const startDate = new Date(document.getElementById('date1').value);
-    const endDate = new Date(document.getElementById('date2').value);
+        function applyCustomDateRange() {
+            const startDate = new Date(document.getElementById('date1').value);
+            const endDate = new Date(document.getElementById('date2').value);
 
-    // Add end-of-day time for the end date to include all leads for that day
-    endDate.setHours(23, 59, 59, 999);
+            // Add end-of-day time for the end date to include all leads for that day
+            endDate.setHours(23, 59, 59, 999);
 
-    if (isNaN(startDate) || isNaN(endDate)) {
-        alert("Please select valid start and end dates.");
-        return;
-    }
+            if (isNaN(startDate) || isNaN(endDate)) {
+                alert("Please select valid start and end dates.");
+                return;
+            }
 
-    // Calculate the difference in months between start and end date
-    const diffInMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12 + (endDate.getMonth() - startDate.getMonth());
+            // Calculate the difference in months between start and end date
+            const diffInMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12 + (endDate.getMonth() - startDate.getMonth());
 
-    let range;
-    if (diffInMonths <= 1) {
-        // If the difference is 1 month or less, treat it as 'thisMonth'
-        range = 'thisMonth';
-    } else {
-        // If the difference is more than 1 month, treat it as 'thisYear'
-        range = 'thisYear';
-    }
+            let range;
+            if (diffInMonths <= 1) {
+                // If the difference is 1 month or less, treat it as 'thisMonth'
+                range = 'thisMonth';
+            } else {
+                // If the difference is more than 1 month, treat it as 'thisYear'
+                range = 'thisYear';
+            }
 
-    // Filter the leads data based on the custom date range
-    const customLeads = leadsData.filter(lead => {
-        const leadDate = new Date(lead.createdAt);
-        return leadDate >= startDate && leadDate <= endDate;
-    });
+            // Filter the leads data based on the custom date range
+            const customLeads = leadsData.filter(lead => {
+                const leadDate = new Date(lead.createdAt);
+                return leadDate >= startDate && leadDate <= endDate;
+            });
 
-    // Get chart data based on the detected range
-    const chartData = getChartData(customLeads, range);
+            // Get chart data based on the detected range
+            const chartData = getChartData(customLeads, range);
 
-    myChart.data.labels = chartData.labels;
-    myChart.data.datasets.forEach((dataset, index) => {
-        dataset.data = chartData.datasets[index].data;
-    });
+            myChart.data.labels = chartData.labels;
+            myChart.data.datasets.forEach((dataset, index) => {
+                dataset.data = chartData.datasets[index].data;
+            });
 
-    // Update the X-axis title based on the detected range
-    myChart.options.scales.x.title.text = getXaxisTitle(range);
-    myChart.update();
-}
+            // Update the X-axis title based on the detected range
+            myChart.options.scales.x.title.text = getXaxisTitle(range);
+            myChart.update();
+        }
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

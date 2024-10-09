@@ -99,6 +99,7 @@ const logInSchema = new mongoose.Schema({
   organizationName: { type: String },
   sector: { type: String },
 
+  
   // Add a new field to track subscription level
   subscriptionLevel: {
     type: String,
