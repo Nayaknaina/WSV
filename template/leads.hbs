@@ -492,6 +492,9 @@
                                 font-size: 1em;
                                 padding: 10px;
                             }
+                            #remarkForm label{
+                                padding: 0;
+                            }
 
                             .slide li {
                                 font-size: 1.0em;
@@ -541,6 +544,9 @@
                             nav label {
                                 font-size: 0.9em;
                                 padding: 8px;
+                            }
+                            #remarkForm label{
+                                padding: 0;
                             }
 
                             .slide li {
@@ -731,7 +737,7 @@
 
                                 {{/each}}
                                 <i onclick="openRemarkPopUp('{{_id}}')" class="fa-solid fa-file-pen"
-                                    style="color: #1E3050;"></i>
+                                    style="color: #007bff;"></i>
 
                                 <span id="st-box{{_id}}" class="status-circle" onclick="toggleDropdown('{{_id}}')"
                                     style="background-color: {{status.color}};">
@@ -761,10 +767,14 @@
                         <form id="remarkForm" onsubmit="createNewRemark('{{_id}}')">
                             <textarea placeholder="setting up next followup" required maxlength="150" name="text"
                                 id="remark-form-text{{id}}" cols="30" rows="5"></textarea>
+                            <label style="margin: 0;" for="remark-form-time{{id}}"><small style="color: #28292a;">Next Followup Time</small></label><br>
                             <input type="time" placeholder="time" min="current-time" name="time"
-                                id="remark-form-time{{id}}" class="time" required>
+                                id="remark-form-time{{id}}" class="time" required> <br>
+
+                            <label style="margin: 0;" for="remark-form-date{{id}}"><small style="color: #28292a;">Next Followup Date</small></label><br>
                             <input type="date" min="current-date" name="date" id="remark-form-date{{id}}" class="date"
-                                required>
+                                required> <br>
+
                             <button class="btn btn-primary mt-1" id="add-btn" style="font-size: 12px;"
                                 type="submit">add</button>
                             <button class="btn btn-danger mt-1" id="add-btn" style="font-size: 12px;"

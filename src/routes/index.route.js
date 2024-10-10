@@ -28,10 +28,10 @@ router.post("/api/verify", async (req, res) => {
       return res.status(500).json({ msg: "try with another email !" });
     }
 
-    const otpCode = otpGenerator.generate(8, {
+    const otpCode = otpGenerator.generate(6, {
       digits: true,
-      lowerCaseAlphabets: true,
-      upperCaseAlphabets: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
       specialChars: false,
     });
 
@@ -39,16 +39,16 @@ router.post("/api/verify", async (req, res) => {
     <div style="font-family: Arial, sans-serif; color: #333;">
       <div style="text-align: center;">
         <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
-        <h2>360followups.com</h2>
+        <h2>360Followups.com</h2>
         <p>Developing Future</p>
       </div>
       <h3>Hello !</h3>
       <p>Welcome to 360followups.com ! We're excited to have you on board.
 
-        To complete your account setup, please verify your email address by using the One-Time Password (OTP) below:
-
-        **Your OTP:** **${otpCode}**
-
+        To complete your account setup, please verify your email address by using the One-Time Password (OTP) below:</p>
+   
+      <p>Otp : <strong>${otpCode}</strong></p>
+      <div style="text-align: center;">
         This OTP is valid for **15 minutes**. Enter it in the registration form to activate your account and explore all the amazing features we offer.
 
         **If you didn’t request this OTP**, simply ignore this email—no action is needed.
@@ -56,9 +56,8 @@ router.post("/api/verify", async (req, res) => {
         Thank you for choosing 360followups.com! If you have any questions or need assistance, feel free to reach out to us.
 
         Best wishes,
-</p>
-      
-      <p>Regards,<br>360followups.com</p>
+      </div>
+      <p>Regards,<br> 360followups.com</p>
     </div>
   `;
     const subject = "Your OTP for Account Creation";
@@ -71,12 +70,19 @@ router.post("/api/verify", async (req, res) => {
   }
 });
 
-
 router.post('/api/otp/verify',(req,res)=>{
   try {
-    
+    let otp = req.session.otp;
+    delete req.session.otp
+    let {reqOtp} = req.body;
+    console.log(otp, reqOtp);
+    if (reqOtp === otp) {
+      res.json({msg: 'email verification successfully'})
+    }else{
+      res.json({msg:'otp verification failed'})
+    }
   } catch (err) {
-    
+    console.log("Error in /api/otp/verify", err);
   }
 })
 

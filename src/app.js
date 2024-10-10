@@ -323,10 +323,11 @@ app.get("/template", isAdminLoggedIn, async (req, res) => {
     user = await memberModel.findById(req.user.id);
   }
 
-  let templates = await templateModel.find({ cid: user.cid });
+  let templates = await templateModel.find({ cid: user.cid, num: { $ne: 4 } });
+  let specialTemp = await templateModel.find({ cid: user.cid, num: 4  });
   // console.log(templates);
 
-  res.render("template", { user, templates });
+  res.render("template", { user, templates,specialTemp });
 });
 
 app.post(
@@ -641,27 +642,84 @@ app.get(
 
       const templates = [
         {
-          title: "welcome",
-          text: "hello dear ! 👋\r\n\r\nWelcome to 360followups! thank you for reaching out to us and showing interest in our services. we're excited to connect with you! our team will be in touch with you shortly to assist you with your needs and provide the best solutions tailored just for you.",
+          title: "Reminder Message To Customer",
+          text: `Dear [Customer Name],
+  
+  This is a friendly reminder from [360FollowUps]. We have a scheduled follow-up call with you on [Date] at [Time]. Our representative will be reaching out to discuss your requirements.
+  
+  If you have any questions or need to reschedule, please feel free to let us know.
+  
+  Looking forward to speaking with you!
+  
+  Best Regards,
+  The [360FollowUps] Team`,
           client: true,
           team: false,
           num: 1,
         },
 
         {
-          title: "after call",
-          text: "hello 👋\n\nthank you for taking the time to speak with us today. we truly appreciate your interest in 360followups and are excited to help you achieve your goals.\nif you have any further questions or need assistance, feel free to reach out. we’re here for you!",
-          client: true,
-          team: false,
+          title: "Reminder Message To Team Member",
+          text: `Hello [Team Member Name],
+  
+  Just a reminder that you have a follow-up call scheduled with [Customer Name] on [Date] at [Time]. Please make sure you are prepared with all the necessary details.
+  
+  Good luck with the call, and let us know if you need any assistance!
+  
+  Best Regards,
+  The [360FollowUps] System`,
+          client: false,
+          team: true,
           num: 2,
         },
 
         {
-          title: "before call",
-          text: "",
-          client: false,
+          title: "Thankyou Message To Customer",
+          text: `Dear [Customer Name],
+  
+  Thank you for taking the time to speak with us today. We appreciate the opportunity to understand your needs better and to discuss how we can assist you further.
+  
+  If you have any questions or need more information, please don’t hesitate to reach out. We look forward to continuing our conversation and helping you achieve your goals.
+  
+  Best Regards,
+  The [360FollowUps] Team`,
+          client: true,
           team: false,
+          num: 5,
+        },
+
+        {
+          title: "Notification Message To Team Members",
+          text: `Hello [Team Member Name],
+  
+  A new lead has been added to the CRM. Here are the details:
+  - *Lead Name:* [Customer Name]
+  - *Contact Number:* [Customer Contact Number]
+  - *Date Received:* [Date]
+  - *Lead Source:* [Lead Source]
+  
+  Please follow up with the lead at your earliest convenience to ensure a prompt response.
+  
+  Best,
+  The [360FollowUps] System`,
+          client: false,
+          team: true,
           num: 3,
+        },
+
+        {
+          title: "Wellcome Message To Customer",
+          text: `Dear [Customer Name],
+  
+  Welcome to [360FollowUps]! We’re thrilled to have you on board. Our team will be reaching out to you shortly to understand your needs and help you find the best solutions.
+  
+  If you have any immediate questions, feel free to get in touch with us. We're here to support you every step of the way!
+  
+  Best Regards,
+  The [360FollowUps] Team`,
+          client: true,
+          team: false,
+          num: 4,
         },
       ].map(
         (temp) =>
@@ -695,6 +753,143 @@ app.get(
   }
 );
 
+app.get("/make/temp", isAdminLoggedIn, async (req, res) => {
+  let user = await logIncollection.findById(req.user.id);
+  const templates = [
+    {
+      title: "Reminder Message To Customer",
+      text: `Dear [Customer Name],
+
+This is a friendly reminder from [Company].
+We have a scheduled follow-up 
+call with you on [Date] at [Time].
+Our representative will be 
+reaching out to discuss your requirements.
+
+If you have any questions or need to reschedule,
+please feel free to let us know.
+
+Looking forward to speaking with you!
+
+Best Regards,
+The [Company] Team`,
+      client: true,
+      team: false,
+      num: 1,
+    },
+
+    {
+      title: "Reminder Message To Team Member",
+      text: `Hello [Team Member Name],
+
+Just a reminder that you have a follow-up 
+call scheduled with [Customer Name] 
+on [Date] at [Time].
+Please make sure you are prepared 
+with all the necessary details.
+
+Good luck with the call, and let us 
+know if you need any assistance!
+
+Best Regards,
+The [Company] System`,
+      client: false,
+      team: true,
+      num: 2,
+    },
+
+    {
+      title: "Thankyou Message To Customer",
+      text: `Dear [Customer Name],
+
+Thank you for taking the time 
+to speak with us today.
+We appreciate the opportunity 
+to understand your needs 
+better and to discuss how we 
+can assist you further.
+
+If you have any questions or 
+need more information, 
+please don’t hesitate to reach out. 
+We look forward to continuing our 
+conversation and helping you achieve
+your goals.
+
+Best Regards,
+The [Company] Team`,
+      client: true,
+      team: false,
+      num: 5,
+    },
+
+    {
+      title: "Notification Message To Team Members",
+      text: `Hello [Team Member Name],
+
+A new lead has been added to the CRM.
+Here are the details:-
+
+Lead Name: [Customer Name]
+Contact Number: [Customer Contact Number]
+Date Received: [Date]
+Lead Source: [Lead Source]
+
+Please follow up with the lead at your earliest 
+convenience to ensure a prompt response.
+
+Best,
+The [Company] System`,
+      client: false,
+      team: true,
+      num: 3,
+    },
+
+    {
+      title: "Wellcome Message To Customer",
+      text: `Dear [Customer Name],
+
+Welcome to [Company]! 
+We’re thrilled to have you on board. 
+Our team will be reaching out to you shortly 
+to understand your needs and help you find the 
+best solutions.
+
+If you have any immediate questions, 
+feel free to get in touch with us. 
+
+We're here to support you every step of the way!
+
+Best Regards,
+The [Company] Team`,
+      client: true,
+      team: false,
+      num: 4,
+    },
+  ].map(
+    (temp) =>
+      new templateModel({
+        uid: user._id,
+        title: temp.title,
+        text: temp.text,
+        num: temp.num,
+        client: temp.client,
+        team: temp.team,
+        cid: user.cid,
+      })
+  );
+
+  // Save all pipelines in parallel
+  await Promise.all(
+    templates.map(async (temp) => {
+      await temp.save();
+      user.myTemplates.push(temp._id);
+    })
+  );
+  await user.save();
+
+  res.redirect("/user/dashboard");
+});
 // Facebook Login Route
 app.get("/auth/facebook", (req, res) => {
   const facebookAuthUrl =
@@ -832,7 +1027,8 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     } else {
       user = await memberModel.findById(req.user.id);
     }
-
+    let connStatus = await WaModel.findOne({ cid: user.cid });
+    const Admin = await logIncollection.findOne({ cid: user.cid });
     const leads_data = Object.entries(req.body)
       .filter(([key]) => key !== "remark" && key !== "remarktime") // Exclude 'remark' and 'remarktime'
       .map(([key, value]) => ({
@@ -841,11 +1037,11 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
       }));
     // console.log(req.body);
     // console.log(leads_data);
-    let userType = 'logIncollection'
-    if (user.role === 'admin') {
-      userType = 'logIncollection'
-    }else{
-      userType = 'teamMember'
+    let userType = "logIncollection";
+    if (user.role === "admin") {
+      userType = "logIncollection";
+    } else {
+      userType = "teamMember";
     }
     let newManualLead = new leadsModel({
       app: "manual",
@@ -856,9 +1052,13 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
       userType,
     });
 
+    let userContact = user.mobile;
+    console.log(req.body, "====", userContact);
+
     const remarkDateTimeformat = new Date(req.body.remarkTime);
     const remarkDate = remarkDateTimeformat.toISOString().split("T")[0];
     const remarkTime = remarkDateTimeformat.toTimeString().split(" ")[0];
+
     let remark = new remarkModel({
       text: req.body.remark,
       time: remarkTime,
@@ -867,9 +1067,11 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
       uid: req.user.id,
       lead_id: newManualLead._id,
     });
+
     await remark.save();
     user.myleads.push(newManualLead._id);
     newManualLead.remarks.push(remark._id);
+
     let defPipe = await pipelineModel.findOne({ defaultVal: true });
     if (defPipe) {
       newManualLead.status = defPipe._id;
@@ -888,7 +1090,94 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
       }
     });
 
+    const searchStrings = [
+      "name",
+      "your name",
+      "customer name",
+      "full name",
+      "first name",
+      "आपका नाम",
+      "नाम",
+      "पूरा नाम",
+      "ग्राहक का नाम",
+      "शुभ नाम",
+    ];
+
+    let customerName = "";
+
+    newManualLead.leads_data.forEach((item) => {
+      const isMatch = searchStrings.some((str) =>
+        item.que.toLowerCase().includes(str.toLowerCase())
+      );
+      if (isMatch) {
+        customerName = item.ans;
+      }
+    });
+
+    if (customerName) {
+      console.log("Matched customerName:", customerName);
+    } else {
+      customerName = "Sir/Madam";
+      console.log("Un-Matched then customerName:", customerName);
+    }
+
     console.log(leadContactNo);
+
+    const wellcomeTemp = await templateModel.findOne({
+      cid: user.cid,
+      num: 4,
+    });
+    let wellcomeTempImagePath, wellcomeTempPdfPath;
+    if (wellcomeTemp.image !== "") {
+      // img for user
+      wellcomeTempImagePath = path.join(
+        __dirname,
+        "../template/images/uploads/whatsapp/",
+        wellcomeTemp.image
+      );
+    }
+    if (wellcomeTemp.pdf !== "") {
+      // pdf for user
+      wellcomeTempPdfPath = path.join(
+        __dirname,
+        "../template/images/uploads/whatsapp/",
+        wellcomeTemp.pdf
+      );
+    }
+
+    setTimeout(() => {
+      console.log("/manual/lead/");
+
+      let msg = wellcomeTemp.text;
+      let companyName =
+        Admin.organizationName !== null || Admin.organizationName !== undefined
+          ? Admin.organizationName
+          : "360FollowUps";
+
+      const personalizedMessage = msg
+        .replace("[customer name]", customerName)
+        .replace("[company]", companyName)
+        .replace("[company]", companyName);
+
+      console.log(
+        "wellcome message log",
+        connStatus,
+        leadContactNo,
+        wellcomeTemp.text,
+        personalizedMessage,
+        wellcomeTempImagePath,
+        wellcomeTempPdfPath
+      );
+
+      sendMessageToLead(
+        connStatus,
+        leadContactNo,
+        personalizedMessage,
+        wellcomeTempImagePath,
+        wellcomeTempPdfPath
+      ); // reminder temp for user
+    }, 4500);
+
     // leadContactNo = "9755313770";
     const remarkDateTime = new Date(`${remarkDate}T${remarkTime}`);
     const currentTime = new Date();
@@ -896,91 +1185,211 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     let timeDifference = remarkDateTime - currentTime;
     timeDifference -= 1000 * 60 * 30;
     console.log(remarkDate, remarkTime);
+    console.log(timeDifference);
 
-    const reminderTemplate = await templateModel.findOne({
-      cid: req.user.cid,
-      num: 3,
-    });
-    const afterCallTemp = await templateModel.findOne({
-      cid: req.user.cid,
+    //todo  reminder message for team member
+    const reminderTemplateForMember = await templateModel.findOne({
+      cid: user.cid,
       num: 2,
     });
-    console.log(timeDifference);
-    let connStatus = await WaModel.findOne({ cid: user.cid });
-    let reminderTempImagePath,
-      reminderTempPdfPath,
-      LeadTempImagePath,
-      LeadTempPdfPath;
-    if (timeDifference > 0) {
-      setTimeout(() => {
-        if (reminderTemplate.image !== "") {
-          // img for user
-          reminderTempImagePath = path.join(
-            __dirname,
-            "../template/images/uploads/whatsapp/",
-            reminderTemplate.image
-          );
-        }
-        if (reminderTemplate.pdf !== "") {
-          // pdf for user
-          reminderTempPdfPath = path.join(
-            __dirname,
-            "../template/images/uploads/whatsapp/",
-            reminderTemplate.pdf
-          );
-        }
-        if (afterCallTemp.image !== "") {
-          // img for lead
-          LeadTempImagePath = path.join(
-            __dirname,
-            "../template/images/uploads/whatsapp/",
-            afterCallTemp.image
-          );
-        }
-        if (afterCallTemp.pdf !== "") {
-          // pdf for lead
-          LeadTempPdfPath = path.join(
-            __dirname,
-            "../template/images/uploads/whatsapp/",
-            afterCallTemp.pdf
-          );
-        }
 
-        console.log("/manual/lead");
-        console.log(
+    console.log(
+      "reminderTemplate document----",
+      reminderTemplateForMember,
+      "------reminderTemplate document"
+    );
+
+    if (timeDifference > 0) {
+      // let reminderTempImagePath,reminderTempPdfPath;
+      setTimeout(() => {
+        // if (reminderTemplateForMember.image !== "") {
+        //   // img for user
+        //   reminderTempImagePath = path.join(
+        //     __dirname,
+        //     "../template/images/uploads/whatsapp/",
+        //     reminderTemplateForMember.image
+        //   );
+        // }
+        // if (reminderTemplateForMember.pdf !== "") {
+        //   // pdf for user
+        //   reminderTempPdfPath = path.join(
+        //     __dirname,
+        //     "../template/images/uploads/whatsapp/",
+        //     reminderTemplateForMember.pdf
+        //   );
+        // }
+        // if (thnakyouLeadTemplate.image !== "") {
+        //   // img for lead
+        //  .join(
+        //     __dirname,
+        //     "../template/images/uploads/whatsapp/",
+        //     thnakyouLeadTemplate.image
+        //   );
+        // }
+        // if (thnakyouLeadTemplate.pdf !== "") {
+        //   // pdf for lead
+        //   LeadTempPdfPath = path.join(
+        //     __dirname,
+        //     "../template/images/uploads/whatsapp/",
+        //     thnakyouLeadTemplate.pdf
+        //   );
+        // }
+
+        // console.log(reminderTempImagePath);
+        // console.log(reminderTempPdfPath);
+        // console.log(LeadTempImagePath);
+        // console.log(LeadTempPdfPath);
+
+        console.log("/remark/add/:id");
+        console.log(leadContactNo);
+
+        let msg = reminderTemplateForMember.text;
+
+        let companyName =
+          Admin.organizationName !== null ||
+          Admin.organizationName !== undefined
+            ? Admin.organizationName
+            : "360FollowUps";
+
+        const personalizedMessage = msg
+          .replace("[team member name]", user.name)
+          .replace(
+            "[customer name]",
+            customerName + " Mobile no. " + leadContactNo
+          )
+          .replace("[date]", remarkDate)
+          .replace("[time]", remarkTime)
+          .replace("[company]", companyName);
+
+        sendMessageToLead(
           connStatus,
-          leadContactNo,
-          afterCallTemp.text,
-          reminderTempImagePath,
-          reminderTempPdfPath
-        );
+          userContact,
+          personalizedMessage
+          // reminderTempImagePath,
+          // reminderTempPdfPath
+        ); // after temp msg sending to lead
+      }, timeDifference);
+    }
+
+    //todo  reminder message for customer
+    const reminderTemplateForCustomer = await templateModel.findOne({
+      cid: user.cid,
+      num: 1,
+    });
+
+    console.log(
+      "reminder for customer template document----",
+      reminderTemplateForCustomer,
+      "------reminder for customer template document"
+    );
+
+    if (timeDifference > 0) {
+      // let reminderForCustomerTempImagePath,reminderForCusromerTempPdfPath;
+      setTimeout(() => {
+        //   if (reminderTemplateForCustomer.image !== "") {
+        //     // img for user
+        //     reminderForCustomerTempImagePath = path.join(
+        //       __dirname,
+        //       "../template/images/uploads/whatsapp/",
+        //       reminderTemplateForCustomer.image
+        //     );
+        //   }
+        //   if (reminderTemplateForCustomer.pdf !== "") {
+        //     // pdf for user
+        //     reminderForCusromerTempPdfPath = path.join(
+        //       __dirname,
+        //       "../template/images/uploads/whatsapp/",
+        //       reminderTemplateForCustomer.pdf
+        //     );
+        //   }
+        // if (thnakyouLeadTemplate.image !== "") {
+        //   // img for lead
+        //   LeadTempImagePath = path.join(
+        //     __dirname,
+        //     "../template/images/uploads/whatsapp/",
+        //     thnakyouLeadTemplate.image
+        //   );
+        // }
+        // if (thnakyouLeadTemplate.pdf !== "") {
+        //   // pdf for lead
+        //   LeadTempPdfPath = path.join(
+        //     __dirname,
+        //     "../template/images/uploads/whatsapp/",
+        //     thnakyouLeadTemplate.pdf
+        //   );
+        // }
+
+        // console.log(reminderForCustomerTempImagePath);
+        // console.log(reminderForCusromerTempPdfPath);
+        // console.log(LeadTempImagePath);
+        // console.log(LeadTempPdfPath);
+
+        console.log("/remark/add/:id");
+        console.log(leadContactNo);
+
+        let msg = reminderTemplateForCustomer.text;
+        let companyName =
+          Admin.organizationName !== null ||
+          Admin.organizationName !== undefined
+            ? Admin.organizationName
+            : "360FollowUps";
+
+        const personalizedMessage = msg
+          .replace("[customer name]", customerName)
+          .replace("[company]", companyName)
+          .replace("[date]", remarkDate)
+          .replace("[time]", remarkTime);
 
         sendMessageToLead(
           connStatus,
           leadContactNo,
-          afterCallTemp.text,
-          reminderTempImagePath,
-          reminderTempPdfPath
+          personalizedMessage
+          // reminderForCustomerTempImagePath,
+          // reminderForCusromerTempPdfPath
         ); // after temp msg sending to lead
       }, timeDifference);
     }
-    // let userMobile = "9755313770";
-    console.log("/manual/lead");
+
+    // todo thankyou message to lead or customer
+    const thnakyouLeadTemplate = await templateModel.findOne({
+      cid: user.cid,
+      num: 5,
+    });
+
     console.log(
-      connStatus,
-      user.mobile,
-      reminderTemplate.text,
-      LeadTempImagePath,
-      LeadTempPdfPath
+      "after call template document----",
+      thnakyouLeadTemplate,
+      "------after call template document"
     );
 
     setTimeout(() => {
+      console.log("/remark/add/:id");
+
+      let msg = thnakyouLeadTemplate.text;
+      let companyName =
+        Admin.organizationName !== null || Admin.organizationName !== undefined
+          ? Admin.organizationName
+          : "360FollowUps";
+      const personalizedMessage = msg
+        .replace("[customer name]", customerName)
+        .replace("[company]", companyName);
+
+      console.log(
+        "thankyu message log",
+        connStatus,
+        leadContactNo,
+        thnakyouLeadTemplate.text,
+        personalizedMessage
+        // LeadTempImagePath,
+        // LeadTempPdfPath
+      );
+
       sendMessageToLead(
         connStatus,
-        user.mobile,
-        reminderTemplate.text,
-        LeadTempImagePath,
-        LeadTempPdfPath
+        leadContactNo,
+        personalizedMessage
+        // LeadTempImagePath,
+        // LeadTempPdfPath
       ); // reminder temp for user
     }, 5000);
 
@@ -1010,8 +1419,10 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
 
   if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id);
-  } else user = await memberModel.findById(req.user.id);
+  } else user = await memberModel.findById(user._id);
+
   let connStatus = await WaModel.findOne({ cid: user.cid });
+  let Admin = await logIncollection.findOne({ cid: user.cid });
 
   let userContact = user.mobile;
   console.log(req.body, "====", userContact);
@@ -1042,6 +1453,37 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
     }
   });
 
+  const searchStrings = [
+    "name",
+    "your name",
+    "customer name",
+    "full name",
+    "first name",
+    "आपका नाम",
+    "नाम",
+    "पूरा नाम",
+    "ग्राहक का नाम",
+    "शुभ नाम",
+  ];
+
+  let customerName = "";
+
+  lead.leads_data.forEach((item) => {
+    const isMatch = searchStrings.some((str) =>
+      item.que.toLowerCase().includes(str.toLowerCase())
+    );
+    if (isMatch) {
+      customerName = item.ans;
+    }
+  });
+
+  if (customerName) {
+    console.log("Matched customerName:", customerName);
+  } else {
+    customerName = "Sir/Madam";
+    console.log("Un-Matched then customerName:", customerName);
+  }
+
   console.log(leadContactNo);
   // leadContactNo = "9755313770";
   const remarkDateTime = new Date(`${date}T${time}:00`);
@@ -1049,89 +1491,206 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
 
   let timeDifference = remarkDateTime - currentTime;
   timeDifference -= 1000 * 60 * 30;
-  const reminderTemplate = await templateModel.findOne({
-    cid: req.user.cid,
-    num: 3,
-  });
-  const afterCallTemp = await templateModel.findOne({
+
+  const reminderTemplateForMember = await templateModel.findOne({
     cid: req.user.cid,
     num: 2,
   });
+
+  console.log(
+    "reminderTemplate document----",
+    reminderTemplateForMember,
+    "------reminderTemplate document"
+  );
+
   console.log(timeDifference);
 
-  let reminderTempImagePath,
-    reminderTempPdfPath,
-    LeadTempImagePath,
-    LeadTempPdfPath;
-
+  //todo  reminder message for team member
   if (timeDifference > 0) {
+    // let reminderTempImagePath,reminderTempPdfPath;
     setTimeout(() => {
-      if (reminderTemplate.image !== "") {
-        // img for user
-        reminderTempImagePath = path.join(
-          __dirname,
-          "../template/images/uploads/whatsapp/",
-          reminderTemplate.image
-        );
-      }
-      if (reminderTemplate.pdf !== "") {
-        // pdf for user
-        reminderTempPdfPath = path.join(
-          __dirname,
-          "../template/images/uploads/whatsapp/",
-          reminderTemplate.pdf
-        );
-      }
-      if (afterCallTemp.image !== "") {
-        // img for lead
-        LeadTempImagePath = path.join(
-          __dirname,
-          "../template/images/uploads/whatsapp/",
-          afterCallTemp.image
-        );
-      }
-      if (afterCallTemp.pdf !== "") {
-        // pdf for lead
-        LeadTempPdfPath = path.join(
-          __dirname,
-          "../template/images/uploads/whatsapp/",
-          afterCallTemp.pdf
-        );
-      }
-      console.log("/remark/add/:id");
+      // if (reminderTemplateForMember.image !== "") {
+      //   // img for user
+      //   reminderTempImagePath = path.join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     reminderTemplateForMember.image
+      //   );
+      // }
+      // if (reminderTemplateForMember.pdf !== "") {
+      //   // pdf for user
+      //   reminderTempPdfPath = path.join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     reminderTemplateForMember.pdf
+      //   );
+      // }
+      // if (thnakyouLeadTemplate.image !== "") {
+      //   // img for lead
+      //  .join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     thnakyouLeadTemplate.image
+      //   );
+      // }
+      // if (thnakyouLeadTemplate.pdf !== "") {
+      //   // pdf for lead
+      //   LeadTempPdfPath = path.join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     thnakyouLeadTemplate.pdf
+      //   );
+      // }
 
-      console.log(reminderTempImagePath);
-      console.log(reminderTempPdfPath);
-      console.log(LeadTempImagePath);
-      console.log(LeadTempPdfPath);
+      // console.log(reminderTempImagePath);
+      // console.log(reminderTempPdfPath);
+      // console.log(LeadTempImagePath);
+      // console.log(LeadTempPdfPath);
+
+      console.log("/remark/add/:id");
       console.log(leadContactNo);
+
+      let msg = reminderTemplateForMember.text;
+      let companyName =
+        Admin.organizationName !== null || Admin.organizationName !== undefined
+          ? Admin.organizationName
+          : "360FollowUps";
+      const personalizedMessage = msg
+        .replace("[team member name]", user.name)
+        .replace(
+          "[customer name]",
+          customerName + " Mobile no. " + leadContactNo
+        )
+        .replace("[date]", date)
+        .replace("[time]", time)
+        .replace("[company]", companyName);
+
+      sendMessageToLead(
+        connStatus,
+        userContact,
+        personalizedMessage
+        // reminderTempImagePath,
+        // reminderTempPdfPath
+      ); // after temp msg sending to lead
+    }, timeDifference);
+  }
+
+  //todo  reminder message for customer
+  const reminderTemplateForCustomer = await templateModel.findOne({
+    cid: req.user.cid,
+    num: 1,
+  });
+  console.log(
+    "reminder for customer template document----",
+    reminderTemplateForCustomer,
+    "------reminder for customer template document"
+  );
+  if (timeDifference > 0) {
+    // let reminderForCustomerTempImagePath,reminderForCusromerTempPdfPath;
+    setTimeout(() => {
+      //   if (reminderTemplateForCustomer.image !== "") {
+      //     // img for user
+      //     reminderForCustomerTempImagePath = path.join(
+      //       __dirname,
+      //       "../template/images/uploads/whatsapp/",
+      //       reminderTemplateForCustomer.image
+      //     );
+      //   }
+      //   if (reminderTemplateForCustomer.pdf !== "") {
+      //     // pdf for user
+      //     reminderForCusromerTempPdfPath = path.join(
+      //       __dirname,
+      //       "../template/images/uploads/whatsapp/",
+      //       reminderTemplateForCustomer.pdf
+      //     );
+      //   }
+      // if (thnakyouLeadTemplate.image !== "") {
+      //   // img for lead
+      //   LeadTempImagePath = path.join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     thnakyouLeadTemplate.image
+      //   );
+      // }
+      // if (thnakyouLeadTemplate.pdf !== "") {
+      //   // pdf for lead
+      //   LeadTempPdfPath = path.join(
+      //     __dirname,
+      //     "../template/images/uploads/whatsapp/",
+      //     thnakyouLeadTemplate.pdf
+      //   );
+      // }
+
+      // console.log(reminderForCustomerTempImagePath);
+      // console.log(reminderForCusromerTempPdfPath);
+      // console.log(LeadTempImagePath);
+      // console.log(LeadTempPdfPath);
+
+      console.log("/remark/add/:id");
+      console.log(leadContactNo);
+
+      let msg = reminderTemplateForCustomer.text;
+      let companyName =
+        Admin.organizationName !== null || Admin.organizationName !== undefined
+          ? Admin.organizationName
+          : "360FollowUps";
+      const personalizedMessage = msg
+        .replace("[customer name]", customerName)
+        .replace("[company]", companyName)
+        .replace("[date]", date)
+        .replace("[time]", time)
+        .replace("[company]", companyName);
 
       sendMessageToLead(
         connStatus,
         leadContactNo,
-        afterCallTemp.text,
-        reminderTempImagePath,
-        reminderTempPdfPath
+        personalizedMessage
+        // reminderForCustomerTempImagePath,
+        // reminderForCusromerTempPdfPath
       ); // after temp msg sending to lead
     }, timeDifference);
   }
+
+  // todo thankyou message to lead or customer
+  const thnakyouLeadTemplate = await templateModel.findOne({
+    cid: req.user.cid,
+    num: 5,
+  });
+
+  console.log(
+    "after call template document----",
+    thnakyouLeadTemplate,
+    "------after call template document"
+  );
+
   setTimeout(() => {
     console.log("/remark/add/:id");
 
+    let msg = thnakyouLeadTemplate.text;
+    let companyName =
+      Admin.organizationName !== null || Admin.organizationName !== undefined
+        ? Admin.organizationName
+        : "360FollowUps";
+    const personalizedMessage = msg
+      .replace("[customer name]", customerName)
+      .replace("[company]", companyName);
+
     console.log(
+      "thankyu message log",
       connStatus,
-      userContact,
-      reminderTemplate.text,
-      LeadTempImagePath,
-      LeadTempPdfPath
+      leadContactNo,
+      thnakyouLeadTemplate.text,
+      personalizedMessage
+      // LeadTempImagePath,
+      // LeadTempPdfPath
     );
 
     sendMessageToLead(
       connStatus,
-      userContact,
-      reminderTemplate.text,
-      LeadTempImagePath,
-      LeadTempPdfPath
+      leadContactNo,
+      personalizedMessage
+      // LeadTempImagePath,
+      // LeadTempPdfPath
     ); // reminder temp for user
   }, 5000);
 
@@ -1249,11 +1808,43 @@ async function findNewLead(accessToken, user) {
       console.log(leadContactNo);
       // leadContactNo = "9755313770";
 
-      const wellcomeTemp = await templateModel.findOne({
-        cid: admin.cid,
-        num: 1,
+      const searchStrings = [
+        "name",
+        "your name",
+        "customer name",
+        "full name",
+        "first name",
+        "आपका नाम",
+        "नाम",
+        "पूरा नाम",
+        "ग्राहक का नाम",
+        "शुभ नाम",
+      ];
+
+      let customerName = "";
+
+      newLead.leads_data.forEach((item) => {
+        const isMatch = searchStrings.some((str) =>
+          item.que.toLowerCase().includes(str.toLowerCase())
+        );
+        if (isMatch) {
+          customerName = item.ans;
+        }
       });
 
+      if (customerName) {
+        console.log("Matched customerName:", customerName);
+      } else {
+        customerName = "Sir/Madam";
+        console.log("Un-Matched then customerName:", customerName);
+      }
+
+      const wellcomeTemp = await templateModel.findOne({
+        cid: admin.cid,
+        num: 4,
+      });
+
+      // todo COUSTOMER Whatsapp Message
       setTimeout(() => {
         let imagePath, pdfPath;
         if (wellcomeTemp.image !== "") {
@@ -1271,10 +1862,24 @@ async function findNewLead(accessToken, user) {
           );
         }
         console.log("find new lead function auto call");
+
+        let msg = wellcomeTemp.text;
+
+        let companyName =
+          admin.organizationName !== null ||
+          admin.organizationName !== undefined
+            ? admin.organizationName
+            : "360FollowUps";
+
+        const personalizedMessage = msg
+          .replace("[customer name]", customerName)
+          .replace("[company]", companyName)
+          .replace("[company]", companyName);
+
         console.log(
           connStatus,
           leadContactNo,
-          wellcomeTemp.text,
+          personalizedMessage,
           imagePath,
           pdfPath
         );
@@ -1282,20 +1887,60 @@ async function findNewLead(accessToken, user) {
         sendMessageToLead(
           connStatus,
           leadContactNo,
-          wellcomeTemp.text,
+          personalizedMessage,
           imagePath,
           pdfPath
         );
       }, 5000);
 
-      setTimeout(() => {
-        let userContactNo = admin.countryCode + admin.mobile;
-        let userWAmsg = "hii you have a new lead 🎉";
-        console.log("find new lead function auto call");
-        console.log(connStatus, userContactNo, userWAmsg);
+      // todo COUSTOMER Whatsapp Message
+      const notificationTemp = await templateModel.findOne({
+        cid: admin.cid,
+        num: 3,
+      });
+      setTimeout(async () => {
+        let msg = notificationTemp.text;
 
-        sendMessageToLead(connStatus, userContactNo, userWAmsg);
-      }, 2000);
+        let companyName =
+          admin.organizationName !== null ||
+          admin.organizationName !== undefined
+            ? admin.organizationName
+            : "360FollowUps";
+        const today = new Date();
+
+        const day = String(today.getDate()).padStart(2, "0"); // Din (2 digits)
+        const month = String(today.getMonth() + 1).padStart(2, "0"); // Month (0-based index, isliye +1)
+        const year = today.getFullYear(); // Year
+
+        const formattedDate = `${day}-${month}-${year}`;
+
+        // todo new lead found msg to Admin
+        const personalizedMessage = msg
+          .replace("[team member name]", admin.name)
+          .replace("[customer name]", customerName)
+          .replace("[customer contact number]", customerName)
+          .replace("[date]", formattedDate)
+          .replace("[lead source]", "facebook")
+          .replace("[company]", companyName);
+
+        sendMessageToLead(connStatus, admin.mobile, personalizedMessage);
+
+        // todo new lead found msg to all Members
+        let users = await memberModel.find({cid: admin.cid})
+        for (let i = 0; i < users.length; i++) {
+          setTimeout(() => {
+            const personalizedMessage = msg
+              .replace("[team member name]", users[i].name)
+              .replace("[customer name]", customerName)
+              .replace("[customer contact number]", customerName)
+              .replace("[date]", formattedDate)
+              .replace("[lead source]", "facebook")
+              .replace("[company]", companyName);
+
+            sendMessageToLead(connStatus, users[i].mobile, personalizedMessage);
+          }, 2000);
+        }
+      }, 2500);
 
       allNewLeads.push(newLead);
 
