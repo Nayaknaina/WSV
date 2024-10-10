@@ -46,11 +46,12 @@
 <body>
 
 
+
   <div class="container-fluid">
     <div class="row">
       {{> sidebar}}
       <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0">
-         {{> NameHead}}
+        {{> NameHead}}
         <div class="container-fluid bg-white shadow-sm m-b-40">
           <div class="container">
             <div class="row page-titles p-t-35 p-b-15">
@@ -60,7 +61,7 @@
               </div>
             </div>
 
-            <form id="profile-form" action="/update/profile" method="post"  class="row g-3">
+            <form id="profile-form" action="/update/profile" method="post" class="row g-3">
               <div class="col-md-6 mb-3">
                 <label for="name" class="form-label">Name</label>
                 <input value="{{user.name}}" disabled name="name" type="text" class="form-control input" id="name"
@@ -80,7 +81,8 @@
                     {{#if user.countryCode}}{{user.countryCode}}{{else}}Select Country Code{{/if}}
                   </option>
 
-                  {{!-- <option data-countryCode="US" value="{{user.countryCode}}" selected>{{user.countryCode}}</option> --}}
+                  {{!-- <option data-countryCode="US" value="{{user.countryCode}}" selected>{{user.countryCode}}
+                  </option> --}}
                   <option data-countryCode="US" value="1">USA (+1)</option>
                   <option data-countryCode="GB" value="44">UK (+44)</option>
                   <option data-countryCode="DZ" value="213">Algeria (+213)</option>
@@ -300,70 +302,41 @@
 
               <div class="col-6">
                 <label for="mobile" class="form-label">Mobile</label>
-                <input disabled placeholder="Mobile" maxlength="10" value="{{user.mobile}}" name="mobile" id="mobile" type="tel"
+                <input placeholder="Mobile" maxlength="10" value="{{user.mobile}}" name="mobile" id="mobile" type="tel"
                   class="form-control input" required>
-
               </div>
+
               <div class="col-6">
                 <label for="inputAddress" class="form-label">Address</label>
-                <input disabled value="{{user.address}}" name="address" type="text" class="form-control input"
-                  id="inputAddress" placeholder="Address">
+                <input value="{{user.address}}" name="address" type="text" class="form-control input" id="inputAddress"
+                  placeholder="Address">
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="inputCity" class="form-label">City</label>
-                <input disabled value="{{user.city}}" name="city" type="text" class="form-control input" id="inputCity"
+                <input value="{{user.city}}" name="city" type="text" class="form-control input" id="inputCity"
                   placeholder="City">
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="inputState" class="form-label">State</label>
-                <input disabled value="{{user.state}}" name="state" type="text" class="form-control input"
-                  id="inputState" placeholder="State">
+                <input value="{{user.state}}" name="state" type="text" class="form-control input" id="inputState"
+                  placeholder="State">
               </div>
-              {{!-- <div class="col-md-6 mb-3">
-                <label for="inputCountry" class="form-label">Country</label>
-                <input disabled value="{{user.country}}" name="country" type="text" class="form-control input"
-                  id="inputCountry" placeholder="Country">
-              </div> --}}
-
-
-             
-            </form>
-          </div>
-          <div class="container">
-            <div class="row page-titles p-b-15">
-              <div class="col-md-12 col-12 align-self-center">
-                <h1 class="text-bodycolor">Professional Details<b> </b></h1>
-                <p class="text-secondary font-14">View and manage all your account associated information.</p>
-              </div>
-            </div>
-
-            <form id="profile-form" action="/update/profile" method="post" class="row g-3">
-
-
-              {{!-- <div class="col-md-6 mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input disabled value="{{user.email}}" name="email" type="email" class="form-control input" id="email"
-                  placeholder="Email">
-              </div> --}}
-
-
 
               <div class="col-6 mb-3">
                 <label for="organisation" class="form-label">Organization Name</label>
-                <input disabled placeholder="organisation" maxlength="10" value="{{user.organisation}}"
-                  name="organisation" id="organisation" type="tel" class="form-control input" required>
-
+                <input placeholder="organisation" maxlength="10" value="{{user.organisation}}" name="organisation"
+                  id="organisation" type="text" class="form-control input" required>
               </div>
+
               <div class="col-6 mb-3">
                 <label for="Sector" class="form-label">Sector</label>
-                <select disabled required id="sector" name="sector" class="form-control input">
+                <select id="sector" name="sector" class="form-control input">
                   <option value="{{#if user.sector}}{{user.sector}}{{else}}''{{/if}}" selected>
-                    {{#if user.sector}}{{user.sector}}{{else}}select Sector{{/if}}
+                    {{#if user.sector}}{{user.sector}}{{else}}Select Sector{{/if}}
                   </option>
 
-                  
                   <option value="Technology">Technology</option>
                   <option value="Finance">Finance</option>
                   <option value="Healthcare">Healthcare</option>
@@ -377,20 +350,13 @@
                 </select>
               </div>
 
-
-              {{!-- <div class="col-md-6 mb-3">
-                <label for="inputCountry" class="form-label">Country</label>
-                <input disabled value="{{user.country}}" name="country" type="text" class="form-control input"
-                  id="inputCountry" placeholder="Country">
-              </div> --}}
-
-
-             <div class="col-12">
-                <button type="button" id="edit" class="btn btn-primary" onclick="updateProfileData()">Edit</button>
+              <div class="col-12">
+                <button type=" button" id="edit" class="btn btn-primary" onclick="updateProfileData()">Edit</button>
                 <button type="submit" id="save" disabled class="btn btn-secondary">Save</button>
               </div>
             </form>
           </div>
+
         </div>
         {{!-- <div class="container min-vh-100">
 
@@ -415,7 +381,7 @@
       </div>
 
 
-    
+
 
     </div>
   </div>

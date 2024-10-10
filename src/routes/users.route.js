@@ -387,6 +387,7 @@ router.post("/pipeline/update", isAdminLoggedIn, async (req, res) => {
 //   res.render("profile", { user });
 // });
 
+
 // router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
 //   let user;
 //   const { name, mobile, countryCode, address, city, state } = req.body;
@@ -558,6 +559,7 @@ router.post("/login", async (req, res) => {
     res.status(500).send("Error logging in");
   }
 });
+
 
 router.get("/logout", (req, res) => {
   res.clearCookie("360Followers");

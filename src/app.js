@@ -146,6 +146,7 @@ hbs.registerHelper("json", function (context) {
   return JSON.stringify(context);
 });
 
+
 hbs.registerHelper("containsPhoneNumber", function (text) {
   // Regular expression for matching phone numbers
   const phoneNumberPattern = /(\+?\d{1,4}[ -]?)?(\(?\d{2,4}\)?[ -]?)?\d{6,12}/;
@@ -266,6 +267,7 @@ app.get("/qr", isAdminLoggedIn, async (req, res) => {
   });
 });
 
+//logout whatsapp
 app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
   try {
     // Check if the client is ready before attempting logout
@@ -273,8 +275,9 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
       try {
         await client.logout();
         isConnected = false;
+        let userWA = await WaModel.findOne({ cid: req.user.cid });
         if (userWA) {
-          let userWA = await WaModel.findOne({ cid: req.user.cid });
+          
           userWA.isConnected = false;
           userWA.whatsappClientReady = false;
           req.session.errorMSG = `Dis-Connected WhatsApp Number: ${connectedPhoneNumber}`;
@@ -898,6 +901,7 @@ app.get("/auth/facebook", (req, res) => {
       response_type: "code",
     });
   console.log("redirected from /auth/fb");
+  
 
   res.redirect(facebookAuthUrl);
 });
@@ -905,11 +909,10 @@ app.get("/auth/facebook", (req, res) => {
 // Facebook Callback Route
 app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
   const { code } = req.query;
-  console.log("comming to /auth/fb/cb");
+  console.log("Entering Facebook callback route");
 
   if (!code) {
-    console.log("no code");
-
+    console.log("No authorization code provided.");
     return res.status(400).send("Invalid authorization code");
   }
 
@@ -926,18 +929,24 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       }
     );
 
-    console.log("now we have an token");
+    console.log("Access token received");
 
     const accessToken = tokenResponse.data.access_token;
-    console.log(accessToken);
+    console.log("Access token:", accessToken);
+
     let admin = await logIncollection.findById(req.user.id);
-    // console.log(admin);
+    if (!admin) {
+      console.log("Admin not found, redirecting to login.");
+      return res.redirect("/login");
+    }
+
+    console.log("Admin found:", admin);
 
     admin.facebookToken = accessToken;
     await admin.save();
+    console.log("Access token saved to admin account");
 
-    // console.log(req.session.accessToken);
-
+    // Fetch pages
     const pagesResponse = await axios.get(
       `https://graph.facebook.com/v20.0/me/accounts`,
       {
@@ -946,11 +955,13 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
         },
       }
     );
+    console.log("Pages fetched");
 
     const pages = pagesResponse.data.data;
     let allLeads = [];
 
     for (const page of pages) {
+      console.log(`Fetching leadgen forms for page: ${page.id}`);
       const leadFormsResponse = await axios.get(
         `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
         {
@@ -961,6 +972,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       const leadForms = leadFormsResponse.data.data;
 
       for (const form of leadForms) {
+        console.log(`Fetching leads for form: ${form.id}`);
         const leadsResponse = await axios.get(
           `https://graph.facebook.com/v20.0/${form.id}/leads`,
           {
@@ -975,15 +987,10 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       }
     }
 
-    if (!admin) {
-      return res.redirect("/login");
-    }
-
-    console.log(allLeads);
+    console.log("Leads fetched:", allLeads);
 
     allLeads.forEach(async (lead) => {
       const perLead = await leadsModel.findOne({ lead_id: lead.id });
-
       if (!perLead) {
         let leads_datas = [];
 
@@ -999,19 +1006,19 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
           app: "facebook",
         });
         await newLead.save();
-        // console.log(leads_datas);
       }
     });
 
     if (chalteRahoId) clearInterval(chalteRahoId);
     chalteRaho(accessToken, req);
-    req.session.successMSG = "Connected to facebook account.";
-    res.redirect("/get/data");
+    req.session.successMSG = "Connected to Facebook account.";
+    res.redirect("/leads");
   } catch (error) {
-    console.error("Error fetching access token:", error);
+    console.error("Error during Facebook callback:", error.response ? error.response.data : error.message);
     res.status(500).send("Error logging in with Facebook.");
   }
 });
+
 
 app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
   try {
@@ -1390,6 +1397,19 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     res.redirect("/leads");
   } catch (err) {
     console.log("Error in /user/manual/lead :- ", err);
+  }
+});
+
+//logout facebook
+app.get("/logoutfacebook", isAdminLoggedIn, async (req, res) => {
+  try {
+   
+    await logIncollection.findByIdAndUpdate(req.user.id, { facebookToken: null });
+    req.session.successMSG = "Facebook account disconnected.";
+    res.redirect("/user/dashboard");
+  } catch (err) {
+    console.error("Error clearing Facebook token:", err);
+    res.status(500).send("Error clearing Facebook token.");
   }
 });
 
@@ -2003,11 +2023,7 @@ function initializeWhatsAppClient() {
 
   // Recreate the client to ensure fresh state
   client = new Client({
-    puppeteer: {
-      headless: true,
-      ignoreHTTPSErrors: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    },
+    puppeteer: { headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--no-first-run', '--no-zygote', '--single-process',  '--disable-gpu', ], },
     authStrategy: new LocalAuth(),
   });
 
