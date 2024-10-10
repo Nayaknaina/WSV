@@ -158,7 +158,9 @@
 <body class>
 
     {{!-- {{> nav}} --}}
-
+<form hidden id="csv-form" enctype="multipart/form-data">
+    <input type="file" onchange="uploadCsvFile()" name="file" id="csv-file" accept=".csv" required>
+</form>
 
     <div class="container-fluid">
         <div class="row  justify-content-center">
@@ -173,6 +175,8 @@
                             Lead</button> --}}
                         <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="openFormBtn">Add New
                             Lead</button>
+
+                        <label for="csv-file" class="btn my-2 mx-2 btn-outline-primary btn-sm"  id="csv-file-upload-btn">Import from csv</label>
                         <div class="custom-modal" id="customModal">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -1157,6 +1161,38 @@
         });
     </script>
 
+    <script>
+        async function uploadCsvFile(){
+             const fileInput = document.getElementById('csv-file');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a CSV file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await axios.post('/user/upload-csv', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' // Required for file upload
+                    }
+                });
+                console.log(response)
+                if(response.status === 200){
+                    toastr.success(response.data.msg)
+                    location.reload()
+                }
+                return
+            } catch (error) {
+                console.error('Error uploading file:', error); // Error handling
+                 // Error message
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </body>
 
 </html>

@@ -267,6 +267,19 @@ app.get("/qr", isAdminLoggedIn, async (req, res) => {
   });
 });
 
+app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
+  // console.log("qrCodeData genrated in /qr", req.user.name);
+  const user = req.user;
+
+  if (qrCodeData) {
+    console.log("Qr genrated");
+  }
+  res.json( {
+    qrCodeData,
+    isConnected,
+  });
+});
+
 //logout whatsapp
 app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
   try {

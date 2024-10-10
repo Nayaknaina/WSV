@@ -24,6 +24,8 @@ const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const { uploadProfile } = require("../service/multer.js");
+const  uploadCSV  = require("../service/csvMulter.js");
+const { csvFileDataChangIntoLeadHandler } = require("../controllers/user.controller.js");
 
 router.get("/team", isAdminLoggedIn, async (req, res) => {
   let user;
@@ -630,5 +632,7 @@ router.get("/member/un-blocked/:id", isAdminLoggedIn, async (req, res) => {
     res.status(500).send("Internal error");
   }
 });
+
+router.post('/upload-csv', isAdminLoggedIn, uploadCSV.single('file'), csvFileDataChangIntoLeadHandler);
 
 module.exports = router;

@@ -320,111 +320,11 @@
         </div>
     </div>
 
-    {{!--
+<script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-        let isTickMarkDisplayed = false;
-
-        // Function to update the display based on connection status
-        function updateDisplayOnConnection(isConnected) {
             const qrCode = document.getElementById('qrImage');
-            const existingTickMark = document.getElementById('tickMark');
-
-            if (isConnected && !isTickMarkDisplayed) {
-                qrCode.style.display = 'none';
-
-                if (!existingTickMark) {
-                    const tickMark = document.createElement('div');
-                    tickMark.id = 'tickMark';
-                    tickMark.innerHTML = '<i class="fa-solid fa-check"></i>';
-                    tickMark.style.fontSize = '100px';
-                    tickMark.style.color = 'green';
-                    tickMark.style.display = 'flex';
-                    tickMark.style.alignItems = 'center';
-                    tickMark.style.justifyContent = 'center';
-                    tickMark.style.backgroundColor = '#dcf7ffb3';
-                    tickMark.style.width = '180px';
-                    tickMark.style.height = '180px';
-                    tickMark.style.borderRadius = '8px';
-
-                    qrCode.parentElement.appendChild(tickMark);
-                }
-
-                isTickMarkDisplayed = true;
-            } else if (!isConnected) {
-                qrCode.style.display = 'block';
-                if (existingTickMark) {
-                    existingTickMark.remove();
-                }
-                isTickMarkDisplayed = false;
-            }
-        }
-
-        // Function to check the connection status of WhatsApp
-        function checkConnectionStatus() {
-            fetch('/connection-status')
-                .then(response => response.json())
-                .then(data => {
-                    const statusMessage = document.querySelector('.status-message');
-                    const logoutContainer = document.getElementById('logoutContainer');
-
-                    if (data.isConnected) {
-                        statusMessage.textContent = 'Connected';
-                        updateDisplayOnConnection(true);
-
-                        // Stop page refresh when connected
-                        clearInterval(pageRefreshInterval);
-
-                        // Add a logout button if it doesn't already exist
-                        if (!logoutContainer.querySelector('button')) {
-                            const logoutButton = document.createElement('button');
-                            logoutButton.textContent = 'Logout';
-                            logoutButton.onclick = () => {
-
-                                // Add functionality for logout here
-                                window.location.href = '/logoutWA'; // Adjust as per your routing
-                            };
-                            logoutContainer.appendChild(logoutButton);
-                        }
-                    } else {
-                        statusMessage.textContent = 'Waiting for your phone...';
-                        updateDisplayOnConnection(false);
-
-                        // Remove logout button when disconnected
-                        if (logoutContainer.querySelector('button')) {
-                            logoutContainer.innerHTML = '';
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking connection status:', error);
-                });
-        }
-
-        // Set interval to check connection status every 5 seconds
-        setInterval(checkConnectionStatus, 5000);
-
-        // Refresh the page if disconnected to ensure QR code re-fetches
-        const pageRefreshInterval = setInterval(() => {
-            fetch('/connection-status')
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.isConnected) {
-                        location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error during page refresh:', error);
-                });
-        }, 10000);
-
-
-    </script> --}}
-
-
-    <script>
         function updateDisplayOnConnection(isConnected) {
                     console.log("isConn true in update displaye")
-            const qrCode = document.getElementById('qrImage');
             const existingTickMark = document.getElementById('tickMark');
 
             if (isConnected) {
@@ -477,27 +377,55 @@
         }
 
 
-        const pageRefreshInterval = setInterval(() => {
-            console.log("start")
-            fetch('/connection-status')
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.isConnected) {
+        // const pageRefreshInterval = setInterval(() => {
+        //     console.log("start")
+        //     fetch('/connection-status')
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (!data.isConnected) {
+// 
+        //             console.log("isConn true")
+        //             location.reload();
+        //               // axios.get('/qr').then(res => console.log(res.data))
+// 
+        //             }
+        //             else{
+        //             console.log("isConn false")
+        //                 updateDisplayOnConnection(true)
+        //                 clearInterval(pageRefreshInterval)
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error during page refresh:', error);
+        //         });
+        // }, 5000);
 
-                    console.log("isConn true")
-                        location.reload();
-                    }
-                    else{
-                    console.log("isConn false")
-                        updateDisplayOnConnection(true)
-                        clearInterval(pageRefreshInterval)
-                    }
-                })
-                .catch(error => {
-                    console.error('Error during page refresh:', error);
-                });
-        }, 5000);
 
+const pageRefreshInterval = setInterval(async () => {
+    console.log("start");
+    try {
+        const response = await axios.get('/connection-status');
+        const data = response.data;
+
+        if (!data.isConnected) {
+            console.log("isConn true");
+           // location.reload(); 
+           const qrResponse = await axios.get('/qr/again');
+            qrCode.setAttribute('src', qrResponse.data.qrCodeData)
+
+            if(qrResponse.data.isConnected){
+                updateDisplayOnConnection(true); 
+                clearInterval(pageRefreshInterval); 
+            }
+        } else {
+            console.log("isConn false");
+            updateDisplayOnConnection(true); 
+            clearInterval(pageRefreshInterval); 
+        }
+    } catch (error) {
+        console.error('Error during page refresh:', error);
+    }
+}, 5000);
 
     </script>
 
