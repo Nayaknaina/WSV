@@ -64,6 +64,7 @@ router.post("/api/verify", async (req, res) => {
     const isSent = await sendMail(email, mailMsg, subject);
     req.session.otp = otpCode;
     console.log(isSent);
+    console.log(otpCode);
     res.json({ msg: "mail sent successfully !" });
   } catch (err) {
     console.log("error in /api/verify :- ", err);
@@ -77,9 +78,9 @@ router.post('/api/otp/verify',(req,res)=>{
     let {reqOtp} = req.body;
     console.log(otp, reqOtp);
     if (reqOtp === otp) {
-      res.json({msg: 'email verification successfully'})
+      res.status(200).json({msg: 'email verification successfully'})
     }else{
-      res.json({msg:'otp verification failed'})
+      res.status(403).json({msg:'otp verification failed'})
     }
   } catch (err) {
     console.log("Error in /api/otp/verify", err);
