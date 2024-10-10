@@ -24,6 +24,8 @@ const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const { uploadProfile } = require("../service/multer.js");
+const  uploadCSV  = require("../service/csvMulter.js");
+const { csvFileDataChangIntoLeadHandler } = require("../controllers/user.controller.js");
 
 router.get("/team", isAdminLoggedIn, async (req, res) => {
   let user;
@@ -139,6 +141,8 @@ router.post(
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
+    console.log(req.body);
+
     const user = await logIncollection.findOne({ email });
 
     if (user)
@@ -181,7 +185,7 @@ router.post("/signup", async (req, res) => {
       })
     );
 
-      const templates = [
+    const templates = [
       {
         title: "Reminder Message To Customer",
         text: `Dear [Customer Name],
@@ -290,7 +294,8 @@ The [360FollowUps] Team`,
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
-    res.redirect("/user/dashboard");
+    res.status(200).json({ msg: "user signup success !" });
+    // res.redirect("/user/dashboard");
   } catch (err) {
     res.status(500).send("Error signing up");
   }
@@ -423,7 +428,6 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       options: { sort: { statusTime: -1 } },
     });
 
- 
     const pipes = await pipelineModel
       .find({ cid: user.cid })
       .sort({ defaultVal: -1 })
@@ -558,7 +562,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
 router.get("/logout", (req, res) => {
   res.clearCookie("360Followers");
   res.redirect("/");
@@ -631,5 +634,7 @@ router.get("/member/un-blocked/:id", isAdminLoggedIn, async (req, res) => {
     res.status(500).send("Internal error");
   }
 });
+
+router.post('/upload-csv', isAdminLoggedIn, uploadCSV.single('file'), csvFileDataChangIntoLeadHandler);
 
 module.exports = router;
