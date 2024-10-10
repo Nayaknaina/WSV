@@ -897,7 +897,7 @@ app.get("/auth/facebook", (req, res) => {
     querystring.stringify({
       client_id: process.env.FB_CLIENT_ID,
       redirect_uri: process.env.REDIRECT_URI,
-      scope: "email,pages_show_list,leads_retrieval",
+      scope: "email,leads_retrieval,pages_manage_ads,pages_read_engagement",
       response_type: "code",
     });
   console.log("redirected from /auth/fb");
@@ -1018,7 +1018,6 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
     res.status(500).send("Error logging in with Facebook.");
   }
 });
-
 
 app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
   try {
