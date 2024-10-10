@@ -554,11 +554,11 @@
 
 
 
-        <form action="/user/signup" method="post" class="sign-up-form">
+        <form id="signUpForm" class="sign-up-form">
           <h2 class="title">Sign up</h2>
           <div class="input-field">
             <i class="fas fa-user"></i>
-            <input placeholder="First Name" name="name" type="text" required>
+            <input placeholder="First Name" id="signName" name="name" type="text" required>
           </div>
           <div class="input-field">
             <i class="fas fa-envelope"></i>
@@ -566,7 +566,7 @@
           </div>
           <div class="input-field">
             <i class="fas fa-lock"></i>
-            <input for="psw" id="psw" id="password" placeholder=" Password" name="password" type="password"
+            <input for="psw" id="psw" placeholder=" Password" name="password" type="password"
               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
               title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
               required>
@@ -574,7 +574,7 @@
           </div>
           <div class="input-field">
             <i class="fas fa-lock"></i>
-            <input for="psw" placeholder="Confirm Password" id="password" name="confirmPassword" type="password"
+            <input for="psw" placeholder="Confirm Password" id="signConPassword" name="confirmPassword" type="password"
               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
               title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
               required>
@@ -591,7 +591,7 @@
           </div>
           <div class="row">
             <input type="button" id="emailVerifyBtn" onclick="verifyEmail()" class="btn"  value="Verifiy email" />
-            <input type="submit" id="signupSubmitBtn"  class="btn" style="background-color: #696969; cursor: not-allowed;" disabled value="Submit" />
+            <input type="button" id="signupSubmitBtn" onclick="submitSignupForm()"  class="btn" style="background-color: #696969; cursor: not-allowed;" disabled value="Submit" />
           </div>
 
 
@@ -825,6 +825,38 @@
     }
 };
 
+    async function submitSignupForm() {
+      const form = document.querySelector('#signUpForm')
+    const name = document.querySelector('#signUpForm #signName').value
+    const emailInp = document.querySelector('#signUpForm #emailInp').value
+    const pass = document.querySelector('#signUpForm #psw').value
+    const conPass = document.querySelector('#signUpForm #signConPassword').value
+    const email = emailInp.trim();
+    
+    let formData = {
+      name,
+      email,
+      password: pass,
+      confirmPassword: conPass
+    }
+    console.log(formData)
+    try{
+     let res = await axios.post("/user/signup", formData);
+     if (res.status === 200) {
+      form.reset()
+    toastr.success(res.data.msg);
+    setTimeout(() => {
+      window.location.href = "/user/dashboard";
+    }, 3000);
+  }
+
+    }catch(err) {
+
+    }
+
+
+    
+};
 
 
 // send req to server for otp verfication
@@ -853,6 +885,7 @@ loadBox.style.zIndex = '999999'
     submitBtn.style.cursor = 'pointer';
     submitBtn.style.backgroundColor = '#5995fd';
     submitBtn.disabled = false;
+    console.log(emailInp.value)
     emailInp.disabled = true;
   }
 } catch (error) {

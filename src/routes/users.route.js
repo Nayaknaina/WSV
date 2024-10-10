@@ -139,6 +139,8 @@ router.post(
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
+    console.log(req.body);
+
     const user = await logIncollection.findOne({ email });
 
     if (user)
@@ -181,7 +183,7 @@ router.post("/signup", async (req, res) => {
       })
     );
 
-      const templates = [
+    const templates = [
       {
         title: "Reminder Message To Customer",
         text: `Dear [Customer Name],
@@ -290,7 +292,8 @@ The [360FollowUps] Team`,
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
-    res.redirect("/user/dashboard");
+    res.status(200).json({ msg: "user signup success !" });
+    // res.redirect("/user/dashboard");
   } catch (err) {
     res.status(500).send("Error signing up");
   }
@@ -387,7 +390,6 @@ router.post("/pipeline/update", isAdminLoggedIn, async (req, res) => {
 //   res.render("profile", { user });
 // });
 
-
 // router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
 //   let user;
 //   const { name, mobile, countryCode, address, city, state } = req.body;
@@ -422,7 +424,6 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       options: { sort: { statusTime: -1 } },
     });
 
- 
     const pipes = await pipelineModel
       .find({ cid: user.cid })
       .sort({ defaultVal: -1 })
@@ -556,7 +557,6 @@ router.post("/login", async (req, res) => {
     res.status(500).send("Error logging in");
   }
 });
-
 
 router.get("/logout", (req, res) => {
   res.clearCookie("360Followers");
