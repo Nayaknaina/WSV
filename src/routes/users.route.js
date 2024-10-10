@@ -365,10 +365,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       options: { sort: { statusTime: -1 } },
     });
 
-    if (!user.organizationName) {
-      return res.render("dashboard", { showForm: true });
-    }
-
+ 
     const pipes = await pipelineModel
       .find({ cid: user.cid })
       .sort({ defaultVal: -1 })
