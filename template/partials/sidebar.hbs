@@ -1,4 +1,3 @@
-
 <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -35,14 +34,23 @@
 
         .sidebar .logo-details {
             height: 60px;
-            display: flex;
+            
             align-items: center;
             position: relative;
         }
 
         .sidebar .logo-details .icon {
             opacity: 0;
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
             transition: all 0.5s ease;
+        }
+
+        .sidebar .logo-details .icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .sidebar .logo-details .logo_name {
@@ -368,8 +376,11 @@
         }
     </style>
     <div class="logo-details">
-        <i class='bx bxl-c-plus-plus icon'></i>
-        <div class="logo_name">360followups-test</div>
+        <i class="icon">
+            <img src="../images/uploads/logo white final.ico" alt="Logo" />
+        </i>
+
+        {{!-- <div class="logo_name">360followups</div> --}}
         <i class='bx bx-menu' id="btn"></i>
     </div>
     <ul class="nav-list">

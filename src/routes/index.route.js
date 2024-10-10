@@ -18,6 +18,7 @@ router.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
 
+
 router.post("/api/verify", async (req, res) => {
   try {
     const { email } = req.body;

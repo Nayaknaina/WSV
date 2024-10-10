@@ -6,3 +6,4 @@ node_modules
 card.css
 card.html
 .wwebjs_auth
+.wwebjs_cache
