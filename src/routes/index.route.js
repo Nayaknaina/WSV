@@ -18,6 +18,22 @@ router.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
 
+router.get("/template", isAdminLoggedIn, async (req, res) => {
+  let user;
+
+  if (req.user.role === "admin") {
+    user = await logIncollection.findById(req.user.id);
+  } else {
+    user = await memberModel.findById(req.user.id);
+  }
+
+  let templates = await templateModel.find({ cid: user.cid, num: { $ne: 4 } });
+  let specialTemp = await templateModel.find({ cid: user.cid, num: 4 });
+  // console.log(templates);
+
+  res.render("template", { user, templates, specialTemp });
+});
+
 
 router.post("/api/verify", async (req, res) => {
   try {
@@ -127,7 +143,7 @@ router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
     user.address = address;
     user.city = city;
     user.state = state;
-    user.organisation = organisation;
+    user.organizationName = organisation;
     user.sector = sector;
     await user.save();
     res.redirect("/profile");
@@ -186,8 +202,8 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
 
     let pipes = await pipelineModel.find({ cid: user.cid });
     let members = await memberModel.find({ cid: user.cid });
-    console.log(leads, "asdfghjkl");
-
+    // console.log(leads, "ok");
+    
     res.render("leads", { user, leads, pipes, members });
   } catch (error) {
     console.error("Error fetching leads:", error);

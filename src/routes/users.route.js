@@ -16,7 +16,7 @@ const WaModel = require("../models/wA.model.js");
 
 const otpGenerator = require("otp-generator");
 const { sendMail } = require("../service/mailSender.js");
-const { isAdminLoggedIn } = require("../middilware/middilware.js");
+const { isAdminLoggedIn, chalteRaho, chalteRahoId} = require("../middilware/middilware.js");
 const { generateToken } = require("../../utils/auth.js");
 const { upload } = require("../service/multer.js");
 const jwt = require("jsonwebtoken");
@@ -24,7 +24,9 @@ const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const { uploadProfile } = require("../service/multer.js");
-const  uploadCSV  = require("../service/csvMulter.js");
+// const { sendMessageToLead } = require("../app.js");
+const uploadCSV = require("../service/csvMulter.js");
+
 const { csvFileDataChangIntoLeadHandler } = require("../controllers/user.controller.js");
 
 router.get("/team", isAdminLoggedIn, async (req, res) => {
@@ -162,10 +164,10 @@ router.post("/signup", async (req, res) => {
     console.log(newUser);
 
     const pipelines = [
-      { title: "win", color: "#28A745", defaultVal: false },
-      { title: "lost", color: "#DC3545", defaultVal: false },
-      { title: "on hold", color: "#007BFF", defaultVal: true },
-      { title: "pending", color: "#FFC107", defaultVal: false },
+      { title: "win", color: "#28A745", defaultVal: false, num: 1 },
+      { title: "lost", color: "#DC3545", defaultVal: false, num: 2 },
+      { title: "on hold", color: "#007BFF", defaultVal: true, num: 3 },
+      { title: "pending", color: "#FFC107", defaultVal: false, num: 4 },
     ].map(
       (pipelineData) =>
         new pipelineModel({
@@ -173,6 +175,7 @@ router.post("/signup", async (req, res) => {
           defaultVal: pipelineData.defaultVal,
           color: pipelineData.color,
           title: pipelineData.title,
+          num: pipelineData.num,
           cid: newUser.cid,
         })
     );
@@ -190,14 +193,14 @@ router.post("/signup", async (req, res) => {
         title: "Reminder Message To Customer",
         text: `Dear [Customer Name],
 
-This is a friendly reminder from [360FollowUps]. We have a scheduled follow-up call with you on [Date] at [Time]. Our representative will be reaching out to discuss your requirements.
+This is a friendly reminder from [Company Name]. We have a scheduled follow-up call with you on [Date] at [Time]. Our representative will be reaching out to discuss your requirements.
 
 If you have any questions or need to reschedule, please feel free to let us know.
 
 Looking forward to speaking with you!
 
 Best Regards,
-The [360FollowUps] Team`,
+The [Company Name] Team`,
         client: true,
         team: false,
         num: 1,
@@ -212,7 +215,7 @@ Just a reminder that you have a follow-up call scheduled with [Customer Name] on
 Good luck with the call, and let us know if you need any assistance!
 
 Best Regards,
-The [360FollowUps] System`,
+The [Company Name] System`,
         client: false,
         team: true,
         num: 2,
@@ -227,7 +230,7 @@ Thank you for taking the time to speak with us today. We appreciate the opportun
 If you have any questions or need more information, please don’t hesitate to reach out. We look forward to continuing our conversation and helping you achieve your goals.
 
 Best Regards,
-The [360FollowUps] Team`,
+The [Company Name] Team`,
         client: true,
         team: false,
         num: 5,
@@ -246,7 +249,7 @@ A new lead has been added to the CRM. Here are the details:
 Please follow up with the lead at your earliest convenience to ensure a prompt response.
 
 Best,
-The [360FollowUps] System`,
+The [Company Name] System`,
         client: false,
         team: true,
         num: 3,
@@ -256,12 +259,12 @@ The [360FollowUps] System`,
         title: "Wellcome Message To Customer",
         text: `Dear [Customer Name],
 
-Welcome to [360FollowUps]! We’re thrilled to have you on board. Our team will be reaching out to you shortly to understand your needs and help you find the best solutions.
+Welcome to [Company Name]! We’re thrilled to have you on board. Our team will be reaching out to you shortly to understand your needs and help you find the best solutions.
 
 If you have any immediate questions, feel free to get in touch with us. We're here to support you every step of the way!
 
 Best Regards,
-The [360FollowUps] Team`,
+The [Company Name] Team`,
         client: true,
         team: false,
         num: 4,
@@ -300,6 +303,7 @@ The [360FollowUps] Team`,
     res.status(500).send("Error signing up");
   }
 });
+
 
 // ! pipeline are here
 
@@ -444,6 +448,12 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
     delete req.session.errorMSG;
     console.log(msg, errMsg);
 
+    if (chalteRahoId) clearInterval(chalteRahoId);
+      console.log("chalte rho calling");
+    if (user.facebookToken) {
+      chalteRaho(user.facebookToken, user);
+    }
+
     res.render("dashboard", {
       user,
       pipes,
@@ -459,85 +469,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// router.post(
-//   "/template/update/:id",
-//   isAdminLoggedIn,
-//   upload.fields([{ name: "image" }, { name: "pdf" }]),
-//   async (req, res) => {
-//     let { id } = req.params;
-//     let template = await templateModel.findById(id);
 
-//     let { title, text, client, team } = req.body;
-
-//     template.title = title;
-//     template.text = text;
-
-//     template.client = client === "on" ? true : false;
-//     template.team = team === "on" ? true : false;
-//     let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
-//     let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
-
-//     // console.log("from form");
-//     // console.log(imageFile);
-//     // console.log(pdfFile);
-
-//     // console.log("template");
-//     // console.log(template.image);
-//     // console.log(template.pdf);
-
-//     if (imageFile !== "" && template.image !== "") {
-//       const imagePath = path.join(
-//         __dirname,
-//         "..",
-//         "template",
-//         "images",
-//         "uploads",
-//         "whatsapp",
-//         template.image
-//       );
-
-//       fs.unlink(imagePath, (err) => {
-//         if (err) {
-//           console.log("Error removing file", err);
-//           return;
-//         }
-//         console.log("file removed successfully");
-//       });
-//       template.image = imageFile;
-//     } else if (imageFile !== "") {
-//       template.image = imageFile;
-//     }
-
-//     if (pdfFile !== "" && template.pdf !== "") {
-//       const pdfPath = path.join(
-//         __dirname,
-//         "..",
-//         "template",
-//         "images",
-//         "uploads",
-//         "whatsapp",
-//         template.pdf
-//       );
-
-//       fs.unlink(pdfPath, (err) => {
-//         if (err) {
-//           console.log("Error removing file", err);
-//           return;
-//         }
-//         console.log("file removed successfully");
-//       });
-//       template.pdf = pdfFile;
-//     } else if (pdfFile !== "") {
-//       template.pdf = pdfFile;
-//     }
-
-//     await template.save();
-//     // console.log(req.body);
-//     res.redirect("/user/template");
-//   }
-// );
-
-// Signup handler
 
 // Login handler
 router.post("/login", async (req, res) => {
@@ -567,43 +499,169 @@ router.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
-// router.get('/member/dashboard/:memId', isAdminLoggedIn, (req,res)=>{
-//   req.session.memId = req.params.memId;
-//   res.redirect('/user/member/dashboard');
-// })
 
-// router.get('/member/dashboard', isAdminLoggedIn, async (req,res)=>{
-//   try {
-//     let user = await memberModel.findById(req.session.memId).populate({
-//       path: "myleads", // Populating 'myleads' field from user
-//       populate: [
-//         { path: "status" }, // Populate the 'status' field inside each lead
-//         { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
-//       ],
-//     })
 
-//     // delete req.session.memId;
-//     // console.log(user);
 
-//     let whtsConn = await WaModel.findOne({cid:user.cid})
-//     let pipes = await pipelineModel.find({cid:user.cid})
-//     let leads = await leadsModel.find({cid:user.cid})
+router.post(
+  "/template/update/:id",
+  isAdminLoggedIn,
+  upload.fields([{ name: "image" }, { name: "pdf" }]),
+  async (req, res) => {
+    try {
+      let { id } = req.params;
+      let template = await templateModel.findById(id);
 
-//     let admin = await logIncollection.findById(req.user.id)
+      let { title, text } = req.body;
 
-//     res.render('memberDashboard',{
-//       leads,
-//       admin,
-//       user,
-//       whtsConn,
-//       pipes
-//     });
-//   } catch (err) {
-//     console.log("Error in /user/member/dashboard with error :- ", err);
-//     res.status(500).send("Internal error")
-//   }
+      template.title = title;
+      template.text = text;
+      console.log(req.files);
 
-// })
+      let imageFile = req.files["image"] ? req.files["image"][0].filename : "";
+      let pdfFile = req.files["pdf"] ? req.files["pdf"][0].filename : "";
+
+      if (imageFile !== "" && template.image !== "") {
+        const imagePath = path.join(
+          __dirname,
+          "..",
+          "template",
+          "images",
+          "uploads",
+          "whatsapp",
+          template.image
+        );
+
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.log("Error removing file", err);
+            return;
+          }
+          console.log("file removed successfully");
+        });
+        template.image = imageFile;
+      } else if (imageFile !== "") {
+        template.image = imageFile;
+      }
+
+      if (pdfFile !== "" && template.pdf !== "") {
+        const pdfPath = path.join(
+          __dirname,
+          "..",
+          "template",
+          "images",
+          "uploads",
+          "whatsapp",
+          template.pdf
+        );
+
+        fs.unlink(pdfPath, (err) => {
+          if (err) {
+            console.log("Error removing file", err);
+            return;
+          }
+          console.log("file removed successfully");
+        });
+        template.pdf = pdfFile;
+      } else if (pdfFile !== "") {
+        template.pdf = pdfFile;
+      }
+
+      await template.save();
+      // console.log(req.body);
+      res.redirect("/template");
+    } catch (err) {
+      console.log("Error in /template/update/id", err);
+    }
+  }
+);
+router.get("/team/invite", isAdminLoggedIn, async (req, res) => {
+  try {
+    const user = await logIncollection.findById(req.user.id);
+    if (user.teams.length >= 3 && user.subscriptionLevel === "free") {
+      req.session.errorMSG = `free`;
+      return res.redirect("/user/team");
+    }
+    if (user.teams.length >= 7 && user.subscriptionLevel === "basic") {
+      req.session.errorMSG = `basic`;
+      return res.redirect("/user/team");
+    }
+
+    const { name, email, mobile, countryCode } = req.query;
+    let preMem = await memberModel.findOne({ email: email });
+    if (preMem !== null) {
+      req.session.errorMSG = `This email ID is already registered.`;
+      return res.redirect("/user/team");
+    }
+    preMem = await logIncollection.findOne({ email: email });
+    if (preMem !== null) {
+      req.session.errorMSG = `This email ID is already registered.`;
+      return res.redirect("/user/team");
+    }
+
+    const password = otpGenerator.generate(8, {
+      digits: true,
+      lowerCaseAlphabets: true,
+      upperCaseAlphabets: true,
+      specialChars: false,
+    });
+
+    const mailMsg = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="text-align: center;">
+        <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
+        <h2>Web Soft Valley</h2>
+        <p>Developing Future</p>
+      </div>
+      <h3>Hello ${name} !</h3>
+      <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
+      <p>Email: <a href="mailto:${email}">${email}</a></p>
+      <p>Password: <strong>${password}</strong></p>
+      <div style="text-align: center;">
+        <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+          Login to Dashboard
+        </a>
+      </div>
+      <p>Regards,<br>Web Soft Valley Technology</p>
+    </div>
+  `;
+    const subject = `Invitation from ${user.name}`;
+    const isSent = await sendMail(email, mailMsg, subject);
+    console.log(isSent);
+
+    const leadContactNo = mobile;
+    const text = `Hello ${name}!\n\nCongratulations! Your account has been created successfully. You can log in now and start using our service.
+    \n\n Your email: ${email}
+    \n Your password : ${password}
+    \n\n[Click here to login](https://360followups.com/member/login)`;
+
+    let connStatus = await WaModel.findOne({ cid: user.cid });
+    setTimeout(() => {
+      console.log("/team/invite route");
+      console.log(connStatus, leadContactNo);
+
+      sendMessageToLead(connStatus, leadContactNo, text); // after temp msg sending to lead
+    }, 4000);
+
+    const newMember = new memberModel({
+      name,
+      email,
+      password,
+      countryCode,
+      mobile,
+      cid: user.cid,
+      owner_id: user._id,
+    });
+    await newMember.save();
+    user.teams.push(newMember._id);
+    await user.save();
+
+    req.session.successMSG = `you have invited ${name} as a team member !. `;
+  } catch (error) {
+    console.log(error);
+  }
+  return res.redirect("/user/team");
+});
+
 
 router.get("/member/blocked/:id", isAdminLoggedIn, async (req, res) => {
   try {
@@ -620,6 +678,22 @@ router.get("/member/blocked/:id", isAdminLoggedIn, async (req, res) => {
   }
 });
 
+router.post('/member/update/:memId', isAdminLoggedIn, async (req, res) => {
+  try {
+    const { name, email, mobile } = req.body;
+
+    let member = await memberModel.findById(req.params.memId);
+
+    member.name = name;
+    member.email = email;
+    member.mobile = mobile;
+    member.save()
+
+    res.json({ msg: "Member details update sucessfully !" })
+  } catch (err) {
+    console.error('Error in /user/member/update:id----', err);
+  }
+})
 router.get("/member/un-blocked/:id", isAdminLoggedIn, async (req, res) => {
   try {
     let member = await memberModel.findById(req.params.id);
@@ -636,5 +710,197 @@ router.get("/member/un-blocked/:id", isAdminLoggedIn, async (req, res) => {
 });
 
 router.post('/upload-csv', isAdminLoggedIn, uploadCSV.single('file'), csvFileDataChangIntoLeadHandler);
+
+router.get("/reset/all/temp", isAdminLoggedIn, async (req, res) => {
+  let user = await logIncollection.findById(req.user.id);
+
+  try {
+    const result = await templateModel.deleteMany({ cid: user.cid });
+    console.log(`${result.deletedCount} documents deleted.`);
+    user.myTemplates = [];
+    await user.save()
+  } catch (error) {
+    console.error("Error deleting documents:", error);
+  }
+
+  const templates = [
+    {
+      title: "Reminder Message To Customer",
+      text: `Dear [Customer Name],
+
+This is a friendly reminder from [Company Name].
+We have a scheduled follow-up 
+call with you on [Date] at [Time].
+Our representative will be 
+reaching out to discuss your requirements.
+
+If you have any questions or need to reschedule,
+please feel free to let us know.
+
+Looking forward to speaking with you!
+
+Best Regards,
+The [Company Name] Team`,
+      client: true,
+      team: false,
+      num: 1,
+    },
+
+    {
+      title: "Reminder Message To Team Member",
+      text: `Hello [Team Member Name],
+
+Just a reminder that you have a follow-up 
+call scheduled with [Customer Name] 
+on [Date] at [Time].
+Please make sure you are prepared 
+with all the necessary details.
+
+Good luck with the call, and let us 
+know if you need any assistance!
+
+Best Regards,
+The [Company Name] System`,
+      client: false,
+      team: true,
+      num: 2,
+    },
+
+    {
+      title: "Thankyou Message To Customer",
+      text: `Dear [Customer Name],
+
+Thank you for taking the time 
+to speak with us today.
+We appreciate the opportunity 
+to understand your needs 
+better and to discuss how we 
+can assist you further.
+
+If you have any questions or 
+need more information, 
+please don’t hesitate to reach out. 
+We look forward to continuing our 
+conversation and helping you achieve
+your goals.
+
+Best Regards,
+The [Company Name] Team`,
+      client: true,
+      team: false,
+      num: 5,
+    },
+
+    {
+      title: "Notification Message To Team Members",
+      text: `Hello [Team Member Name],
+
+A new lead has been added to the CRM.
+Here are the details:-
+
+Lead Name: [Customer Name]
+Contact Number: [Customer Contact Number]
+Date Received: [Date]
+Lead Source: [Lead Source]
+
+Please follow up with the lead at your earliest 
+convenience to ensure a prompt response.
+
+Best,
+The [Company Name] System`,
+      client: false,
+      team: true,
+      num: 3,
+    },
+
+    {
+      title: "Wellcome Message To Customer",
+      text: `Dear [Customer Name],
+
+Welcome to [Company Name]! 
+We’re thrilled to have you on board. 
+Our team will be reaching out to you shortly 
+to understand your needs and help you find the 
+best solutions.
+
+If you have any immediate questions, 
+feel free to get in touch with us. 
+
+We're here to support you every step of the way!
+
+Best Regards,
+The [Company Name] Team`,
+      client: true,
+      team: false,
+      num: 4,
+    },
+  ].map(
+    (temp) =>
+      new templateModel({
+        uid: user._id,
+        title: temp.title,
+        text: temp.text,
+        num: temp.num,
+        client: temp.client,
+        team: temp.team,
+        cid: user.cid,
+      })
+  );
+
+  // Save all pipelines in parallel
+  await Promise.all(
+    templates.map(async (temp) => {
+      await temp.save();
+      user.myTemplates.push(temp._id);
+    })
+  );
+  await user.save();
+
+  res.redirect("/template");
+});
+
+
+
+router.get("/reset/all/pipes", isAdminLoggedIn, async (req, res) => {
+  let user = await logIncollection.findById(req.user.id);
+
+  try {
+    const result = await pipelineModel.deleteMany({ cid: user.cid });
+    console.log(`${result.deletedCount} documents deleted.`);
+    user.myPipelines = [];
+    await user.save()
+  } catch (error) {
+    console.error("Error deleting documents:", error);
+  }
+
+  const pipelines = [
+    { title: "win", color: "#28A745", defaultVal: false, num: 1 },
+    { title: "lost", color: "#DC3545", defaultVal: false, num: 2 },
+    { title: "on hold", color: "#007BFF", defaultVal: true, num: 3 },
+    { title: "pending", color: "#FFC107", defaultVal: false, num: 4 },
+  ].map(
+    (pipelineData) =>
+      new pipelineModel({
+        uid: user._id,
+        defaultVal: pipelineData.defaultVal,
+        color: pipelineData.color,
+        title: pipelineData.title,
+        num: pipelineData.num,
+        cid: user.cid,
+      })
+  );
+
+  // Save all pipelines in parallel
+  await Promise.all(
+    pipelines.map(async (pipeline) => {
+      await pipeline.save();
+      user.myPipelines.push(pipeline._id);
+    })
+  );
+
+  await user.save();
+
+  res.redirect("/template");
+});
 
 module.exports = router;

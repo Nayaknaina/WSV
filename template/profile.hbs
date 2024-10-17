@@ -302,37 +302,37 @@
 
               <div class="col-6">
                 <label for="mobile" class="form-label">Mobile</label>
-                <input placeholder="Mobile" maxlength="10" value="{{user.mobile}}" name="mobile" id="mobile" type="tel"
+                <input placeholder="Mobile" disabled maxlength="10" value="{{user.mobile}}" name="mobile" id="mobile" type="tel"
                   class="form-control input" required>
               </div>
 
               <div class="col-6">
                 <label for="inputAddress" class="form-label">Address</label>
-                <input value="{{user.address}}" name="address" type="text" class="form-control input" id="inputAddress"
+                <input value="{{user.address}}" disabled name="address" type="text" class="form-control input" id="inputAddress"
                   placeholder="Address">
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="inputCity" class="form-label">City</label>
-                <input value="{{user.city}}" name="city" type="text" class="form-control input" id="inputCity"
+                <input value="{{user.city}}" disabled name="city" type="text" class="form-control input" id="inputCity"
                   placeholder="City">
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="inputState" class="form-label">State</label>
-                <input value="{{user.state}}" name="state" type="text" class="form-control input" id="inputState"
+                <input value="{{user.state}}" disabled name="state" type="text" class="form-control input" id="inputState"
                   placeholder="State">
               </div>
 
               <div class="col-6 mb-3">
                 <label for="organisation" class="form-label">Organization Name</label>
-                <input placeholder="organisation" maxlength="10" value="{{user.organisation}}" name="organisation"
-                  id="organisation" type="text" class="form-control input" required>
+                <input placeholder="organisation" value="{{user.organizationName}}" name="organisation"
+                  id="organisation" type="text" disabled class="form-control input" required>
               </div>
 
               <div class="col-6 mb-3">
                 <label for="Sector" class="form-label">Sector</label>
-                <select id="sector" name="sector" class="form-control input">
+                <select id="sector" name="sector" class="form-control input" disabled >
                   <option value="{{#if user.sector}}{{user.sector}}{{else}}''{{/if}}" selected>
                     {{#if user.sector}}{{user.sector}}{{else}}Select Sector{{/if}}
                   </option>
@@ -351,7 +351,7 @@
               </div>
 
               <div class="col-12">
-                <button type=" button" id="edit" class="btn btn-primary" onclick="updateProfileData()">Edit</button>
+                <button type="button" id="edit" class="btn btn-primary" onclick="updateProfileData()">Edit</button>
                 <button type="submit" id="save" disabled class="btn btn-secondary">Save</button>
               </div>
             </form>

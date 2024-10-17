@@ -6,7 +6,22 @@ const leadsSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
-
+    page_id: {
+      type: String,
+      default: ''
+    },
+    form_id: {
+      type: String,
+      default: ''
+    },
+    page_name: {
+      type: String,
+      default: ''
+    },
+    form_name: {
+      type: String,
+      default: ''
+    },
     uid: {
       type: mongoose.Schema.Types.ObjectId,
       refPath: 'userType',  // Dynamic reference based on userType
@@ -30,15 +45,15 @@ const leadsSchema = new mongoose.Schema(
     remarks: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'remark',
-    }],             
+    }],
     status: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'pipeline',
-    },             
+    },
     statusTime: {
       type: Date,
       default: null,
-    },             
+    },
 
     leads_data: [
       {
@@ -47,11 +62,11 @@ const leadsSchema = new mongoose.Schema(
         ans: String,
       },
     ],
-    app:{
+    app: {
       type: String,
       default: ''
     },
-    
+
   },
   {
     timestamps: true,

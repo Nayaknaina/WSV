@@ -6,7 +6,9 @@ const pipelineSchema = new mongoose.Schema(
       type: Date,
       default: Date.now, 
     },
-
+    num:{
+      type: Number,
+    },
     title:{
       type:String,
       lowercase: true,

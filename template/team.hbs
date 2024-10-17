@@ -42,7 +42,7 @@
   </script>
   <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
     src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
-
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">  
   <link rel="stylesheet" href="/kcss/sendmail.css">
   <link rel="stylesheet" href="/assets/css/team.css">
 </head>
@@ -55,12 +55,118 @@
   }
 </style>
 
+<style>
+  /* Global Styles */
+
+.form-container.hiden {
+  display: none;
+}
+.form-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+        position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99;
+    max-width: 450px;
+    display: block;
+    animation: fadeIn 1s ease-out;
+}
+
+/* Input Group Styles */
+/* Input Group Styles */
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.input-group input,
+.input-group textarea {
+    padding: 12px 15px;
+    padding-top: 12px;
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+/* Focused State for Labels */
+
+.input-group .input-icon i {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.input-group input:focus + i,
+.input-group textarea:focus + i {
+    color: #007bff;
+}
+
+.button {
+    width: 100%;
+    padding: 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 20px;
+    }
+
+    button {
+        padding: 12px;
+        font-size: 16px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%,-30%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%,-50%);
+    }
+}
+@keyframes fadeInDown {
+    to {
+        opacity: 1;
+        transform: translate(-50%,-30%);
+    }
+}
+</style>
 
 <body class="naina">
   <div id="popup-reg" class="popup">
     <div id="popup-reg" class="popup-content">
 
-      <form id="send" action="/team/invite" method="get" class="send-form">
+      <form id="send" action="/user/team/invite" method="get" class="send-form">
         <div class="form-group">
           <input type="text" placeholder="Enter name..." id="name" name="name" required="required">
           <label for="name">
@@ -390,7 +496,7 @@
               {{!-- <td data-label="Amount">{{myleads.length}}</td> --}}
               {{!-- <td><a href="/member/blocked/{{_id}}"><i class="fa-solid fa-ban" style="color: #ff0000;"></i></a>
               </td> --}}
-              <td data-label="Actions">
+              <td data-label="Actions" style="display: flex; gap: 4px;">
                 {{#if blocked}}
                 <a href="/user/member/un-blocked/{{_id}}"><button type="button"
                     class="btn btn-success btn-sm">Un-Block</button></a>
@@ -398,6 +504,7 @@
                 <a href="/user/member/blocked/{{_id}}"><button type="button"
                     class="btn btn-danger btn-sm">Block</button></a>
                 {{/if}}
+                 <button type="button" class="btn btn-success btn-sm" onclick="openTeamMemberUpdateForm('{{_id}}')">Edit</button>
               </td>
             </tr>
             {{/each }}
@@ -416,6 +523,44 @@
 
       </div>
     </div>
+{{#each user.teams}}
+    <div class="form-container team-update hiden" id="teamMemberUpdateFormContainer-{{_id}}">
+        <form id="teamMemberUpdateForm-{{_id}}">
+        
+            
+            <div class="input-group">
+                
+                <div class="input-icon">
+                   <i class="fa-solid fa-rectangle-xmark" onclick="closeTeamMemberUpdateForm()" style="color: crimson; font-size: 1.6rem;"></i>
+                   
+                </div>
+            </div>
+            <div class="input-group">
+                
+                <div class="input-icon">
+                    <input type="text" id="INP-name-{{_id}}" name="name" value="{{name}}" required>
+                   
+                </div>
+            </div>
+            <div class="input-group">
+               
+                <div class="input-icon">
+                    <input type="tel" id="INP-mobile-{{_id}}" name="mobile" value="{{mobile}}" required>
+                   
+                </div>
+            </div>
+            <div class="input-group">
+              
+                <div class="input-icon">
+                    <input type="email" id="INP-email-{{_id}}" name="email" value="{{email}}" required>
+               
+                </div>
+            </div>
+             
+            <button type="button" class="button" onclick="submitTeamMemberEditForm('{{_id}}')">Save</button>
+        </form>
+    </div>
+{{/each}}
   </div>
   <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
@@ -497,44 +642,44 @@
     // Call the function to populate country codes when the page loads
     window.onload = populateCountryCodes;
 
-    // document.getElementById('registerForm').addEventListener('submit', function (e) {
-    //   e.preventDefault(); // Prevent default form submission
-    //
-    //   const email = document.getElementById('email').value;
-    //   const mobile = document.getElementById('mobile').value;
-    //   const password = document.getElementById('password').value;
-    //   const countryCode = document.getElementById('countryCode').value;
-    //   const countryName = document.getElementById('countryCode').options[document.getElementById('countryCode').selectedIndex].text.split(' ')[0];
-    //
-    //   const data = {
-    //     email: email,
-    //     password: password,
-    //     mobile: mobile,
-    //     countryCode: countryCode,
-    //     countryName: countryName
-    //   };
-    //
-    //   console.log(data)
-    //
-    //   fetch('/member/login', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(data)
-    //   })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //       console.log('Success:', data);
-    //       alert('Registration Successful!');
-    //       window.location('/member/dashboard')
-    //     })
-    //     .catch((error) => {
-    //       console.error('Error:', error);
-    //       alert('Registration Failed!');
-    //     });
-    // });
+async function submitTeamMemberEditForm(id){
+  const form = document.getElementById(`teamMemberUpdateForm-${id}`);
+  let name = document.querySelector(`#INP-name-${id}`).value
+  let mobile = document.querySelector(`#INP-mobile-${id}`).value
+  let email = document.querySelector(`#INP-email-${id}`).value
+  let formData = {
+    name,
+    mobile,
+    email,
+  }
+    const actionUrl = `/user/member/update/${id}`;
+  console.log(formData)
+    try {
+      // Send POST request using Axios
+      const response = await axios.post(actionUrl, formData);
+      console.log("Form submitted successfully:", response.data);
+      location.reload()
+    } catch (error) {
+      // Handle error
+      console.error("Error submitting form:", error);
+    }
+}
 
+
+function openTeamMemberUpdateForm(id){
+  let formContainer = document.querySelector(`#teamMemberUpdateFormContainer-${id}`)
+  console.log(formContainer)
+  formContainer.classList.remove('hiden');
+}
+
+function closeTeamMemberUpdateForm(){
+  let forms = document.querySelectorAll(`.team-update`)
+  forms.forEach((form)=>{
+    if(!form.classList.contains('hiden')){
+      form.classList.add('hiden');
+    }
+  })
+}
   </script>
 </body>
 

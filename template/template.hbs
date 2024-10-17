@@ -197,7 +197,7 @@
 
         {{#each templates}}
         <div class="box-form" id="form{{_id}}">
-          <form action="/template/update/{{_id}}" enctype='multipart/form-data' method="post">
+          <form action="user/template/update/{{_id}}" enctype='multipart/form-data' method="post">
             <label for="title2">Title</label>
             <input type="text" id="title2" name="title" value="{{title}}" placeholder="Enter title">
 
@@ -215,7 +215,7 @@
     {{#each specialTemp}}
     
         <div class="box-form" id="form5">
-          <form action="/template/update/{{_id}}" method="post">
+          <form action="user/template/update/{{_id}}" method="post" enctype="multipart/form-data">
             <label for="title2">Title</label>
             <input type="text" id="title2" value="{{ title }}" name="title" placeholder="Enter title">
 
@@ -223,10 +223,10 @@
             <textarea id="text2" name="text" rows="4" placeholder="Enter text"> {{text }}</textarea>
 
             <label for="image2">Image File</label>
-            <input type="file" id="image2" name="image2" accept="image/*">
+            <input type="file" id="image2" name="image" accept="image/*">
 
             <label for="pdf2">PDF File</label>
-            <input type="file" id="pdf2" name="pdf2" accept="application/pdf">
+            <input type="file" id="pdf2" name="pdf" accept="application/pdf">
 
             <div class="buttons">
               <button type="submit" class="save-button">save</button>

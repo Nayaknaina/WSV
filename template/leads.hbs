@@ -2,8 +2,8 @@
 <html>
 
 <head>
-    
-    
+
+
     <title>
         Connect
     </title>
@@ -43,7 +43,7 @@
     body {
         font-family: Arial, sans-serif;
         background-color: #f0f0f0;
-       
+
     }
 
     /* Modal (Popup) Styling */
@@ -114,6 +114,7 @@
         border: 1px solid #ccc;
         border-radius: 4px;
     }
+
     .form-group div textarea {
         width: 100%;
         padding: 4px 8px;
@@ -130,6 +131,14 @@
         border-color: green;
     }
 
+    .details-container {
+        display: block;
+        margin-top: 8px;
+        /* Add space between the icon and text */
+        font-size: 0.8em;
+    }
+
+
     @media (max-width: 600px) {
         .form-group div {
             width: 100%;
@@ -141,19 +150,55 @@
             max-height: 470px;
         }
     }
+
+    /* Mobile-specific adjustments */
+    @media (max-width: 768px) {
+        .start-drowp-app {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .details-container {
+            margin-left: 30px;
+            /* Adjust margin to align properly */
+        }
+
+        .icon-container {
+            gap: 5px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .details-container {
+            font-size: 0.9em;
+            margin-left: 0;
+            /* No margin for very small screens */
+        }
+
+        .start-drowp-app {
+            /* flex-direction: column;*/
+            /* Stack elements vertically */
+            align-items: flex-start;
+        }
+
+        .formateDate {
+            margin-bottom: 4px;
+        }
+    }
 </style>
 
 <body class>
 
     {{!-- {{> nav}} --}}
-<form hidden id="csv-form" enctype="multipart/form-data">
-    <input type="file" onchange="uploadCsvFile()" name="file" id="csv-file" accept=".csv" required>
-</form>
+    <form hidden id="csv-form" enctype="multipart/form-data">
+        <input type="file" onchange="uploadCsvFile()" name="file" id="csv-file" accept=".csv" required>
+    </form>
 
     <div class="container-fluid">
         <div class="row  justify-content-center">
             {{> sidebar}}
-            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  home-section">
+            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  ">
                 {{> NameHead}}
                 <div class="container-fluid bg-white shadow-sm m-b-20">
                     <div class="row flex-row justify-content-start px-3">
@@ -164,7 +209,8 @@
                         <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="openFormBtn">Add New
                             Lead</button>
 
-                        <label for="csv-file" class="btn my-2 mx-2 btn-outline-primary btn-sm"  id="csv-file-upload-btn">Import from csv</label>
+                        <label for="csv-file" class="btn my-2 mx-2 btn-outline-primary btn-sm"
+                            id="csv-file-upload-btn">Import from csv</label>
                         <div class="custom-modal" id="customModal">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -190,7 +236,7 @@
                                         <!-- Email -->
                                         <div>
                                             <label for="email">Email</label>
-                                            <input type="email" placeholder="Email" id="email" name="email" >
+                                            <input type="email" placeholder="Email" id="email" name="email">
                                         </div>
 
                                         <!-- City (Optional) -->
@@ -202,7 +248,8 @@
                                         <!-- State (Optional) -->
                                         <div>
                                             <label for="state">State (Optional)</label>
-                                            <input type="text" placeholder="State" id="state" minlength="3" name="state">
+                                            <input type="text" placeholder="State" id="state" minlength="3"
+                                                name="state">
                                         </div>
 
                                         <!-- Alternate Number 1 -->
@@ -254,7 +301,7 @@
                             <button id="all-lead-btn" onclick="showAllLeads()" type="button"
                                 class="btn btn-primary p-x-8">Leads</button>
                         </div>
-                        
+
                         <div class="col-auto text-center py-2">
                             <button id="my-lead-btn" onclick="showMyLeads()" type="button"
                                 class="btn btn-outline-primary p-x-8">My leads</button>
@@ -277,7 +324,7 @@
 
                         nav {
                             margin: 1px 0;
-                            box-shadow: 0px 6px 8px #d7d7d7;
+                            box-shadow: 0px 6px 8px #7d7a7a;
                             border-radius: 8px;
                             transition: max-height 0.4s ease;
 
@@ -327,11 +374,11 @@
                         }
 
                         .created-time-label {
-                            display: flex;
+                            /*display: flex;*/
                             justify-content: space-between;
                             align-items: center;
                             padding: 10px;
-                            background-color: #eef6ff;
+                            background-color: #f7fbff;
                             border-radius: 5px;
                         }
 
@@ -340,7 +387,15 @@
                             gap: 20px;
                             align-items: center;
                             right: 10px;
-                            justify-content: space-between;
+                            justify-content:flex-end;
+                        }
+
+                        .icon-container-myleads {
+                            display: flex;
+                            gap: 20px;
+                            align-items: center;
+                            right: 10px;
+                            justify-content: flex-end;
                         }
 
                         .status-circle {
@@ -450,7 +505,7 @@
 
                         .start-drowp-app {
                             display: flex;
-                            gap: 15px;
+                            gap: 8px;
                         }
 
                         .user-name-style {
@@ -484,7 +539,8 @@
                                 font-size: 1em;
                                 padding: 10px;
                             }
-                            #remarkForm label{
+
+                            #remarkForm label {
                                 padding: 0;
                             }
 
@@ -537,7 +593,8 @@
                                 font-size: 0.9em;
                                 padding: 8px;
                             }
-                            #remarkForm label{
+
+                            #remarkForm label {
                                 padding: 0;
                             }
 
@@ -547,7 +604,7 @@
                         }
                     </style>
 
-                   
+
 
                     {{#ifEquals user.role 'admin'}}
                     <ul id="allLeads" style="display: block;">
@@ -561,7 +618,14 @@
                                         <i class="fa-solid fa-chevron-down"></i>
                                         <i class="fa-brands fa-square-{{app}}"
                                             style="font-size: 22px; color: #316ff6;"></i>
+
+
+
                                     </label>
+                                    <div class="details-container">
+                                        <strong>Page:</strong> {{page_name}} <br>
+                                        <strong>Form:</strong> {{form_name}}
+                                    </div>
 
 
                                     <span class="icon-container">
@@ -610,6 +674,8 @@
                     </div>
                 </span>--}}
                 </span>
+
+
                 </label>
                 <input type="checkbox" id="touch-{{@index}}">
                 <ul class="slide">
@@ -642,7 +708,12 @@
                                     <strong class="formateDate">At- {{formatDate income_time}}</strong>
                                     <i class="fa-solid fa-chevron-down"></i>
                                     <i class="fa-brands fa-square-{{app}}" style="font-size: 22px; color: #316ff6;"></i>
+
                                 </label>
+                                <div class="details-container">
+                                    <strong>Page:</strong> {{page_name}} <br>
+                                    <strong>Form:</strong> {{form_name}}
+                                </div>
 
 
                                 <span class="icon-container">
@@ -679,7 +750,9 @@
                     {{/each}}
             </div>
             </span>--}}
+
             </span>
+
             </label>
             <input type="checkbox" id="touch-{{@index}}">
             <ul class="slide">
@@ -710,8 +783,11 @@
                                 <i class="fa-solid fa-chevron-down"></i>
                                 <i class="fa-brands fa-square-{{app}}" style="font-size: 22px; color: #316ff6;"></i>
                             </label>
-
-                            <span class="icon-container" style="display: flex; align-items: center;">
+                            <div class="details-container">
+                                <strong>Page:</strong> {{page_name}} <br>
+                                <strong>Form:</strong> {{form_name}}
+                            </div>
+                            <span class="icon-container-myleads" style="display: flex; align-items: center;">
                                 {{!-- <a href="/lead/remove/{{_id}}">
                                     <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
                                 </a> --}}
@@ -759,11 +835,13 @@
                         <form id="remarkForm" onsubmit="createNewRemark('{{_id}}')">
                             <textarea placeholder="setting up next followup" required maxlength="150" name="text"
                                 id="remark-form-text{{id}}" cols="30" rows="5"></textarea>
-                            <label style="margin: 0;" for="remark-form-time{{id}}"><small style="color: #28292a;">Next Followup Time</small></label><br>
+                            <label style="margin: 0;" for="remark-form-time{{id}}"><small style="color: #28292a;">Next
+                                    Followup Time</small></label><br>
                             <input type="time" placeholder="time" min="current-time" name="time"
                                 id="remark-form-time{{id}}" class="time" required> <br>
 
-                            <label style="margin: 0;" for="remark-form-date{{id}}"><small style="color: #28292a;">Next Followup Date</small></label><br>
+                            <label style="margin: 0;" for="remark-form-date{{id}}"><small style="color: #28292a;">Next
+                                    Followup Date</small></label><br>
                             <input type="date" min="current-date" name="date" id="remark-form-date{{id}}" class="date"
                                 required> <br>
 
@@ -960,13 +1038,7 @@
     </div>
 
 
-    <div class="fg-main-footer bg-white border-top w-100">
-        <div class="col-md-12">
-            <p class="sub_footer_text m-t-10 m-b-10 text-center"> Copyright © 2024. Web Soft Valley All Rights
-                Reserved
-            </p>
-        </div>
-    </div>
+
 
     </div>
     </div>
@@ -1150,8 +1222,8 @@
     </script>
 
     <script>
-        async function uploadCsvFile(){
-             const fileInput = document.getElementById('csv-file');
+        async function uploadCsvFile() {
+            const fileInput = document.getElementById('csv-file');
             const file = fileInput.files[0];
 
             if (!file) {
@@ -1169,14 +1241,14 @@
                     }
                 });
                 console.log(response)
-                if(response.status === 200){
+                if (response.status === 200) {
                     toastr.success(response.data.msg)
                     location.reload()
                 }
                 return
             } catch (error) {
                 console.error('Error uploading file:', error); // Error handling
-                 // Error message
+                // Error message
             }
         }
     </script>
