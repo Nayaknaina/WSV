@@ -1,6 +1,16 @@
+
 const logIncollection = require("../models/admin.model");
 const leadsModel = require("../models/leads.model");
 const router = require("./members.route");
+const { isAdminLoggedIn } = require("../middilware/middilware.js");
+const templateModel = require("../models/temlate.model.js");
+const path = require("path");
+const fs = require('fs');
+const readJsonFile = () => {
+  const filePath = "./src/generated_data.json";
+  const data = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(data); // Return the parsed JSON data
+};
 
 router.get("/get/data", isAdminLoggedIn, async (req, res) => {
     const admin = await logIncollection.findById(req.user.id);
@@ -27,7 +37,7 @@ router.get("/get/data", isAdminLoggedIn, async (req, res) => {
           page_id: lead.page_id,
           form_id: lead.form_id,
           income_time: lead.created_time,
-          cid: user.cid,
+          cid: admin.cid,
           leads_data: leads_datas,
           app: "facebook",
         });
@@ -178,3 +188,6 @@ router.get("/get/data", isAdminLoggedIn, async (req, res) => {
   
     res.redirect("/user/dashboard");
   });
+
+
+  module.exports = router;

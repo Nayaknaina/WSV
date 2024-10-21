@@ -34,7 +34,6 @@ router.get("/template", isAdminLoggedIn, async (req, res) => {
   res.render("template", { user, templates, specialTemp });
 });
 
-
 router.post("/api/verify", async (req, res) => {
   try {
     const { email } = req.body;
@@ -163,53 +162,120 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
 });
 
 // Facebook Leads Fetch Route
-router.get("/leads", isAdminLoggedIn, async (req, res) => {
-  try {
-    let user;
-    console.log("leads page");
+// router.get("/leads", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     let user;
+//     console.log("leads page");
      
 
-    if (req.user.role == "admin") {
+//     if (req.user.role == "admin") {
+//       user = await logIncollection
+//         .findById(req.user.id)
+//         .populate({
+//           path: "myleads", // Populating 'myleads' field from user
+//           populate: [
+//             { path: "status" }, // Populate the 'status' field inside each lead
+//             // { path: "uid" }, // Populate the 'status' field inside each lead
+//             { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
+//           ],
+//         })
+//         .populate("teams");
+//     } else {
+//       user = await memberModel.findById(req.user.id).populate({
+//         path: "myleads", // Populating 'myleads' field from user
+//         populate: [
+//           { path: "status" }, // Populate the 'status' field inside each lead
+//           { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
+//         ],
+//       });
+//     }
+//     let leads = await leadsModel
+//       .find({ cid: user.cid })
+//       .populate("status")
+//       .populate("uid") // Ensure that 'status' is populated
+//       .sort({ createdAt: -1 });
+
+//     // let lead = await leadsModel
+//     //   .findById('66ed6c684e1f1c79f01999a1')
+//     //   .populate("uid") // Ensure that 'status' is populated
+
+//     let pipes = await pipelineModel.find({ cid: user.cid });
+//     let members = await memberModel.find({ cid: user.cid });
+//     console.log( "ok");
+//     // console.log("Fetched Leads with IDs:", leads.map(lead => ({
+//     //   lead_id: lead.lead_id,
+//     //   page_id: lead.page_id,
+//     //   form_id: lead.form_id,
+//     // })));
+//     res.render("leads", { user, leads, pipes, members });
+//   } catch (error) {
+//     console.error("Error fetching leads:", error);
+//     res.status(500).send("Error fetching leads");
+//   }
+// });
+router.get("/leads", isAdminLoggedIn, async (req, res) => {
+  try {
+    const { page = 1 } = req.query; // Get the page number from query params, default to 1
+    const limit = 25; // Number of leads per page
+
+    console.log("leads page");
+    let user;
+
+    if (req.user.role === "admin") {
       user = await logIncollection
         .findById(req.user.id)
         .populate({
-          path: "myleads", // Populating 'myleads' field from user
+          path: "myleads",
           populate: [
-            { path: "status" }, // Populate the 'status' field inside each lead
-            // { path: "uid" }, // Populate the 'status' field inside each lead
-            { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
+            { path: "status" },
+            { path: "remarks", options: { sort: { createdAt: -1 } } },
           ],
         })
         .populate("teams");
     } else {
-      user = await memberModel.findById(req.user.id).populate({
-        path: "myleads", // Populating 'myleads' field from user
-        populate: [
-          { path: "status" }, // Populate the 'status' field inside each lead
-          { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
-        ],
-      });
+      user = await memberModel
+        .findById(req.user.id)
+        .populate({
+          path: "myleads",
+          populate: [
+            { path: "status" },
+            { path: "remarks", options: { sort: { createdAt: -1 } } },
+          ],
+        });
     }
-    let leads = await leadsModel
+
+    // Fetch paginated leads
+    const leads = await leadsModel
       .find({ cid: user.cid })
       .populate("status")
-      .populate("uid") // Ensure that 'status' is populated
-      .sort({ createdAt: -1 });
+      .populate("uid")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-    // let lead = await leadsModel
-    //   .findById('66ed6c684e1f1c79f01999a1')
-    //   .populate("uid") // Ensure that 'status' is populated
+    const totalLeads = await leadsModel.countDocuments({ cid: user.cid });
+    const totalPages = Math.ceil(totalLeads / limit);
 
-    let pipes = await pipelineModel.find({ cid: user.cid });
-    let members = await memberModel.find({ cid: user.cid });
-    // console.log(leads, "ok");
-    
-    res.render("leads", { user, leads, pipes, members });
+    const pipes = await pipelineModel.find({ cid: user.cid });
+    const members = await memberModel.find({ cid: user.cid });
+
+    // Render the leads page
+    res.render("leads", {
+      user,
+      leads,
+      pipes,
+      members,
+      currentPage: parseInt(page),
+      totalPages,
+      showPagination: leads.length > 0, // Only show pagination if leads exist
+    });
   } catch (error) {
     console.error("Error fetching leads:", error);
     res.status(500).send("Error fetching leads");
   }
 });
+
+
 
 router.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {
   let { id } = req.params;

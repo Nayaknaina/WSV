@@ -198,7 +198,7 @@
     <div class="container-fluid">
         <div class="row  justify-content-center">
             {{> sidebar}}
-            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  ">
+            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  home-section">
                 {{> NameHead}}
                 <div class="container-fluid bg-white shadow-sm m-b-20">
                     <div class="row flex-row justify-content-start px-3">
@@ -387,7 +387,7 @@
                             gap: 20px;
                             align-items: center;
                             right: 10px;
-                            justify-content:flex-end;
+                            justify-content: flex-end;
                         }
 
                         .icon-container-myleads {
@@ -528,6 +528,31 @@
                             color: #36383a89;
                             margin-top: 100px;
 
+                        }
+
+                        /* Pagination container styling */
+                        .pagination {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            gap: 15px;
+                            margin: 20px 0;
+                            font-family: 'Arial', sans-serif;
+                        }
+
+
+                        /* Disabled Previous/Next button style (if needed) */
+                        .pagination .btn.disabled {
+                            pointer-events: none;
+                            background-color: #bbb;
+                            cursor: not-allowed;
+                        }
+
+                        /* Page Info Text Styling */
+                        .pagination .page-info {
+                            font-size: 16px;
+                            font-weight: bold;
+                            color: #333;
                         }
 
                         @media (max-width: 768px) {
@@ -688,11 +713,30 @@
                 </nav>
                 </li>
                 {{/each}}
+                <!-- Pagination Controls -->
+                <div class="pagination">
+                    {{#if (gt currentPage 1)}}
+                    <a href="/leads?page={{subtract currentPage 1}}" class="btn btn-primary p-x-8">Previous</a>
+                    {{/if}}
+
+                    <span>Page {{currentPage}} of {{totalPages}}</span>
+
+                    {{#if (lt currentPage totalPages)}}
+                    <a href="/leads?page={{add currentPage 1}}" class="btn btn-outline-primary p-x-8">Next</a>
+                    {{/if}}
+                </div>
+
                 {{else}}
                 <li class="noLead">No leads
                     added here <br> please connect your app first</li>
                 {{/if}}
+
                 </ul>
+
+
+
+
+
                 {{/ifEquals}}
 
 
@@ -765,10 +809,23 @@
             </nav>
             </li>
             {{/each}}
+            <div class="pagination">
+                {{#if (gt currentPage 1)}}
+                <a href="/leads?page={{subtract currentPage 1}}" class="btn">Previous</a>
+                {{/if}}
+
+                <span>Page {{currentPage}} of {{totalPages}}</span>
+
+                {{#if (lt currentPage totalPages)}}
+                <a href="/leads?page={{add currentPage 1}}" class="btn">Next</a>
+                {{/if}}
+            </div>
             {{else}}
             <li class="noLead" leads added here <br> please connect your app first</li>
             {{/if}}
             </ul>
+
+
             {{/ifEquals}}
 
 
@@ -876,11 +933,29 @@
         </nav>
         </li>
         {{/each}}
+
+        <!-- Pagination Controls -->
+        {{!-- {{#if showPagination}}
+        <div class="pagination">
+            {{#if (gt currentPage 1)}}
+            <a href="/leads?page={{subtract currentPage 1}}" class="btn btn-primary p-x-8">Previous</a>
+            {{/if}}
+
+            <span>Page {{currentPage}} of {{totalPages}}</span>
+
+            {{#if (lt currentPage totalPages)}}
+            <a href="/leads?page={{add currentPage 1}}" class="btn btn-outline-primary p-x-8">Next</a>
+            {{/if}}
+        </div>
+        {{/if}} --}}
+
+
         {{else}}
         <li class="noLead">No leads
             added here</li>
         {{/if}}
         </ul>
+
 
 
 
@@ -1065,8 +1140,11 @@
 
     <script src="/assets/js/custom-new.js"></script>
     <script>
-
+        // Handlebars helper to add/subtract numbers
+        Handlebars.registerHelper('add', (a, b) => a + b);
+        Handlebars.registerHelper('subtract', (a, b) => a - b);
     </script>
+
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
         $(document).ready(function () {
             $('#signup').on('submit', function () {

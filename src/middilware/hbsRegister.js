@@ -1,6 +1,26 @@
 
 const hbs = require('hbs')
 
+// Register 'gt' (greater than) helper
+hbs.registerHelper('gt', function (a, b) {
+  return a > b;
+});
+
+// Register 'lt' (less than) helper
+hbs.registerHelper('lt', function (a, b) {
+  return a < b;
+});
+
+// Register 'add' helper
+hbs.registerHelper('add', function (a, b) {
+  return a + b;
+});
+
+// Register 'subtract' helper
+hbs.registerHelper('subtract', function (a, b) {
+  return a - b;
+});
+
 hbs.registerHelper("formatDate", function (datetime) {
     if (!datetime) {
       return ""; // Return an empty string if datetime is invalid

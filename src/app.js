@@ -31,18 +31,17 @@ const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
 const WaModel = require("./models/wA.model.js");
 
-
 const paymentRoute = require("./routes/payment.route.js");
 const memberRoute = require("./routes/members.route.js");
 const userRoute = require("./routes/users.route.js");
 const Route = require("./routes/index.route.js");
+const externalRoute = require("./routes/external.route.js");
 const { log } = require("console");
 
 // todo Whatsapp integrations-----------------------------------------
 const { startKeepAlive } = require("./middilware/whatsapp.js");
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qr = require("qr-image");
-
 
 // Initialize variables
 let qrCodeData = "";
@@ -53,7 +52,19 @@ let connectedPhoneNumber = "";
 // Initialize the WhatsApp Client with Local Authentication
 let client = new Client({
   puppeteer: {
-    headless: true, ignoreHTTPSErrors: true, args: ['--ignore-certificate-errors', '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--no-first-run', '--no-zygote', '--single-process', '--disable-gpu']
+    headless: true,
+    ignoreHTTPSErrors: true,
+    args: [
+      "--ignore-certificate-errors",
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process",
+      "--disable-gpu",
+    ],
   },
   authStrategy: new LocalAuth(),
 });
@@ -61,10 +72,10 @@ let client = new Client({
 const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({
-      mongoUrl:
-        "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
-      collectionName: "sessions", // Collection name for sessions
-    })
+        mongoUrl:
+          "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+        collectionName: "sessions", // Collection name for sessions
+      })
     : new session.MemoryStore();
 
 const static_path = path.join(__dirname, "../public");
@@ -88,7 +99,7 @@ app.set("views", templatepath);
 
 //todo register partials
 hbs.registerPartials(path.join(__dirname, "../template/partials"));
-require('./middilware/hbsRegister.js')
+require("./middilware/hbsRegister.js");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -97,7 +108,6 @@ app.use(express.static("template"));
 // todo Passport.js Google Strategy
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 passport.use(
   new GoogleStrategy(
@@ -153,28 +163,27 @@ app.use("/", Route);
 app.use("/member", memberRoute);
 app.use("/user", userRoute);
 app.use("/payment", paymentRoute);
+app.use("/external", externalRoute);
 
 // todo wtsapp Handle root request
+
 app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
   let user;
-  if (req.user.role === "admin") {
+  if( req.user.role === "admin" ) {
     user = await logIncollection.findById(req.user.id)
-  }
-  else {
+  } 
+  else{
     user = await memberModel.findById(req.user.id);
   }
-
+  
   let userWA = await WaModel.findOne({ cid: user.cid });
-  if (userWA) {
-    console.log("DB val Of isConn", userWA.isConnected);
 
-  }
   console.log(isConnected, user.name, "check connection//");
   console.log("debug again", isConnected);
 
   if (userWA) {
     return res.json({ isConnected: userWA.isConnected });
-  } else {
+  }else{
     return res.json({ isConnected: false });
   }
 
@@ -183,7 +192,6 @@ app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
 app.get("/qr", isAdminLoggedIn, async (req, res) => {
   // console.log("qrCodeData genrated in /qr", req.user.name);
   const user = req.user;
-
 
   if (qrCodeData) {
     console.log("Qr genrated");
@@ -199,34 +207,36 @@ app.get("/qr", isAdminLoggedIn, async (req, res) => {
 let iii = 0;
 app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
   // console.log("qrCodeData genrated in /qr", req.user.name);
-  const user = await logIncollection.findById(req.user.id)
 
   if (qrCodeData) {
     console.log("Qr genrated");
   }
-  console.log("debug again On Second QR", iii, isConnected);
+  console.log("debug again On Second QR", iii,isConnected);
   iii++;
 
   if (isConnected) {
-    let userWA = await WaModel.findOne({ cid: user.cid })
     isConnected = false;
     whatsappClientReady = false;
+    let userWA = await WaModel.findOne({cid: req.user.cid})
     if (!userWA) {
+      console.log("user WA Model Not present then creant new");
       let userWA = new WaModel({
-        cid: user.cid,
+        cid: req.user.cid,
         isConnected: true,
         whatsappClientReady: true,
         connectedPhoneNumber: connectedPhoneNumber,
       });
+      
       await userWA.save();
-    } else {
-      userWA.cid = user.cid;
-      userWA.isConnected = true;
-      userWA.whatsappClientReady = true;
-      userWA.connectedPhoneNumber = connectedPhoneNumber;
-      await userWA.save()
-    }
-    console.log("debug again when client connected success", isConnected);
+    }else{
+    console.log("user WA Model present then update it");
+    userWA.isConnected = true;
+    userWA.whatsappClientReady = true;
+    userWA.connectedPhoneNumber = connectedPhoneNumber;
+    await userWA.save();
+  }
+
+  console.log("debug again when client connected success", isConnected);
 
     console.log("now we are blocking to refreshing qr page");
     return res.json({
@@ -234,92 +244,36 @@ app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
       isConnected: true,
     });
   }
-  else {
+  else{
     return res.json({
       qrCodeData,
-      isConnected: false,
+      isConnected : false,
     });
   }
 
-
+  
 });
-
-app.get("/qr/again/direct", isAdminLoggedIn, async (req, res) => {
-  // console.log("qrCodeData genrated in /qr", req.user.name);
-  const user = await logIncollection.findById(req.user.id)
-
-
-  if (isConnected) {
-    let userWA = await WaModel.findOne({ cid: user.cid })
-    isConnected = false;
-    whatsappClientReady = false;
-    // if(!userWA){
-    //   let userWA = new WaModel({
-    //     cid: user.cid,
-    //     isConnected: true,
-    //     whatsappClientReady: true,
-    //     connectedPhoneNumber: connectedPhoneNumber,
-    //   });
-    //   await userWA.save();
-  } else {
-    res.redirect('/logoutWA')
-    // userWA.cid = user.cid;
-    // userWA.isConnected = false;
-    // userWA.whatsappClientReady = false;
-    // userWA.connectedPhoneNumber = "";
-    // await userWA.save()
-  }
-  //   console.log("debug again when client connected success", isConnected);
-
-  //   console.log("now we are blocking to refreshing qr page");
-  //   return res.json({
-  //     qrCodeData,
-  //     isConnected: true,
-  //   });
-  // }
-  // else {
-  //   return res.json({
-  //     qrCodeData,
-  //     isConnected: false,
-  //   });
-
-
-
-});
-
 // todo logout whatsapp
 app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
   let whatsapp = await WaModel.findOne({ cid: req.user.cid });
-
   try {
-    let isConnected = whatsapp.isConnected;
+    whatsappClientReady = whatsapp.whatsappClientReady;
     // Check if the client is ready before attempting logout
-    console.log("outer");
-
-    if (isConnected && client.pupPage && !client.pupPage.isClosed()) {
-      console.log("inner");
+    if (whatsappClientReady && client.pupPage && !client.pupPage.isClosed()) {
       try {
-        setTimeout(async () => {
-          try {
-            await client.logout();
-          } catch (err) {
-            console.warn(err);
-          }
-        }, 3000);
-        console.log("pucho");
-
+        await client.logout();
         isConnected = false;
         let userWA = await WaModel.findOne({ cid: req.user.cid });
         if (userWA) {
-          console.log("aagye");
-
-
+          
           userWA.isConnected = false;
           userWA.whatsappClientReady = false;
           req.session.errorMSG = `Dis-Connected WhatsApp Number: ${connectedPhoneNumber}`;
           userWA.connectedPhoneNumber = "";
           await userWA.save();
         }
+
+        // req.session.errMsg = ''
         console.log("WhatsApp client logged out successfully.");
       } catch (logoutError) {
         console.error("Error during logout process:", logoutError);
@@ -350,6 +304,25 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
   }
 });
 
+
+// todo fetch leads on  button click
+app.get("/fetch/leads", isAdminLoggedIn, async (req, res) => {
+  try {
+    let user = await logIncollection.findOne({ cid: req.user.cid });
+    if (!user.facebookToken) {
+      let errMsg = "Please connect your facebook account. ";
+      return res.json(errMsg);
+    }
+
+    let data = await findNewLead(user.facebookToken, user);
+    console.log(data.length);
+    
+    res.json(data.length);
+  } catch (err) {
+    console.warn("Error in fetching leads manualy",err);
+  }
+});
+
 //------------------------------------------------------
 // todo manual lead addition
 app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
@@ -360,7 +333,7 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     } else {
       user = await memberModel.findById(req.user.id);
     }
-    let connStatus = await WaModel.findOne({ cid: user.cid });
+    
     const Admin = await logIncollection.findOne({ cid: user.cid });
     const leads_data = Object.entries(req.body)
       .filter(([key]) => key !== "remark" && key !== "remarktime") // Exclude 'remark' and 'remarktime'
@@ -478,12 +451,20 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
       );
     }
 
-    setTimeout(() => {
+    setTimeout(async() => {
+      let connStatus;
+      try {
+        connStatus = await WaModel.findOne({ cid: req.user.cid });
+      } catch (err) {
+        console.error("Error fetching connStatus: ", err);
+      }
       console.log("/manual/lead/");
-
+      console.log("wellcome to lead ",leadContactNo);
       let msg = wellcomeTemp.text;
       let companyName =
-        Admin.organizationName !== null || Admin.organizationName !== undefined || Admin.organizationName !== ""
+        Admin.organizationName !== null ||
+        Admin.organizationName !== undefined ||
+        Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
 
@@ -503,7 +484,6 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
       // );
 
       sendMessageToLead(
-
         connStatus,
         leadContactNo,
         personalizedMessage,
@@ -527,61 +507,24 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
       num: 2,
     });
 
-    // console.log(
-    //   "reminderTemplate document----",
-    //   reminderTemplateForMember,
-    //   "------reminderTemplate document"
-    // );
-
     if (timeDifference > 0) {
       // let reminderTempImagePath,reminderTempPdfPath;
-      setTimeout(() => {
-        // if (reminderTemplateForMember.image !== "") {
-        //   // img for user
-        //   reminderTempImagePath = path.join(
-        //     __dirname,
-        //     "../template/images/uploads/whatsapp/",
-        //     reminderTemplateForMember.image
-        //   );
-        // }
-        // if (reminderTemplateForMember.pdf !== "") {
-        //   // pdf for user
-        //   reminderTempPdfPath = path.join(
-        //     __dirname,
-        //     "../template/images/uploads/whatsapp/",
-        //     reminderTemplateForMember.pdf
-        //   );
-        // }
-        // if (thnakyouLeadTemplate.image !== "") {
-        //   // img for lead
-        //  .join(
-        //     __dirname,
-        //     "../template/images/uploads/whatsapp/",
-        //     thnakyouLeadTemplate.image
-        //   );
-        // }
-        // if (thnakyouLeadTemplate.pdf !== "") {
-        //   // pdf for lead
-        //   LeadTempPdfPath = path.join(
-        //     __dirname,
-        //     "../template/images/uploads/whatsapp/",
-        //     thnakyouLeadTemplate.pdf
-        //   );
-        // }
-
-        // console.log(reminderTempImagePath);
-        // console.log(reminderTempPdfPath);
-        // console.log(LeadTempImagePath);
-        // console.log(LeadTempPdfPath);
-
+      setTimeout(async() => {
+        let connStatus;
+        try {
+          connStatus = await WaModel.findOne({ cid: req.user.cid });
+        } catch (err) {
+          console.error("Error fetching connStatus: ", err);
+        }
         console.log("/remark/add/:id");
-        console.log(leadContactNo);
+        console.log(leadContactNo," lead contact number");
 
         let msg = reminderTemplateForMember.text;
 
         let companyName =
           Admin.organizationName !== null ||
-            Admin.organizationName !== undefined || Admin.organizationName !== ""
+          Admin.organizationName !== undefined ||
+          Admin.organizationName !== ""
             ? Admin.organizationName
             : "360FollowUps";
 
@@ -594,7 +537,7 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
           .replace("[date]", remarkDate)
           .replace("[time]", remarkTime)
           .replace("[company name]", companyName);
-
+          console.log("reminder to member ",userContact);
         sendMessageToLead(
           connStatus,
           userContact,
@@ -611,60 +554,23 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
       num: 1,
     });
 
-    // console.log(
-    //   "reminder for customer template document----",
-    //   reminderTemplateForCustomer,
-    //   "------reminder for customer template document"
-    // );
-
     if (timeDifference > 0) {
       // let reminderForCustomerTempImagePath,reminderForCusromerTempPdfPath;
-      setTimeout(() => {
-        //   if (reminderTemplateForCustomer.image !== "") {
-        //     // img for user
-        //     reminderForCustomerTempImagePath = path.join(
-        //       __dirname,
-        //       "../template/images/uploads/whatsapp/",
-        //       reminderTemplateForCustomer.image
-        //     );
-        //   }
-        //   if (reminderTemplateForCustomer.pdf !== "") {
-        //     // pdf for user
-        //     reminderForCusromerTempPdfPath = path.join(
-        //       __dirname,
-        //       "../template/images/uploads/whatsapp/",
-        //       reminderTemplateForCustomer.pdf
-        //     );
-        //   }
-        // if (thnakyouLeadTemplate.image !== "") {
-        //   // img for lead
-        //   LeadTempImagePath = path.join(
-        //     __dirname,
-        //     "../template/images/uploads/whatsapp/",
-        //     thnakyouLeadTemplate.image
-        //   );
-        // }
-        // if (thnakyouLeadTemplate.pdf !== "") {
-        //   // pdf for lead
-        //   LeadTempPdfPath = path.join(
-        //     __dirname,
-        //     "../template/images/uploads/whatsapp/",
-        //     thnakyouLeadTemplate.pdf
-        //   );
-        // }
-
-        // console.log(reminderForCustomerTempImagePath);
-        // console.log(reminderForCusromerTempPdfPath);
-        // console.log(LeadTempImagePath);
-        // console.log(LeadTempPdfPath);
-
+      setTimeout(async() => {
+       let connStatus
+        try {
+          connStatus = await WaModel.findOne({ cid: req.user.cid });
+        } catch (err) {
+          console.error("Error fetching connStatus: ", err);
+        }
         console.log("/remark/add/:id");
-        console.log(leadContactNo);
+        console.log(leadContactNo," lead contact number");
 
         let msg = reminderTemplateForCustomer.text;
         let companyName =
           Admin.organizationName !== null ||
-            Admin.organizationName !== undefined || Admin.organizationName !== ""
+          Admin.organizationName !== undefined ||
+          Admin.organizationName !== ""
             ? Admin.organizationName
             : "360FollowUps";
 
@@ -672,8 +578,9 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
           .replace("[customer name]", customerName)
           .replace("[company name]", companyName)
           .replace("[date]", remarkDate)
-          .replace("[time]", remarkTime);
-
+          .replace("[time]", remarkTime)
+          .replace("[company name]", companyName);
+          console.log("reminder to lead ",leadContactNo);
         sendMessageToLead(
           connStatus,
           leadContactNo,
@@ -696,12 +603,21 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     //   "------after call template document"
     // );
 
-    setTimeout(() => {
+    setTimeout(async() => {
+      let connStatus
+      try {
+        connStatus = await WaModel.findOne({ cid: req.user.cid });
+      } catch (err) {
+        console.error("Error fetching connStatus: ", err);
+      }
       console.log("/remark/add/:id");
-
+      console.log("thanks to lead ",leadContactNo);
+      
       let msg = thnakyouLeadTemplate.text;
       let companyName =
-        Admin.organizationName !== null || Admin.organizationName !== undefined || Admin.organizationName !== ""
+        Admin.organizationName !== null ||
+        Admin.organizationName !== undefined ||
+        Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
       const personalizedMessage = msg
@@ -743,7 +659,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
     user = await logIncollection.findById(req.user.id);
   } else user = await memberModel.findById(user._id);
 
-  let connStatus = await WaModel.findOne({ cid: user.cid });
+  
   let Admin = await logIncollection.findOne({ cid: user.cid });
 
   let userContact = user.mobile;
@@ -819,19 +735,22 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
     num: 2,
   });
 
-
   console.log(timeDifference);
 
   //todo  reminder message for team member
   if (timeDifference > 0) {
     // let reminderTempImagePath,reminderTempPdfPath;
-    setTimeout(() => {
+    setTimeout(async() => {
+      let connStatus = await WaModel.findOne({ cid: req.user.cid });
+
       console.log("/remark/add/:id");
       console.log(leadContactNo);
-
+      console.log("reminder to members ",userContact);
       let msg = reminderTemplateForMember.text;
       let companyName =
-        Admin.organizationName !== null || Admin.organizationName !== undefined || Admin.organizationName !== ""
+        Admin.organizationName !== null ||
+        Admin.organizationName !== undefined ||
+        Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
       const personalizedMessage = msg
@@ -862,14 +781,22 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
 
   if (timeDifference > 0) {
     // let reminderForCustomerTempImagePath,reminderForCusromerTempPdfPath;
-    setTimeout(() => {
-
+    setTimeout(async() => {
+      let connStatus;
+      try {
+        connStatus = await WaModel.findOne({ cid: req.user.cid });
+      } catch (err) {
+        console.error("Error fetching connStatus: ", err);
+      }
       console.log("/remark/add/:id");
       console.log(leadContactNo);
+      console.log("reminder to lead ",leadContactNo);
 
       let msg = reminderTemplateForCustomer.text;
       let companyName =
-        Admin.organizationName !== null || Admin.organizationName !== undefined || Admin.organizationName !== ""
+        Admin.organizationName !== null ||
+        Admin.organizationName !== undefined ||
+        Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
       const personalizedMessage = msg
@@ -895,20 +822,26 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
     num: 5,
   });
 
-
-
-  setTimeout(() => {
+  setTimeout(async() => {
+    let connStatus;
+    try {
+      connStatus = await WaModel.findOne({ cid: req.user.cid });
+    } catch (err) {
+      console.error("Error fetching connStatus: ", err);
+    }
     console.log("/remark/add/:id");
+    console.log("thanks to lead ",leadContactNo);
 
     let msg = thnakyouLeadTemplate.text;
     let companyName =
-      Admin.organizationName !== null || Admin.organizationName !== undefined || Admin.organizationName !== ""
+      Admin.organizationName !== null ||
+      Admin.organizationName !== undefined ||
+      Admin.organizationName !== ""
         ? Admin.organizationName
         : "360FollowUps";
     const personalizedMessage = msg
       .replace("[customer name]", customerName)
       .replace("[company name]", companyName);
-
 
     sendMessageToLead(
       connStatus,
@@ -922,12 +855,11 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
   return res.json(remark);
 });
 
-
 // todo Google Authentication Routes
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] }),
-  (req, res) => { }
+  (req, res) => {}
 );
 // todo google callback
 app.get(
@@ -1081,7 +1013,6 @@ app.get(
   }
 );
 
-
 //todo  Facebook Login Route
 app.get("/auth/facebook", (req, res) => {
   const facebookAuthUrl =
@@ -1089,7 +1020,8 @@ app.get("/auth/facebook", (req, res) => {
     querystring.stringify({
       client_id: process.env.FB_CLIENT_ID,
       redirect_uri: process.env.REDIRECT_URI,
-      scope: "public_profile,email,leads_retrieval,pages_manage_ads,pages_read_engagement,pages_manage_metadata,pages_show_list",
+      scope:
+        "public_profile,email,leads_retrieval,pages_manage_ads,pages_read_engagement,pages_manage_metadata,pages_show_list",
       response_type: "code",
     });
   console.log("redirected from /auth/fb");
@@ -1098,9 +1030,174 @@ app.get("/auth/facebook", (req, res) => {
 });
 
 // todo Facebook Callback Route
+// app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
+//   const { code } = req.query;
+//   console.log("Entering Facebook callback route");
+
+//   if (!code) {
+//     console.log("No authorization code provided.");
+//     return res.status(400).send("Invalid authorization code");
+//   }
+
+//   try {
+//     // Get access token from Facebook OAuth
+//     const tokenResponse = await axios.get(
+//       "https://graph.facebook.com/v20.0/oauth/access_token",
+//       {
+//         params: {
+//           client_id: process.env.FB_CLIENT_ID,
+//           redirect_uri: process.env.REDIRECT_URI,
+//           client_secret: process.env.FB_CLIENT_SECRET,
+//           code,
+//         },
+//       }
+//     );
+
+//     const accessToken = tokenResponse.data.access_token;
+//     console.log("User Access token received:", accessToken);
+
+//     // Find the admin from the database
+//     let admin = await logIncollection.findById(req.user.id);
+//     if (!admin) {
+//       console.log("Admin not found, redirecting to login.");
+//       return res.redirect("/login");
+//     }
+
+//     admin.facebookToken = accessToken;
+//     await admin.save();
+//     console.log("Access token saved to admin account.");
+
+//     // Fetch pages connected to the Facebook account
+//     const pagesResponse = await axios.get(
+//       `https://graph.facebook.com/v20.0/me/accounts`,
+//       {
+//         params: { access_token: accessToken, fields: "id,name,access_token" },
+//       }
+//     );
+
+//     const pages = pagesResponse.data.data;
+//     console.log("Total pages fetched:", pages.length);
+//     if (!pages.length) console.warn("No pages available for this account.");
+
+//     let allLeads = [];
+
+//     // Loop through each page to fetch its leadgen forms
+//     for (const page of pages) {
+//       console.log(`Processing page: ${page.name} (ID: ${page.id})`);
+
+//       try {
+//         const leadFormsResponse = await axios.get(
+//           `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
+//           {
+//             params: { access_token: page.access_token, fields: "id,name" },
+//           }
+//         );
+
+//         const leadForms = leadFormsResponse.data.data;
+//         console.log(`Forms fetched for page ${page.name}: ${leadForms.length}`);
+
+//         // Loop through each form to fetch leads
+//         for (const form of leadForms) {
+//           console.log(`Fetching leads for form: ${form.name} (ID: ${form.id})`);
+
+//           try {
+//             const leadsResponse = await axios.get(
+//               `https://graph.facebook.com/v20.0/${form.id}/leads`,
+//               {
+//                 params: {
+//                   access_token: page.access_token,
+//                   fields: "id,created_time,field_data",
+//                 },
+//               }
+//             );
+
+//             const leads = leadsResponse.data.data;
+//             console.log(
+//               `Total leads fetched for form ${form.name}: ${leads.length}`
+//             );
+
+//             leads.forEach((lead) => {
+//               allLeads.push({
+//                 ...lead, // Include original lead data
+//                 page_id: page.id,
+//                 page_name: page.name,
+//                 form_id: form.id,
+//                 form_name: form.name,
+//               });
+//             });
+
+//             if (leadsResponse.data.paging?.next) {
+//               console.log(
+//                 `Pagination detected. Next page URL: ${leadsResponse.data.paging.next}`
+//               );
+//             }
+//           } catch (err) {
+//             console.error(
+//               `Error fetching leads for form ${form.name}:`,
+//               err.message
+//             );
+//           }
+//         }
+//       } catch (err) {
+//         console.error(
+//           `Error fetching forms for page ${page.name}:`,
+//           err.message
+//         );
+//       }
+//     }
+
+//     console.log("Leads fetched with page and form details:", allLeads);
+
+//     // Save the leads to the database
+//     for (const lead of allLeads) {
+//       const existingLead = await leadsModel.findOne({
+//         lead_id: lead.id,
+//         cid: req.user.cid,
+//       });
+
+//       if (!existingLead) {
+//         const leadsData = lead.field_data.map((data) => ({
+//           que: data.name,
+//           ans: data.values[0],
+//         }));
+//         // let defPipe = await pipelineModel.findOne({ num: 4, cid: user.cid });
+//         const newLead = new leadsModel({
+//           lead_id: lead.id,
+//           income_time: lead.created_time,
+//           page_id: lead.page_id,
+//           page_name: lead.page_name,
+//           form_id: lead.form_id,
+//           form_name: lead.form_name,
+//           cid: admin.cid,
+//           leads_data: leadsData,
+//           // status: defPipe._id,
+//           app: "facebook",
+//         });
+
+//         await newLead.save();
+//         console.log(
+//           `Saved lead ${lead.id} from page "${lead.page_name}" and form "${lead.form_name}".`
+//         );
+//       } else {
+//         console.log(`Lead ${lead.id} already exists in the database.`);
+//       }
+//     }
+
+//     // Start background job for keeping access token alive, if necessary
+
+//     req.session.successMSG = "Connected to Facebook account.";
+//     res.redirect("/external/get/data");
+//   } catch (error) {
+//     console.error(
+//       "Error during Facebook callback:",
+//       error.response ? error.response.data : error.message
+//     );
+//     res.status(500).send("Error logging in with Facebook.");
+//   }
+// });
+
 app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
   const { code } = req.query;
-  console.log("Entering Facebook callback route");
 
   if (!code) {
     console.log("No authorization code provided.");
@@ -1108,7 +1205,6 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
   }
 
   try {
-    // Get access token from Facebook OAuth
     const tokenResponse = await axios.get(
       "https://graph.facebook.com/v20.0/oauth/access_token",
       {
@@ -1122,104 +1218,19 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
     );
 
     const accessToken = tokenResponse.data.access_token;
-    console.log("User Access token received:", accessToken);
+    const admin = await logIncollection.findById(req.user.id);
 
-    // Find the admin from the database
-    let admin = await logIncollection.findById(req.user.id);
     if (!admin) {
-      console.log("Admin not found, redirecting to login.");
       return res.redirect("/login");
     }
 
     admin.facebookToken = accessToken;
     await admin.save();
-    console.log("Access token saved to admin account.");
 
-    // Fetch pages connected to the Facebook account
-    const pagesResponse = await axios.get(
-      `https://graph.facebook.com/v20.0/me/accounts`,
-      {
-        params: { access_token: accessToken, fields: "id,name,access_token" },
-      }
-    );
-
-    const pages = pagesResponse.data.data;
-    console.log("Total pages fetched:", pages.length);
-    if (!pages.length) console.warn("No pages available for this account.");
-
-    let allLeads = [];
-
-    // Loop through each page to fetch its leadgen forms
-    for (const page of pages) {
-      console.log(`Processing page: ${page.name} (ID: ${page.id})`);
-
-      try {
-        const leadFormsResponse = await axios.get(
-          `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
-          {
-            params: { access_token: page.access_token, fields: "id,name" },
-          }
-        );
-
-        const leadForms = leadFormsResponse.data.data;
-        console.log(
-          `Forms fetched for page ${page.name}: ${leadForms.length}`
-        );
-
-        // Loop through each form to fetch leads
-        for (const form of leadForms) {
-          console.log(
-            `Fetching leads for form: ${form.name} (ID: ${form.id})`
-          );
-
-          try {
-            const leadsResponse = await axios.get(
-              `https://graph.facebook.com/v20.0/${form.id}/leads`,
-              {
-                params: {
-                  access_token: page.access_token,
-                  fields: "id,created_time,field_data",
-                },
-              }
-            );
-
-            const leads = leadsResponse.data.data;
-            console.log(
-              `Total leads fetched for form ${form.name}: ${leads.length}`
-            );
-
-
-            leads.forEach((lead) => {
-              allLeads.push({
-                ...lead, // Include original lead data
-                page_id: page.id,
-                page_name: page.name,
-                form_id: form.id,
-                form_name: form.name,
-              });
-            });
-
-
-            if (leadsResponse.data.paging?.next) {
-              console.log(
-                `Pagination detected. Next page URL: ${leadsResponse.data.paging.next}`
-              );
-            }
-          } catch (err) {
-            console.error(
-              `Error fetching leads for form ${form.name}:`,
-              err.message
-            );
-          }
-        }
-      } catch (err) {
-        console.error(`Error fetching forms for page ${page.name}:`, err.message);
-      }
-    }
-
-    console.log("Leads fetched with page and form details:", allLeads);
-
-    // Save the leads to the database
+    // Fetch pages and leads
+    let allLeads = await fetchLeadsFromFacebook(accessToken);
+    
+    // Save leads to database (if needed)
     for (const lead of allLeads) {
       const existingLead = await leadsModel.findOne({ lead_id: lead.id, cid: req.user.cid });
 
@@ -1228,7 +1239,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
           que: data.name,
           ans: data.values[0],
         }));
-        // let defPipe = await pipelineModel.findOne({ num: 4, cid: user.cid });
+
         const newLead = new leadsModel({
           lead_id: lead.id,
           income_time: lead.created_time,
@@ -1238,21 +1249,12 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
           form_name: lead.form_name,
           cid: admin.cid,
           leads_data: leadsData,
-          // status: defPipe._id,
           app: "facebook",
         });
 
         await newLead.save();
-        console.log(
-          `Saved lead ${lead.id} from page "${lead.page_name}" and form "${lead.form_name}".`
-        );
-      } else {
-        console.log(`Lead ${lead.id} already exists in the database.`);
       }
     }
-
-    // Start background job for keeping access token alive, if necessary
-
 
     req.session.successMSG = "Connected to Facebook account.";
     res.redirect("/leads");
@@ -1265,11 +1267,79 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
   }
 });
 
+
+async function fetchLeadsFromFacebook(accessToken) {
+  let allLeads = [];
+  const pagesResponse = await axios.get(
+    `https://graph.facebook.com/v20.0/me/accounts`,
+    { params: { access_token: accessToken, fields: "id,name,access_token" } }
+  );
+
+  const pages = pagesResponse.data.data;
+  
+  for (const page of pages) {
+    const formsResponse = await axios.get(
+      `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
+      { params: { access_token: page.access_token, fields: "id,name" } }
+    );
+
+    const forms = formsResponse.data.data;
+
+    for (const form of forms) {
+      let nextPageUrl = `https://graph.facebook.com/v20.0/${form.id}/leads`;
+
+      while (nextPageUrl) {
+        const response = await axios.get(nextPageUrl, {
+          params: {
+            access_token: page.access_token,
+            fields: "id,created_time,field_data",
+          },
+        });
+
+      
+        for (const lead of response.data.data) {
+         
+          lead.page_id = page.id;
+          lead.page_name = page.name;
+          lead.form_id = form.id;
+          lead.form_name = form.name; 
+
+          allLeads.push(lead);
+        }
+
+        nextPageUrl = response.data.paging?.next || null;
+      }
+    }
+  }
+  return allLeads;
+}
+
+app.get('/leads/pre', isAdminLoggedIn,async(req,res)=>{
+  try {
+    let user = await logIncollection.findOne({cid: req.user.cid})
+    
+    if(!user) {
+      return res.redirect('/user/login')
+    };
+    console.log(user.facebookToken,"hhhh");
+    
+    if(user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
+      return res.redirect('/leads')
+    }
+    let data = await findNewLead(user.facebookToken, user);
+    console.log(data);
+    
+    res.redirect('/leads');
+  } catch (err) {
+    console.warn("error in finding ne lead in /leads/pre - ",err);
+  }
+})
 // todo logout facebook
 app.get("/logoutfacebook", isAdminLoggedIn, async (req, res) => {
   try {
-
-    await logIncollection.findByIdAndUpdate(req.user.id, { facebookToken: null });
+    await logIncollection.findByIdAndUpdate(req.user.id, {
+      facebookToken: null,
+    });
     req.session.successMSG = "Facebook account disconnected.";
     res.redirect("/user/dashboard");
   } catch (err) {
@@ -1277,7 +1347,6 @@ app.get("/logoutfacebook", isAdminLoggedIn, async (req, res) => {
     res.status(500).send("Error clearing Facebook token.");
   }
 });
-
 
 app.get("/:page", (req, res) => {
   const page = req.params.page;
@@ -1313,7 +1382,6 @@ function isAdminLoggedIn(req, res, next) {
     return next();
   });
 }
-
 
 function ensureQRCodeEvent() {
   // Avoid attaching multiple QR listeners by checking if it's already attached
@@ -1358,7 +1426,21 @@ function initializeWhatsAppClient() {
 
   // Recreate the client to ensure fresh state
   client = new Client({
-    puppeteer: { headless: true, ignoreHTTPSErrors: true, args: ['--ignore-certificate-errors', '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--no-first-run', '--no-zygote', '--single-process', '--disable-gpu'] },
+    puppeteer: {
+      headless: true,
+      ignoreHTTPSErrors: true,
+      args: [
+        "--ignore-certificate-errors",
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-accelerated-2d-canvas",
+        "--no-first-run",
+        "--no-zygote",
+        "--single-process",
+        "--disable-gpu",
+      ],
+    },
     authStrategy: new LocalAuth(),
   });
 
@@ -1371,7 +1453,7 @@ function initializeWhatsAppClient() {
     isConnected = true;
     connectedPhoneNumber = client.info.wid.user;
     console.log("Connected WhatsApp Number:", connectedPhoneNumber);
-    startKeepAlive(client);
+    // startKeepAlive(client);
   });
 
   client.on("disconnected", async (reason) => {
@@ -1408,11 +1490,6 @@ function initializeWhatsAppClient() {
 
 initializeWhatsAppClient();
 
-const readJsonFile = () => {
-  const filePath = "./src/generated_data.json";
-  const data = fs.readFileSync(filePath, "utf8");
-  return JSON.parse(data); // Return the parsed JSON data
-};
 
 async function sendMessageToLead(
   adminWA,
@@ -1421,15 +1498,15 @@ async function sendMessageToLead(
   imagePath = null,
   pdfPath = null
 ) {
-
-  if (adminWA === null) {
+  if (adminWA === null || adminWA === undefined || adminWA === '') {
     console.warn("WhatsApp client is not ready. please connect mobile number");
-    return
+    return;
   }
-
+  console.log();
+  
   // Check if WhatsApp client is ready
   if (adminWA && !adminWA.isConnected) {
-    console.warn("WhatsApp client is not ready. Queuing message.");
+    console.warn("WhatsApp client is not ready. please re-connect mobile number isConnected in DB=", adminWA.isConnected);
     return;
   }
   console.log(
@@ -1486,13 +1563,13 @@ async function findNewLead(accessToken, user) {
     return;
   }
 
-
   let allNewLeads = [];
   const pagesResponse = await axios.get(
     `https://graph.facebook.com/v20.0/me/accounts`,
     {
       params: {
-        access_token: accessToken, fields: "id,name,access_token"
+        access_token: accessToken,
+        fields: "id,name,access_token",
       },
     }
   );
@@ -1515,15 +1592,11 @@ async function findNewLead(accessToken, user) {
       );
 
       const leadForms = leadFormsResponse.data.data;
-      console.log(
-        `Forms fetched for page ${page.name}: ${leadForms.length}`
-      );
+      console.log(`Forms fetched for page ${page.name}: ${leadForms.length}`);
 
       // Loop through each form to fetch leads
       for (const form of leadForms) {
-        console.log(
-          `Fetching leads for form: ${form.name} (ID: ${form.id})`
-        );
+        console.log(`Fetching leads for form: ${form.name} (ID: ${form.id})`);
 
         try {
           const leadsResponse = await axios.get(
@@ -1541,7 +1614,6 @@ async function findNewLead(accessToken, user) {
             `Total leads fetched for form ${form.name}: ${leads.length}`
           );
 
-
           leads.forEach((lead) => {
             allLeads.push({
               ...lead, // Include original lead data
@@ -1551,7 +1623,6 @@ async function findNewLead(accessToken, user) {
               form_name: form.name,
             });
           });
-
 
           if (leadsResponse.data.paging?.next) {
             console.log(
@@ -1571,7 +1642,10 @@ async function findNewLead(accessToken, user) {
   }
 
   allLeads.forEach(async (lead) => {
-    const existingLead = await leadsModel.findOne({ lead_id: lead.id, cid: admin.cid });
+    const existingLead = await leadsModel.findOne({
+      lead_id: lead.id,
+      cid: admin.cid,
+    });
 
     if (!existingLead) {
       console.log("new lead found", lead);
@@ -1581,7 +1655,7 @@ async function findNewLead(accessToken, user) {
       lead.field_data.forEach((data) => {
         leads_datas.push({
           que: data.name,
-          ans: data.values[0]
+          ans: data.values[0],
         });
       });
 
@@ -1645,26 +1719,21 @@ async function findNewLead(accessToken, user) {
         console.log("Un-Matched then customerName:", customerName);
       }
 
-      let connStatus;
-      try {
-        connStatus = await WaModel.findOne({ cid: admin.cid });
-      } catch (err) {
-        console.error("Error fetching connStatus: ", err);
-        return;
-      }
-
-      if (!connStatus) {
-        console.error("connStatus not found.");
-        return;
-      }
-
+      
       const wellcomeTemp = await templateModel.findOne({
         cid: admin.cid,
         num: 4,
       });
 
       // todo COUSTOMER Whatsapp Message
-      setTimeout(() => {
+      setTimeout(async() => {
+        let connStatus;
+      try {
+        connStatus = await WaModel.findOne({ cid: admin.cid });
+      } catch (err) {
+        console.error("Error fetching connStatus: ", err);
+      }
+
         let imagePath, pdfPath;
         if (wellcomeTemp.image !== "") {
           imagePath = path.join(
@@ -1686,8 +1755,8 @@ async function findNewLead(accessToken, user) {
 
         let companyName =
           admin.organizationName !== null ||
-            admin.organizationName !== 'undefined' ||
-            admin.organizationName !== ''
+          admin.organizationName !== "undefined" ||
+          admin.organizationName !== ""
             ? admin.organizationName
             : "360FollowUps";
 
@@ -1703,7 +1772,7 @@ async function findNewLead(accessToken, user) {
         //   imagePath,
         //   pdfPath
         // );
-
+        console.log("Welcome to lead new lead found",leadContactNo);
         sendMessageToLead(
           connStatus,
           leadContactNo,
@@ -1719,12 +1788,17 @@ async function findNewLead(accessToken, user) {
         num: 3,
       });
       setTimeout(async () => {
+        try {
+          connStatus = await WaModel.findOne({ cid: admin.cid });
+        } catch (err) {
+          console.error("Error fetching connStatus: ", err);
+        }
         let msg = notificationTemp.text;
 
         let companyName =
           admin.organizationName !== null ||
-            admin.organizationName !== '' ||
-            admin.organizationName !== undefined
+          admin.organizationName !== "" ||
+          admin.organizationName !== undefined
             ? admin.organizationName
             : "360FollowUps";
         const today = new Date();
@@ -1743,11 +1817,11 @@ async function findNewLead(accessToken, user) {
           .replace("[date]", formattedDate)
           .replace("[lead source]", "facebook")
           .replace("[company name]", companyName);
-
+          console.log("notificaton to admin new lead found ",admin.mobile);
         sendMessageToLead(connStatus, admin.mobile, personalizedMessage);
 
         // todo new lead found msg to all Members
-        let users = await memberModel.find({ cid: admin.cid })
+        let users = await memberModel.find({ cid: admin.cid });
         for (let i = 0; i < users.length; i++) {
           setTimeout(() => {
             const personalizedMessage = msg
@@ -1757,19 +1831,77 @@ async function findNewLead(accessToken, user) {
               .replace("[date]", formattedDate)
               .replace("[lead source]", "facebook")
               .replace("[company name]", companyName);
-
+            console.log("notification to members new lead found",users[i].mobile);
             sendMessageToLead(connStatus, users[i].mobile, personalizedMessage);
           }, 2000);
         }
       }, 2500);
 
       allNewLeads.push(newLead);
-
     }
   });
 
   return allLeads;
 }
+
+async function sendMessageToLead(
+  adminWA,
+  phoneNumber,
+  message,
+  imagePath = null,
+  pdfPath = null
+) {
+  if (adminWA === null || adminWA === undefined || adminWA === "") {
+    console.warn("WhatsApp client is not ready. please connect mobile number");
+    return;
+  }
+  console.log();
+
+  // Check if WhatsApp client is ready
+  if (adminWA && !adminWA.isConnected) {
+    console.warn(
+      "WhatsApp client is not ready. please re-connect mobile number isConnected in DB=",
+      adminWA.isConnected
+    );
+    return;
+  }
+  console.log(
+    "Trying to send message. Client ready status:",
+    adminWA.isConnected
+  );
+
+  try {
+    // If imagePath and captionText are provided, send image with caption
+    if (imagePath && pdfPath) {
+      const imageMedia = MessageMedia.fromFilePath(imagePath);
+      const pdfMedia = MessageMedia.fromFilePath(pdfPath);
+
+      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
+        caption: message,
+      });
+
+      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia);
+    } else if ((imagePath && !pdfPath) || pdfPath == "") {
+      // send Only a image with text message
+      const imageMedia = MessageMedia.fromFilePath(imagePath);
+      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
+        caption: message,
+      });
+    } else if ((pdfPath && !imagePath) || imagePath == "") {
+      // send Only a pdf with text message
+      const pdfMedia = MessageMedia.fromFilePath(pdfPath);
+      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia, {
+        caption: message,
+      });
+    } else {
+      await client.sendMessage(`91${phoneNumber}@c.us`, message);
+      console.log("Text message sent successfully!");
+    }
+  } catch (error) {
+    console.error("Error sending message:", error);
+  }
+}
+
 
 let chalteRahoId;
 function chalteRaho(token, user) {
