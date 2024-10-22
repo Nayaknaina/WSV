@@ -215,7 +215,7 @@ Just a reminder that you have a follow-up call scheduled with [Customer Name] on
 Good luck with the call, and let us know if you need any assistance!
 
 Best Regards,
-The [Company Name] System`,
+The [Company Name] Team`,
         client: false,
         team: true,
         num: 2,
@@ -230,7 +230,7 @@ Thank you for taking the time to speak with us today. We appreciate the opportun
 If you have any questions or need more information, please don’t hesitate to reach out. We look forward to continuing our conversation and helping you achieve your goals.
 
 Best Regards,
-The [Company Name] Team`,
+The [Company Name] Team`,
         client: true,
         team: false,
         num: 5,
@@ -249,7 +249,7 @@ A new lead has been added to the CRM. Here are the details:
 Please follow up with the lead at your earliest convenience to ensure a prompt response.
 
 Best,
-The [Company Name] System`,
+The [Company Name] Team`,
         client: false,
         team: true,
         num: 3,
@@ -264,7 +264,7 @@ Welcome to [Company Name]! We’re thrilled to have you on board. Our team will 
 If you have any immediate questions, feel free to get in touch with us. We're here to support you every step of the way!
 
 Best Regards,
-The [Company Name] Team`,
+The [Company Name] Team`,
         client: true,
         team: false,
         num: 4,

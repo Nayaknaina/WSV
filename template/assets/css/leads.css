@@ -1,0 +1,561 @@
+  /* Global reset and basic styling */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+
+}
+
+/* Modal (Popup) Styling */
+.custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999999999999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 800px;
+    width: 100%;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.close-btn {
+    cursor: pointer;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: rgb(255, 255, 255);
+    background-color: #f00;
+    border-radius: 4px;
+    padding: 0px 10px;
+}
+
+/* Form Styling */
+.form-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  
+}
+
+.form-group div {
+    width: 48%;
+    margin-bottom: 10px;
+}
+
+.form-group div label {
+    display: block;
+    margin-bottom: 0px;
+}
+
+.form-group div input {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-group div textarea {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Custom validation styles */
+input:invalid {
+    border-color: red;
+}
+
+input:valid {
+    border-color: green;
+}
+
+.details-container {
+    display: block;
+    margin-top: 8px;
+    /* Add space between the icon and text */
+    font-size: 0.8em;
+}
+
+
+@media (max-width: 600px) {
+    .form-group div {
+        width: 100%;
+
+    }
+
+    .form-group {
+        overflow: auto;
+        max-height: 470px;
+    }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    .start-drowp-app {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .details-container {
+        margin-left: 30px;
+        /* Adjust margin to align properly */
+    }
+
+    .icon-container {
+        gap: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .details-container {
+        font-size: 0.9em;
+        margin-left: 0;
+        /* No margin for very small screens */
+    }
+
+    .start-drowp-app {
+       
+        align-items: flex-start;
+    }
+
+    .formateDate {
+        margin-bottom: 4px;
+    }
+}
+body {
+    background-color: #ededed;
+    font-family: "Open Sans", sans-serif;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav {
+    margin: 1px 0;
+    box-shadow: 0px 6px 8px #7d7a7a;
+    border-radius: 8px;
+    transition: max-height 0.4s ease;
+
+}
+
+nav .fa-chevron-down {
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 22px;
+}
+
+nav>label {
+    display: block;
+    padding: 7px;
+    box-shadow: 0 0 0.3125rem 0 rgba(20, 12, 0, .06);
+    color: rgb(7, 7, 7);
+    font-size: 1.2em;
+    cursor: pointer;
+    font-variant: small-caps;
+}
+
+.slide {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    background-color: #f9f9f9;
+    padding: 0 15px;
+}
+
+.slide li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.slide li:last-child {
+    border-bottom: none;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="checkbox"]:checked+.slide {
+    max-height: 500px;
+    /* Adjust as per content */
+    padding: 15px;
+}
+
+.created-time-label {
+    /*display: flex;*/
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f7fbff;
+    border-radius: 5px;
+}
+
+.icon-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    right: 10px;
+    justify-content: flex-end;
+}
+
+.icon-container-myleads {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    right: 10px;
+    justify-content: flex-end;
+}
+
+.status-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid black;
+    background-color: #36383a;
+    position: relative;
+}
+
+.created-time-icon {
+    width: 20px;
+    height: 20px;
+}
+
+#status-box {
+    display: none;
+    width: auto;
+    height: auto;
+    position: relative;
+    top: 0%;
+    z-index: 99999999;
+    right: 0%;
+}
+
+.ul-box {
+    min-width: 150px;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 3rem;
+    right: 1rem;
+    z-index: 99999999;
+    display: none;
+    border-radius: 11px;
+    background-color: rgb(255, 255, 255);
+    overflow-y: auto;
+    box-shadow: 2px 2px 11px 5px #424242;
+    padding: 10px 8px;
+}
+
+.other-user-box {
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 3rem;
+    right: 1rem;
+    display: none;
+    border-radius: 11px;
+    background-color: rgb(255, 255, 255);
+    overflow-y: auto;
+    box-shadow: 1px 1px 14px 0 rgb(158, 158, 158);
+    padding: 8px 8px;
+
+}
+
+.user-name {
+    position: relative;
+}
+
+.other-user-box li {
+    border: 2px solid rgb(124, 124, 124);
+    width: auto;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 8px;
+    gap: 10px;
+}
+
+.other-user-box.open {
+    display: block;
+}
+
+.ul-box.open {
+    display: block;
+}
+
+.ul-box li {
+    border: 2px solid rgb(124, 124, 124);
+    width: auto;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 8px;
+    gap: 10px;
+}
+
+.drop-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgb(0, 0, 0);
+}
+
+.fa-square-facebook {
+    margin-left: 15px;
+}
+
+.formateDate {
+    min-width: 100px;
+    display: inline-block;
+}
+
+.start-drowp-app {
+    display: flex;
+    gap: 8px;
+}
+
+.user-name-style {
+    display: inline-block;
+    display: flex;
+    justify-content: center;
+    font-variant: normal;
+    font-size: 16px;
+    min-width: 90px;
+    max-width: 150px;
+    padding: 2px 7px;
+    background-color: #fff;
+    border: 1px solid rgb(9, 9, 9);
+    border-radius: 5px;
+}
+
+.noLead {
+    text-align: center;
+    font-size: 35px;
+    color: #36383a89;
+    margin-top: 100px;
+
+}
+
+/* Pagination container styling */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    font-family: 'Arial', sans-serif;
+}
+
+
+/* Disabled Previous/Next button style (if needed) */
+.pagination .btn.disabled {
+    pointer-events: none;
+    background-color: #bbb;
+    cursor: not-allowed;
+}
+
+/* Page Info Text Styling */
+.pagination .page-info {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* General filter container styling */
+.filter-container {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    max-width: 400px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    z-index: 100;
+    display: none;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Input fields and buttons */
+.filter-container input,
+.filter-container button {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Primary button styling */
+.filter-container button {
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+}
+
+.filter-container button:hover {
+    background-color: #0056b3;
+}
+
+/* Reset button styling */
+#resetBtn {
+    background-color: #ff4d4d;
+    margin-top: 10px;
+}
+
+#resetBtn:hover {
+    background-color: #e60000;
+}
+
+
+@media (max-width: 768px) {
+    .customer-info {
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        transform: none;
+        align-items: flex-end;
+        font-size: 14px; /* Smaller font size */
+        gap: 2px; /* Reduce gap between name and number */
+    }
+
+    .noLead {
+        font-size: 27px;
+    }
+
+    nav label {
+        font-size: 1em;
+        padding: 10px;
+    }
+
+    #remarkForm label {
+        padding: 0;
+    }
+
+    .slide li {
+        font-size: 1.0em;
+    }
+
+    .fa-square-facebook {
+        margin-left: 8px;
+    }
+
+    .icon-container {
+        gap: 10px;
+    }
+
+    .icon-container i {
+        font-size: 20px;
+    }
+
+    .formateDate {
+        min-width: 70px;
+        display: inline-block;
+    }
+
+    .user-name-style {
+        font-size: 10px;
+        min-width: 60px;
+    }
+
+    .start-drowp-app {
+        
+        align-items: flex-start;
+        padding: 10px;
+        display: flex;
+        gap: 7px;
+    }
+
+    .fa-square-facebook {
+        margin-left: 0px;
+    }
+
+    .ul-box {
+        right: 4px;
+    }
+
+    .other-user-box {
+        right: 4px;
+    }
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 576px) {
+    .filter-container {
+        max-width: 90%;
+        /* Make the form more compact */
+        left: 5%;
+        /* Center it horizontally */
+    }
+
+    .filter-container input,
+    .filter-container button {
+        font-size: 14px;
+        padding: 10px;
+        /* Adjust padding for smaller screens */
+    }
+
+    /* Ensure form buttons are stacked neatly */
+    .filter-container button {
+        margin-bottom: 10px;
+    }
+}
+
+/* Prevent page elements from shifting when the filter opens */
+.row {
+    position: relative;
+}
+
+@media (max-width: 480px) {
+    .customer-info {
+        font-size: 12px; /* Further reduce font size */
+    }
+    nav label {
+        font-size: 0.9em;
+        padding: 8px;
+    }
+
+    #remarkForm label {
+        padding: 0;
+    }
+
+    .slide li {
+        font-size: 0.8em;
+    }
+}

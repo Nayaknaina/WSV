@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+    <link rel="stylesheet" type="text/css" href="./assets/css/leads.css">
     <link rel="stylesheet" type="text/css" href="/styles/loader.css">
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -33,159 +33,7 @@
     <link rel="stylesheet" href="/assets/css/remark.css">
 </head>
 <style>
-    /* Global reset and basic styling */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
 
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
-
-    }
-
-    /* Modal (Popup) Styling */
-    .custom-modal {
-        display: none;
-        position: fixed;
-        z-index: 9999999999999;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background-color: white;
-        padding: 20px;
-        border-radius: 8px;
-        max-width: 800px;
-        width: 100%;
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .modal-header h2 {
-        margin: 0;
-    }
-
-    .close-btn {
-        cursor: pointer;
-        font-size: 24px;
-        background: none;
-        border: none;
-        color: rgb(255, 255, 255);
-        background-color: #f00;
-        border-radius: 4px;
-        padding: 0px 10px;
-    }
-
-    /* Form Styling */
-    .form-group {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-
-    .form-group div {
-        width: 48%;
-        margin-bottom: 10px;
-    }
-
-    .form-group div label {
-        display: block;
-        margin-bottom: 0px;
-    }
-
-    .form-group div input {
-        width: 100%;
-        padding: 4px 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    .form-group div textarea {
-        width: 100%;
-        padding: 4px 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    /* Custom validation styles */
-    input:invalid {
-        border-color: red;
-    }
-
-    input:valid {
-        border-color: green;
-    }
-
-    .details-container {
-        display: block;
-        margin-top: 8px;
-        /* Add space between the icon and text */
-        font-size: 0.8em;
-    }
-
-
-    @media (max-width: 600px) {
-        .form-group div {
-            width: 100%;
-
-        }
-
-        .form-group {
-            overflow: auto;
-            max-height: 470px;
-        }
-    }
-
-    /* Mobile-specific adjustments */
-    @media (max-width: 768px) {
-        .start-drowp-app {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .details-container {
-            margin-left: 30px;
-            /* Adjust margin to align properly */
-        }
-
-        .icon-container {
-            gap: 5px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .details-container {
-            font-size: 0.9em;
-            margin-left: 0;
-            /* No margin for very small screens */
-        }
-
-        .start-drowp-app {
-            /* flex-direction: column;*/
-            /* Stack elements vertically */
-            align-items: flex-start;
-        }
-
-        .formateDate {
-            margin-bottom: 4px;
-        }
-    }
 </style>
 
 <body class>
@@ -202,15 +50,47 @@
                 {{> NameHead}}
                 <div class="container-fluid bg-white shadow-sm m-b-20">
                     <div class="row flex-row justify-content-start px-3">
-                        <button type="button" class="btn my-2 mx-2 btn-outline-warning btn-sm">Filter <i
-                                class="ri-filter-3-fill"></i></button>
-                        {{!-- <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm">Add New
-                            Lead</button> --}}
-                        <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="openFormBtn">Add New
-                            Lead</button>
+                        <button type="button" class="btn my-2 mx-2 btn-outline-warning btn-sm" id="filterBtn">
+                            Filter <i class="ri-filter-3-fill"></i>
+                        </button>
 
-                        <label for="csv-file" class="btn my-2 mx-2 btn-outline-primary btn-sm"
-                            id="csv-file-upload-btn">Import from csv</label>
+                        <label for="csv-file" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="csv-file-upload-btn">
+                            Import from CSV
+                        </label>
+
+                        <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="openFormBtn">
+                            Add New Lead
+                        </button>
+                        <div id="filterForm" class="filter-container" style="display: none;">
+                            <form id="leadFilterForm" method="GET" action="/leads">
+                                <input type="hidden" name="section" value="{{section}}" />
+
+                                <div class="form-group">
+                                    <label for="customerName">Customer Name</label>
+                                    <input type="text" id="customerName" name="customerName"
+                                        placeholder="Customer Name" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="customerPhoneNumber">Phone Number</label>
+                                    <input type="tel" id="customerPhoneNumber" name="customerPhoneNumber"
+                                        placeholder="Phone Number" pattern="[0-9]{10}" maxlength="10" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pageName">Page Name</label>
+                                    <input type="text" id="pageName" name="pageName" placeholder="Page Name" />
+                                </div>
+                                {{!-- <div class="form-group">
+                                    <label for="formName">Form Name</label>
+                                    <input type="text" id="formName" name="formName" placeholder="Form Name" />
+                                </div> --}}
+                                <div class="form-group">
+                                    <label for="date">Date</label>
+                                    <input type="date" id="date" name="date" />
+                                </div>
+                                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                                <button type="button" class="btn btn-secondary" id="resetBtn">Reset Filters</button>
+                            </form>
+                        </div>
                         <div class="custom-modal" id="customModal">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -292,26 +172,27 @@
                             </div>
                         </div>
                     </div>
+
+
                 </div>
 
 
                 <div class="container-fluid bg-white shadow-sm m-b-20">
                     <div class="row flex-row justify-content-around">
                         <div class="col-auto text-center py-2">
-                            <button id="all-lead-btn" onclick="showAllLeads()" type="button"
+                            <button id="all-lead-btn" onclick="showAllLeads()"
                                 class="btn btn-primary p-x-8">Leads</button>
                         </div>
-
                         <div class="col-auto text-center py-2">
-                            <button id="my-lead-btn" onclick="showMyLeads()" type="button"
-                                class="btn btn-outline-primary p-x-8">My leads</button>
+                            <button id="my-lead-btn" onclick="showMyLeads()" class="btn btn-outline-primary p-x-8">My
+                                Leads</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="container min-vh-100">
 
-                    <style>
+                    {{!-- <style>
                         body {
                             background-color: #ededed;
                             font-family: "Open Sans", sans-serif;
@@ -555,6 +436,57 @@
                             color: #333;
                         }
 
+                        /* General filter container styling */
+                        .filter-container {
+                            position: absolute;
+                            top: 60px;
+                            left: 0;
+                            width: 100%;
+                            max-width: 400px;
+                            background-color: #fff;
+                            border: 1px solid #ccc;
+                            border-radius: 10px;
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                            padding: 20px;
+                            z-index: 100;
+                            display: none;
+                            transition: all 0.3s ease-in-out;
+                        }
+
+                        /* Input fields and buttons */
+                        .filter-container input,
+                        .filter-container button {
+                            width: 100%;
+                            padding: 12px;
+                            margin-bottom: 10px;
+                            font-size: 16px;
+                            border: 1px solid #ddd;
+                            border-radius: 5px;
+                        }
+
+                        /* Primary button styling */
+                        .filter-container button {
+                            cursor: pointer;
+                            background-color: #007bff;
+                            color: #fff;
+                            border: none;
+                        }
+
+                        .filter-container button:hover {
+                            background-color: #0056b3;
+                        }
+
+                        /* Reset button styling */
+                        #resetBtn {
+                            background-color: #ff4d4d;
+                            margin-top: 10px;
+                        }
+
+                        #resetBtn:hover {
+                            background-color: #e60000;
+                        }
+
+
                         @media (max-width: 768px) {
                             .noLead {
                                 font-size: 27px;
@@ -613,6 +545,33 @@
                             }
                         }
 
+                        /* Responsive adjustments for small screens */
+                        @media (max-width: 576px) {
+                            .filter-container {
+                                max-width: 90%;
+                                /* Make the form more compact */
+                                left: 5%;
+                                /* Center it horizontally */
+                            }
+
+                            .filter-container input,
+                            .filter-container button {
+                                font-size: 14px;
+                                padding: 10px;
+                                /* Adjust padding for smaller screens */
+                            }
+
+                            /* Ensure form buttons are stacked neatly */
+                            .filter-container button {
+                                margin-bottom: 10px;
+                            }
+                        }
+
+                        /* Prevent page elements from shifting when the filter opens */
+                        .row {
+                            position: relative;
+                        }
+
                         @media (max-width: 480px) {
                             nav label {
                                 font-size: 0.9em;
@@ -627,7 +586,7 @@
                                 font-size: 0.8em;
                             }
                         }
-                    </style>
+                    </style> --}}
 
 
 
@@ -638,15 +597,28 @@
                         <li style="margin-bottom: 10px;">
                             <nav>
                                 <label class="created-time-label">
-                                    <label class="start-drowp-app" for="touch-{{@index}}" style="margin-bottom: 0;">
-                                        <strong class="formateDate">At- {{formatDate income_time}}</strong>
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                        <i class="fa-brands fa-square-{{app}}"
-                                            style="font-size: 22px; color: #316ff6;"></i>
+                                    <label class="start-drowp-app" for="touch-{{@index}}"
+                                        style="display: flex; align-items: center; width: 100%; margin-bottom: 0; gap: 10px; position: relative;">
 
+                                        <!-- Date and App Icon at the Start -->
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <strong class="formateDate">{{formatDate income_time}}</strong>
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                            <i class="fa-brands fa-square-{{app}}"
+                                                style="font-size: 22px; color: #316ff6;"></i>
+                                        </div>
 
-
+                                        <!-- Centered Customer Info -->
+                                        <div class="customer-info"
+                                            style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;    margin-top: 4rem; ">
+                                            <div style="font-size: 18px; "> <strong>{{customerName}}</strong></div>
+                                            <div style="font-size: 18px; "><strong>{{customerPhoneNumber}}</strong>
+                                            </div>
+                                        </div>
                                     </label>
+
+
+
                                     <div class="details-container">
                                         <strong>Page:</strong> {{page_name}} <br>
                                         <strong>Form:</strong> {{form_name}}
@@ -662,41 +634,44 @@
                                             <span class="user-name-style" id="name-{{_id}}">{{uid.name}}
 
                                                 <div class="other-user-box" id="other-user-box{{@index}}">
-                                                    {{#each ../members}}
-                        <li onclick="assignToOtherUserForm('{{_id}}','{{../_id}}', '{{../uid._id}}','{{ index}}')">
-                            <span>{{name}}</span>
-                        </li>
-                        {{/each}}
-                </div>
-                </span>
-                {{else}}
-                <!-- Single Check Icon when uid is null -->
-                <a href="/lead/book/{{_id}}">
-                    <i class="fa-solid fa-check" style="color: #36383a;"></i>
-                </a>
-                {{/if}}
+                                                    <ul id="lead-list">
+                                                        {{#each ../members}}
+                                                        <li id="lead-{{_id}}"
+                                                            onclick="assignToOtherUserForm('{{_id}}','{{../_id}}', '{{../uid._id}}','{{ index}}')">
+                                                            <span>{{name}}</span>
+                                                        </li>
+                                                        {{/each}}
+                                                    </ul>
+                                                </div>
+                                            </span>
+                                            {{else}}
+                                            <!-- Single Check Icon when uid is null -->
+                                            <a href="/lead/book/{{_id}}">
+                                                <i class="fa-solid fa-check" style="color: #36383a;"></i>
+                                            </a>
+                                            {{/if}}
 
-                {{!-- {{#each leads_data}}
-                {{#if (containsPhoneNumber ans)}}
-                <a href="tel:{{ans}}">
-                    <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
-                </a>
-                <a href="https://wa.me/{{ans}}" target="_blank">
-                    <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
-                </a>
-                {{/if}}
-                {{/each}} --}}
-                {{!-- <span class="status-circle" onclick="toggleDropdown()"
-                    style="background-color: {{status.color}};">
-                    --}}
-                    {{!-- <div class="ul-box">
-                        {{#each ../pipes}}
+                                            {{!-- {{#each leads_data}}
+                                            {{#if (containsPhoneNumber ans)}}
+                                            <a href="tel:{{ans}}">
+                                                <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
+                                            </a>
+                                            <a href="https://wa.me/{{ans}}" target="_blank">
+                                                <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                                            </a>
+                                            {{/if}}
+                                            {{/each}} --}}
+                                            {{!-- <span class="status-circle" onclick="toggleDropdown()"
+                                                style="background-color: {{status.color}};">
+                                                --}}
+                                                {{!-- <div class="ul-box">
+                                                    {{#each ../pipes}}
                         <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
                             <span>{{title}}</span>
                             <span class="drop-circle" style="background-color: {{color}};"></span>
                         </li>
                         {{/each}}
-                    </div>
+                </div>
                 </span>--}}
                 </span>
 
@@ -714,18 +689,21 @@
                 </li>
                 {{/each}}
                 <!-- Pagination Controls -->
+
+                <!-- Pagination -->
+                {{#if showPagination}}
                 <div class="pagination">
                     {{#if (gt currentPage 1)}}
-                    <a href="/leads?page={{subtract currentPage 1}}" class="btn btn-primary p-x-8">Previous</a>
+                    <a href="/leads?page={{subtract currentPage 1}}&section={{section}}"
+                        class="btn btn-primary">Previous</a>
                     {{/if}}
-
                     <span>Page {{currentPage}} of {{totalPages}}</span>
-
                     {{#if (lt currentPage totalPages)}}
-                    <a href="/leads?page={{add currentPage 1}}" class="btn btn-outline-primary p-x-8">Next</a>
+                    <a href="/leads?page={{add currentPage 1}}&section={{section}}"
+                        class="btn btn-outline-primary">Next</a>
                     {{/if}}
                 </div>
-
+                {{/if}}
                 {{else}}
                 <li class="noLead">No leads
                     added here <br> please connect your app first</li>
@@ -748,11 +726,24 @@
                     <li style="margin-bottom: 10px;">
                         <nav>
                             <label class="created-time-label">
-                                <label class="start-drowp-app" for="touch-{{@index}}" style="margin-bottom: 0;">
-                                    <strong class="formateDate">At- {{formatDate income_time}}</strong>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                    <i class="fa-brands fa-square-{{app}}" style="font-size: 22px; color: #316ff6;"></i>
+                                <label class="start-drowp-app" for="touch-{{@index}}"
+                                    style="display: flex; align-items: center; width: 100%; margin-bottom: 0; gap: 10px; position: relative;">
 
+                                    <!-- Date and App Icon at the Start -->
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <strong class="formateDate">{{formatDate income_time}}</strong>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                        <i class="fa-brands fa-square-{{app}}"
+                                            style="font-size: 22px; color: #316ff6;"></i>
+                                    </div>
+
+                                    <!-- Centered Customer Info -->
+                                    <div class="customer-info"
+                                        style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;    margin-top: 4rem; ">
+                                        <div style="font-size: 18px; "> <strong>{{customerName}}</strong></div>
+                                        <div style="font-size: 18px; "><strong>{{customerPhoneNumber}}</strong>
+                                        </div>
+                                    </div>
                                 </label>
                                 <div class="details-container">
                                     <strong>Page:</strong> {{page_name}} <br>
@@ -809,17 +800,20 @@
             </nav>
             </li>
             {{/each}}
+            {{!-- pagination --}}
+            <!-- Pagination -->
+            {{#if showPagination}}
             <div class="pagination">
                 {{#if (gt currentPage 1)}}
-                <a href="/leads?page={{subtract currentPage 1}}" class="btn">Previous</a>
+                <a href="/leads?page={{subtract currentPage 1}}&section={{section}}"
+                    class="btn btn-primary">Previous</a>
                 {{/if}}
-
                 <span>Page {{currentPage}} of {{totalPages}}</span>
-
                 {{#if (lt currentPage totalPages)}}
-                <a href="/leads?page={{add currentPage 1}}" class="btn">Next</a>
+                <a href="/leads?page={{add currentPage 1}}&section={{section}}" class="btn btn-outline-primary">Next</a>
                 {{/if}}
             </div>
+            {{/if}}
             {{else}}
             <li class="noLead" leads added here <br> please connect your app first</li>
             {{/if}}
@@ -836,9 +830,15 @@
                     <nav style="position: relative;">
                         <label class="created-time-label">
                             <label class="start-drowp-app" for="touch2-{{@index}}" style="margin-bottom: 0;">
-                                <strong class="formateDate">At- {{formatDate income_time}}</strong>
+                                <strong class="formateDate">{{formatDate income_time}}</strong>
                                 <i class="fa-solid fa-chevron-down"></i>
                                 <i class="fa-brands fa-square-{{app}}" style="font-size: 22px; color: #316ff6;"></i>
+                                <span class="company-customer" style="display: block; margin-top: 5px;">
+                                    Customer: <strong>{{customerName}}</strong>
+                                    <span style="margin-left: 10px;">
+                                        Phone: <strong>{{customerPhoneNumber}}</strong>
+                                    </span>
+                                </span>
                             </label>
                             <div class="details-container">
                                 <strong>Page:</strong> {{page_name}} <br>
@@ -929,6 +929,19 @@
                 <strong>{{que}}:</strong> {{ans}}
             </li>
             {{/each}}
+            {{!-- <!-- Pagination -->
+            {{#if showPagination}}
+            <div class="pagination">
+                {{#if (gt currentPage 1)}}
+                <a href="/leads?page={{subtract currentPage 1}}&section={{section}}"
+                    class="btn btn-primary">Previous</a>
+                {{/if}}
+                <span>Page {{currentPage}} of {{totalPages}}</span>
+                {{#if (lt currentPage totalPages)}}
+                <a href="/leads?page={{add currentPage 1}}&section={{section}}" class="btn btn-outline-primary">Next</a>
+                {{/if}}
+            </div>
+            {{/if}} --}}
         </ul>
         </nav>
         </li>
@@ -1181,35 +1194,23 @@
 
     <script>
         function showMyLeads() {
-            let myLeadsBox = document.querySelector('#myLeads')
-            let allLeadsBox = document.querySelector('#allLeads')
-            let myBtn = document.querySelector('#my-lead-btn')
-            let allBtn = document.querySelector('#all-lead-btn')
-
-            myLeadsBox.style.display = 'block'
-            allLeadsBox.style.display = 'none'
-
-
-            myBtn.classList.remove('btn-outline-primary')
-            myBtn.classList.add('btn-primary')
-
-            allBtn.classList.add('btn-outline-primary')
-            allBtn.classList.remove('btn-primary')
+            document.querySelector('#myLeads').style.display = 'block';
+            document.querySelector('#allLeads').style.display = 'none';
+            document.querySelector('#my-lead-btn').classList.add('btn-primary');
+            document.querySelector('#my-lead-btn').classList.remove('btn-outline-primary');
+            document.querySelector('#all-lead-btn').classList.add('btn-outline-primary');
+            document.querySelector('#all-lead-btn').classList.remove('btn-primary');
+            document.querySelector('input[name="section"]').value = 'myleads';
         }
-        function showAllLeads(t) {
-            let myLeadsBox = document.querySelector('#myLeads')
-            let allLeadsBox = document.querySelector('#allLeads')
-            let myBtn = document.querySelector('#my-lead-btn')
-            let allBtn = document.querySelector('#all-lead-btn')
 
-            allLeadsBox.style.display = 'block'
-            myLeadsBox.style.display = 'none'
-
-            myBtn.classList.remove('btn-primary')
-            myBtn.classList.add('btn-outline-primary')
-
-            allBtn.classList.remove('btn-outline-primary')
-            allBtn.classList.add('btn-primary')
+        function showAllLeads() {
+            document.querySelector('#allLeads').style.display = 'block';
+            document.querySelector('#myLeads').style.display = 'none';
+            document.querySelector('#all-lead-btn').classList.add('btn-primary');
+            document.querySelector('#all-lead-btn').classList.remove('btn-outline-primary');
+            document.querySelector('#my-lead-btn').classList.add('btn-outline-primary');
+            document.querySelector('#my-lead-btn').classList.remove('btn-primary');
+            document.querySelector('input[name="section"]').value = 'all';
         }
 
         function openRemarkPopUp(id) {
@@ -1237,30 +1238,33 @@
             userlist.classList.toggle('open')
         }
 
+        //modified
         function assignToOtherUserForm(assignMemId, leadId, currentMemId, nid) {
-            let name = document.querySelector(`#name-${leadId}`)
-            // console.log(currentMemId, leadId)
+            let nameElement = document.querySelector(`#name-${leadId}`);
+            let leadElement = document.querySelector(`#lead-${leadId}`);
+            let leadList = document.querySelector('#lead-list');
 
             fetch(`/user/change/lead/owner/${leadId}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'  // Specify that we're sending JSON
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ assignMemId, currentMemId })  // Convert the status to a JSON string
+                body: JSON.stringify({ assignMemId, currentMemId })
             })
                 .then(response => {
-                    // Ensure the response is JSON
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-
+                    if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
-                    // location.reload()
                 })
                 .then(data => {
-                    name.innerHTML = data.name
+                    nameElement.innerHTML = data.name;
+
+
+                    leadList.prepend(leadElement);
                 })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
 
 
@@ -1268,7 +1272,7 @@
 
 
     <script>
-        // Get DOM elements
+
         const openFormBtn = document.getElementById('openFormBtn');
         const closeFormBtn = document.getElementById('closeFormBtn');
         const customModal = document.getElementById('customModal');
@@ -1330,6 +1334,104 @@
             }
         }
     </script>
+
+
+    <script>
+        const filterBtn = document.getElementById('filterBtn');
+        const filterForm = document.getElementById('filterForm');
+        const resetBtn = document.getElementById('resetBtn');
+        const leadFilterForm = document.getElementById('leadFilterForm');
+
+        filterBtn.addEventListener('click', () => {
+            filterForm.style.display = filterForm.style.display === 'none' ? 'block' : 'none';
+        });
+
+        resetBtn.addEventListener('click', () => {
+            leadFilterForm.reset();
+            window.location.href = "/leads";
+        });
+        /* const filterForm = document.getElementById('leadFilterForm');
+          filterForm.addEventListener('submit', function (event) {
+              event.preventDefault();
+              const section = document.querySelector('input[name="section"]').value; // Get current section
+              const url = new URL('/leads', window.location.origin);
+              const params = new URLSearchParams({
+                  customerName: document.getElementById('customerName').value,
+                  customerPhoneNumber: document.getElementById('customerPhoneNumber').value,
+                  date: document.getElementById('date').value,
+                  section: section, // Pass the current section
+              });
+              url.search = params.toString();
+              window.location.href = url.toString(); // Redirect to the new URL with filters
+          });
+          */
+
+        // Pagination logic
+        const paginationLinks = document.querySelectorAll('.pagination a');
+        paginationLinks.forEach((link) => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const section = document.querySelector('input[name="section"]').value;
+                const url = new URL(link.href, window.location.origin);
+                const params = new URLSearchParams(url.search);
+                params.set('section', section);
+                url.search = params.toString();
+                window.location.href = url.toString();
+            });
+        });
+    </script>
+    {{!--
+    <script>
+        document.getElementById('dateFilter').addEventListener('change', function () {
+            const customDateInputs = document.getElementById('customDateInputs');
+            customDateInputs.style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+
+        document.getElementById('filterBtn').addEventListener('click', function () {
+            const customerName = document.getElementById('filterCustomerName').value;
+            const mobile = document.getElementById('filterMobile').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const customStartDate = document.getElementById('customStartDate').value;
+            const customEndDate = document.getElementById('customEndDate').value;
+
+            // Construct the URL for fetching filtered leads
+            let url = `/leads/filter?customerName=${encodeURIComponent(customerName)}&mobile=${encodeURIComponent(mobile)}&dateFilter=${dateFilter}`;
+
+            // Append custom dates if custom filter is selected
+            if (dateFilter === 'custom') {
+                url += `&startDate=${encodeURIComponent(customStartDate)}&endDate=${encodeURIComponent(customEndDate)}`;
+            }
+
+            // Fetch filtered leads
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Update the UI with the filtered leads
+                    updateLeadsUI(data);
+                })
+                .catch(error => console.error('Error fetching filtered leads:', error));
+        });
+
+        function updateLeadsUI(leads) {
+            const leadsContainer = document.getElementById('allLeads');
+            leadsContainer.innerHTML = ''; // Clear current leads
+
+            if (leads.length) {
+                leads.forEach(lead => {
+                    const leadItem = document.createElement('li');
+                    leadItem.innerHTML = `
+                    <nav>
+                        <label class="created-time-label">
+                            <strong>${lead.customerName}</strong> - ${lead.mobile}
+                        </label>
+                    </nav>`;
+                    leadsContainer.appendChild(leadItem);
+                });
+            } else {
+                leadsContainer.innerHTML = '<li class="noLead">No leads found</li>';
+            }
+        }
+    </script> --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </body>
 

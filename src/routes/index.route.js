@@ -87,16 +87,16 @@ router.post("/api/verify", async (req, res) => {
   }
 });
 
-router.post('/api/otp/verify',(req,res)=>{
+router.post('/api/otp/verify', (req, res) => {
   try {
     let otp = req.session.otp;
     delete req.session.otp
-    let {reqOtp} = req.body;
+    let { reqOtp } = req.body;
     console.log(otp, reqOtp);
     if (reqOtp === otp) {
-      res.status(200).json({msg: 'email verification successfully'})
-    }else{
-      res.status(403).json({msg:'otp verification failed'})
+      res.status(200).json({ msg: 'email verification successfully' })
+    } else {
+      res.status(403).json({ msg: 'otp verification failed' })
     }
   } catch (err) {
     console.log("Error in /api/otp/verify", err);
@@ -161,113 +161,571 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
   res.render("gethelp", { user });
 });
 
-// Facebook Leads Fetch Route
+
 // router.get("/leads", isAdminLoggedIn, async (req, res) => {
 //   try {
-//     let user;
-//     console.log("leads page");
-     
+//     const { page = 1 } = req.query; // Get the page number from query params, default to 1
+//     const limit = 25; // Number of leads per page
 
-//     if (req.user.role == "admin") {
+//     console.log("leads page");
+//     let user;
+
+//     if (req.user.role === "admin") {
 //       user = await logIncollection
 //         .findById(req.user.id)
 //         .populate({
-//           path: "myleads", // Populating 'myleads' field from user
+//           path: "myleads",
 //           populate: [
-//             { path: "status" }, // Populate the 'status' field inside each lead
-//             // { path: "uid" }, // Populate the 'status' field inside each lead
-//             { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
+//             { path: "status" },
+//             { path: "remarks", options: { sort: { createdAt: -1 } } },
 //           ],
 //         })
 //         .populate("teams");
 //     } else {
-//       user = await memberModel.findById(req.user.id).populate({
-//         path: "myleads", // Populating 'myleads' field from user
-//         populate: [
-//           { path: "status" }, // Populate the 'status' field inside each lead
-//           { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
-//         ],
-//       });
+//       user = await memberModel
+//         .findById(req.user.id)
+//         .populate({
+//           path: "myleads",
+//           populate: [
+//             { path: "status" },
+//             { path: "remarks", options: { sort: { createdAt: -1 } } },
+//           ],
+//         });
 //     }
-//     let leads = await leadsModel
+
+//     // Fetch paginated leads
+//     const leads = await leadsModel
 //       .find({ cid: user.cid })
 //       .populate("status")
-//       .populate("uid") // Ensure that 'status' is populated
-//       .sort({ createdAt: -1 });
+//       .populate("uid")
+//       .sort({ createdAt: -1 })
+//       .skip((page - 1) * limit)
+//       .limit(limit);
 
-//     // let lead = await leadsModel
-//     //   .findById('66ed6c684e1f1c79f01999a1')
-//     //   .populate("uid") // Ensure that 'status' is populated
+//     const totalLeads = await leadsModel.countDocuments({ cid: user.cid });
+//     const totalPages = Math.ceil(totalLeads / limit);
 
-//     let pipes = await pipelineModel.find({ cid: user.cid });
-//     let members = await memberModel.find({ cid: user.cid });
-//     console.log( "ok");
-//     // console.log("Fetched Leads with IDs:", leads.map(lead => ({
-//     //   lead_id: lead.lead_id,
-//     //   page_id: lead.page_id,
-//     //   form_id: lead.form_id,
-//     // })));
-//     res.render("leads", { user, leads, pipes, members });
+//     const pipes = await pipelineModel.find({ cid: user.cid });
+//     const members = await memberModel.find({ cid: user.cid });
+
+//     // Render the leads page
+//     res.render("leads", {
+//       user,
+//       leads,
+//       pipes,
+//       members,
+//       currentPage: parseInt(page),
+//       totalPages,
+//       showPagination: leads.length > 0, // Only show pagination if leads exist
+//     });
 //   } catch (error) {
 //     console.error("Error fetching leads:", error);
 //     res.status(500).send("Error fetching leads");
 //   }
 // });
+
+// router.get("/leads", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     const { page = 1 } = req.query; // Get the page number from query params, default to 1
+//     const limit = 25; // Number of leads per page
+
+//     let user;
+
+//     if (req.user.role === "admin") {
+//       user = await logIncollection
+//         .findById(req.user.id)
+//         .populate({
+//           path: "myleads",
+//           populate: [
+//             { path: "status" },
+//             { path: "remarks", options: { sort: { createdAt: -1 } } },
+//           ],
+//         })
+//         .populate("teams");
+//     } else {
+//       user = await memberModel
+//         .findById(req.user.id)
+//         .populate({
+//           path: "myleads",
+//           populate: [
+//             { path: "status" },
+//             { path: "remarks", options: { sort: { createdAt: -1 } } },
+//           ],
+//         });
+//     }
+
+//     // Fetch paginated leads
+//     const leads = await leadsModel
+//       .find({ cid: user.cid })
+//       .populate("status")
+//       .populate("uid")
+//       .sort({ createdAt: -1 })
+//       .skip((page - 1) * limit)
+//       .limit(limit);
+
+//     // Extract customer name and phone number from leads data
+//     const leadsWithCustomerInfo = leads.map(lead => {
+//       const customerName = lead.leads_data.find(data => 
+//         data.que.toLowerCase().includes("name") || 
+//         data.que.toLowerCase().includes("customer name")
+//       )?.ans || "Unknown";
+
+//       const customerPhoneNumber = lead.leads_data.find(data => 
+//         /^[6-9]\d{9}$/.test(data.ans.trim())
+//       )?.ans || "N/A";
+
+//       return {
+//         ...lead.toObject(), // Convert lead to plain object
+//         customerName,
+//         customerPhoneNumber
+//       };
+//     });
+
+//     const totalLeads = await leadsModel.countDocuments({ cid: user.cid });
+//     const totalPages = Math.ceil(totalLeads / limit);
+
+//     const pipes = await pipelineModel.find({ cid: user.cid });
+//     const members = await memberModel.find({ cid: user.cid });
+
+//     // Render the leads page with customer information
+//     res.render("leads", {
+//       user,
+//       leads: leadsWithCustomerInfo, // Pass modified leads to the template
+//       pipes,
+//       members,
+//       currentPage: parseInt(page),
+//       totalPages,
+//       showPagination: leads.length > 0, // Only show pagination if leads exist
+//     });
+//   } catch (error) {
+//     console.error("Error fetching leads:", error);
+//     res.status(500).send("Error fetching leads");
+//   }
+// });
+//working fIne for leads section
+// router.get("/leads", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     const { page = 1, customerName, customerPhoneNumber, date } = req.query; 
+//     const limit = 25; 
+
+//     let user;
+//     if (req.user.role === "admin") {
+//       user = await logIncollection
+//         .findById(req.user.id)
+//         .populate({
+//           path: "myleads",
+//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+//         })
+//         .populate("teams");
+//     } else {
+//       user = await memberModel
+//         .findById(req.user.id)
+//         .populate({
+//           path: "myleads",
+//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+//         });
+//     }
+
+//     // filter query
+//     const filter = { cid: user.cid };
+//     if (customerName) {
+//       filter['leads_data.ans'] = new RegExp(customerName, 'i'); // Case-insensitive name search
+//     }
+//     if (customerPhoneNumber) {
+//       filter['leads_data.ans'] = customerPhoneNumber;
+//     }
+//     if (date) {
+//       filter.income_time = {
+//         $gte: new Date(date).setHours(0, 0, 0),
+//         $lt: new Date(date).setHours(23, 59, 59),
+//       };
+//     }
+
+//     // Fetch leads with filtering and pagination
+//     const leads = await leadsModel
+//       .find(filter)
+//       .populate("status")
+//       .populate("uid")
+//       .sort({ createdAt: -1 })
+//       .skip((page - 1) * limit)
+//       .limit(limit);
+
+//     const leadsWithCustomerInfo = leads.map((lead) => {
+//       const customerName = lead.leads_data.find((data) =>
+//         data.que.toLowerCase().includes("name") || data.que.toLowerCase().includes("customer name") ||data.que.toLowerCase().includes("आपका_नाम")|| data.que.toLowerCase().includes("नाम")
+//       )?.ans || "Unknown";
+
+//       const customerPhoneNumber = lead.leads_data.find((data) =>
+//         /^[6-9]\d{9}$/.test(data.ans.trim())
+//       )?.ans || "N/A";
+
+//       return { ...lead.toObject(), customerName, customerPhoneNumber };
+//     });
+
+//     const totalLeads = await leadsModel.countDocuments(filter);
+//     const totalPages = Math.ceil(totalLeads / limit);
+
+//     const pipes = await pipelineModel.find({ cid: user.cid });
+//     const members = await memberModel.find({ cid: user.cid });
+
+//     res.render("leads", {
+//       user,
+//       leads: leadsWithCustomerInfo,
+//       pipes,
+//       members,
+//       currentPage: parseInt(page),
+//       totalPages,
+//       showPagination: leads.length > 0,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching leads:", error);
+//     res.status(500).send("Error fetching leads");
+//   }
+// });
+
+// router.get("/leads", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     const { page = 1, customerName, customerPhoneNumber, date, section = "all" } = req.query;
+//     const limit = 25;
+
+//     let user;
+//     if (req.user.role === "admin") {
+//       user = await logIncollection.findById(req.user.id)
+//         .populate({
+//           path: "myleads",
+//           options: { sort: { createdAt: -1 } },
+//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+//         })
+//         .populate("teams");
+//     } else {
+//       user = await memberModel.findById(req.user.id)
+//         .populate({
+//           path: "myleads",
+//           options: { sort: { createdAt: -1 } }, 
+//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+//         });
+//     }
+
+
+//     const filter = { cid: user.cid };
+//     if (customerName) {
+//       filter['leads_data.ans'] = new RegExp(customerName, 'i');
+//     }
+//     if (customerPhoneNumber) {
+//       filter['leads_data.ans'] = customerPhoneNumber;
+//     }
+//     if (date) {
+//       filter.income_time = {
+//         $gte: new Date(date).setHours(0, 0, 0),
+//         $lt: new Date(date).setHours(23, 59, 59),
+//       };
+//     }
+
+
+//     let leadsSource;
+//     if (section === "myleads") {
+//       leadsSource = user.myleads.filter(lead => {
+
+
+//         let matches = true;
+//         if (customerName) {
+//           matches = matches && lead.leads_data.some(data => new RegExp(customerName, 'i').test(data.ans));
+//         }
+//         if (customerPhoneNumber) {
+//           matches = matches && lead.leads_data.some(data => data.ans === customerPhoneNumber);
+//         }
+//         if (date) {
+//           const incomeDate = new Date(lead.income_time);
+//           matches = matches && incomeDate >= new Date(date).setHours(0, 0, 0) && incomeDate < new Date(date).setHours(23, 59, 59);
+//         }
+//         return matches;
+//       });
+//     } else {
+//       leadsSource = await leadsModel
+//         .find(filter)
+//         .populate("status")
+//         .populate("uid")
+//         .sort({ createdAt: -1 })
+//         .skip((page - 1) * limit)
+//         .limit(limit);
+//     }
+
+
+//     const leadsWithCustomerInfo = leadsSource.map((lead) => {
+//       const customerName = lead.leads_data.find((data) =>
+//         data.que.toLowerCase().includes("name") ||
+//         data.que.toLowerCase().includes("customer name") ||
+//         data.que.toLowerCase().includes("आपका_नाम") ||
+//         data.que.toLowerCase().includes("नाम")
+//       )?.ans || "Unknown";
+
+//       const customerPhoneNumber = lead.leads_data.find((data) =>
+//         /^[6-9]\d{9}$/.test(data.ans.trim())
+//       )?.ans || "N/A";
+
+//       return { ...lead.toObject(), customerName, customerPhoneNumber };
+//     });
+
+//     const totalLeads = section === "myleads" ? leadsWithCustomerInfo.length : await leadsModel.countDocuments(filter);
+//     const totalPages = Math.ceil(totalLeads / limit);
+
+//     const pipes = await pipelineModel.find({ cid: user.cid });
+//     const members = await memberModel.find({ cid: user.cid });
+
+//     res.render("leads", {
+//       user,
+//       leads: leadsWithCustomerInfo,
+//       myleads: leadsWithCustomerInfo,
+//       pipes,
+//       members,
+//       currentPage: parseInt(page),
+//       totalPages,
+//       showPagination: leadsWithCustomerInfo.length > 0,
+//       activeTab: section, 
+//     });
+//   } catch (error) {
+//     console.error("Error fetching leads:", error);
+//     res.status(500).send("Error fetching leads");
+//   }
+// });
+
+
+// router.get("/leads", isAdminLoggedIn, async (req, res) => {
+//   try {
+//     const { 
+//       page = 1, 
+//       customerName, 
+//       customerPhoneNumber, 
+//       date, 
+//       pageName, 
+//       formName, 
+//       section = "all" 
+//     } = req.query;
+
+//     const limit = 25;
+//     let user;
+
+//     if (req.user.role === "admin") {
+//       user = await logIncollection.findById(req.user.id)
+//         .populate({
+//           path: "myleads",
+//           options: { sort: { createdAt: -1 } },
+//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+//         })
+//         .populate("teams");
+//     } else {
+//       user = await memberModel.findById(req.user.id)
+//         .populate({
+//           path: "myleads",
+//           options: { sort: { createdAt: -1 } },
+//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+//         });
+//     }
+
+//     // Build the filter object
+//     const filter = { cid: user.cid };
+//     if (customerName) {
+//       filter['leads_data.ans'] = new RegExp(customerName, 'i');
+//     }
+//     if (customerPhoneNumber) {
+//       filter['leads_data.ans'] = customerPhoneNumber;
+//     }
+//     if (date) {
+//       filter.income_time = {
+//         $gte: new Date(date).setHours(0, 0, 0),
+//         $lt: new Date(date).setHours(23, 59, 59),
+//       };
+//     }
+//     if (pageName) {
+//       filter.page_name = new RegExp(pageName, 'i');  // Case-insensitive match
+//     }
+//     if (formName) {
+//       filter.form_name = new RegExp(formName, 'i');  // Case-insensitive match
+//     }
+
+//     // Fetch leads based on section and filter
+//     let leadsSource;
+//     if (section === "myleads") {
+//       leadsSource = user.myleads.filter(lead => {
+//         let matches = true;
+//         if (customerName) {
+//           matches = matches && lead.leads_data.some(data => new RegExp(customerName, 'i').test(data.ans));
+//         }
+//         if (customerPhoneNumber) {
+//           matches = matches && lead.leads_data.some(data => data.ans === customerPhoneNumber);
+//         }
+//         if (date) {
+//           const incomeDate = new Date(lead.income_time);
+//           matches = matches && incomeDate >= new Date(date).setHours(0, 0, 0) && incomeDate < new Date(date).setHours(23, 59, 59);
+//         }
+//         if (pageName) {
+//           matches = matches && new RegExp(pageName, 'i').test(lead.page_name);
+//         }
+//         if (formName) {
+//           matches = matches && new RegExp(formName, 'i').test(lead.form_name);
+//         }
+//         return matches;
+//       });
+//     } else {
+//       leadsSource = await leadsModel
+//         .find(filter)
+//         .populate("status")
+//         .populate("uid")
+//         .sort({ createdAt: -1 })
+//         .skip((page - 1) * limit)
+//         .limit(limit);
+//     }
+
+//     // Add customer information to leads
+//     const leadsWithCustomerInfo = leadsSource.map((lead) => {
+//       const customerName = lead.leads_data.find((data) =>
+//         data.que.toLowerCase().includes("name") ||
+//         data.que.toLowerCase().includes("customer name") ||
+//         data.que.toLowerCase().includes("आपका_नाम") ||
+//         data.que.toLowerCase().includes("नाम")
+//       )?.ans || "Unknown";
+
+//       const customerPhoneNumber = lead.leads_data.find((data) =>
+//         /^[6-9]\d{9}$/.test(data.ans.trim())
+//       )?.ans || "N/A";
+
+//       return { ...lead.toObject(), customerName, customerPhoneNumber };
+//     });
+
+//     const totalLeads = section === "myleads" ? leadsWithCustomerInfo.length : await leadsModel.countDocuments(filter);
+//     const totalPages = Math.ceil(totalLeads / limit);
+
+//     const pipes = await pipelineModel.find({ cid: user.cid });
+//     const members = await memberModel.find({ cid: user.cid });
+// // console.log(leadsWithCustomerInfo);
+// user.myleads.forEach(lead => {
+//   console.log("Lead ID:", lead.lead_id);
+//   console.log("Leads Data:", JSON.stringify(lead.leads_data, null, 2));
+// });
+
+
+//     res.render("leads", {
+//       user,
+//        myleads: leadsWithCustomerInfo,
+//       leadsWithCustomerInfo,
+//       leads: leadsWithCustomerInfo,
+
+//       pipes,
+//       members,
+//       currentPage: parseInt(page),
+//       totalPages,
+//       showPagination: leadsWithCustomerInfo.length > 0,
+//       activeTab: section,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching leads:", error);
+//     res.status(500).send("Error fetching leads");
+//   }
+// });
+
 router.get("/leads", isAdminLoggedIn, async (req, res) => {
   try {
-    const { page = 1 } = req.query; // Get the page number from query params, default to 1
-    const limit = 25; // Number of leads per page
+    const {
+      page = 1,
+      customerName,
+      customerPhoneNumber,
+      date,
+      pageName,
+      formName,
+      section = "all"
+    } = req.query;
 
-    console.log("leads page");
+    const limit = 25;
     let user;
 
     if (req.user.role === "admin") {
-      user = await logIncollection
-        .findById(req.user.id)
+      user = await logIncollection.findById(req.user.id)
         .populate({
           path: "myleads",
+          options: { sort: { createdAt: -1 } },
           populate: [
             { path: "status" },
-            { path: "remarks", options: { sort: { createdAt: -1 } } },
+            { path: "remarks", options: { sort: { createdAt: -1 } } }
           ],
         })
         .populate("teams");
     } else {
-      user = await memberModel
-        .findById(req.user.id)
+      user = await memberModel.findById(req.user.id)
         .populate({
           path: "myleads",
+          options: { sort: { createdAt: -1 } },
           populate: [
             { path: "status" },
-            { path: "remarks", options: { sort: { createdAt: -1 } } },
+            { path: "remarks", options: { sort: { createdAt: -1 } } }
           ],
         });
     }
 
-    // Fetch paginated leads
-    const leads = await leadsModel
-      .find({ cid: user.cid })
-      .populate("status")
-      .populate("uid")
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+    // Build the filter object
+    const filter = { cid: user.cid };
+    if (customerName) {
+      filter['leads_data.ans'] = new RegExp(customerName, 'i');
+    }
+    if (customerPhoneNumber) {
+      filter['leads_data.ans'] = customerPhoneNumber;
+    }
+    if (date) {
+      filter.income_time = {
+        $gte: new Date(date).setHours(0, 0, 0),
+        $lt: new Date(date).setHours(23, 59, 59),
+      };
+    }
+    if (pageName) {
+      filter.page_name = new RegExp(pageName, 'i');
+    }
+    if (formName) {
+      filter.form_name = new RegExp(formName, 'i');
+    }
 
-    const totalLeads = await leadsModel.countDocuments({ cid: user.cid });
+    // Fetch leads based on section and filter
+    let leadsSource;
+    if (section === "myleads") {
+      leadsSource = user.myleads.filter(lead => applyFilters(lead, req.query));
+    } else {
+      leadsSource = await leadsModel
+        .find(filter)
+        .populate("status")
+        .populate("uid")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit);
+    }
+
+    // Ensure leadsSource is properly populated and mapped
+    const leadsWithCustomerInfo = leadsSource.map((lead) => {
+      const customerName = extractCustomerName(lead);
+      const customerPhoneNumber = extractCustomerPhone(lead);
+
+      console.log(`Lead ID: ${lead._id}, Name: ${customerName}, Phone: ${customerPhoneNumber}`);
+
+      // Return a consistent structure
+      return { ...lead.toObject(), customerName, customerPhoneNumber };
+    });
+
+    console.log("User Leads:", leadsWithCustomerInfo);
+
+    const totalLeads = section === "myleads" ? leadsWithCustomerInfo.length : await leadsModel.countDocuments(filter);
     const totalPages = Math.ceil(totalLeads / limit);
 
     const pipes = await pipelineModel.find({ cid: user.cid });
     const members = await memberModel.find({ cid: user.cid });
 
-    // Render the leads page
     res.render("leads", {
       user,
-      leads,
+      leadsWithCustomerInfo,
+      myleads: leadsWithCustomerInfo,
+      leads: leadsWithCustomerInfo,
       pipes,
       members,
       currentPage: parseInt(page),
       totalPages,
-      showPagination: leads.length > 0, // Only show pagination if leads exist
+      showPagination: leadsWithCustomerInfo.length > 0,
+      activeTab: section,
     });
   } catch (error) {
     console.error("Error fetching leads:", error);
@@ -275,6 +733,70 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
   }
 });
 
+// Helper function to filter leads based on query parameters
+function applyFilters(lead, query) {
+  const { customerName, customerPhoneNumber, date, pageName, formName } = query;
+  let matches = true;
+
+  if (customerName) {
+    matches = matches && lead.leads_data.some(data =>
+      new RegExp(customerName, 'i').test(data.ans)
+    );
+  }
+  if (customerPhoneNumber) {
+    matches = matches && lead.leads_data.some(data =>
+      data.ans === customerPhoneNumber
+    );
+  }
+  if (date) {
+    const incomeDate = new Date(lead.income_time);
+    matches = matches && incomeDate >= new Date(date).setHours(0, 0, 0) &&
+      incomeDate < new Date(date).setHours(23, 59, 59);
+  }
+  if (pageName) {
+    matches = matches && new RegExp(pageName, 'i').test(lead.page_name);
+  }
+  if (formName) {
+    matches = matches && new RegExp(formName, 'i').test(lead.form_name);
+  }
+
+  return matches;
+}
+
+
+
+function extractCustomerName(lead) {
+  console.log("Inspecting leads_data for lead:", lead.lead_id, lead.leads_data);
+
+  if (!Array.isArray(lead.leads_data)) {
+    console.warn("leads_data is not an array for lead:", lead.lead_id);
+    return "Unknown";
+  }
+
+  const nameData = lead.leads_data.find((data) =>
+    /name|customer name|आपका_नाम|नाम/i.test(data.que)
+  );
+
+  console.log("Extracted Name Data:", nameData);
+  return nameData?.ans || "Unknown";
+}
+
+
+function extractCustomerPhone(lead) {
+  console.log("Inspecting leads_data for phone:", lead.lead_id, lead.leads_data);
+
+  if (!Array.isArray(lead.leads_data)) {
+    console.warn("leads_data is not an array for lead:", lead.lead_id);
+    return "N/A";
+  }
+
+  const phoneData = lead.leads_data.find((data) =>
+    /^[6-9]\d{9}$/.test(data.ans.trim())
+  );
+
+  console.log("Extracted Phone Data:", phoneData);
+  return phoneData?.ans || "N/A";
+}
 
 
 router.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {

@@ -55,6 +55,11 @@ const leadsSchema = new mongoose.Schema(
       default: null,
     },
 
+    // New Fields for Customer Info
+    customerName: { type: String, default: 'Unknown' },
+    customerPhoneNumber: { type: String, default: 'N/A' },
+
+
     leads_data: [
       {
         _id: false,

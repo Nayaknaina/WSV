@@ -72,10 +72,10 @@ let client = new Client({
 const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({
-        mongoUrl:
-          "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
-        collectionName: "sessions", // Collection name for sessions
-      })
+      mongoUrl:
+        "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+      collectionName: "sessions", // Collection name for sessions
+    })
     : new session.MemoryStore();
 
 const static_path = path.join(__dirname, "../public");
@@ -169,13 +169,13 @@ app.use("/external", externalRoute);
 
 app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
   let user;
-  if( req.user.role === "admin" ) {
+  if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id)
-  } 
-  else{
+  }
+  else {
     user = await memberModel.findById(req.user.id);
   }
-  
+
   let userWA = await WaModel.findOne({ cid: user.cid });
 
   console.log(isConnected, user.name, "check connection//");
@@ -183,7 +183,7 @@ app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
 
   if (userWA) {
     return res.json({ isConnected: userWA.isConnected });
-  }else{
+  } else {
     return res.json({ isConnected: false });
   }
 
@@ -211,13 +211,13 @@ app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
   if (qrCodeData) {
     console.log("Qr genrated");
   }
-  console.log("debug again On Second QR", iii,isConnected);
+  console.log("debug again On Second QR", iii, isConnected);
   iii++;
 
   if (isConnected) {
     isConnected = false;
     whatsappClientReady = false;
-    let userWA = await WaModel.findOne({cid: req.user.cid})
+    let userWA = await WaModel.findOne({ cid: req.user.cid })
     if (!userWA) {
       console.log("user WA Model Not present then creant new");
       let userWA = new WaModel({
@@ -226,17 +226,17 @@ app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
         whatsappClientReady: true,
         connectedPhoneNumber: connectedPhoneNumber,
       });
-      
-      await userWA.save();
-    }else{
-    console.log("user WA Model present then update it");
-    userWA.isConnected = true;
-    userWA.whatsappClientReady = true;
-    userWA.connectedPhoneNumber = connectedPhoneNumber;
-    await userWA.save();
-  }
 
-  console.log("debug again when client connected success", isConnected);
+      await userWA.save();
+    } else {
+      console.log("user WA Model present then update it");
+      userWA.isConnected = true;
+      userWA.whatsappClientReady = true;
+      userWA.connectedPhoneNumber = connectedPhoneNumber;
+      await userWA.save();
+    }
+
+    console.log("debug again when client connected success", isConnected);
 
     console.log("now we are blocking to refreshing qr page");
     return res.json({
@@ -244,14 +244,14 @@ app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
       isConnected: true,
     });
   }
-  else{
+  else {
     return res.json({
       qrCodeData,
-      isConnected : false,
+      isConnected: false,
     });
   }
 
-  
+
 });
 // todo logout whatsapp
 app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
@@ -265,7 +265,7 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
         isConnected = false;
         let userWA = await WaModel.findOne({ cid: req.user.cid });
         if (userWA) {
-          
+
           userWA.isConnected = false;
           userWA.whatsappClientReady = false;
           req.session.errorMSG = `Dis-Connected WhatsApp Number: ${connectedPhoneNumber}`;
@@ -305,7 +305,7 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
 });
 
 
-// todo fetch leads on  button click
+// todo fetch leads 
 app.get("/fetch/leads", isAdminLoggedIn, async (req, res) => {
   try {
     let user = await logIncollection.findOne({ cid: req.user.cid });
@@ -316,10 +316,10 @@ app.get("/fetch/leads", isAdminLoggedIn, async (req, res) => {
 
     let data = await findNewLead(user.facebookToken, user);
     console.log(data.length);
-    
+
     res.json(data.length);
   } catch (err) {
-    console.warn("Error in fetching leads manualy",err);
+    console.warn("Error in fetching leads manualy", err);
   }
 });
 
@@ -333,7 +333,7 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     } else {
       user = await memberModel.findById(req.user.id);
     }
-    
+
     const Admin = await logIncollection.findOne({ cid: user.cid });
     const leads_data = Object.entries(req.body)
       .filter(([key]) => key !== "remark" && key !== "remarktime") // Exclude 'remark' and 'remarktime'
@@ -451,7 +451,7 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
       );
     }
 
-    setTimeout(async() => {
+    setTimeout(async () => {
       let connStatus;
       try {
         connStatus = await WaModel.findOne({ cid: req.user.cid });
@@ -459,19 +459,24 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
         console.error("Error fetching connStatus: ", err);
       }
       console.log("/manual/lead/");
-      console.log("wellcome to lead ",leadContactNo);
+      console.log("wellcome to lead ", leadContactNo);
       let msg = wellcomeTemp.text;
       let companyName =
-        Admin.organizationName !== null ||
-        Admin.organizationName !== undefined ||
-        Admin.organizationName !== ""
+        Admin.organizationName !== null &&
+          Admin.organizationName !== undefined &&
+          Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
+      console.log("company name", companyName);
+      console.log(Admin.organizationName);
+
 
       const personalizedMessage = msg
         .replace("[customer name]", customerName)
         .replace("[company name]", companyName)
         .replace("[company name]", companyName);
+
+      console.log("company name", companyName);
 
       // console.log(
       //   "wellcome message log",
@@ -509,7 +514,7 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
 
     if (timeDifference > 0) {
       // let reminderTempImagePath,reminderTempPdfPath;
-      setTimeout(async() => {
+      setTimeout(async () => {
         let connStatus;
         try {
           connStatus = await WaModel.findOne({ cid: req.user.cid });
@@ -517,14 +522,14 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
           console.error("Error fetching connStatus: ", err);
         }
         console.log("/remark/add/:id");
-        console.log(leadContactNo," lead contact number");
+        console.log(leadContactNo, " lead contact number");
 
         let msg = reminderTemplateForMember.text;
 
         let companyName =
           Admin.organizationName !== null ||
-          Admin.organizationName !== undefined ||
-          Admin.organizationName !== ""
+            Admin.organizationName !== undefined ||
+            Admin.organizationName !== ""
             ? Admin.organizationName
             : "360FollowUps";
 
@@ -537,7 +542,7 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
           .replace("[date]", remarkDate)
           .replace("[time]", remarkTime)
           .replace("[company name]", companyName);
-          console.log("reminder to member ",userContact);
+        console.log("reminder to member ", userContact);
         sendMessageToLead(
           connStatus,
           userContact,
@@ -556,21 +561,21 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
 
     if (timeDifference > 0) {
       // let reminderForCustomerTempImagePath,reminderForCusromerTempPdfPath;
-      setTimeout(async() => {
-       let connStatus
+      setTimeout(async () => {
+        let connStatus
         try {
           connStatus = await WaModel.findOne({ cid: req.user.cid });
         } catch (err) {
           console.error("Error fetching connStatus: ", err);
         }
         console.log("/remark/add/:id");
-        console.log(leadContactNo," lead contact number");
+        console.log(leadContactNo, " lead contact number");
 
         let msg = reminderTemplateForCustomer.text;
         let companyName =
           Admin.organizationName !== null ||
-          Admin.organizationName !== undefined ||
-          Admin.organizationName !== ""
+            Admin.organizationName !== undefined ||
+            Admin.organizationName !== ""
             ? Admin.organizationName
             : "360FollowUps";
 
@@ -580,7 +585,7 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
           .replace("[date]", remarkDate)
           .replace("[time]", remarkTime)
           .replace("[company name]", companyName);
-          console.log("reminder to lead ",leadContactNo);
+        console.log("reminder to lead ", leadContactNo);
         sendMessageToLead(
           connStatus,
           leadContactNo,
@@ -603,7 +608,7 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     //   "------after call template document"
     // );
 
-    setTimeout(async() => {
+    setTimeout(async () => {
       let connStatus
       try {
         connStatus = await WaModel.findOne({ cid: req.user.cid });
@@ -611,13 +616,13 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
         console.error("Error fetching connStatus: ", err);
       }
       console.log("/remark/add/:id");
-      console.log("thanks to lead ",leadContactNo);
-      
+      console.log("thanks to lead ", leadContactNo);
+
       let msg = thnakyouLeadTemplate.text;
       let companyName =
-        Admin.organizationName !== null ||
-        Admin.organizationName !== undefined ||
-        Admin.organizationName !== ""
+        Admin.organizationName !== null &&
+          Admin.organizationName !== undefined &&
+          Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
       const personalizedMessage = msg
@@ -659,7 +664,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
     user = await logIncollection.findById(req.user.id);
   } else user = await memberModel.findById(user._id);
 
-  
+
   let Admin = await logIncollection.findOne({ cid: user.cid });
 
   let userContact = user.mobile;
@@ -740,17 +745,17 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
   //todo  reminder message for team member
   if (timeDifference > 0) {
     // let reminderTempImagePath,reminderTempPdfPath;
-    setTimeout(async() => {
+    setTimeout(async () => {
       let connStatus = await WaModel.findOne({ cid: req.user.cid });
 
       console.log("/remark/add/:id");
       console.log(leadContactNo);
-      console.log("reminder to members ",userContact);
+      console.log("reminder to members ", userContact);
       let msg = reminderTemplateForMember.text;
       let companyName =
-        Admin.organizationName !== null ||
-        Admin.organizationName !== undefined ||
-        Admin.organizationName !== ""
+        Admin.organizationName !== null &&
+          Admin.organizationName !== undefined &&
+          Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
       const personalizedMessage = msg
@@ -781,7 +786,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
 
   if (timeDifference > 0) {
     // let reminderForCustomerTempImagePath,reminderForCusromerTempPdfPath;
-    setTimeout(async() => {
+    setTimeout(async () => {
       let connStatus;
       try {
         connStatus = await WaModel.findOne({ cid: req.user.cid });
@@ -790,13 +795,13 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
       }
       console.log("/remark/add/:id");
       console.log(leadContactNo);
-      console.log("reminder to lead ",leadContactNo);
+      console.log("reminder to lead ", leadContactNo);
 
       let msg = reminderTemplateForCustomer.text;
       let companyName =
-        Admin.organizationName !== null ||
-        Admin.organizationName !== undefined ||
-        Admin.organizationName !== ""
+        Admin.organizationName !== null &&
+          Admin.organizationName !== undefined &&
+          Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
       const personalizedMessage = msg
@@ -822,7 +827,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
     num: 5,
   });
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     let connStatus;
     try {
       connStatus = await WaModel.findOne({ cid: req.user.cid });
@@ -830,13 +835,13 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
       console.error("Error fetching connStatus: ", err);
     }
     console.log("/remark/add/:id");
-    console.log("thanks to lead ",leadContactNo);
+    console.log("thanks to lead ", leadContactNo);
 
     let msg = thnakyouLeadTemplate.text;
     let companyName =
       Admin.organizationName !== null ||
-      Admin.organizationName !== undefined ||
-      Admin.organizationName !== ""
+        Admin.organizationName !== undefined ||
+        Admin.organizationName !== ""
         ? Admin.organizationName
         : "360FollowUps";
     const personalizedMessage = msg
@@ -859,7 +864,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] }),
-  (req, res) => {}
+  (req, res) => { }
 );
 // todo google callback
 app.get(
@@ -1229,7 +1234,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
 
     // Fetch pages and leads
     let allLeads = await fetchLeadsFromFacebook(accessToken);
-    
+
     // Save leads to database (if needed)
     for (const lead of allLeads) {
       const existingLead = await leadsModel.findOne({ lead_id: lead.id, cid: req.user.cid });
@@ -1276,7 +1281,7 @@ async function fetchLeadsFromFacebook(accessToken) {
   );
 
   const pages = pagesResponse.data.data;
-  
+
   for (const page of pages) {
     const formsResponse = await axios.get(
       `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
@@ -1296,13 +1301,13 @@ async function fetchLeadsFromFacebook(accessToken) {
           },
         });
 
-      
+
         for (const lead of response.data.data) {
-         
+
           lead.page_id = page.id;
           lead.page_name = page.name;
           lead.form_id = form.id;
-          lead.form_name = form.name; 
+          lead.form_name = form.name;
 
           allLeads.push(lead);
         }
@@ -1314,24 +1319,24 @@ async function fetchLeadsFromFacebook(accessToken) {
   return allLeads;
 }
 
-app.get('/leads/pre', isAdminLoggedIn,async(req,res)=>{
+app.get('/leads/pre', isAdminLoggedIn, async (req, res) => {
   try {
-    let user = await logIncollection.findOne({cid: req.user.cid})
-    
-    if(!user) {
+    let user = await logIncollection.findOne({ cid: req.user.cid })
+
+    if (!user) {
       return res.redirect('/user/login')
     };
-    console.log(user.facebookToken,"hhhh");
-    
-    if(user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
+    console.log(user.facebookToken, "hhhh");
+
+    if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
       return res.redirect('/leads')
     }
     let data = await findNewLead(user.facebookToken, user);
     console.log(data);
-    
+
     res.redirect('/leads');
   } catch (err) {
-    console.warn("error in finding ne lead in /leads/pre - ",err);
+    console.warn("error in finding ne lead in /leads/pre - ", err);
   }
 })
 // todo logout facebook
@@ -1503,7 +1508,7 @@ async function sendMessageToLead(
     return;
   }
   console.log();
-  
+
   // Check if WhatsApp client is ready
   if (adminWA && !adminWA.isConnected) {
     console.warn("WhatsApp client is not ready. please re-connect mobile number isConnected in DB=", adminWA.isConnected);
@@ -1719,20 +1724,20 @@ async function findNewLead(accessToken, user) {
         console.log("Un-Matched then customerName:", customerName);
       }
 
-      
+
       const wellcomeTemp = await templateModel.findOne({
         cid: admin.cid,
         num: 4,
       });
 
       // todo COUSTOMER Whatsapp Message
-      setTimeout(async() => {
+      setTimeout(async () => {
         let connStatus;
-      try {
-        connStatus = await WaModel.findOne({ cid: admin.cid });
-      } catch (err) {
-        console.error("Error fetching connStatus: ", err);
-      }
+        try {
+          connStatus = await WaModel.findOne({ cid: admin.cid });
+        } catch (err) {
+          console.error("Error fetching connStatus: ", err);
+        }
 
         let imagePath, pdfPath;
         if (wellcomeTemp.image !== "") {
@@ -1755,8 +1760,8 @@ async function findNewLead(accessToken, user) {
 
         let companyName =
           admin.organizationName !== null ||
-          admin.organizationName !== "undefined" ||
-          admin.organizationName !== ""
+            admin.organizationName !== "undefined" ||
+            admin.organizationName !== ""
             ? admin.organizationName
             : "360FollowUps";
 
@@ -1772,7 +1777,7 @@ async function findNewLead(accessToken, user) {
         //   imagePath,
         //   pdfPath
         // );
-        console.log("Welcome to lead new lead found",leadContactNo);
+        console.log("Welcome to lead new lead found", leadContactNo);
         sendMessageToLead(
           connStatus,
           leadContactNo,
@@ -1797,8 +1802,8 @@ async function findNewLead(accessToken, user) {
 
         let companyName =
           admin.organizationName !== null ||
-          admin.organizationName !== "" ||
-          admin.organizationName !== undefined
+            admin.organizationName !== "" ||
+            admin.organizationName !== undefined
             ? admin.organizationName
             : "360FollowUps";
         const today = new Date();
@@ -1817,7 +1822,7 @@ async function findNewLead(accessToken, user) {
           .replace("[date]", formattedDate)
           .replace("[lead source]", "facebook")
           .replace("[company name]", companyName);
-          console.log("notificaton to admin new lead found ",admin.mobile);
+        console.log("notificaton to admin new lead found ", admin.mobile);
         sendMessageToLead(connStatus, admin.mobile, personalizedMessage);
 
         // todo new lead found msg to all Members
@@ -1831,7 +1836,7 @@ async function findNewLead(accessToken, user) {
               .replace("[date]", formattedDate)
               .replace("[lead source]", "facebook")
               .replace("[company name]", companyName);
-            console.log("notification to members new lead found",users[i].mobile);
+            console.log("notification to members new lead found", users[i].mobile);
             sendMessageToLead(connStatus, users[i].mobile, personalizedMessage);
           }, 2000);
         }
