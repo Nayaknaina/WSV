@@ -829,16 +829,28 @@
                 <li style="margin-bottom: 10px;">
                     <nav style="position: relative;">
                         <label class="created-time-label">
-                            <label class="start-drowp-app" for="touch2-{{@index}}" style="margin-bottom: 0;">
-                                <strong class="formateDate">{{formatDate income_time}}</strong>
-                                <i class="fa-solid fa-chevron-down"></i>
-                                <i class="fa-brands fa-square-{{app}}" style="font-size: 22px; color: #316ff6;"></i>
-                                <span class="company-customer" style="display: block; margin-top: 5px;">
-                                    Customer: <strong>{{customerName}}</strong>
-                                    <span style="margin-left: 10px;">
-                                        Phone: <strong>{{customerPhoneNumber}}</strong>
-                                    </span>
-                                </span>
+                          
+                            <label class="start-drowp-app" for="touch2-{{@index}}"
+                                style="display: flex; align-items: center; width: 100%; margin-bottom: 0; gap: 10px; position: relative;">
+
+                                
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <strong class="formateDate">{{formatDate income_time}}</strong>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                    <i class="fa-brands fa-square-{{app}}" style="font-size: 22px; color: #316ff6;"></i>
+                                </div>
+
+                                
+                                <div class="customer-info"
+                                    style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;    margin-top: 4rem; ">
+                                    <div style="font-size: 18px; "> <strong>{{findAnswer ./leads_data}}</strong></div>
+                                    <div style="font-size: 18px; "> {{#each leads_data}}
+                                        {{#if (containsPhoneNumber ans)}}
+                                        <strong>{{ans}}</strong>
+                                        {{/if}}
+                                        {{/each}}
+                                    </div>
+                                </div>
                             </label>
                             <div class="details-container">
                                 <strong>Page:</strong> {{page_name}} <br>

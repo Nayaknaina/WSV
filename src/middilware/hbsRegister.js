@@ -80,3 +80,56 @@ hbs.registerHelper("formatDate", function (datetime) {
     return phoneNumberPattern.test(text);
   });
   
+
+  hbs.registerHelper('findAnswer', function(leads_data) {
+    console.log(leads_data);
+    
+    const searchStrings = [
+      "name",
+      "Name",
+      "NAME",
+      "your name",
+      "your_name",
+      "Your_Name",
+      "Your_name",
+      "YOUR_NAME",
+      "YOUR NAME",
+      "YoyrName",
+      "YOURNAME",
+      "customerName",
+      "CustomerName",
+      "customer name",
+      "Customer Name",
+      "Customer_Name",
+      "customer_name",
+      "full name",
+      "full_name",
+      "Full_Name",
+      "FullName",
+      "FULL_NAME",
+      "first name",
+      "first_name",
+      "First_Name",
+      "आपका नाम",
+      "आपका_नाम",
+      "आपका_नाम:",
+      "नाम",
+      "पूरा नाम",
+      "पूरा_नाम",
+      "ग्राहक का नाम",
+      "ग्राहक_का_नाम",
+      "शुभ नाम",
+      "शुभ_नाम",
+    ];
+    // Loop over the leads_data array
+    for (let i = 0; i < leads_data.length; i++) {
+      const lead = leads_data[i];
+      // Check if any of the search strings match the lead's 'que'
+      for (let j = 0; j < searchStrings.length; j++) {
+        if (lead.que && lead.que.toLowerCase() === searchStrings[j].toLowerCase()) {
+          return lead.ans; // Return the 'ans' if a match is found
+        }
+      }
+    }
+    return 'No match found'; // Default response if no match
+  });

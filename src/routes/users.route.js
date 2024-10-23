@@ -26,6 +26,7 @@ const { v4: uuidv4 } = require("uuid");
 const { uploadProfile } = require("../service/multer.js");
 // const { sendMessageToLead } = require("../app.js");
 const uploadCSV = require("../service/csvMulter.js");
+const shared = require('../shared.js');
 
 const { csvFileDataChangIntoLeadHandler } = require("../controllers/user.controller.js");
 
@@ -431,7 +432,8 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       ],
       options: { sort: { statusTime: -1 } },
     });
-
+    const phoneNumber = shared.connectedPhoneNumber; // Access 
+    console.log("Connected Phone Number:", phoneNumber);
     const pipes = await pipelineModel
       .find({ cid: user.cid })
       .sort({ defaultVal: -1 })
@@ -460,6 +462,8 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       leads,
       successMSG: msg,
       errorMSG: errMsg,
+       phoneNumber: phoneNumber || "Not connected" ,
+      
     });
     // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
   } catch (error) {

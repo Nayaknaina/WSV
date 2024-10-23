@@ -701,13 +701,13 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
       const customerName = extractCustomerName(lead);
       const customerPhoneNumber = extractCustomerPhone(lead);
 
-      console.log(`Lead ID: ${lead._id}, Name: ${customerName}, Phone: ${customerPhoneNumber}`);
+      // console.log(`Lead ID: ${lead._id}, Name: ${customerName}, Phone: ${customerPhoneNumber}`);
 
       // Return a consistent structure
       return { ...lead.toObject(), customerName, customerPhoneNumber };
     });
 
-    console.log("User Leads:", leadsWithCustomerInfo);
+    // console.log("User Leads:", leadsWithCustomerInfo);
 
     const totalLeads = section === "myleads" ? leadsWithCustomerInfo.length : await leadsModel.countDocuments(filter);
     const totalPages = Math.ceil(totalLeads / limit);
@@ -766,10 +766,10 @@ function applyFilters(lead, query) {
 
 
 function extractCustomerName(lead) {
-  console.log("Inspecting leads_data for lead:", lead.lead_id, lead.leads_data);
+  // console.log("Inspecting leads_data for lead:", lead.lead_id, lead.leads_data);
 
   if (!Array.isArray(lead.leads_data)) {
-    console.warn("leads_data is not an array for lead:", lead.lead_id);
+    // console.warn("leads_data is not an array for lead:", lead.lead_id);
     return "Unknown";
   }
 
@@ -777,16 +777,16 @@ function extractCustomerName(lead) {
     /name|customer name|आपका_नाम|नाम/i.test(data.que)
   );
 
-  console.log("Extracted Name Data:", nameData);
+  // console.log("Extracted Name Data:", nameData);
   return nameData?.ans || "Unknown";
 }
 
 
 function extractCustomerPhone(lead) {
-  console.log("Inspecting leads_data for phone:", lead.lead_id, lead.leads_data);
+  // console.log("Inspecting leads_data for phone:", lead.lead_id, lead.leads_data);
 
   if (!Array.isArray(lead.leads_data)) {
-    console.warn("leads_data is not an array for lead:", lead.lead_id);
+    // console.warn("leads_data is not an array for lead:", lead.lead_id);
     return "N/A";
   }
 
@@ -794,7 +794,7 @@ function extractCustomerPhone(lead) {
     /^[6-9]\d{9}$/.test(data.ans.trim())
   );
 
-  console.log("Extracted Phone Data:", phoneData);
+  // console.log("Extracted Phone Data:", phoneData);
   return phoneData?.ans || "N/A";
 }
 

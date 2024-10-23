@@ -71,7 +71,148 @@
 </head>
 
 <style>
-    
+    body,
+    html {
+        width: 100%;
+        height: 100% !important;
+    }
+
+    #findNewLeadloader {
+        width: 100%;
+        min-height: 100%;
+        height: 100vh;
+        background-size: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 999999;
+        background-color: #908f8faa;
+        background-color: #000000aa;
+        display: none;
+        overflow: hidden;
+    }
+
+    #finSec {
+        min-width: 200px;
+        width: 33.33%;
+        height: 200px;
+        padding: 10px;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ccc;
+        cursor: pointer;
+        transition: 0.3s linear;
+    }
+
+    .loader-11 {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        border: 6px solid;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1s linear infinite;
+        animation: rotation 1s linear infinite;
+    }
+
+    .loader-11:after,
+    .loader-11:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        border: 6px solid;
+        border-color: transparent transparent #047 #047;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        -webkit-animation: rotationBack 0.5s linear infinite;
+        animation: rotationBack 0.5s linear infinite;
+        transform-origin: center center;
+    }
+
+    .loader-11:before {
+        width: 64px;
+        height: 64px;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1.5s linear infinite;
+        animation: rotation 1.5s linear infinite;
+
+    }
+
+    @media (max-width: 600px) {
+        .loader-11:before {
+            width: 32px;
+            height: 32px;
+            border-color: #FFF #FFF transparent transparent;
+        }
+
+        .loader-11:after,
+        .loader-11:before {
+            width: 40px;
+            height: 40px;
+            border: 3px solid;
+            border-color: transparent transparent #047 #047;
+        }
+
+        .loader-11 {
+            width: 48px;
+            height: 48px;
+            border: 3px solid;
+            border-color: #FFF #FFF transparent transparent;
+        }
+    }
+
+
+    @-webkit-keyframes rotationBack {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(-360deg);
+        }
+    }
+
+    @keyframes rotationBack {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(-360deg);
+        }
+    }
+
+    @-webkit-keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
     .modal {
         display: none;
 
@@ -141,7 +282,9 @@
 </style>
 
 <body class>
-
+    <div id="findNewLeadloader">
+        <section id="finSec"><span class="loader-11"> </span></section>
+    </div>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="
             height="0" width="0" style="display:none;visibility:hidden;"></iframe></noscript>
     {{!-- {{#if showForm}}
@@ -176,6 +319,7 @@
     </div>
 
     {{else}} --}}
+
     <div class="container-fluid" id="dashboard-content">
         <div class="row">
             {{> sidebar}}
@@ -209,22 +353,22 @@
                     <div class="row">
                         <!--/.col-->
                         <style>
-                        .social-box .btn {
+                            .social-box .btn {
                                 width: 48%;
                                 margin-top: .4rem;
-                                
+
                             }
 
                             .d-flex.gap-2 {
                                 gap: 10px;
-                              
+
                             }
-                            </style>
+                        </style>
                         <div class="col-lg-3 col-md-6">
                             <div class="social-box facebook">
                                 <i class="fa-brands fa-square-facebook"></i>
                                 {{#if user.facebookToken}}
-                                <div class="" >
+                                <div class="">
                                     <a class="btn border font-15 btn-success" href="#">Connected</a>
                                     <a class="btn btn-danger border font-15" href="/logoutfacebook">Logout</a>
                                 </div>
@@ -234,20 +378,38 @@
                                 </a>
                                 {{/if}}
                             </div>
-                            <!--/social-box-->
+                        
                         </div>
-
                         <div class="col-lg-3 col-md-6">
-                            <div class="social-box twitter">
-                                <i class="fa-brands fa-whatsapp"></i>
+                            {{!-- <div class="social-box twitter text-center">
+                                <i class="fa-brands fa-whatsapp fa-2x mb-2"></i> <!-- WhatsApp Icon with some margin -->
+
+                                {{#if phoneNumber}}
+                                <div class="font-15">Connected: <span class="fw-bold">{{phoneNumber}}</span></div>
+                                <a href="/logoutWA" id="whatsapp-Logout-Btn"
+                                    class="btn btn-sm btn-danger mt-2">Logout</a>
+                                {{else}}
+                                <div class="font-15">No WhatsApp connected.</div>
+                                <a href="/qr" id="whatsapp-Connect-Btn"
+                                    class="btn btn-sm btn-outline-secondary mt-2">Connect Now</a>
+                                {{/if}}
+                            </div> --}}
+                            <div class="social-box twitter text-center">
+                                <i class="fa-brands fa-whatsapp fa-2x"></i>
+
+                                <div id="phone-number-container" class="font-15 " style="font-weight: bold;">
+                                    <span id="connected-number">No WhatsApp connected.</span>
+                                </div>
 
                                 <a href="/qr" id="whatsapp-Connect-Btn"
-                                    class="btn btn-outline-secondary border font-15">Connect Now</a>
-                                <a href="/logoutWA" id="whatsapp-Logout-Btn" class="btn btn-danger border font-15"
+                                    class="btn btn-sm btn-outline-secondary ">Connect Now</a>
+                                <a href="/logoutWA" id="whatsapp-Logout-Btn" class="btn btn-sm btn-danger "
                                     style="display: none;">Logout</a>
                             </div>
 
+
                         </div>
+
                         <!--/.col-->
 
 
@@ -771,7 +933,7 @@
             </div>
 
 
-           
+
 
         </div>
     </div>
@@ -1274,6 +1436,7 @@
 
 
 
+    {{!--
     <script>
         async function checkConnectionStatus() {
             try {
@@ -1309,6 +1472,44 @@
 
         // Call the function when the page loads
         document.addEventListener('DOMContentLoaded', checkConnectionStatus);
+    </script> --}}
+
+    <script>
+        async function checkConnectionStatus() {
+            try {
+                const response = await fetch('/connection-status');
+                const data = await response.json();
+
+                console.log('Connection status response:', data); 
+
+                const isConnected = data.isConnected;
+                const phoneNumber = data.phoneNumber || 'No WhatsApp connected';
+                const phoneNumberContainer = document.getElementById('connected-number');
+                const connectBtn = document.getElementById('whatsapp-Connect-Btn');
+                const logoutBtn = document.getElementById('whatsapp-Logout-Btn');
+
+                if (isConnected) {
+                    phoneNumberContainer.textContent = `Connected: ${phoneNumber}`;
+                    connectBtn.textContent = 'Connected';
+                    connectBtn.classList.replace('btn-outline-secondary', 'btn-success');
+                    connectBtn.setAttribute('disabled', true);
+                    logoutBtn.style.display = 'inline-block';
+                } else {
+                    phoneNumberContainer.textContent = 'No WhatsApp connected.';
+                    connectBtn.textContent = 'Connect Now';
+                    connectBtn.classList.replace('btn-success', 'btn-outline-secondary');
+                    connectBtn.removeAttribute('disabled');
+                    logoutBtn.style.display = 'none';  
+                }
+            } catch (error) {
+                console.error('Error fetching connection status:', error);
+            }
+        }
+
+        // Call the function when the page loads
+        document.addEventListener('DOMContentLoaded', checkConnectionStatus);
+
+
     </script>
     {{!--todo profile card current location with local time --}}
     <script>

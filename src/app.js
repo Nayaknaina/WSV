@@ -42,7 +42,7 @@ const { log } = require("console");
 const { startKeepAlive } = require("./middilware/whatsapp.js");
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qr = require("qr-image");
-
+const shared = require('./shared.js');
 // Initialize variables
 let qrCodeData = "";
 let whatsappClientReady = false;
@@ -151,9 +151,9 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await logIncollection.findById(id); // Find user by ID
+    const user = await logIncollection.findById(id); 
 
-    done(null, user); // Attach user object to request
+    done(null, user);
   } catch (err) {
     done(err, null);
   }
@@ -167,27 +167,52 @@ app.use("/external", externalRoute);
 
 // todo wtsapp Handle root request
 
+// app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
+//   let user;
+//   if (req.user.role === "admin") {
+//     user = await logIncollection.findById(req.user.id)
+//   }
+//   else {
+//     user = await memberModel.findById(req.user.id);
+//   }
+
+//   let userWA = await WaModel.findOne({ cid: user.cid });
+
+//   console.log(isConnected, user.name, "check connection//");
+//   console.log("debug again", isConnected);
+
+//   if (userWA) {
+//     return res.json({ isConnected: userWA.isConnected });
+//   } else {
+//     return res.json({ isConnected: false });
+//   }
+
+// });
 app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
   let user;
   if (req.user.role === "admin") {
-    user = await logIncollection.findById(req.user.id)
-  }
-  else {
-    user = await memberModel.findById(req.user.id);
-  }
-
-  let userWA = await WaModel.findOne({ cid: user.cid });
-
-  console.log(isConnected, user.name, "check connection//");
-  console.log("debug again", isConnected);
-
-  if (userWA) {
-    return res.json({ isConnected: userWA.isConnected });
+      user = await logIncollection.findById(req.user.id);
   } else {
-    return res.json({ isConnected: false });
+      user = await memberModel.findById(req.user.id);
   }
 
+ 
+  const phoneNumber = shared.connectedPhoneNumber || null;
+
+  if (phoneNumber) {
+      return res.json({
+          isConnected: true,
+          phoneNumber: phoneNumber 
+      });
+  } else {
+      return res.json({
+          isConnected: false,
+          phoneNumber: null 
+      });
+  }
 });
+
+
 
 app.get("/qr", isAdminLoggedIn, async (req, res) => {
   // console.log("qrCodeData genrated in /qr", req.user.name);
@@ -653,6 +678,31 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     console.log("Error in /user/manual/lead :- ", err);
   }
 });
+
+//todo --
+app.get('/leads/pre', isAdminLoggedIn,async(req,res)=>{
+  try {
+    let user = await logIncollection.findOne({cid: req.user.cid})
+    
+    if(!user) {
+      return res.redirect('/user/login')
+    };
+    console.log(user.facebookToken,"hhhh");
+    
+    if(user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
+      // await new Promise(resolve => setTimeout(resolve, 10000));  // 10 seconds ka delay
+      return res.redirect('/leads')
+    }
+    console.log("aage na aana");
+    
+    let data = await findNewLead(user.facebookToken, user);
+    console.log(data);
+    
+    return res.redirect('/leads');
+  } catch (err) {
+    console.warn("error in finding ne lead in /leads/pre - ",err);
+  }
+})
 
 // todo remark addition
 app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
@@ -1319,26 +1369,7 @@ async function fetchLeadsFromFacebook(accessToken) {
   return allLeads;
 }
 
-app.get('/leads/pre', isAdminLoggedIn, async (req, res) => {
-  try {
-    let user = await logIncollection.findOne({ cid: req.user.cid })
 
-    if (!user) {
-      return res.redirect('/user/login')
-    };
-    console.log(user.facebookToken, "hhhh");
-
-    if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
-      return res.redirect('/leads')
-    }
-    let data = await findNewLead(user.facebookToken, user);
-    console.log(data);
-
-    res.redirect('/leads');
-  } catch (err) {
-    console.warn("error in finding ne lead in /leads/pre - ", err);
-  }
-})
 // todo logout facebook
 app.get("/logoutfacebook", isAdminLoggedIn, async (req, res) => {
   try {
@@ -1456,8 +1487,8 @@ function initializeWhatsAppClient() {
     console.log("WhatsApp client is ready!");
     whatsappClientReady = true;
     isConnected = true;
-    connectedPhoneNumber = client.info.wid.user;
-    console.log("Connected WhatsApp Number:", connectedPhoneNumber);
+    shared.connectedPhoneNumber = client.info.wid.user; // Store 
+    console.log("Connected WhatsApp Number:", shared.connectedPhoneNumber);
     // startKeepAlive(client);
   });
 
@@ -1917,3 +1948,6 @@ function chalteRaho(token, user) {
     console.log("step", i++);
   }, 60000);
 }
+
+
+module.exports = app;
