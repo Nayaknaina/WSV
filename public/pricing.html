@@ -49,12 +49,12 @@
 
 </head>
 
-<body id="home">
+<body id="home" style="background-color: rgb(175 188 255 / 87%);">
 
 
-    <header class="header position-relative">
+    <header class="header position-relative" >
         <!-- START Navigation -->
-        <div class="navigation-bar sticky" style="position: fixed;" id="affix">
+        <div class="navigation-bar sticky" style="position: fixed; padding: 0 12px;" id="affix">
             <div class="container">
                 <nav class="navbar navbar-expand-lg p-0">
 
@@ -100,12 +100,10 @@
         </div>
 
     </header>
-
-
-    <main>
-
-        <section class="pt-fluid-lg mb-fluid-sm px-fluid-base"
-            style="background-image: radial-gradient(at 50% 100%, #fff 0%, rgb(128 174 226 / 50%) 100%), linear-gradient(to bottom, rgb(156 159 176 / 25%) 0%, rgb(224 212 212 / 40%) 100%);">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;background-image: radial-gradient(at 50% 100%, #fff 0%, rgb(128 174 226 / 50%) 100%), linear-gradient(to bottom, rgb(156 159 176 / 25%) 0%, rgb(224 212 212 / 40%) 100%);
+">
+    <section class="pt-fluid-lg mb-fluid-sm px-fluid-base align-items-center"
+>
 
             <figure class="figure highlight-background highlight-background--lean-right">
                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1291px"
@@ -140,12 +138,12 @@
                 </div>
             </header>
 
-            <div class="row row-grid justify-content-center  mb-lg-5 ">
+            <div class="row justify-content-center  mb-lg ">
                 <div class="col-12 text-center">
                     <div class="offset-6 col-2  ">
                         <div class=" py-2 mb-3 position-relative"
                             style="width: 140px; background-color: #ffffff; color: #4A9BA5; border-radius: 20px;">
-                            <small>🎁 5 Months Free!</small>
+                            <small>🎁5 Months Free!</small>
                             <div class="promo-arrow" style="
                                     position: absolute;
                                     width: 50px;
@@ -192,6 +190,7 @@
                     </div>
                 </div>
             </div>
+            
             <div class="mx-auto flex flex-col lg:flex-row items-center justify-center max-w-screen-3xl">
 
                 <div class="bg-thd-color-violet-10 flex flex-col items-start  thd-card-flat flex-grow w-full "
@@ -318,13 +317,12 @@
                     <button onclick="submitForm()" class="btn btn-lg btn-primary wow pulse" data-wow-delay="0.4s">
                         Get Started</button>
                     <div class="flex items-center "><span id="pro-price"
-                            class="text-thd-color-violet-90 my-16 thd-heading-md">$15.00</span>
+                            class="text-thd-color-violet-90 my-16 thd-heading-md">$10.00</span>
                         <p class="text-thd-color-grey-60 thd-body-lg mt-12" id="pro-duration">/ month</p>
                     </div>
                     <p class="font-bold mb-fixed-sm">Includes:</p>
                     <ul class="thd-body-sm mb-lg list-disc list-inside flex flex-col justify-center">
-                        <li class="text-thd-color-black mb-sm ml-6"><span class="ml-4">Free for 10 days. Cancel
-                                anytime.
+                        <li class="text-thd-color-black mb-sm ml-6"><span class="ml-4">Billed Annually (120.00 USD)
                             </span></li>
                         <li class="text-thd-color-black mb-sm ml-6"><span class="ml-4">No credit card
                                 required.</span></li>
@@ -554,7 +552,7 @@
                                             d="M30 15.4433C30 16.6091 29.0933 16.8581 27.9562 16.9301C22.5158 17.2323 16.7962 22.686 16.4795 28.112C16.422 29.2634 16.173 30.1702 15.0072 30.1702C13.8414 30.1702 13.578 29.2634 13.5205 28.0976C13.2038 22.686 7.48416 17.2323 2.05814 16.9301C0.906735 16.8581 0 16.6091 0 15.4433C0 14.2775 0.906735 14.043 2.05814 13.971C7.48416 13.6687 13.2038 7.65433 13.5205 2.22831C13.578 1.0769 13.827 0.170166 15.0072 0.170166C16.1874 0.170166 16.422 1.0769 16.4795 2.22831C16.7962 7.65433 22.5158 13.6687 27.9419 13.971C29.0933 14.043 30 14.2919 30 15.4433Z"
                                             fill="url(#ai-logo--gradient-3"></path>
                                     </svg></span>
-                                <span class="SanityMarkdown_gradientAiText__O0eX_">Advanced branding and content
+                                <span class="SanityMarkdown_gradientAiText__O0eX_">Advanced branding and 
                                     customization</span>
                             </li>
                             <li class="flex items-center mb-sm"><svg viewBox="0 0 24 24" fill="none"
@@ -607,19 +605,9 @@
                 </div>
             </div>
         </section>
-
-
-        </div>
-
-
-
-
-    </main>
-
     </div>
 
-    </div>
-
+       
 
     <script>
         function submitForm() {
@@ -655,7 +643,7 @@
             document.getElementById('option_monthly').parentElement.classList.add('active');
             document.getElementById('option_yearly').parentElement.classList.remove('active');
         } else if (plan === 'yearly') {
-            document.getElementById('pro-price').innerHTML = '$8.00';
+            document.getElementById('pro-price').innerHTML = '$10.00';
             document.getElementById('pro-duration').innerHTML = '/ month';
             document.getElementById('savings_text').style.display = 'none';
     
