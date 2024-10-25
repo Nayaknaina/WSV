@@ -42,25 +42,25 @@ router.get("/team", isAdminLoggedIn, async (req, res) => {
   res.render("team", { user, successMSG: msg, errorMSG: errMsg });
 });
 
-router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
-  let { id } = req.params;
+// router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
+//   let { id } = req.params;
 
-  let lead = await leadsModel.findById(id);
-  if (!lead) {
-    return res.redirect("/leads");
-  }
+//   let lead = await leadsModel.findById(id);
+//   if (!lead) {
+//     return res.redirect("/leads");
+//   }
 
-  let admin = await logIncollection.findById(req.user.id);
-  admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
-  lead.uid = null;
-  lead.userType = null;
-  // lead.remarks = [];
+//   let admin = await logIncollection.findById(req.user.id);
+//   admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
+//   lead.uid = null;
+//   lead.userType = null;
+//   // lead.remarks = [];
 
-  await admin.save();
-  await lead.save();
+//   await admin.save();
+//   await lead.save();
 
-  res.redirect("/leads");
-});
+//   res.redirect("/leads");
+// });
 
 // lead ownership assign other member by admin
 router.post("/change/lead/owner/:leadId", isAdminLoggedIn, async (req, res) => {
@@ -442,12 +442,12 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
     // console.log(req.session.successMSG);
     let msg = req.session.successMSG;
     // console.log(req.session.successMSG);
-
     let errMsg = req.session.errorMSG;
+    let warnMsg = req.session.warnMsg;
 
     delete req.session.successMSG;
     delete req.session.errorMSG;
-    console.log(msg, errMsg);
+    delete req.session.warnMsg;
 
     if (chalteRahoId) clearInterval(chalteRahoId);
       console.log("chalte rho calling");
@@ -461,7 +461,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       leads,
       successMSG: msg,
       errorMSG: errMsg,
-      
+      warnMsg: warnMsg,
     });
     // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
   } catch (error) {
@@ -853,7 +853,7 @@ Please follow up with the lead at your earliest
 convenience to ensure a prompt response.
 
 Best,
-The [Company Name] System`,
+The [Company Name] System`,
       client: false,
       team: true,
       num: 3,

@@ -406,6 +406,19 @@ function chalteRaho(token, user) {
 }
 
 
+// todo Middleware to check subscription status
+
+function checkSubscription(req, res, next) {
+  const subExp = new Date(req.user.subscriptionExpiry); // Assuming `subscriptionExpiry` is stored in user data
+  const today = new Date();
+  const diffTime = subExp - today;
+  const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  req.access = daysLeft > 0; // true if subscription is active, false if expired
+
+  next();
+}
+
 
 
 module.exports = {
@@ -415,5 +428,5 @@ module.exports = {
   isSubscriptionValid,
   chalteRahoId,
   chalteRaho,
- 
+  checkSubscription,
 }
