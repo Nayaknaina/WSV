@@ -11,6 +11,7 @@ const axios = require("axios");
 const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
+const moment = require("moment");
 
 const querystring = require("querystring");
 const passport = require("passport");
@@ -37,6 +38,9 @@ const userRoute = require("./routes/users.route.js");
 const Route = require("./routes/index.route.js");
 const externalRoute = require("./routes/external.route.js");
 const { log } = require("console");
+
+const { checkSubscription } = require("./middilware/middilware.js");
+
 
 // todo Whatsapp integrations-----------------------------------------
 const { startKeepAlive } = require("./middilware/whatsapp.js");
@@ -300,7 +304,26 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
           await userWA.save();
         }
 
-        // req.session.errMsg = ''
+        const today = moment().startOf("day");
+        let remarks = await remarkModel.find({ cid: req.user.cid });
+
+        let futureCount = 0;
+        remarks.forEach((remark) => {
+          const remarkDate = moment(remark.date).startOf("day");
+          const remarkTime = remark.time;
+
+          if (
+            remarkDate.isAfter(today) ||
+            (remarkDate.isSame(today) && remark.time > moment().format("HH:mm"))
+          ) {
+            futureCount++;
+          }
+        });
+        console.log(futureCount);
+
+        req.session.warnMsg = `You’ve been logged out of WhatsApp. Please reconnect to send ${futureCount} pending remarks`;
+      
+        
         console.log("WhatsApp client logged out successfully.");
       } catch (logoutError) {
         console.error("Error during logout process:", logoutError);
@@ -333,9 +356,13 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
 
 
 // todo fetch leads 
-app.get("/fetch/leads", isAdminLoggedIn, async (req, res) => {
+app.get("/fetch/leads", isAdminLoggedIn,checkSubscription, async (req, res) => {
   try {
     let user = await logIncollection.findOne({ cid: req.user.cid });
+    if(req.access) {
+      console.warn(`Subscription expired. Please renew to continue.`)
+      return req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+    }
     if (!user.facebookToken) {
       let errMsg = "Please connect your facebook account. ";
       return res.json(errMsg);
@@ -352,7 +379,7 @@ app.get("/fetch/leads", isAdminLoggedIn, async (req, res) => {
 
 //------------------------------------------------------
 // todo manual lead addition
-app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
+app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) => {
   try {
     let user;
     if (req.user.role === "admin") {
@@ -362,6 +389,10 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
     }
 
     const Admin = await logIncollection.findOne({ cid: user.cid });
+    if(req.access) {
+      console.warn(`Subscription expired. Please renew to continue.`)
+      return req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+    }
     const leads_data = Object.entries(req.body)
       .filter(([key]) => key !== "remark" && key !== "remarktime") // Exclude 'remark' and 'remarktime'
       .map(([key, value]) => ({
@@ -681,20 +712,25 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-//todo --
-app.get('/leads/pre', isAdminLoggedIn, async (req, res) => {
+//todo -- fetch lead from Fb when you have tocken and Subscription
+app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
   try {
     let user = await logIncollection.findOne({ cid: req.user.cid })
 
     if (!user) {
       return res.redirect('/user/login')
     };
+
+    if(req.access){
+      console.warn(`Subscription expired. Please renew to continue.`)
+      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+      return res.redirect('/leads')
+    }
+
     console.log(user.facebookToken, "hhhh");
 
     if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
-      // await new Promise(resolve => setTimeout(resolve, 10000));  
-      console.log("without facebook");
-      
+      // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
       return res.redirect('/leads')
     }
     console.log("findinnngggg");
@@ -709,7 +745,7 @@ app.get('/leads/pre', isAdminLoggedIn, async (req, res) => {
 })
 
 // todo remark addition
-app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
+app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) => {
   const { id } = req.params;
   const { text, time, date } = req.body;
   let user;
@@ -717,8 +753,11 @@ app.post("/remark/add/:id", isAdminLoggedIn, async (req, res) => {
   if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id);
   } else user = await memberModel.findById(user._id);
-
-
+  
+  if(req.access) {
+    console.warn(`Subscription expired. Please renew to continue.`)
+    return req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+  }
   let Admin = await logIncollection.findOne({ cid: user.cid });
 
   let userContact = user.mobile;
@@ -1070,12 +1109,13 @@ app.get(
     const diffTime = subExp - today;
     const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-
-    // days left success left
-    const successMessage =
-      daysLeft > 0
-        ? `Your free plan started. You have ${daysLeft} days remaining.`
-        : req.session.errorMSG;
+    if(daysLeft) {
+      console.warn(`Subscription expired. Please renew to continue.`)
+      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+    }
+    else {// days left success left
+      req.session.successMSG = `Your free plan started. You have ${daysLeft} days remaining.`
+    }
 
     const token = await generateToken(user);
 
@@ -1083,7 +1123,6 @@ app.get(
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
-    req.session.successMSG = successMessage;
     
     res.redirect("/user/dashboard");
   }
@@ -1272,7 +1311,7 @@ app.get("/auth/facebook", (req, res) => {
 //   }
 // });
 
-app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
+app.get("/auth/facebook/callback", isAdminLoggedIn,checkSubscription, async (req, res) => {
   const { code } = req.query;
 
   if (!code) {
@@ -1302,8 +1341,15 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
 
     admin.facebookToken = accessToken;
     await admin.save();
+    
+    req.session.successMSG = "Connected to Facebook account.";
 
-    // Fetch pages and leads
+    // todo if Subscription end i cant give you permission to fetch your leads 
+    if(req.access){
+      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+      console.warn(req.session.errorMSG);
+      return res.redirect("/leads");
+    }
     let allLeads = await fetchLeadsFromFacebook(accessToken);
 
     // Save leads to database (if needed)
@@ -1332,7 +1378,6 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
       }
     }
 
-    req.session.successMSG = "Connected to Facebook account.";
     res.redirect("/leads");
   } catch (error) {
     console.error(
@@ -1901,64 +1946,6 @@ async function findNewLead(accessToken, user) {
   });
 
   return allLeads;
-}
-
-async function sendMessageToLead(
-  adminWA,
-  phoneNumber,
-  message,
-  imagePath = null,
-  pdfPath = null
-) {
-  if (adminWA === null || adminWA === undefined || adminWA === "") {
-    console.warn("WhatsApp client is not ready. please connect mobile number");
-    return;
-  }
-  console.log();
-
-  // Check if WhatsApp client is ready
-  if (adminWA && !adminWA.isConnected) {
-    console.warn(
-      "WhatsApp client is not ready. please re-connect mobile number isConnected in DB=",
-      adminWA.isConnected
-    );
-    return;
-  }
-  console.log(
-    "Trying to send message. Client ready status:",
-    adminWA.isConnected
-  );
-
-  try {
-    // If imagePath and captionText are provided, send image with caption
-    if (imagePath && pdfPath) {
-      const imageMedia = MessageMedia.fromFilePath(imagePath);
-      const pdfMedia = MessageMedia.fromFilePath(pdfPath);
-
-      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
-        caption: message,
-      });
-
-      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia);
-    } else if ((imagePath && !pdfPath) || pdfPath == "") {
-      // send Only a image with text message
-      const imageMedia = MessageMedia.fromFilePath(imagePath);
-      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
-        caption: message,
-      });
-    } else if ((pdfPath && !imagePath) || imagePath == "") {
-      // send Only a pdf with text message
-      const pdfMedia = MessageMedia.fromFilePath(pdfPath);
-      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia, {
-        caption: message,
-      });
-    } else {
-      await client.sendMessage(`91${phoneNumber}@c.us`, message);
-      console.log("Text message sent successfully!");
-    }
-  } catch (error) {
-    console.error("Error sending message:", error);
-  }
 }
 
 

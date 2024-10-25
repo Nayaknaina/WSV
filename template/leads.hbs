@@ -61,6 +61,9 @@
                         <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="openFormBtn">
                             Add New Lead
                         </button>
+
+                        <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" onclick="fetchFacebookLeadFromFacebook()">Fetch leads</button>
+
                         <div id="filterForm" class="filter-container" style="display: none;">
                             <form id="leadFilterForm" method="GET" action="/leads">
                                 <input type="hidden" name="section" value="{{section}}" />
@@ -1445,6 +1448,27 @@
         }
     </script> --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+        
+        function fetchFacebookLeadFromFacebook(){
+             try {
+                const response = await axios.get('/fetch/leads');
+                
+                console.log(response)
+                if (response.status === 200) {
+                    //toastr.success()
+                    //location.reload()
+                    console.log(response.data)
+                }
+                return
+            } catch (error) {
+                console.error('Error uploading file:', error); // Error handling
+                // Error message
+            }
+        }
+        
+    </script>
 </body>
 
 </html>
