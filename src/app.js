@@ -509,6 +509,10 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       );
     }
 
+    let isWACnn = await WaModel.findOne({cid: user.cid})
+    if(!isWACnn.isConnected){
+      req.session.errorMSG = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
+    }
     setTimeout(async () => {
       let connStatus;
       try {
@@ -731,6 +735,7 @@ app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
 
     if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
       // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
+      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
       return res.redirect('/leads')
     }
     console.log("aage na aana");
