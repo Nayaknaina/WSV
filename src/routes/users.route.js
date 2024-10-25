@@ -4,7 +4,6 @@ const router = express.Router();
 // Apply middleware for parsing only on this router
 router.use(express.urlencoded({ extended: true })); // Parse form data
 router.use(express.json()); // Parse JSON data
-// const {initializeWhatsAppClient} = require("../app3.js");
 const logIncollection = require("../models/admin.model.js");
 const pipelineModel = require("../models/pipeline.model.js");
 const memberModel = require("../models/member.model.js");
@@ -42,25 +41,7 @@ router.get("/team", isAdminLoggedIn, async (req, res) => {
   res.render("team", { user, successMSG: msg, errorMSG: errMsg });
 });
 
-router.get("/lead/remove/:id", isAdminLoggedIn, async (req, res) => {
-  let { id } = req.params;
 
-  let lead = await leadsModel.findById(id);
-  if (!lead) {
-    return res.redirect("/leads");
-  }
-
-  let admin = await logIncollection.findById(req.user.id);
-  admin.myleads.splice(admin.myleads.indexOf(lead._id), 1);
-  lead.uid = null;
-  lead.userType = null;
-  // lead.remarks = [];
-
-  await admin.save();
-  await lead.save();
-
-  res.redirect("/leads");
-});
 
 // lead ownership assign other member by admin
 router.post("/change/lead/owner/:leadId", isAdminLoggedIn, async (req, res) => {

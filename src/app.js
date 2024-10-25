@@ -692,10 +692,12 @@ app.get('/leads/pre', isAdminLoggedIn, async (req, res) => {
     console.log(user.facebookToken, "hhhh");
 
     if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
-      await new Promise(resolve => setTimeout(resolve, 10000));  // 10 seconds ka delay
+      // await new Promise(resolve => setTimeout(resolve, 10000));  
+      console.log("without facebook");
+      
       return res.redirect('/leads')
     }
-    console.log("aage na aana");
+    console.log("findinnngggg");
 
     let data = await findNewLead(user.facebookToken, user);
     console.log(data);
