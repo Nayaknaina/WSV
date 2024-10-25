@@ -378,7 +378,7 @@
                                 </a>
                                 {{/if}}
                             </div>
-                        
+
                         </div>
                         <div class="col-lg-3 col-md-6">
                             {{!-- <div class="social-box twitter text-center">
@@ -394,7 +394,7 @@
                                     class="btn btn-sm btn-outline-secondary mt-2">Connect Now</a>
                                 {{/if}}
                             </div> --}}
-                            <div class="social-box twitter text-center">
+                            {{!-- <div class="social-box twitter text-center">
                                 <i class="fa-brands fa-whatsapp fa-2x"></i>
 
                                 <div id="phone-number-container" class="font-15 " style="font-weight: bold;">
@@ -405,9 +405,21 @@
                                     class="btn btn-sm btn-outline-secondary ">Connect Now</a>
                                 <a href="/logoutWA" id="whatsapp-Logout-Btn" class="btn btn-sm btn-danger "
                                     style="display: none;">Logout</a>
+                            </div> --}}
+
+                            <div class="social-box twitter text-center">
+                                <i class="fa-brands fa-whatsapp fa-2x"></i>
+
+                                <div id="phone-number-container" class="font-15" style="font-weight: bold;">
+                                    <span id="connected-number">{{#if phoneNumber}}{{phoneNumber}}{{else}}No WhatsApp
+                                        connected{{/if}}</span>
+                                </div>
+
+                                <a href="/qr" id="whatsapp-Connect-Btn" class="btn btn-sm btn-outline-secondary">Connect
+                                    Now</a>
+                                <a href="/logoutWA" id="whatsapp-Logout-Btn" class="btn btn-sm btn-danger"
+                                    style="display: none;">Logout</a>
                             </div>
-
-
                         </div>
 
                         <!--/.col-->
@@ -884,8 +896,6 @@
                             </div>
                         </div>
                     </div>
-
-
                     {{!-- <div class="col-xl-3 col-lg-6">
                         <div class="card">
                             <div class="card-body">
@@ -937,7 +947,7 @@
 
         </div>
     </div>
-    {{!-- {{/if}} --}}
+   
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
@@ -953,8 +963,6 @@
 
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
         src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
-
-
 
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
@@ -1480,7 +1488,7 @@
                 const response = await fetch('/connection-status');
                 const data = await response.json();
 
-                console.log('Connection status response:', data); 
+                console.log('Connection status response:', data);
 
                 const isConnected = data.isConnected;
                 const phoneNumber = data.phoneNumber || 'No WhatsApp connected';
@@ -1499,7 +1507,7 @@
                     connectBtn.textContent = 'Connect Now';
                     connectBtn.classList.replace('btn-success', 'btn-outline-secondary');
                     connectBtn.removeAttribute('disabled');
-                    logoutBtn.style.display = 'none';  
+                    logoutBtn.style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error fetching connection status:', error);

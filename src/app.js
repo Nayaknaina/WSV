@@ -151,7 +151,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await logIncollection.findById(id); 
+    const user = await logIncollection.findById(id);
 
     done(null, user);
   } catch (err) {
@@ -167,50 +167,52 @@ app.use("/external", externalRoute);
 
 // todo wtsapp Handle root request
 
-// app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
-//   let user;
-//   if (req.user.role === "admin") {
-//     user = await logIncollection.findById(req.user.id)
-//   }
-//   else {
-//     user = await memberModel.findById(req.user.id);
-//   }
-
-//   let userWA = await WaModel.findOne({ cid: user.cid });
-
-//   console.log(isConnected, user.name, "check connection//");
-//   console.log("debug again", isConnected);
-
-//   if (userWA) {
-//     return res.json({ isConnected: userWA.isConnected });
-//   } else {
-//     return res.json({ isConnected: false });
-//   }
-
-// });
 app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
   let user;
   if (req.user.role === "admin") {
-      user = await logIncollection.findById(req.user.id);
-  } else {
-      user = await memberModel.findById(req.user.id);
+    user = await logIncollection.findById(req.user.id)
+  }
+  else {
+    user = await memberModel.findById(req.user.id);
   }
 
- 
-  const phoneNumber = shared.connectedPhoneNumber || null;
+  let userWA = await WaModel.findOne({ cid: user.cid });
 
-  if (phoneNumber) {
-      return res.json({
-          isConnected: true,
-          phoneNumber: phoneNumber 
-      });
+  console.log(isConnected, user.name, "check connection//");
+  console.log("debug again", isConnected);
+
+  if (userWA) {
+    // Update shared variable for frontend use
+    shared.connectedPhoneNumber = userWA.connectedPhoneNumber || "";
+    return res.json({ isConnected: userWA.isConnected});
   } else {
-      return res.json({
-          isConnected: false,
-          phoneNumber: null 
-      });
+    return res.json({ isConnected: false });
   }
+
 });
+// app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
+//   let user;
+//   if (req.user.role === "admin") {
+//       user = await logIncollection.findById(req.user.id);
+//   } else {
+//       user = await memberModel.findById(req.user.id);
+//   }
+
+
+//   const phoneNumber = shared.connectedPhoneNumber || null;
+
+//   if (phoneNumber) {
+//       return res.json({
+//           isConnected: true,
+//           phoneNumber: phoneNumber 
+//       });
+//   } else {
+//       return res.json({
+//           isConnected: false,
+//           phoneNumber: null 
+//       });
+//   }
+// });
 
 
 
@@ -267,6 +269,8 @@ app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
     return res.json({
       qrCodeData,
       isConnected: true,
+      //added
+      phoneNumber: connectedPhoneNumber,
     });
   }
   else {
@@ -680,27 +684,27 @@ app.post("/manual/lead", isAdminLoggedIn, async (req, res) => {
 });
 
 //todo --
-app.get('/leads/pre', isAdminLoggedIn,async(req,res)=>{
+app.get('/leads/pre', isAdminLoggedIn, async (req, res) => {
   try {
-    let user = await logIncollection.findOne({cid: req.user.cid})
-    
-    if(!user) {
+    let user = await logIncollection.findOne({ cid: req.user.cid })
+
+    if (!user) {
       return res.redirect('/user/login')
     };
-    console.log(user.facebookToken,"hhhh");
-    
-    if(user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
+    console.log(user.facebookToken, "hhhh");
+
+    if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
       // await new Promise(resolve => setTimeout(resolve, 10000));  // 10 seconds ka delay
       return res.redirect('/leads')
     }
     console.log("aage na aana");
-    
+
     let data = await findNewLead(user.facebookToken, user);
     console.log(data);
-    
+
     return res.redirect('/leads');
   } catch (err) {
-    console.warn("error in finding ne lead in /leads/pre - ",err);
+    console.warn("error in finding ne lead in /leads/pre - ", err);
   }
 })
 
@@ -928,6 +932,7 @@ app.get(
       const cid = uuidv4();
       user.cid = cid;
       user.role = "admin";
+      user.signupDate = new Date();//added
       await user.save();
     }
     if (!(user.myPipelines.length >= 4)) {
@@ -1058,12 +1063,29 @@ app.get(
       );
       await user.save();
     }
+
+    const TOTAL_PLAN_DAYS = 15;
+ 
+    const signupDate = new Date(user.signupDate);
+    const today = new Date();
+    const diffTime = today - signupDate;
+    const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const daysLeft = TOTAL_PLAN_DAYS - daysPassed;
+
+    // days left success left
+    const successMessage =
+      daysLeft > 0
+        ? `Your free plan started. You have ${daysLeft} days remaining.`
+        : errorMSG;
+
     const token = await generateToken(user);
 
     res.cookie("360Followers", token, {
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
+    req.session.successMSG = successMessage;
+    
     res.redirect("/user/dashboard");
   }
 );
@@ -1322,7 +1344,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-
+//todo fetch lead--on
 async function fetchLeadsFromFacebook(accessToken) {
   let allLeads = [];
   const pagesResponse = await axios.get(
@@ -1487,8 +1509,10 @@ function initializeWhatsAppClient() {
     console.log("WhatsApp client is ready!");
     whatsappClientReady = true;
     isConnected = true;
-    shared.connectedPhoneNumber = client.info.wid.user; // Store 
-    console.log("Connected WhatsApp Number:", shared.connectedPhoneNumber);
+    // shared.connectedPhoneNumber = client.info.wid.user; // Store phone 
+    // console.log("Connected WhatsApp Number:", shared.connectedPhoneNumber);
+    connectedPhoneNumber = client.info.wid.user;
+    console.log("Connected WhatsApp Number:", connectedPhoneNumber);
     // startKeepAlive(client);
   });
 

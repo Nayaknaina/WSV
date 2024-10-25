@@ -791,7 +791,7 @@ function extractCustomerPhone(lead) {
   }
 
   const phoneData = lead.leads_data.find((data) =>
-    /^[6-9]\d{9}$/.test(data.ans.trim())
+    /(\+?\d{1,4}[ -]?)?(\(?\d{2,4}\)?[ -]?)?\d{6,12}/.test(data.ans.trim())
   );
 
   // console.log("Extracted Phone Data:", phoneData);

@@ -192,7 +192,7 @@ router.post("/signup", async (req, res) => {
     const templates = [
       {
         title: "Reminder Message To Customer",
-        text: `Dear [Customer Name],
+        text: `dear [Customer Name],
 
 This is a friendly reminder from [Company Name]. We have a scheduled follow-up call with you on [Date] at [Time]. Our representative will be reaching out to discuss your requirements.
 
@@ -209,7 +209,7 @@ The [Company Name] Team`,
 
       {
         title: "Reminder Message To Team Member",
-        text: `Hello [Team Member Name],
+        text: `hello [Team Member Name],
 
 Just a reminder that you have a follow-up call scheduled with [Customer Name] on [Date] at [Time]. Please make sure you are prepared with all the necessary details.
 
@@ -224,7 +224,7 @@ The [Company Name] Team`,
 
       {
         title: "Thankyou Message To Customer",
-        text: `Dear [Customer Name],
+        text: `dear [Customer Name],
 
 Thank you for taking the time to speak with us today. We appreciate the opportunity to understand your needs better and to discuss how we can assist you further.
 
@@ -239,7 +239,7 @@ The [Company Name] Team`,
 
       {
         title: "Notification Message To Team Members",
-        text: `Hello [Team Member Name],
+        text: `hello [Team Member Name],
 
 A new lead has been added to the CRM. Here are the details:
 - *Lead Name:* [Customer Name]
@@ -432,8 +432,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       ],
       options: { sort: { statusTime: -1 } },
     });
-    const phoneNumber = shared.connectedPhoneNumber; // Access 
-    console.log("Connected Phone Number:", phoneNumber);
+    // console.log("Connected Phone Number:", phoneNumber);
     const pipes = await pipelineModel
       .find({ cid: user.cid })
       .sort({ defaultVal: -1 })
@@ -462,7 +461,6 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       leads,
       successMSG: msg,
       errorMSG: errMsg,
-       phoneNumber: phoneNumber || "Not connected" ,
       
     });
     // res.render("dashboard", { user, pipes, leads, showForm: false,qrCode: qrCodeImage });
@@ -476,6 +474,30 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
 
 
 // Login handler
+// router.post("/login", async (req, res) => {
+//   try {
+//     const user = await logIncollection.findOne({ email: req.body.email });
+
+//     if (!user || user.password !== req.body.password) {
+//       return res.render("signup", {
+//         errorMessage: "Invalid username or password",
+//       });
+//     }
+
+//     const token = await generateToken(user);
+//     res.cookie("360Followers", token, {
+//       httpOnly: true,
+//       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
+//     });
+//     req.session.successMSG = "Your free plan started of 15 days";
+//     res.redirect("/user/dashboard");
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Error logging in");
+//   }
+// });
+
+//free plan messgg show 
 router.post("/login", async (req, res) => {
   try {
     const user = await logIncollection.findOne({ email: req.body.email });
@@ -486,17 +508,35 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // Calculate remaining days
+    const signupDate = new Date(user.signupDate);
+    const today = new Date();
+    const diffTime = today - signupDate; 
+    const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const totalPlanDays = 15; 
+    const daysLeft = totalPlanDays - daysPassed;
+
+    // success days left 
+    const successMessage =
+      daysLeft > 0
+        ? `Your free plan started. You have ${daysLeft} days remaining.`
+        : `Your free plan has expired. Please upgrade to continue.`;
+
     const token = await generateToken(user);
     res.cookie("360Followers", token, {
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
+
+    req.session.successMSG = successMessage;
     res.redirect("/user/dashboard");
   } catch (err) {
     console.error(err);
     res.status(500).send("Error logging in");
   }
 });
+
+
 
 router.get("/logout", (req, res) => {
   res.clearCookie("360Followers");
