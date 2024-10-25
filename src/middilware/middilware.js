@@ -414,8 +414,9 @@ function checkSubscription(req, res, next) {
   const diffTime = subExp - today;
   const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  req.access = daysLeft > 0; // true if subscription is active, false if expired
-
+  req.session.access = daysLeft > 0; // true if subscription is active, false if expired
+  console.log(req.session.access,"in a check Subscription");
+  
   next();
 }
 

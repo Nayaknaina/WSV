@@ -359,9 +359,10 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
 app.get("/fetch/leads", isAdminLoggedIn,checkSubscription, async (req, res) => {
   try {
     let user = await logIncollection.findOne({ cid: req.user.cid });
-    if(req.access) {
+    if(!req.session.access) {
       console.warn(`Subscription expired. Please renew to continue.`)
-      return req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+      return res.redirect('/leads')
     }
     if (!user.facebookToken) {
       let errMsg = "Please connect your facebook account. ";
@@ -389,9 +390,10 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     }
 
     const Admin = await logIncollection.findOne({ cid: user.cid });
-    if(req.access) {
+    if(!req.session.access) {
       console.warn(`Subscription expired. Please renew to continue.`)
-      return req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+      return res.redirect('/leads')
     }
     const leads_data = Object.entries(req.body)
       .filter(([key]) => key !== "remark" && key !== "remarktime") // Exclude 'remark' and 'remarktime'
@@ -724,21 +726,23 @@ app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
     if (!user) {
       return res.redirect('/user/login')
     };
-
-    if(req.access){
+   
+    
+    if(!req.session.access){
       console.warn(`Subscription expired. Please renew to continue.`)
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
       return res.redirect('/leads')
     }
 
-    console.log(user.facebookToken, "hhhh");
+    console.log(user.facebookToken, "usrer facebook token");
 
     if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
       // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
-      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+      console.log("you not have fb token");
+      
       return res.redirect('/leads')
     }
-    console.log("aage na aana");
+    console.log("findinnngggg");
 
     let data = await findNewLead(user.facebookToken, user);
     console.log(data);
@@ -759,9 +763,10 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
     user = await logIncollection.findById(req.user.id);
   } else user = await memberModel.findById(user._id);
   
-  if(req.access) {
+  if(!req.session.access) {
     console.warn(`Subscription expired. Please renew to continue.`)
-    return req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+    req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+    return res.redirect('/leads')
   }
   let Admin = await logIncollection.findOne({ cid: user.cid });
 
@@ -1114,7 +1119,7 @@ app.get(
     const diffTime = subExp - today;
     const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    if(daysLeft) {
+    if(daysLeft<=0) {
       console.warn(`Subscription expired. Please renew to continue.`)
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
     }
@@ -1350,7 +1355,7 @@ app.get("/auth/facebook/callback", isAdminLoggedIn,checkSubscription, async (req
     req.session.successMSG = "Connected to Facebook account.";
 
     // todo if Subscription end i cant give you permission to fetch your leads 
-    if(req.access){
+    if(!req.session.access){
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
       console.warn(req.session.errorMSG);
       return res.redirect("/leads");
