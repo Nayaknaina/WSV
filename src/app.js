@@ -42,7 +42,6 @@ const { log } = require("console");
 const { startKeepAlive } = require("./middilware/whatsapp.js");
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qr = require("qr-image");
-const shared = require('./shared.js');
 // Initialize variables
 let qrCodeData = "";
 let whatsappClientReady = false;
@@ -183,7 +182,7 @@ app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
 
   if (userWA) {
     // Update shared variable for frontend use
-    shared.connectedPhoneNumber = userWA.connectedPhoneNumber || "";
+    // shared.connectedPhoneNumber = userWA.connectedPhoneNumber || "";
     return res.json({ isConnected: userWA.isConnected});
   } else {
     return res.json({ isConnected: false });
@@ -269,8 +268,7 @@ app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
     return res.json({
       qrCodeData,
       isConnected: true,
-      //added
-      phoneNumber: connectedPhoneNumber,
+     
     });
   }
   else {
@@ -694,7 +692,7 @@ app.get('/leads/pre', isAdminLoggedIn, async (req, res) => {
     console.log(user.facebookToken, "hhhh");
 
     if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
-      // await new Promise(resolve => setTimeout(resolve, 10000));  // 10 seconds ka delay
+      await new Promise(resolve => setTimeout(resolve, 10000));  // 10 seconds ka delay
       return res.redirect('/leads')
     }
     console.log("aage na aana");
@@ -1064,19 +1062,18 @@ app.get(
       await user.save();
     }
 
-    const TOTAL_PLAN_DAYS = 15;
  
-    const signupDate = new Date(user.signupDate);
+    const subExp = new Date(user.subscriptionExpiry);
     const today = new Date();
-    const diffTime = today - signupDate;
-    const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const daysLeft = TOTAL_PLAN_DAYS - daysPassed;
+    const diffTime = subExp - today;
+    const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
 
     // days left success left
     const successMessage =
       daysLeft > 0
         ? `Your free plan started. You have ${daysLeft} days remaining.`
-        : errorMSG;
+        : req.session.errorMSG;
 
     const token = await generateToken(user);
 

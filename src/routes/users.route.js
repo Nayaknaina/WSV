@@ -26,7 +26,7 @@ const { v4: uuidv4 } = require("uuid");
 const { uploadProfile } = require("../service/multer.js");
 // const { sendMessageToLead } = require("../app.js");
 const uploadCSV = require("../service/csvMulter.js");
-const shared = require('../shared.js');
+
 
 const { csvFileDataChangIntoLeadHandler } = require("../controllers/user.controller.js");
 
@@ -515,6 +515,8 @@ router.post("/login", async (req, res) => {
     const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const totalPlanDays = 15; 
     const daysLeft = totalPlanDays - daysPassed;
+    console.log(diffTime,daysPassed);
+    
 
     // success days left 
     const successMessage =
