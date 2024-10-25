@@ -415,7 +415,7 @@
             <span class="tooltip">Account</span>
         </li>
         <li>
-            <a href="/leads/pre">
+            <a onclick="findLead()">
                 {{!-- <i class='bx bx-user'></i> --}}
                 <i class="fa-solid fa-users-viewfinder"></i>
                 <span class="links_name">Leads</span>
@@ -534,5 +534,25 @@
         } else {
             closeBtn.classList.replace("bx-menu-alt-right", "bx-menu"); // Replacing the icons class
         }
+    }
+</script>
+
+    <script>
+    async function findLead(){
+        let loadBox = document.querySelector('#findNewLeadloader')
+            console.log(loadBox)
+            console.log("loadBox")
+            console.log("loadBox")
+            console.log("loadBox")
+        
+        let body = document.querySelector('body')
+        if(loadBox){
+            console.log('clickkeeedddd')
+            loadBox.style.display = 'flex'
+            body.style.height =  `100vh !important`
+            body.style.overflow = 'hidden'
+        }
+       
+            window.location.href = '/leads/pre'
     }
 </script>
