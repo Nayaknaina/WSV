@@ -715,6 +715,15 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
     const pipes = await pipelineModel.find({ cid: user.cid });
     const members = await memberModel.find({ cid: user.cid });
 
+    let msg = req.session.successMSG;
+    // console.log(req.session.successMSG);
+    let errMsg = req.session.errorMSG;
+    let warnMsg = req.session.warnMsg;
+
+    delete req.session.successMSG;
+    delete req.session.errorMSG;
+    delete req.session.warnMsg;
+    
     res.render("leads", {
       user,
       leadsWithCustomerInfo,
@@ -726,6 +735,9 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
       totalPages,
       showPagination: leadsWithCustomerInfo.length > 0,
       activeTab: section,
+      successMSG: msg,
+      errorMSG: errMsg,
+      warnMsg: warnMsg,
     });
   } catch (error) {
     console.error("Error fetching leads:", error);

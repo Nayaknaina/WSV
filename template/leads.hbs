@@ -49,6 +49,28 @@
             <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  home-section">
                 {{> NameHead}}
                 <div class="container-fluid bg-white shadow-sm m-b-20">
+                    {{#if successMSG}}
+                    <div class="col-sm-12">
+                        <div id="alert-success" class="alert  alert-success alert-dismissible fade show" role="alert">
+                            <span class="badge badge-pill badge-success">Success</span> {{successMSG}}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                    {{/if}}
+
+                    {{#if errorMSG}}
+                    <div class="col-sm-12">
+                        <div id="alert-error" class="alert  alert-danger alert-dismissible fade show" role="alert">
+                            <span class="badge badge-pill badge-danger">Alert</span> {{errorMSG}}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                    {{/if}}
+
                     <div class="row flex-row justify-content-start px-3">
                         <button type="button" class="btn my-2 mx-2 btn-outline-warning btn-sm" id="filterBtn">
                             Filter <i class="ri-filter-3-fill"></i>
@@ -62,7 +84,8 @@
                             Add New Lead
                         </button>
 
-                        <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" onclick="fetchFacebookLeadFromFacebook()">Fetch leads</button>
+                        <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm"
+                            onclick="fetchFacebookLeadFromFacebook()">Fetch leads</button>
 
                         <div id="filterForm" class="filter-container" style="display: none;">
                             <form id="leadFilterForm" method="GET" action="/leads">
@@ -832,18 +855,18 @@
                 <li style="margin-bottom: 10px;">
                     <nav style="position: relative;">
                         <label class="created-time-label">
-                          
+
                             <label class="start-drowp-app" for="touch2-{{@index}}"
                                 style="display: flex; align-items: center; width: 100%; margin-bottom: 0; gap: 10px; position: relative;">
 
-                                
+
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <strong class="formateDate">{{formatDate income_time}}</strong>
                                     <i class="fa-solid fa-chevron-down"></i>
                                     <i class="fa-brands fa-square-{{app}}" style="font-size: 22px; color: #316ff6;"></i>
                                 </div>
 
-                                
+
                                 <div class="customer-info"
                                     style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;    margin-top: 4rem; ">
                                     <div style="font-size: 18px; "> <strong>{{findAnswer ./leads_data}}</strong></div>
@@ -1450,11 +1473,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
-        
-        function fetchFacebookLeadFromFacebook(){
-             try {
+
+        function fetchFacebookLeadFromFacebook() {
+            try {
                 const response = await axios.get('/fetch/leads');
-                
+
                 console.log(response)
                 if (response.status === 200) {
                     //toastr.success()
@@ -1467,7 +1490,7 @@
                 // Error message
             }
         }
-        
+
     </script>
 </body>
 

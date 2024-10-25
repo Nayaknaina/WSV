@@ -507,30 +507,29 @@ router.post("/login", async (req, res) => {
         errorMessage: "Invalid username or password",
       });
     }
-
-    // Calculate remaining days
-    const signupDate = new Date(user.signupDate);
-    const today = new Date();
-    const diffTime = today - signupDate; 
-    const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const totalPlanDays = 15; 
-    const daysLeft = totalPlanDays - daysPassed;
-    console.log(diffTime,daysPassed);
     
+    // user.subscriptionExpiry =  new Date();
+    // await user.save()
 
-    // success days left 
-    const successMessage =
-      daysLeft > 0
-        ? `Your free plan started. You have ${daysLeft} days remaining.`
-        : `Your free plan has expired. Please upgrade to continue.`;
-
+    const subExp = new Date(user.subscriptionExpiry);
+    const today = new Date();
+    const diffTime = subExp - today;
+    const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if(daysLeft<=0) {
+      console.warn(`Subscription expired. Please renew to continue.`)
+      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+    }
+    else {// days left success left
+      req.session.successMSG = `Your free plan started. You have ${daysLeft} days remaining.`
+    };
     const token = await generateToken(user);
+    await user.save()
     res.cookie("360Followers", token, {
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
 
-    req.session.successMSG = successMessage;
     res.redirect("/user/dashboard");
   } catch (err) {
     console.error(err);
