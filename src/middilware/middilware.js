@@ -296,7 +296,7 @@ async function findNewLead(accessToken, user) {
             ? admin.organizationName
             : "360FollowUps";
 
-        const personalizedMessage = msg
+        let personalizedMessage = msg
           .replace("[customer name]", customerName)
           .replace("[company name]", companyName)
           .replace("[company name]", companyName);
@@ -308,7 +308,7 @@ async function findNewLead(accessToken, user) {
         //   imagePath,
         //   pdfPath
         // );
-
+        personalizedMessage = capitalizeText(personalizedMessage);
         sendMessageToLead(
           connStatus,
           leadContactNo,
@@ -341,28 +341,28 @@ async function findNewLead(accessToken, user) {
         const formattedDate = `${day}-${month}-${year}`;
 
         // todo new lead found msg to Admin
-        const personalizedMessage = msg
+        let personalizedMessage = msg
           .replace("[team member name]", admin.name)
           .replace("[customer name]", customerName)
           .replace("[customer contact number]", customerName)
           .replace("[date]", formattedDate)
           .replace("[lead source]", "facebook")
           .replace("[company name]", companyName);
-
+          personalizedMessage = capitalizeText(personalizedMessage);
         sendMessageToLead(connStatus, admin.mobile, personalizedMessage);
 
         // todo new lead found msg to all Members
         let users = await memberModel.find({ cid: admin.cid })
         for (let i = 0; i < users.length; i++) {
           setTimeout(() => {
-            const personalizedMessage = msg
+            let personalizedMessage = msg
               .replace("[team member name]", users[i].name)
               .replace("[customer name]", customerName)
               .replace("[customer contact number]", customerName)
               .replace("[date]", formattedDate)
               .replace("[lead source]", "facebook")
               .replace("[company name]", companyName);
-
+              personalizedMessage = capitalizeText(personalizedMessage);
             sendMessageToLead(connStatus, users[i].mobile, personalizedMessage);
           }, 2000);
         }
@@ -408,8 +408,10 @@ function chalteRaho(token, user) {
 
 // todo Middleware to check subscription status
 
-function checkSubscription(req, res, next) {
-  const subExp = new Date(req.user.subscriptionExpiry); // Assuming `subscriptionExpiry` is stored in user data
+async function checkSubscription(req, res, next) {
+  let Admin = await logIncollection.findOne({cid: req.user.cid})
+  
+  const subExp = new Date(Admin.subscriptionExpiry); // Assuming `subscriptionExpiry` is stored in user data
   const today = new Date();
   const diffTime = subExp - today;
   const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -420,7 +422,9 @@ function checkSubscription(req, res, next) {
   next();
 }
 
-
+function capitalizeText(text) {
+  return text.replace(/(^\w{1}|\.\s*\w{1})/gm, (char) => char.toUpperCase());
+}
 
 module.exports = {
   isAdminLoggedIn,
@@ -430,4 +434,5 @@ module.exports = {
   chalteRahoId,
   chalteRaho,
   checkSubscription,
+  capitalizeText,
 }

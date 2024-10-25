@@ -39,7 +39,7 @@ const Route = require("./routes/index.route.js");
 const externalRoute = require("./routes/external.route.js");
 const { log } = require("console");
 
-const { checkSubscription } = require("./middilware/middilware.js");
+const { checkSubscription,capitalizeText } = require("./middilware/middilware.js");
 
 
 // todo Whatsapp integrations-----------------------------------------
@@ -456,18 +456,43 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       }
     });
 
-    const searchStrings = [
+    const searchStrings =  [
       "name",
+      "Name",
+      "NAME",
       "your name",
+      "your_name",
+      "Your_Name",
+      "Your_name",
+      "YOUR_NAME",
+      "YOUR NAME",
+      "YoyrName",
+      "YOURNAME",
+      "customerName",
+      "CustomerName",
       "customer name",
+      "Customer Name",
+      "Customer_Name",
+      "customer_name",
       "full name",
+      "full_name",
+      "Full_Name",
+      "FullName",
+      "FULL_NAME",
       "first name",
+      "first_name",
+      "First_Name",
       "आपका नाम",
+      "आपका_नाम",
+      "आपका_नाम:",
       "नाम",
       "पूरा नाम",
+      "पूरा_नाम",
       "ग्राहक का नाम",
+      "ग्राहक_का_नाम",
       "शुभ नाम",
-    ];
+      "शुभ_नाम",
+    ];;
 
     let customerName = "";
 
@@ -535,7 +560,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       console.log(Admin.organizationName);
 
 
-      const personalizedMessage = msg
+      let personalizedMessage = msg
         .replace("[customer name]", customerName)
         .replace("[company name]", companyName)
         .replace("[company name]", companyName);
@@ -551,7 +576,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       //   // wellcomeTempImagePath,
       //   // wellcomeTempPdfPath
       // );
-
+      personalizedMessage = capitalizeText(personalizedMessage);
       sendMessageToLead(
         connStatus,
         leadContactNo,
@@ -597,7 +622,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
             ? Admin.organizationName
             : "360FollowUps";
 
-        const personalizedMessage = msg
+        let personalizedMessage = msg
           .replace("[team member name]", user.name)
           .replace(
             "[customer name]",
@@ -607,6 +632,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
           .replace("[time]", remarkTime)
           .replace("[company name]", companyName);
         console.log("reminder to member ", userContact);
+        personalizedMessage = capitalizeText(personalizedMessage);
         sendMessageToLead(
           connStatus,
           userContact,
@@ -643,13 +669,16 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
             ? Admin.organizationName
             : "360FollowUps";
 
-        const personalizedMessage = msg
+        let personalizedMessage = msg
           .replace("[customer name]", customerName)
           .replace("[company name]", companyName)
           .replace("[date]", remarkDate)
           .replace("[time]", remarkTime)
           .replace("[company name]", companyName);
         console.log("reminder to lead ", leadContactNo);
+
+        personalizedMessage = capitalizeText(personalizedMessage);
+
         sendMessageToLead(
           connStatus,
           leadContactNo,
@@ -689,7 +718,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
           Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
-      const personalizedMessage = msg
+      let personalizedMessage = msg
         .replace("[customer name]", customerName)
         .replace("[company name]", companyName);
 
@@ -702,6 +731,8 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       //   // LeadTempImagePath,
       //   // LeadTempPdfPath
       // );
+
+      personalizedMessage = capitalizeText(personalizedMessage);
 
       sendMessageToLead(
         connStatus,
@@ -739,7 +770,7 @@ app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
     if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
       // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
       console.log("you not have fb token");
-      
+      req.session.errorMSG = `Facebook Account Not Connected. Please Connect to Find New Leads.`;
       return res.redirect('/leads')
     }
     console.log("findinnngggg");
@@ -799,18 +830,43 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
     }
   });
 
-  const searchStrings = [
+  const searchStrings =  [
     "name",
+    "Name",
+    "NAME",
     "your name",
+    "your_name",
+    "Your_Name",
+    "Your_name",
+    "YOUR_NAME",
+    "YOUR NAME",
+    "YoyrName",
+    "YOURNAME",
+    "customerName",
+    "CustomerName",
     "customer name",
+    "Customer Name",
+    "Customer_Name",
+    "customer_name",
     "full name",
+    "full_name",
+    "Full_Name",
+    "FullName",
+    "FULL_NAME",
     "first name",
+    "first_name",
+    "First_Name",
     "आपका नाम",
+    "आपका_नाम",
+    "आपका_नाम:",
     "नाम",
     "पूरा नाम",
+    "पूरा_नाम",
     "ग्राहक का नाम",
+    "ग्राहक_का_नाम",
     "शुभ नाम",
-  ];
+    "शुभ_नाम",
+  ];;
 
   let customerName = "";
 
@@ -845,6 +901,11 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
 
   console.log(timeDifference);
 
+  let isWACnn = await WaModel.findOne({cid: user.cid});
+  if (!isWACnn.isConnected) {
+    req.session.errorMSG = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
+  }
+
   //todo  reminder message for team member
   if (timeDifference > 0) {
     // let reminderTempImagePath,reminderTempPdfPath;
@@ -861,7 +922,7 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
           Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
-      const personalizedMessage = msg
+      let personalizedMessage = msg
         .replace("[team member name]", user.name)
         .replace(
           "[customer name]",
@@ -871,6 +932,7 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
         .replace("[time]", time)
         .replace("[company name]", companyName);
 
+        personalizedMessage = capitalizeText(personalizedMessage);
       sendMessageToLead(
         connStatus,
         userContact,
@@ -907,13 +969,15 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
           Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
-      const personalizedMessage = msg
+      let personalizedMessage = msg
         .replace("[customer name]", customerName)
         .replace("[company name]", companyName)
         .replace("[date]", date)
         .replace("[time]", time)
         .replace("[company name]", companyName);
 
+
+        personalizedMessage = capitalizeText(personalizedMessage);
       sendMessageToLead(
         connStatus,
         leadContactNo,
@@ -941,15 +1005,18 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
     console.log("thanks to lead ", leadContactNo);
 
     let msg = thnakyouLeadTemplate.text;
-    let companyName =
-      Admin.organizationName !== null ||
+    let companyName = Admin.organizationName !== null ||
         Admin.organizationName !== undefined ||
         Admin.organizationName !== ""
         ? Admin.organizationName
         : "360FollowUps";
-    const personalizedMessage = msg
+        console.warn(companyName,"RThanjks me commpany ni aa rahi");
+        companyName = companyName == undefined ? "360FollowUps" : companyName;
+    let personalizedMessage = msg
       .replace("[customer name]", customerName)
       .replace("[company name]", companyName);
+
+      personalizedMessage = capitalizeText(personalizedMessage);
 
     sendMessageToLead(
       connStatus,
@@ -1874,7 +1941,7 @@ async function findNewLead(accessToken, user) {
             ? admin.organizationName
             : "360FollowUps";
 
-        const personalizedMessage = msg
+        let personalizedMessage = msg
           .replace("[customer name]", customerName)
           .replace("[company name]", companyName)
           .replace("[company name]", companyName);
@@ -1887,6 +1954,9 @@ async function findNewLead(accessToken, user) {
         //   pdfPath
         // );
         console.log("Welcome to lead new lead found", leadContactNo);
+
+        personalizedMessage = capitalizeText(personalizedMessage);
+
         sendMessageToLead(
           connStatus,
           leadContactNo,
@@ -1924,7 +1994,7 @@ async function findNewLead(accessToken, user) {
         const formattedDate = `${day}-${month}-${year}`;
 
         // todo new lead found msg to Admin
-        const personalizedMessage = msg
+        let personalizedMessage = msg
           .replace("[team member name]", admin.name)
           .replace("[customer name]", customerName)
           .replace("[customer contact number]", customerName)
@@ -1932,13 +2002,16 @@ async function findNewLead(accessToken, user) {
           .replace("[lead source]", "facebook")
           .replace("[company name]", companyName);
         console.log("notificaton to admin new lead found ", admin.mobile);
+
+        personalizedMessage = capitalizeText(personalizedMessage);
+
         sendMessageToLead(connStatus, admin.mobile, personalizedMessage);
 
         // todo new lead found msg to all Members
         let users = await memberModel.find({ cid: admin.cid });
         for (let i = 0; i < users.length; i++) {
           setTimeout(() => {
-            const personalizedMessage = msg
+            let personalizedMessage = msg
               .replace("[team member name]", users[i].name)
               .replace("[customer name]", customerName)
               .replace("[customer contact number]", customerName)
@@ -1946,6 +2019,7 @@ async function findNewLead(accessToken, user) {
               .replace("[lead source]", "facebook")
               .replace("[company name]", companyName);
             console.log("notification to members new lead found", users[i].mobile);
+            personalizedMessage = capitalizeText(personalizedMessage);
             sendMessageToLead(connStatus, users[i].mobile, personalizedMessage);
           }, 2000);
         }
