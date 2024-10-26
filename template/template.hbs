@@ -194,7 +194,6 @@
       {{> sidebar}}
       {{#ifEquals user.role 'admin'}}
       <div class="box-form-container">
-
         {{#each templates}}
         <div class="box-form" id="form{{_id}}">
           <form action="user/template/update/{{_id}}" enctype='multipart/form-data' method="post">
@@ -242,6 +241,13 @@
       <div id="blurkro" class="fg-main-content-wrap col-xl-2 col-lg-11 col-md-12 p-0 home-section">
         {{> NameHead}}
         <div class="container ">
+      {{#ifEquals user.role 'admin'}}
+      <div class="row flex-row justify-content-around">
+        <div class="col-auto text-center py-2">
+          <button onclick="reSetTemps()" type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm">Reset All</button>
+        </div>
+      </div>
+      {{/ifEquals}}
 
           <div class="row">
             <div class="card-deck">
@@ -307,9 +313,21 @@
 
         </div>
       </div>
-
+  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
       {{#ifEquals user.role 'admin'}}
       <script>
+
+        async function reSetTemps(){
+          try{
+            let res = await axios.get('/user/reset/all/temp');
+            console.log(res.data)
+            if(res.data.msg === 'done'){
+              location.reload()
+            }
+          }catch(err){
+            console.log(err)
+          }
+        }
 
         function openForm(id) {
           let container = document.querySelector('.box-form-container')
@@ -367,7 +385,7 @@
 
 
 
-  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
 
   <script src="/assets/js/timezones.full.min.js"></script>
 

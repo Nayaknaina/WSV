@@ -423,7 +423,7 @@ async function checkSubscription(req, res, next) {
 }
 
 function capitalizeText(text) {
-  return text.replace(/(^\w{1}|\.\s*\w{1})/gm, (char) => char.toUpperCase());
+  return text.replace(/(^\w{1}|\.\s*\w{1}|\*\w{1})/gm, (char) => char.toUpperCase());
 }
 
 module.exports = {
