@@ -642,7 +642,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
       user = await logIncollection.findById(req.user.id)
         .populate({
           path: "myleads",
-          options: { sort: { createdAt: -1 } },
+          
           populate: [
             { path: "status" },
             { path: "remarks", options: { sort: { createdAt: -1 } } }
@@ -653,7 +653,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
       user = await memberModel.findById(req.user.id)
         .populate({
           path: "myleads",
-          options: { sort: { createdAt: -1 } },
+          
           populate: [
             { path: "status" },
             { path: "remarks", options: { sort: { createdAt: -1 } } }
@@ -723,9 +723,16 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
     delete req.session.successMSG;
     delete req.session.errorMSG;
     delete req.session.warnMsg;
+    user.myleads.forEach(elem => console.log(elem._id+"====="))
+
+    // let userMyLeads = user.myleads
+    let userMyLeads = [...user.myleads].reverse();
+    userMyLeads.forEach(elem => console.log(elem._id))
+    console.log(userMyLeads[0]);
     
     res.render("leads", {
       user,
+      userMyLeads,
       leadsWithCustomerInfo,
       myleads: leadsWithCustomerInfo,
       leads: leadsWithCustomerInfo,

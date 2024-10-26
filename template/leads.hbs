@@ -49,9 +49,10 @@
             <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  home-section">
                 {{> NameHead}}
                 <div class="container-fluid bg-white shadow-sm m-b-20">
+                    <div class="row  flex-row justify-content-start px-3 col-11">
                     {{#if successMSG}}
                     <div class="col-sm-12">
-                        <div id="alert-success" class="alert  alert-success alert-dismissible fade show" role="alert">
+                        <div id="alert-success" class="alert alert-success alert-dismissible fade show" role="alert">
                             <span class="badge badge-pill badge-success">Success</span> {{successMSG}}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -70,6 +71,7 @@
                         </div>
                     </div>
                     {{/if}}
+                    </div>
 
                     <div class="row flex-row justify-content-start px-3">
                         <button type="button" class="btn my-2 mx-2 btn-outline-warning btn-sm" id="filterBtn">
@@ -83,9 +85,6 @@
                         <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="openFormBtn">
                             Add New Lead
                         </button>
-
-                        <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm"
-                            onclick="fetchFacebookLeadFromFacebook()">Fetch leads</button>
 
                         <div id="filterForm" class="filter-container" style="display: none;">
                             <form id="leadFilterForm" method="GET" action="/leads">
@@ -851,7 +850,7 @@
 
             <ul id="myLeads" style="display: none;">
                 {{#if user.myleads.length}}
-                {{#each user.myleads}}
+                {{#each userMyLeads}}
                 <li style="margin-bottom: 10px;">
                     <nav style="position: relative;">
                         <label class="created-time-label">

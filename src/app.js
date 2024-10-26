@@ -506,10 +506,10 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     });
 
     if (customerName) {
-      console.log("Matched customerName:", customerName);
+      // console.log("Matched customerName:", customerName);
     } else {
       customerName = "Sir/Madam";
-      console.log("Un-Matched then customerName:", customerName);
+      // console.log("Un-Matched then customerName:", customerName);
     }
 
     console.log(leadContactNo);
@@ -548,7 +548,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
         console.error("Error fetching connStatus: ", err);
       }
       console.log("/manual/lead/");
-      console.log("wellcome to lead ", leadContactNo);
+      // console.log("wellcome to lead ", leadContactNo);
       let msg = wellcomeTemp.text;
       let companyName =
         Admin.organizationName !== null &&
@@ -561,9 +561,9 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
 
 
       let personalizedMessage = msg
-        .replace("[customer name]", customerName)
-        .replace("[company name]", companyName)
-        .replace("[company name]", companyName);
+        .replace("[customer name]", `*${customerName}*`)
+        .replace("[company name]", `*${companyName}*`)
+        .replace("[company name]", `*${companyName}*`);
 
       console.log("company name", companyName);
 
@@ -623,14 +623,14 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
             : "360FollowUps";
 
         let personalizedMessage = msg
-          .replace("[team member name]", user.name)
+          .replace("[team member name]", `*${user.name}*`)
           .replace(
             "[customer name]",
-            customerName + " Mobile no. " + leadContactNo
+            `*${customerName}*` + " Mobile no. " + `*${leadContactNo}*`
           )
-          .replace("[date]", remarkDate)
-          .replace("[time]", remarkTime)
-          .replace("[company name]", companyName);
+          .replace("[date]", `*${remarkDate}*`)
+          .replace("[time]", `*${remarkTime}*`)
+          .replace("[company name]", `*${companyName}*`);
         console.log("reminder to member ", userContact);
         personalizedMessage = capitalizeText(personalizedMessage);
         sendMessageToLead(
@@ -640,6 +640,13 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
           // reminderTempImagePath,
           // reminderTempPdfPath
         ); // after temp msg sending to lead
+        
+          sendMessageToLead(
+            connStatus,
+            userContact,
+            remark.text
+          );
+
       }, timeDifference);
     }
 
@@ -670,11 +677,11 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
             : "360FollowUps";
 
         let personalizedMessage = msg
-          .replace("[customer name]", customerName)
-          .replace("[company name]", companyName)
-          .replace("[date]", remarkDate)
-          .replace("[time]", remarkTime)
-          .replace("[company name]", companyName);
+          .replace("[customer name]", `*${customerName}*`)
+          .replace("[company name]",`*${companyName}*` )
+          .replace("[date]", `*${remarkDate}*`)
+          .replace("[time]", `*${remarkTime}*`)
+          .replace("[company name]", `*${companyName}*`);
         console.log("reminder to lead ", leadContactNo);
 
         personalizedMessage = capitalizeText(personalizedMessage);
@@ -719,8 +726,8 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
           ? Admin.organizationName
           : "360FollowUps";
       let personalizedMessage = msg
-        .replace("[customer name]", customerName)
-        .replace("[company name]", companyName);
+        .replace("[customer name]", `*${customerName}*`)
+        .replace("[company name]", `*${companyName}*`);
 
       // console.log(
       //   "thankyu message log",
@@ -923,14 +930,15 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
           ? Admin.organizationName
           : "360FollowUps";
       let personalizedMessage = msg
-        .replace("[team member name]", user.name)
+        .replace("[team member name]", `*${user.name}*`)
         .replace(
           "[customer name]",
-          customerName + " Mobile no. " + leadContactNo
+          `*${customerName}*` + " Mobile no. " + `*${leadContactNo}*`
         )
-        .replace("[date]", date)
-        .replace("[time]", time)
-        .replace("[company name]", companyName);
+        .replace("[date]", `*${date}*`)
+        .replace("[time]", `*${time}*`)
+        .replace("[remark content]", remark.text)
+        .replace("[company name]", `*${companyName}*`);
 
         personalizedMessage = capitalizeText(personalizedMessage);
       sendMessageToLead(
@@ -940,6 +948,7 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
         // reminderTempImagePath,
         // reminderTempPdfPath
       ); // after temp msg sending to lead
+    
     }, timeDifference);
   }
 
@@ -970,11 +979,11 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
           ? Admin.organizationName
           : "360FollowUps";
       let personalizedMessage = msg
-        .replace("[customer name]", customerName)
-        .replace("[company name]", companyName)
-        .replace("[date]", date)
-        .replace("[time]", time)
-        .replace("[company name]", companyName);
+        .replace("[customer name]", `*${customerName}*`)
+        .replace("[company name]", `*${companyName}*`)
+        .replace("[date]", `*${date}*`)
+        .replace("[time]", `*${time}*`)
+        .replace("[company name]", `*${companyName}*`);
 
 
         personalizedMessage = capitalizeText(personalizedMessage);
@@ -1013,8 +1022,8 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
         console.warn(companyName,"RThanjks me commpany ni aa rahi");
         companyName = companyName == undefined ? "360FollowUps" : companyName;
     let personalizedMessage = msg
-      .replace("[customer name]", customerName)
-      .replace("[company name]", companyName);
+      .replace("[customer name]", `*${customerName}*`)
+      .replace("[company name]", `*${companyName}*`);
 
       personalizedMessage = capitalizeText(personalizedMessage);
 
@@ -1942,9 +1951,9 @@ async function findNewLead(accessToken, user) {
             : "360FollowUps";
 
         let personalizedMessage = msg
-          .replace("[customer name]", customerName)
-          .replace("[company name]", companyName)
-          .replace("[company name]", companyName);
+          .replace("[customer name]", `*${customerName}*`)
+          .replace("[company name]", `*${companyName}*`)
+          .replace("[company name]", `*${companyName}*`);
 
         // console.log(
         //   connStatus,
@@ -1995,12 +2004,12 @@ async function findNewLead(accessToken, user) {
 
         // todo new lead found msg to Admin
         let personalizedMessage = msg
-          .replace("[team member name]", admin.name)
-          .replace("[customer name]", customerName)
-          .replace("[customer contact number]", customerName)
-          .replace("[date]", formattedDate)
-          .replace("[lead source]", "facebook")
-          .replace("[company name]", companyName);
+          .replace("[team member name]", `*${admin.name}*`)
+          .replace("[customer name]", `*${customerName}*`)
+          .replace("[customer contact number]", `*${customerName}*`)
+          .replace("[date]", `*${formattedDate}*`)
+          .replace("[lead source]", "*facebook*")
+          .replace("[company name]", `*${companyName}*`);
         console.log("notificaton to admin new lead found ", admin.mobile);
 
         personalizedMessage = capitalizeText(personalizedMessage);
@@ -2012,12 +2021,12 @@ async function findNewLead(accessToken, user) {
         for (let i = 0; i < users.length; i++) {
           setTimeout(() => {
             let personalizedMessage = msg
-              .replace("[team member name]", users[i].name)
-              .replace("[customer name]", customerName)
-              .replace("[customer contact number]", customerName)
-              .replace("[date]", formattedDate)
-              .replace("[lead source]", "facebook")
-              .replace("[company name]", companyName);
+              .replace("[team member name]", `*${users[i].name}*`)
+              .replace("[customer name]", `*${customerName}*`)
+              .replace("[customer contact number]", `*${customerName}*`)
+              .replace("[date]", `*${formattedDate}*`)
+              .replace("[lead source]", "*facebook*")
+              .replace("[company name]", `*${companyName}*`);
             console.log("notification to members new lead found", users[i].mobile);
             personalizedMessage = capitalizeText(personalizedMessage);
             sendMessageToLead(connStatus, users[i].mobile, personalizedMessage);
