@@ -383,123 +383,102 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
 //   }
 // });
 
-// router.get("/leads", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     const { page = 1, customerName, customerPhoneNumber, date, section = "all" } = req.query;
-//     const limit = 25;
 
-//     let user;
-//     if (req.user.role === "admin") {
-//       user = await logIncollection.findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           options: { sort: { createdAt: -1 } },
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
-//         })
-//         .populate("teams");
-//     } else {
-//       user = await memberModel.findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           options: { sort: { createdAt: -1 } }, 
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
-//         });
-//     }
+router.get("/leads", isAdminLoggedIn, async (req, res) => {
+  try {
+    const { page = 1, customerName, customerPhoneNumber, date } = req.query; 
+    const limit = 25; 
 
+    let user;
+    if (req.user.role === "admin") {
+      user = await logIncollection
+        .findById(req.user.id)
+        .populate({
+          path: "myleads",
+             options: { sort: { createdAt: -1 } },
 
-//     const filter = { cid: user.cid };
-//     if (customerName) {
-//       filter['leads_data.ans'] = new RegExp(customerName, 'i');
-//     }
-//     if (customerPhoneNumber) {
-//       filter['leads_data.ans'] = customerPhoneNumber;
-//     }
-//     if (date) {
-//       filter.income_time = {
-//         $gte: new Date(date).setHours(0, 0, 0),
-//         $lt: new Date(date).setHours(23, 59, 59),
-//       };
-//     }
+          populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+        })
+        .populate("teams");
+    } else {
+      user = await memberModel
+        .findById(req.user.id)
+        .populate({
+          path: "myleads",
+             options: { sort: { createdAt: -1 } },
+          populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+        });
+    }
 
+    // filter query
+    const filter = { cid: user.cid };
+    if (customerName) {
+      filter['leads_data.ans'] = new RegExp(customerName, 'i'); // Case-insensitive name search
+    }
+    if (customerPhoneNumber) {
+      filter['leads_data.ans'] = customerPhoneNumber;
+    }
+    if (date) {
+      filter.income_time = {
+        $gte: new Date(date).setHours(0, 0, 0),
+        $lt: new Date(date).setHours(23, 59, 59),
+      };
+    }
 
-//     let leadsSource;
-//     if (section === "myleads") {
-//       leadsSource = user.myleads.filter(lead => {
+    // Fetch leads with filtering and pagination
+    const leads = await leadsModel
+      .find(filter)
+      .populate("status")
+      .populate("uid")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
 
+    const leadsWithCustomerInfo = leads.map((lead) => {
+      const customerName = lead.leads_data.find((data) =>
+        data.que.toLowerCase().includes("name") || data.que.toLowerCase().includes("customer name") ||data.que.toLowerCase().includes("आपका_नाम")|| data.que.toLowerCase().includes("नाम")
+      )?.ans || "Unknown";
 
-//         let matches = true;
-//         if (customerName) {
-//           matches = matches && lead.leads_data.some(data => new RegExp(customerName, 'i').test(data.ans));
-//         }
-//         if (customerPhoneNumber) {
-//           matches = matches && lead.leads_data.some(data => data.ans === customerPhoneNumber);
-//         }
-//         if (date) {
-//           const incomeDate = new Date(lead.income_time);
-//           matches = matches && incomeDate >= new Date(date).setHours(0, 0, 0) && incomeDate < new Date(date).setHours(23, 59, 59);
-//         }
-//         return matches;
-//       });
-//     } else {
-//       leadsSource = await leadsModel
-//         .find(filter)
-//         .populate("status")
-//         .populate("uid")
-//         .sort({ createdAt: -1 })
-//         .skip((page - 1) * limit)
-//         .limit(limit);
-//     }
+      const customerPhoneNumber = lead.leads_data.find((data) =>
+        /^[6-9]\d{9}$/.test(data.ans.trim())
+      )?.ans || "N/A";
 
+      return { ...lead.toObject(), customerName, customerPhoneNumber };
+    });
 
-//     const leadsWithCustomerInfo = leadsSource.map((lead) => {
-//       const customerName = lead.leads_data.find((data) =>
-//         data.que.toLowerCase().includes("name") ||
-//         data.que.toLowerCase().includes("customer name") ||
-//         data.que.toLowerCase().includes("आपका_नाम") ||
-//         data.que.toLowerCase().includes("नाम")
-//       )?.ans || "Unknown";
+    const totalLeads = await leadsModel.countDocuments(filter);
+    const totalPages = Math.ceil(totalLeads / limit);
 
-//       const customerPhoneNumber = lead.leads_data.find((data) =>
-//         /^[6-9]\d{9}$/.test(data.ans.trim())
-//       )?.ans || "N/A";
+    const pipes = await pipelineModel.find({ cid: user.cid });
+    const members = await memberModel.find({ cid: user.cid });
 
-//       return { ...lead.toObject(), customerName, customerPhoneNumber };
-//     });
-
-//     const totalLeads = section === "myleads" ? leadsWithCustomerInfo.length : await leadsModel.countDocuments(filter);
-//     const totalPages = Math.ceil(totalLeads / limit);
-
-//     const pipes = await pipelineModel.find({ cid: user.cid });
-//     const members = await memberModel.find({ cid: user.cid });
-
-//     res.render("leads", {
-//       user,
-//       leads: leadsWithCustomerInfo,
-//       myleads: leadsWithCustomerInfo,
-//       pipes,
-//       members,
-//       currentPage: parseInt(page),
-//       totalPages,
-//       showPagination: leadsWithCustomerInfo.length > 0,
-//       activeTab: section, 
-//     });
-//   } catch (error) {
-//     console.error("Error fetching leads:", error);
-//     res.status(500).send("Error fetching leads");
-//   }
-// });
-
+    
+console.log(user.myleads,"data of myleads");
+    res.render("leads", {
+      user,
+      leads: leadsWithCustomerInfo,
+      pipes,
+      members,
+      currentPage: parseInt(page),
+      totalPages,
+      showPagination: leads.length > 0,
+    });
+  } catch (error) {
+    console.error("Error fetching leads:", error);
+    res.status(500).send("Error fetching leads");
+  }
+});
 
 // router.get("/leads", isAdminLoggedIn, async (req, res) => {
 //   try {
-//     const { 
-//       page = 1, 
-//       customerName, 
-//       customerPhoneNumber, 
-//       date, 
-//       pageName, 
-//       formName, 
-//       section = "all" 
+//     const {
+//       page = 1,
+//       customerName,
+//       customerPhoneNumber,
+//       date,
+//       pageName,
+//       formName,
+//       section = "all"
 //     } = req.query;
 
 //     const limit = 25;
@@ -510,7 +489,10 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
 //         .populate({
 //           path: "myleads",
 //           options: { sort: { createdAt: -1 } },
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+//           populate: [
+//             { path: "status" },
+//             { path: "remarks", options: { sort: { createdAt: -1 } } }
+//           ],
 //         })
 //         .populate("teams");
 //     } else {
@@ -518,9 +500,13 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
 //         .populate({
 //           path: "myleads",
 //           options: { sort: { createdAt: -1 } },
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
+//           populate: [
+//             { path: "status" },
+//             { path: "remarks", options: { sort: { createdAt: -1 } } }
+//           ],
 //         });
 //     }
+
 
 //     // Build the filter object
 //     const filter = { cid: user.cid };
@@ -537,35 +523,16 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
 //       };
 //     }
 //     if (pageName) {
-//       filter.page_name = new RegExp(pageName, 'i');  // Case-insensitive match
+//       filter.page_name = new RegExp(pageName, 'i');
 //     }
 //     if (formName) {
-//       filter.form_name = new RegExp(formName, 'i');  // Case-insensitive match
+//       filter.form_name = new RegExp(formName, 'i');
 //     }
 
 //     // Fetch leads based on section and filter
 //     let leadsSource;
 //     if (section === "myleads") {
-//       leadsSource = user.myleads.filter(lead => {
-//         let matches = true;
-//         if (customerName) {
-//           matches = matches && lead.leads_data.some(data => new RegExp(customerName, 'i').test(data.ans));
-//         }
-//         if (customerPhoneNumber) {
-//           matches = matches && lead.leads_data.some(data => data.ans === customerPhoneNumber);
-//         }
-//         if (date) {
-//           const incomeDate = new Date(lead.income_time);
-//           matches = matches && incomeDate >= new Date(date).setHours(0, 0, 0) && incomeDate < new Date(date).setHours(23, 59, 59);
-//         }
-//         if (pageName) {
-//           matches = matches && new RegExp(pageName, 'i').test(lead.page_name);
-//         }
-//         if (formName) {
-//           matches = matches && new RegExp(formName, 'i').test(lead.form_name);
-//         }
-//         return matches;
-//       });
+//       leadsSource = user.myleads.filter(lead => applyFilters(lead, req.query));
 //     } else {
 //       leadsSource = await leadsModel
 //         .find(filter)
@@ -576,46 +543,48 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
 //         .limit(limit);
 //     }
 
-//     // Add customer information to leads
+//     // Ensure leadsSource is properly populated and mapped
 //     const leadsWithCustomerInfo = leadsSource.map((lead) => {
-//       const customerName = lead.leads_data.find((data) =>
-//         data.que.toLowerCase().includes("name") ||
-//         data.que.toLowerCase().includes("customer name") ||
-//         data.que.toLowerCase().includes("आपका_नाम") ||
-//         data.que.toLowerCase().includes("नाम")
-//       )?.ans || "Unknown";
+//       const customerName = extractCustomerName(lead);
+//       const customerPhoneNumber = extractCustomerPhone(lead);
 
-//       const customerPhoneNumber = lead.leads_data.find((data) =>
-//         /^[6-9]\d{9}$/.test(data.ans.trim())
-//       )?.ans || "N/A";
+//       // console.log(`Lead ID: ${lead._id}, Name: ${customerName}, Phone: ${customerPhoneNumber}`);
 
+//       // Return a consistent structure
 //       return { ...lead.toObject(), customerName, customerPhoneNumber };
 //     });
+
+//     // console.log("User Leads:", leadsWithCustomerInfo);
 
 //     const totalLeads = section === "myleads" ? leadsWithCustomerInfo.length : await leadsModel.countDocuments(filter);
 //     const totalPages = Math.ceil(totalLeads / limit);
 
 //     const pipes = await pipelineModel.find({ cid: user.cid });
 //     const members = await memberModel.find({ cid: user.cid });
-// // console.log(leadsWithCustomerInfo);
-// user.myleads.forEach(lead => {
-//   console.log("Lead ID:", lead.lead_id);
-//   console.log("Leads Data:", JSON.stringify(lead.leads_data, null, 2));
-// });
 
+//     let msg = req.session.successMSG;
+//     // console.log(req.session.successMSG);
+//     let errMsg = req.session.errorMSG;
+//     let warnMsg = req.session.warnMsg;
 
+//     delete req.session.successMSG;
+//     delete req.session.errorMSG;
+//     delete req.session.warnMsg;
+    
 //     res.render("leads", {
 //       user,
-//        myleads: leadsWithCustomerInfo,
 //       leadsWithCustomerInfo,
+//       myleads: leadsWithCustomerInfo,
 //       leads: leadsWithCustomerInfo,
-
 //       pipes,
 //       members,
 //       currentPage: parseInt(page),
 //       totalPages,
 //       showPagination: leadsWithCustomerInfo.length > 0,
 //       activeTab: section,
+//       successMSG: msg,
+//       errorMSG: errMsg,
+//       warnMsg: warnMsg,
 //     });
 //   } catch (error) {
 //     console.error("Error fetching leads:", error);
@@ -623,192 +592,70 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
 //   }
 // });
 
-router.get("/leads", isAdminLoggedIn, async (req, res) => {
-  try {
-    const {
-      page = 1,
-      customerName,
-      customerPhoneNumber,
-      date,
-      pageName,
-      formName,
-      section = "all"
-    } = req.query;
+// // Helper function to filter leads based on query parameters
+// function applyFilters(lead, query) {
+//   const { customerName, customerPhoneNumber, date, pageName, formName } = query;
+//   let matches = true;
 
-    const limit = 25;
-    let user;
+//   if (customerName) {
+//     matches = matches && lead.leads_data.some(data =>
+//       new RegExp(customerName, 'i').test(data.ans)
+//     );
+//   }
+//   if (customerPhoneNumber) {
+//     matches = matches && lead.leads_data.some(data =>
+//       data.ans === customerPhoneNumber
+//     );
+//   }
+//   if (date) {
+//     const incomeDate = new Date(lead.income_time);
+//     matches = matches && incomeDate >= new Date(date).setHours(0, 0, 0) &&
+//       incomeDate < new Date(date).setHours(23, 59, 59);
+//   }
+//   if (pageName) {
+//     matches = matches && new RegExp(pageName, 'i').test(lead.page_name);
+//   }
+//   if (formName) {
+//     matches = matches && new RegExp(formName, 'i').test(lead.form_name);
+//   }
 
-    if (req.user.role === "admin") {
-      user = await logIncollection.findById(req.user.id)
-        .populate({
-          path: "myleads",
-          options: { sort: { createdAt: -1 } },
-          populate: [
-            { path: "status" },
-            { path: "remarks", options: { sort: { createdAt: -1 } } }
-          ],
-        })
-        .populate("teams");
-    } else {
-      user = await memberModel.findById(req.user.id)
-        .populate({
-          path: "myleads",
-          options: { sort: { createdAt: -1 } },
-          populate: [
-            { path: "status" },
-            { path: "remarks", options: { sort: { createdAt: -1 } } }
-          ],
-        });
-    }
-
-    // Build the filter object
-    const filter = { cid: user.cid };
-    if (customerName) {
-      filter['leads_data.ans'] = new RegExp(customerName, 'i');
-    }
-    if (customerPhoneNumber) {
-      filter['leads_data.ans'] = customerPhoneNumber;
-    }
-    if (date) {
-      filter.income_time = {
-        $gte: new Date(date).setHours(0, 0, 0),
-        $lt: new Date(date).setHours(23, 59, 59),
-      };
-    }
-    if (pageName) {
-      filter.page_name = new RegExp(pageName, 'i');
-    }
-    if (formName) {
-      filter.form_name = new RegExp(formName, 'i');
-    }
-
-    // Fetch leads based on section and filter
-    let leadsSource;
-    if (section === "myleads") {
-      leadsSource = user.myleads.filter(lead => applyFilters(lead, req.query));
-    } else {
-      leadsSource = await leadsModel
-        .find(filter)
-        .populate("status")
-        .populate("uid")
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit);
-    }
-
-    // Ensure leadsSource is properly populated and mapped
-    const leadsWithCustomerInfo = leadsSource.map((lead) => {
-      const customerName = extractCustomerName(lead);
-      const customerPhoneNumber = extractCustomerPhone(lead);
-
-      // console.log(`Lead ID: ${lead._id}, Name: ${customerName}, Phone: ${customerPhoneNumber}`);
-
-      // Return a consistent structure
-      return { ...lead.toObject(), customerName, customerPhoneNumber };
-    });
-
-    // console.log("User Leads:", leadsWithCustomerInfo);
-
-    const totalLeads = section === "myleads" ? leadsWithCustomerInfo.length : await leadsModel.countDocuments(filter);
-    const totalPages = Math.ceil(totalLeads / limit);
-
-    const pipes = await pipelineModel.find({ cid: user.cid });
-    const members = await memberModel.find({ cid: user.cid });
-
-    let msg = req.session.successMSG;
-    // console.log(req.session.successMSG);
-    let errMsg = req.session.errorMSG;
-    let warnMsg = req.session.warnMsg;
-
-    delete req.session.successMSG;
-    delete req.session.errorMSG;
-    delete req.session.warnMsg;
-    
-    res.render("leads", {
-      user,
-      leadsWithCustomerInfo,
-      myleads: leadsWithCustomerInfo,
-      leads: leadsWithCustomerInfo,
-      pipes,
-      members,
-      currentPage: parseInt(page),
-      totalPages,
-      showPagination: leadsWithCustomerInfo.length > 0,
-      activeTab: section,
-      successMSG: msg,
-      errorMSG: errMsg,
-      warnMsg: warnMsg,
-    });
-  } catch (error) {
-    console.error("Error fetching leads:", error);
-    res.status(500).send("Error fetching leads");
-  }
-});
-
-// Helper function to filter leads based on query parameters
-function applyFilters(lead, query) {
-  const { customerName, customerPhoneNumber, date, pageName, formName } = query;
-  let matches = true;
-
-  if (customerName) {
-    matches = matches && lead.leads_data.some(data =>
-      new RegExp(customerName, 'i').test(data.ans)
-    );
-  }
-  if (customerPhoneNumber) {
-    matches = matches && lead.leads_data.some(data =>
-      data.ans === customerPhoneNumber
-    );
-  }
-  if (date) {
-    const incomeDate = new Date(lead.income_time);
-    matches = matches && incomeDate >= new Date(date).setHours(0, 0, 0) &&
-      incomeDate < new Date(date).setHours(23, 59, 59);
-  }
-  if (pageName) {
-    matches = matches && new RegExp(pageName, 'i').test(lead.page_name);
-  }
-  if (formName) {
-    matches = matches && new RegExp(formName, 'i').test(lead.form_name);
-  }
-
-  return matches;
-}
+//   return matches;
+// }
 
 
 
-function extractCustomerName(lead) {
-  // console.log("Inspecting leads_data for lead:", lead.lead_id, lead.leads_data);
+// function extractCustomerName(lead) {
+//   // console.log("Inspecting leads_data for lead:", lead.lead_id, lead.leads_data);
 
-  if (!Array.isArray(lead.leads_data)) {
-    // console.warn("leads_data is not an array for lead:", lead.lead_id);
-    return "Unknown";
-  }
+//   if (!Array.isArray(lead.leads_data)) {
+//     // console.warn("leads_data is not an array for lead:", lead.lead_id);
+//     return "Unknown";
+//   }
 
-  const nameData = lead.leads_data.find((data) =>
-    /name|customer name|आपका_नाम|नाम/i.test(data.que)
-  );
+//   const nameData = lead.leads_data.find((data) =>
+//     /name|customer name|आपका_नाम|नाम/i.test(data.que)
+//   );
 
-  // console.log("Extracted Name Data:", nameData);
-  return nameData?.ans || "Unknown";
-}
+//   // console.log("Extracted Name Data:", nameData);
+//   return nameData?.ans || "Unknown";
+// }
 
 
-function extractCustomerPhone(lead) {
-  // console.log("Inspecting leads_data for phone:", lead.lead_id, lead.leads_data);
+// function extractCustomerPhone(lead) {
+//   // console.log("Inspecting leads_data for phone:", lead.lead_id, lead.leads_data);
 
-  if (!Array.isArray(lead.leads_data)) {
-    // console.warn("leads_data is not an array for lead:", lead.lead_id);
-    return "N/A";
-  }
+//   if (!Array.isArray(lead.leads_data)) {
+//     // console.warn("leads_data is not an array for lead:", lead.lead_id);
+//     return "N/A";
+//   }
 
-  const phoneData = lead.leads_data.find((data) =>
-    /(\+?\d{1,4}[ -]?)?(\(?\d{2,4}\)?[ -]?)?\d{6,12}/.test(data.ans.trim())
-  );
+//   const phoneData = lead.leads_data.find((data) =>
+//     /(\+?\d{1,4}[ -]?)?(\(?\d{2,4}\)?[ -]?)?\d{6,12}/.test(data.ans.trim())
+//   );
 
-  // console.log("Extracted Phone Data:", phoneData);
-  return phoneData?.ans || "N/A";
-}
+//   // console.log("Extracted Phone Data:", phoneData);
+//   return phoneData?.ans || "N/A";
+// }
 
 
 router.get("/lead/book/:id", isAdminLoggedIn, async (req, res) => {

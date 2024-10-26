@@ -426,6 +426,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
     console.log("we are in a /user/dashboard");
     const user = await logIncollection.findById(req.user.id).populate({
       path: "myleads", // Populating 'myleads' field from user
+      
       populate: [
         { path: "status" }, // Populate the 'status' field inside each lead
         { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
