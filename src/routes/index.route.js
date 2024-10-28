@@ -161,15 +161,6 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
   res.render("gethelp", { user });
 });
 
-router.get("/mysubscription", isAdminLoggedIn, async (req, res) => {
-  let user;
-  if (req.user.role === "admin")
-    user = await logIncollection.findById(req.user.id);
-  else user = await memberModel.findById(req.user.id);
-
-  res.render("subscription", { user });
-});
-
 
 // router.get("/leads", isAdminLoggedIn, async (req, res) => {
 //   try {

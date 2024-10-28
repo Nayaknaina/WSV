@@ -29,6 +29,7 @@ const uploadCSV = require("../service/csvMulter.js");
 
 const { csvFileDataChangIntoLeadHandler } = require("../controllers/user.controller.js");
 const wAModel = require("../models/wA.model.js");
+const paymentModel = require('../models/paySuccess.model.js')
 
 router.get("/team", isAdminLoggedIn, async (req, res) => {
   let user;
@@ -455,7 +456,9 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
     let whatsappConnectedPhoneNumber;
     if (user) {
       let isconn = await wAModel.findOne({cid: user.cid});
-      whatsappConnectedPhoneNumber = isconn.connectedPhoneNumber;
+      if (isconn) {
+        whatsappConnectedPhoneNumber = isconn.connectedPhoneNumber;
+      }
     }
     console.log(whatsappConnectedPhoneNumber);
     
@@ -883,6 +886,17 @@ The [Company Name] Team`,
   return res.status(200).json({msg:'done'});
 });
 
+
+router.get("/mysubscription", isAdminLoggedIn, async (req, res) => {
+ try {
+  let user = await logIncollection.findById(req.user.id)
+  let paymentProofs = await paymentModel.find({uid: user._id})
+  let paymentProof = paymentProofs[paymentProofs.length-1]
+  res.render("subscription", { user, paymentProof});
+ } catch (err) {
+  console.error("Error in /user/mysubscription -",err)
+ }
+});
 
 
 router.get("/reset/all/pipes", isAdminLoggedIn, async (req, res) => {

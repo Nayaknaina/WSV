@@ -33,7 +33,7 @@
         return function () {
           heap.push([e].concat(Array.prototype.slice.call(arguments, 0)))
         }
-      }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], c = 0; c < p.length; c++) heap[p[c]] = o(p[c])
+      }, p = ["addEventProperties", "addroperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], c = 0; c < p.length; c++) heap[p[c]] = o(p[c])
     };
     heap.load("490363613");
   </script>
@@ -64,8 +64,8 @@
           </div>
           <div class="container min-vh-100">
             <div class="row">
-              
-             
+
+
               <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                 <div class="card">
                   <div class="card-header p-t-15 p-b-15">
@@ -82,16 +82,48 @@
                           <table class="custom-table text-nowrap table m-b-0">
                             <thead>
                               <tr>
-                                <th class="align-middle" scope="col">Email</th>
                                 <th class="align-middle" scope="col">Payer Name</th>
-                                <th class="align-middle" scope="col">Your Plan Name</th>
+                                <th class="align-middle" scope="col">Payer Email</th>
+                                <th class="align-middle" scope="col">Payer Address</th>
+                                {{!--<th class="align-middle" scope="col">Payment Id</th>
+                                <th class="align-middle" scope="col">Order Id</th>
+                                <th class="align-middle" scope="col">Plan Name</th>
+                                <th class="align-middle" scope="col">Amount</th>
+                                <th class="align-middle" scope="col">Status</th>
+                                <th class="align-middle" scope="col">Payment Time</th> --}}
                               </tr>
                             </thead>
                             <tbody>
                               <tr>
-                                <td>support@pabbly.com</td>
-                                <td> Magnet Brains LLC</td>
-                                <td class="text-wrap">16192 Coastal Hwy Lewes, Delaware, United States, 19958</td>
+                                <td>{{paymentProof.payerName}}</td>
+                                <td>{{paymentProof.payerEmail}}</td>
+                                <td>
+                                  {{paymentProof.address.address_line_1}}
+                                  {{paymentProof.address.address_line_2}}
+                                  {{paymentProof.address.admin_area_2}}
+                                  {{paymentProof.address.admin_area_1}}
+                                  {{paymentProof.address.postal_code}}
+                                  {{paymentProof.address.country_code}}
+                                </td>
+                                {{!-- <td>{{paymentProof.paymentId}}</td>
+                                <td>{{paymentProof.orderId}}</td> --}}
+
+                                {{!-- <td class="text-wrap">
+                                  {{#ifEquals user.subscriptionLevel "free"}}
+                                  Followups Lite
+                                  {{else}}
+                                  {{#ifEquals user.subscriptionLevel "basic"}}
+                                  Followups Pro
+                                  {{else}}
+                                  {{#ifEquals user.subscriptionLevel "premium"}}
+                                  Followups Prime
+                                  {{/ifEquals}}
+                                  {{/ifEquals}}
+                                  {{/ifEquals}}
+                                </td> --}}
+                                {{!-- <td>{{paymentProof.amount}} {{paymentProof.currency}}</td> --}}
+
+                                {{!-- <td>{{formatDate paymentProof.createdAt}}</td> --}}
                               </tr>
                             </tbody>
                           </table>
@@ -110,18 +142,89 @@
                       </div>
                       <div class="col-md-6 col-6 col-sm-6 col-xs-6 text-right"><a
                           class="btn btn-sm btn-outline-primary font-15"
-                          href="/portal/app/en/affiliateportal/settings/payment-setting" previewlistener="true">Manage
-                          Card</a></div>
+                          href="/pricing" previewlistener="true">
+                          Go to pricing</a></div>
                     </div>
                   </div>
+                  <style>
+                    .tdHeading {
+                      font-weight: 600;
+                    }
+                  </style>
                   <div class="card-body p-t-0">
                     <div class="row">
                       <div class="col-md-12">
-                        <div class="card-body">
-                          <div class="text-center">
-                            <h3 class="m-b-10"></h3>
+                        <table class="table">
+                          <tbody>
+                            <tr>
+                              <td class="tdHeading">Payment Status :</td>
+                              <td>
+                                {{#ifEquals paymentProof.paymentStatus 'COMPLETED'}}
+
+                                <div class="alert alert-success d-flex align-items-center" role="alert"
+                                  style="margin: 0; width: fit-content;">
+                                  <div>{{paymentProof.paymentStatus}}</div>
+                                </div>
+                                {{else}}
+                                <p class="alert-warnning">{{paymentProof.paymentStatus}}</p>
+                                {{/ifEquals}}
+                              </td>
+                              <td></td>
+                              <td></td>
+
+                            </tr>
+                          </tbody>
+                        </table>
+                        <div class="container">
+                          <div class="col-6 col-md-6">
+                            <table class="table">
+                              <tbody>
+                                <tr>
+                                  <td class="tdHeading">Order Id :</td>
+                                  <td>{{paymentProof.orderId}}</td>
+                                  <td class="tdHeading">Payment Id :</td>
+                                  <td>{{paymentProof.paymentId}}</td>
+                                </tr>
+                                <tr>
+                                  <td class="tdHeading">Payer Id :</td>
+                                  <td>{{paymentProof.payerId}}</td>
+                                  <td class="tdHeading">Payer Email :</td>
+                                  <td>{{paymentProof.payerEmail}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="col-6 col-md-6">
+                            <table class="table">
+                              <tbody>
+                                <tr>
+                                  <td class="tdHeading">Payer Name :</td>
+                                  <td>{{paymentProof.payerName}}</td>
+                                  <td class="tdHeading">Amount :</td>
+                                  <td>{{paymentProof.amount}} {{paymentProof.currency}}</td>
+                                </tr>
+                                <tr>
+                                  <td class="tdHeading">Pay Name :</td>
+                                  <td>{{paymentProof.payerName}}</td>
+                                  <td class="tdHeading">Amount :</td>
+                                  <td>{{paymentProof.amount}} {{paymentProof.currency}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
                           </div>
                         </div>
+                        </tbody>
+                        </table>
+                        {{!-- <div class="card-body row bg-success">
+                          <div class="col-auto">
+                            <h3 class="m-b-10">heello:</h3>
+                            <h3 class="m-b-10">heello:</h3>
+                          </div>
+                          <div class="col-auto bg-primary">
+                            <p class="m-b-10">heello Lorem</p>
+                            <p class="m-b-10">heello</p>
+                          </div>
+                        </div> --}}
                       </div>
                     </div>
                   </div>
@@ -136,7 +239,7 @@
 
     </div>
   </div>
-  
+
 
 
 
