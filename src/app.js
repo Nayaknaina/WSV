@@ -537,8 +537,10 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     }
 
     let isWACnn = await WaModel.findOne({cid: user.cid})
-    if(!isWACnn.isConnected){
-      req.session.errorMSG = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
+    if(isWACnn !== null) {
+      if(!isWACnn.isConnected){
+        req.session.warnMsg = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
+      }
     }
     setTimeout(async () => {
       let connStatus;
