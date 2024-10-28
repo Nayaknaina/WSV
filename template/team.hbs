@@ -162,11 +162,212 @@
 }
 </style>
 
+
+<style>
+    body,
+    html {
+        width: 100%;
+        height: 100% !important;
+    }
+
+    #findNewLeadloader {
+        width: 100%;
+        min-height: 100%;
+        height: 100vh;
+        background-size: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 999999;
+        background-color: #908f8faa;
+        background-color: #000000aa;
+        display: none;
+        overflow: hidden;
+    }
+
+    #finSec {
+        min-width: 200px;
+        width: 33.33%;
+        height: 200px;
+        padding: 10px;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ccc;
+        cursor: pointer;
+        transition: 0.3s linear;
+    }
+
+    .loader-11 {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        border: 6px solid;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1s linear infinite;
+        animation: rotation 1s linear infinite;
+    }
+
+    .loader-11:after,
+    .loader-11:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        border: 6px solid;
+        border-color: transparent transparent #047 #047;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        -webkit-animation: rotationBack 0.5s linear infinite;
+        animation: rotationBack 0.5s linear infinite;
+        transform-origin: center center;
+    }
+
+    .loader-11:before {
+        width: 64px;
+        height: 64px;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1.5s linear infinite;
+        animation: rotation 1.5s linear infinite;
+
+    }
+
+    @media (max-width: 600px) {
+        .loader-11:before {
+            width: 32px;
+            height: 32px;
+            border-color: #FFF #FFF transparent transparent;
+        }
+
+        .loader-11:after,
+        .loader-11:before {
+            width: 40px;
+            height: 40px;
+            border: 3px solid;
+            border-color: transparent transparent #047 #047;
+        }
+
+        .loader-11 {
+            width: 48px;
+            height: 48px;
+            border: 3px solid;
+            border-color: #FFF #FFF transparent transparent;
+        }
+    }
+
+
+    @-webkit-keyframes rotationBack {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(-360deg);
+        }
+    }
+
+    @keyframes rotationBack {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(-360deg);
+        }
+    }
+
+    @-webkit-keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .modal {
+        display: none;
+
+        position: fixed;
+        z-index: 100000000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+
+        position: fixed;
+        z-index: 100000000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 300px;
+        text-align: center;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #whatsappReadyMessage {
+        display: none;
+        color: green;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+</style>
+
+
 <body class="naina">
+   <div id="findNewLeadloader">
+        <section id="finSec"><span class="loader-11"> </span></section>
+    </div>
   <div id="popup-reg" class="popup">
     <div id="popup-reg" class="popup-content">
 
-      <form id="send" action="/user/team/invite" method="get" class="send-form">
+      <form id="send" action="/user/team/invite" onsubmit="loadMember()" method="get" class="send-form">
         <div class="form-group">
           <input type="text" placeholder="Enter name..." id="name" name="name" required="required">
           <label for="name">
@@ -643,6 +844,7 @@
     window.onload = populateCountryCodes;
 
 async function submitTeamMemberEditForm(id){
+  findLead()
   const form = document.getElementById(`teamMemberUpdateForm-${id}`);
   let name = document.querySelector(`#INP-name-${id}`).value
   let mobile = document.querySelector(`#INP-mobile-${id}`).value
@@ -665,6 +867,9 @@ async function submitTeamMemberEditForm(id){
     }
 }
 
+function loadMember(){
+ findLead()
+}
 
 function openTeamMemberUpdateForm(id){
   let formContainer = document.querySelector(`#teamMemberUpdateFormContainer-${id}`)
@@ -681,6 +886,22 @@ function closeTeamMemberUpdateForm(){
   })
 }
   </script>
+
+      <script>
+    function findLead(){
+        console.log('clickkeeedddd Loader function ')
+      
+        let loadBox = document.querySelector('#findNewLeadloader')
+            console.log(loadBox)
+        let body = document.querySelector('body')
+        if(loadBox){
+            console.log('clickkeeedddd')
+            loadBox.style.display = 'flex'
+            body.style.height =  `100vh !important`
+            body.style.overflow = 'hidden'
+        }
+    }
+</script>
 </body>
 
 </html>

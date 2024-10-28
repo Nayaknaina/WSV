@@ -133,3 +133,11 @@ hbs.registerHelper("formatDate", function (datetime) {
     }
     return 'No match found'; // Default response if no match
   });
+
+  hbs.registerHelper('formatTextForTemplate', function(text) {
+    return new hbs.SafeString(text
+      .replace(/\*(.*?)\*/g, '<strong>$1</strong>')  // Convert *text* to <strong>text</strong>
+      .replace(/_(.*?)_/g, '<em>$1</em>')            // Convert _text_ to <em>text</em>
+      .replace(/\n/g, '<br>')  
+    );
+  });
