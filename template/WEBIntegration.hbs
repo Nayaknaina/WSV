@@ -138,11 +138,17 @@ p {
                     <div class="container min-vh-100">
                         <div id="integration-tab">
                             <button id="generateKeyBtn">Generate API Key</button>
-                            <p>Your API Key: <span id="apiKeyDisplay">Not Generated</span></p>
+                            <p>Your API Key: <span id="apiKeyDisplay">
+                                {{#if user.apiKey}}
+                                {{user.apiKey}}
+                                {{else}}
+                                Not Generated
+                                {{/if}}
+                                </span></p>
 
-                            <button id="generateUrlBtn" disabled>Generate URL</button>
-                            <p>Generated URL: <input type="text" id="generatedUrl" readonly></p>
-                            <button onclick="copyToClipboard()">Copy URL</button>
+                            
+                            <p>Generated URL: <input type="text" value="**************" id="generatedUrl" readonly></p>
+                            <button onclick="copyToClipboard('{{user.apiKey}}')">Copy URL</button>
                         </div>
                     </div>
                 </div>
@@ -151,6 +157,7 @@ p {
 
         </div>
     </div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
 const apiKeyDisplay = document.getElementById('apiKeyDisplay');
@@ -160,8 +167,8 @@ const generatedUrlInput = document.getElementById('generatedUrl');
 
 generateKeyBtn.addEventListener('click', async () => {
     try {
-        const response = await fetch('/generate-key', { method: 'POST' });
-        const data = await response.json();
+        const response = await axios.get('/user/generate-key');
+        const data = response.data;
         apiKeyDisplay.textContent = data.apiKey;
         generateUrlBtn.disabled = false;
     } catch (error) {
@@ -169,14 +176,9 @@ generateKeyBtn.addEventListener('click', async () => {
     }
 });
 
-generateUrlBtn.addEventListener('click', async () => {
-    const apiKey = apiKeyDisplay.textContent;
-    const response = await fetch(`/generate-url/${apiKey}`);
-    const data = await response.json();
-    generatedUrlInput.value = data.url;
-});
-
-function copyToClipboard() {
+function copyToClipboard(api=null) {
+    if(!api) return 
+    generatedUrlInput.value = `http://localhost:8000/${api}`;
     generatedUrlInput.select();
     document.execCommand('copy');
     alert('URL copied to clipboard!');

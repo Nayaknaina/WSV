@@ -111,22 +111,23 @@ router.get("/website-integration", isAdminLoggedIn, async (req, res) => {
 
   res.render("WEBIntegration", { user });
 });
-router.post('/generate-key', isAdminLoggedIn, async (req, res) => {
+router.get('/generate-key', isAdminLoggedIn, async (req, res) => {
   try {
     console.log("enter");
 
     const user = await logIncollection.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
-    }
+    }  
 
-  
     const newApiKey = crypto.randomBytes(16).toString('hex');
+    console.warn(newApiKey);
+    
     user.apiKey = newApiKey;
     await user.save();
     console.log(newApiKey,"jeweufnwu");
 
-    res.status(201).json({ apiKey: newApiKey });
+    res.status(200).json({ apiKey: newApiKey });
   } catch (error) {
     console.error('Error generating API key:', error);
     res.status(500).json({ error: 'Error generating API key' });
