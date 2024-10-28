@@ -1,5 +1,10 @@
 const express = require('express');
 const payment_route = express.Router(); 
+// Uncomment these lines in your route file
+const bodyParser = require('body-parser');
+payment_route.use(bodyParser.json());
+payment_route.use(bodyParser.urlencoded({ extended: false }));
+
 
 // const bodyParser = require('body-parser');
 // payment_route.use(bodyParser.json());
