@@ -28,6 +28,7 @@ const uploadCSV = require("../service/csvMulter.js");
 
 
 const { csvFileDataChangIntoLeadHandler } = require("../controllers/user.controller.js");
+const wAModel = require("../models/wA.model.js");
 
 router.get("/team", isAdminLoggedIn, async (req, res) => {
   let user;
@@ -192,83 +193,83 @@ router.post("/signup", async (req, res) => {
     const templates = [
       {
         title: "Reminder Message To Customer",
-        text: `dear [Customer Name],
-
-This is a friendly reminder from [Company Name]. We have a scheduled follow-up call with you on [Date] at [Time]. Our representative will be reaching out to discuss your requirements.
-
-If you have any questions or need to reschedule, please feel free to let us know.
-
-Looking forward to speaking with you!
-
-Best Regards,
-The [Company Name] Team`,
+        text: `*dear* [Customer Name],
+  
+  This is a friendly reminder from [Company Name]. We have a scheduled follow-up call with you on [Date] at [Time]. Our representative will be reaching out to discuss your requirements.
+  
+  If you have any questions or need to reschedule, please feel free to let us know.
+  
+  Looking forward to speaking with you!
+  
+  Best Regards,
+  The [Company Name] Team`,
         client: true,
         team: false,
         num: 1,
       },
-
+  
       {
         title: "Reminder Message To Team Member",
-        text: `*hello [Team Member Name]*,
-
-Just a reminder that you have a follow-up call scheduled with [Customer Name] on [Date] at [Time]. Please make sure you are prepared with all the necessary details.
-
-Good luck with the call, and let us know if you need any assistance!
-
-*Remark:*
-- [Remark Content].
-
-Best Regards,
-The [Company Name] Team`,
+        text: `*hello* [Team Member Name],
+  
+  Just a reminder that you have a follow-up call scheduled with [Customer Name] on [Date] at [Time]. Please make sure you are prepared with all the necessary details.
+  
+  Good luck with the call, and let us know if you need any assistance!
+  
+  *Last Discussion:*
+  [Remark Content].
+  
+  Best Regards,
+  The [Company Name] Team`,
         client: false,
         team: true,
         num: 2,
       },
-
+  
       {
         title: "Thankyou Message To Customer",
-        text: `dear [Customer Name],
-
-Thank you for taking the time to speak with us today. We appreciate the opportunity to understand your needs better and to discuss how we can assist you further.
-
-If you have any questions or need more information, please don’t hesitate to reach out. We look forward to continuing our conversation and helping you achieve your goals.
-
-Best Regards,
-The [Company Name] Team`,
+        text: `*dear* [Customer Name],
+  
+  Thank you for taking the time to speak with us today. We appreciate the opportunity to understand your needs better and to discuss how we can assist you further.
+  
+  If you have any questions or need more information, please don’t hesitate to reach out. We look forward to continuing our conversation and helping you achieve your goals.
+  
+  Best Regards,
+  The [Company Name] Team`,
         client: true,
         team: false,
         num: 5,
       },
-
+  
       {
         title: "Notification Message To Team Members",
-        text: `hello [Team Member Name],
-
-A new lead has been added to the CRM. Here are the details:
-- *Lead Name:* [Customer Name]
-- *Contact Number:* [Customer Contact Number]
-- *Date Received:* [Date]
-- *Lead Source:* [Lead Source]
-
-Please follow up with the lead at your earliest convenience to ensure a prompt response.
-
-Best,
-The [Company Name] Team`,
+        text: `*hello* [Team Member Name],
+  
+  A new lead has been added to the CRM. Here are the details:
+  - *Lead Name:* [Customer Name]
+  - *Contact Number:* [Customer Contact Number]
+  - *Date Received:* [Date]
+  - *Lead Source:* [Lead Source]
+  
+  Please follow up with the lead at your earliest convenience to ensure a prompt response.
+  
+  Best,
+  The [Company Name] Team`,
         client: false,
         team: true,
         num: 3,
       },
-
+  
       {
         title: "Wellcome Message To Customer",
-        text: `Dear [Customer Name],
-
-Welcome to [Company Name]! We’re thrilled to have you on board. Our team will be reaching out to you shortly to understand your needs and help you find the best solutions.
-
-If you have any immediate questions, feel free to get in touch with us. We're here to support you every step of the way!
-
-Best Regards,
-The [Company Name] Team`,
+        text: `*Dear* [Customer Name],
+  
+  Welcome to [Company Name]! We’re thrilled to have you on board. Our team will be reaching out to you shortly to understand your needs and help you find the best solutions.
+  
+  If you have any immediate questions, feel free to get in touch with us. We're here to support you every step of the way!
+  
+  Best Regards,
+  The [Company Name] Team`,
         client: true,
         team: false,
         num: 4,
@@ -441,8 +442,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       .sort({ defaultVal: -1 })
       .exec();
     const leads = await leadsModel.find({ cid: user.cid }).populate("status");
-    // res.json({})
-    // console.log(req.session.successMSG);
+
     let msg = req.session.successMSG;
     // console.log(req.session.successMSG);
     let errMsg = req.session.errorMSG;
@@ -451,14 +451,16 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
     delete req.session.successMSG;
     delete req.session.errorMSG;
     delete req.session.warnMsg;
-
-    if (chalteRahoId) clearInterval(chalteRahoId);
-      console.log("chalte rho calling");
-    if (user.facebookToken) {
-      chalteRaho(user.facebookToken, user);
+    let whatsappConnectedPhoneNumber;
+    if (user) {
+      let isconn = await wAModel.findOne({cid: user.cid});
+      whatsappConnectedPhoneNumber = isconn.connectedPhoneNumber;
     }
+    console.log(whatsappConnectedPhoneNumber);
+    
 
     res.render("dashboard", {
+      whatsappConnectedPhoneNumber: whatsappConnectedPhoneNumber || "hhhh",
       user,
       pipes,
       leads,
@@ -676,19 +678,19 @@ router.get("/team/invite", isAdminLoggedIn, async (req, res) => {
     const isSent = await sendMail(email, mailMsg, subject);
     console.log(isSent);
 
-    const leadContactNo = mobile;
-    const text = `Hello ${name}!\n\nCongratulations! Your account has been created successfully. You can log in now and start using our service.
-    \n\n Your email: ${email}
-    \n Your password : ${password}
-    \n\n[Click here to login](https://360followups.com/member/login)`;
+    // const leadContactNo = mobile;
+    // const text = `Hello ${name}!\n\nCongratulations! Your account has been created successfully. You can log in now and start using our service.
+    // \n\n Your email: ${email}
+    // \n Your password : ${password}
+    // \n\n[Click here to login](https://360followups.com/member/login)`;
 
-    let connStatus = await WaModel.findOne({ cid: user.cid });
-    setTimeout(() => {
-      console.log("/team/invite route");
-      console.log(connStatus, leadContactNo);
+    // let connStatus = await WaModel.findOne({ cid: user.cid });
+    // setTimeout(() => {
+    //   console.log("/team/invite route");
+    //   console.log(connStatus, leadContactNo);
 
-      sendMessageToLead(connStatus, leadContactNo, text); // after temp msg sending to lead
-    }, 4000);
+    //   sendMessageToLead(connStatus, leadContactNo, text); // after temp msg sending to lead
+    // }, 4000);
 
     const newMember = new memberModel({
       name,
@@ -797,7 +799,7 @@ Just a reminder that you have a follow-up call scheduled with [Customer Name] on
 
 Good luck with the call, and let us know if you need any assistance!
 
-*Remark:*
+*Last Discussion:*
 [Remark Content].
 
 Best Regards,

@@ -242,7 +242,7 @@
         {{> NameHead}}
         <div class="container ">
       {{#ifEquals user.role 'admin'}}
-      <div class="row flex-row justify-content-around">
+      <div class="row flex-row ">
         <div class="col-auto text-center py-2">
           <button onclick="reSetTemps()" type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm">Reset All</button>
         </div>
@@ -265,7 +265,7 @@
                 </div>
                 <div class="card-body">
                   <h5 class="card-title" style="text-transform: capitalize;">{{ title}}</h5>
-                  <pre class="card-text" style="text-transform: capitalize;">{{ text}}</pre>
+                  <p class="card-text" style="text-transform: capitalize;">{{formatTextForTemplate text}}</p>
                 </div>
                 <div class="card-footer">
                   <small class="text-muted">{{#if client }} for client {{/if}}</small><br>
@@ -293,7 +293,7 @@
                 </div>
                 <div class="card-body">
                   <h5 class="card-title" style="text-transform: capitalize;">{{ title}}</h5>
-                  <pre class="card-text" style="text-transform: capitalize;">{{ text}}</pre>
+                  <p class="card-text" style="text-transform: capitalize;">{{formatTextForTemplate text}}</p>
                 </div>
                 <div class="card-footer">
                   <small class="text-muted">{{#if client }} for client {{/if}}</small><br>

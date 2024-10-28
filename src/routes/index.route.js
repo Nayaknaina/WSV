@@ -744,7 +744,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
       activeTab: section,
       successMSG: msg,
       errorMSG: errMsg,
-      warnMsg: warnMsg,
+      warnMSG: warnMsg,
     });
   } catch (error) {
     console.error("Error fetching leads:", error);
