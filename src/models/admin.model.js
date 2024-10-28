@@ -18,10 +18,10 @@ const logInSchema = new mongoose.Schema({
     type: String,
   },
   fcmToken: String,
-  paymentProof: {
+  paymentProof: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Payment",
-  },
+  }],
   teams: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -107,7 +107,11 @@ const logInSchema = new mongoose.Schema({
     default: "free",
   },
   subscriptionExpiry: {
-    type: Date, // Store the expiration date
+    type: Date, 
+  },
+  apiKey: {
+    type: String,
+    unique: true,
   },
 });
 
@@ -131,6 +135,13 @@ logInSchema.pre("save", function (next) {
   if (userSubscriptionLevel === "free" && !this.subscriptionExpiry) {
     this.subscriptionExpiry = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000); // 15 days from now
   }
+  next();
+
+  if (!this.apiKey) {
+    const crypto = require("crypto");
+    this.apiKey = crypto.randomBytes(16).toString("hex");
+  }
+
   next();
 });
 

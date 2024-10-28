@@ -12,10 +12,11 @@ const leadsModel = require("../models/leads.model.js");
 const templateModel = require("../models/temlate.model.js");
 const WaModel = require("../models/wA.model.js");
 // const manualLeadModel = require("../models/manualLeads.model.js");
+const crypto = require('crypto');
 
 const otpGenerator = require("otp-generator");
 const { sendMail } = require("../service/mailSender.js");
-const { isAdminLoggedIn, chalteRaho, chalteRahoId} = require("../middilware/middilware.js");
+const { isAdminLoggedIn, chalteRaho, chalteRahoId } = require("../middilware/middilware.js");
 const { generateToken } = require("../../utils/auth.js");
 const { upload } = require("../service/multer.js");
 const jwt = require("jsonwebtoken");
@@ -99,6 +100,67 @@ router.post("/change/lead/owner/:leadId", isAdminLoggedIn, async (req, res) => {
 
 router.get("/signup", (req, res) => {
   res.render("signup");
+});
+
+router.get("/website-integration", isAdminLoggedIn, async (req, res) => {
+  let user;
+  if (req.user.role === "admin")
+    user = await logIncollection.findById(req.user.id);
+  else user = await memberModel.findById(req.user.id);
+
+  res.render("WEBIntegration", { user });
+});
+router.post('/generate-key', isAdminLoggedIn, async (req, res) => {
+  try {
+    console.log("enter");
+
+    const user = await logIncollection.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+  
+    const newApiKey = crypto.randomBytes(16).toString('hex');
+    user.apiKey = newApiKey;
+    await user.save();
+    console.log(newApiKey,"jeweufnwu");
+
+    res.status(201).json({ apiKey: newApiKey });
+  } catch (error) {
+    console.error('Error generating API key:', error);
+    res.status(500).json({ error: 'Error generating API key' });
+  }
+});
+
+
+router.get('/generate-url', isAdminLoggedIn, async (req, res) => {
+  try {
+    const user = await logIncollection.findById(req.user.id);
+    if (!user || !user.apiKey) {
+      return res.status(404).json({ error: 'User or API key not found' });
+    }
+    const baseUrl = 'https://360followups.com/api';
+    const exampleUrl = `${baseUrl}?apiKey=${user.apiKey}&name={name}&email={email}&phone={phone}&message={message}`;
+
+    res.json({ url: exampleUrl });
+  } catch (error) {
+    console.error('Error generating URL:', error);
+    res.status(500).json({ error: 'Error generating URL' });
+  }
+});
+
+
+router.post('/copy-url', (req, res) => {
+  try {
+    const { url } = req.body;
+    if (!url) {
+      return res.status(400).json({ error: 'URL not provided' });
+    }
+    res.status(200).json({ message: 'URL copied successfully', url });
+  } catch (error) {
+    console.error('Error copying URL:', error);
+    res.status(500).json({ error: 'Error copying URL' });
+  }
 });
 
 router.post(
@@ -207,7 +269,7 @@ router.post("/signup", async (req, res) => {
         team: false,
         num: 1,
       },
-  
+
       {
         title: "Reminder Message To Team Member",
         text: `*hello* [Team Member Name],
@@ -225,7 +287,7 @@ router.post("/signup", async (req, res) => {
         team: true,
         num: 2,
       },
-  
+
       {
         title: "Thankyou Message To Customer",
         text: `*dear* [Customer Name],
@@ -240,7 +302,7 @@ router.post("/signup", async (req, res) => {
         team: false,
         num: 5,
       },
-  
+
       {
         title: "Notification Message To Team Members",
         text: `*hello* [Team Member Name],
@@ -259,7 +321,7 @@ router.post("/signup", async (req, res) => {
         team: true,
         num: 3,
       },
-  
+
       {
         title: "Wellcome Message To Customer",
         text: `*Dear* [Customer Name],
@@ -430,7 +492,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
     console.log("we are in a /user/dashboard");
     const user = await logIncollection.findById(req.user.id).populate({
       path: "myleads", // Populating 'myleads' field from user
-      
+
       populate: [
         { path: "status" }, // Populate the 'status' field inside each lead
         { path: "remarks", options: { sort: { createdAt: -1 } } }, // Populate 'remarks' and sort by 'createdAt'
@@ -454,14 +516,16 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
     delete req.session.warnMsg;
     let whatsappConnectedPhoneNumber;
     if (user) {
-      let isconn = await wAModel.findOne({cid: user.cid});
-      whatsappConnectedPhoneNumber = isconn.connectedPhoneNumber;
+      let isconn = await wAModel.findOne({ cid: user.cid });
+      if (isconn) {
+        whatsappConnectedPhoneNumber = isconn.connectedPhoneNumber;
+      }
     }
     console.log(whatsappConnectedPhoneNumber);
-    
+
 
     res.render("dashboard", {
-      whatsappConnectedPhoneNumber: whatsappConnectedPhoneNumber || "hhhh",
+      whatsappConnectedPhoneNumber: whatsappConnectedPhoneNumber || "",
       user,
       pipes,
       leads,
@@ -513,7 +577,7 @@ router.post("/login", async (req, res) => {
         errorMessage: "Invalid username or password",
       });
     }
-    
+
     // user.subscriptionExpiry =  new Date();
     // await user.save()
 
@@ -521,8 +585,8 @@ router.post("/login", async (req, res) => {
     const today = new Date();
     const diffTime = subExp - today;
     const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    if(daysLeft<=0) {
+
+    if (daysLeft <= 0) {
       console.warn(`Subscription expired. Please renew to continue.`)
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
     }
@@ -880,7 +944,7 @@ The [Company Name] Team`,
   );
   await user.save();
 
-  return res.status(200).json({msg:'done'});
+  return res.status(200).json({ msg: 'done' });
 });
 
 

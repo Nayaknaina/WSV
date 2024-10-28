@@ -18,6 +18,8 @@ router.get("/", (req, res) => {
   res.sendFile(path.join(static_path, "index.html"));
 });
 
+
+
 router.get("/template", isAdminLoggedIn, async (req, res) => {
   let user;
 
