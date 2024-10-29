@@ -121,51 +121,36 @@ router.get('/generate-key', isAdminLoggedIn, async (req, res) => {
     }  
 
     const newApiKey = crypto.randomBytes(16).toString('hex');
-    console.warn(newApiKey);
+    console.warn(newApiKey,"this is key updated");
     
     user.apiKey = newApiKey;
     await user.save();
-    console.log(newApiKey,"jeweufnwu");
 
     res.status(200).json({ apiKey: newApiKey });
-  } catch (error) {
+  } catch (error) { 
     console.error('Error generating API key:', error);
     res.status(500).json({ error: 'Error generating API key' });
   }
 });
 
-
-router.get('/generate-url', isAdminLoggedIn, async (req, res) => {
+router.get('/api/del', isAdminLoggedIn, async(req,res)=>{
   try {
-    const user = await logIncollection.findById(req.user.id);
-    if (!user || !user.apiKey) {
-      return res.status(404).json({ error: 'User or API key not found' });
-    }
-    const baseUrl = 'https://360followups.com/api';
-    const exampleUrl = `${baseUrl}?apiKey=${user.apiKey}&name={name}&email={email}&phone={phone}&message={message}`;
-
-    res.json({ url: exampleUrl });
-  } catch (error) {
-    console.error('Error generating URL:', error);
-    res.status(500).json({ error: 'Error generating URL' });
+    let user = await logIncollection.findById(req.user.id)
+    if (!user) return 
+    user.apiKey = '';
+    await user.save()
+    console.warn(user.apiKey);
+    
+    res.redirect('/user/website-integration');
+  } catch (err) {
+    console.log(err);
+    
   }
-});
-
-
-router.post('/copy-url', (req, res) => {
-  try {
-    const { url } = req.body;
-    if (!url) {
-      return res.status(400).json({ error: 'URL not provided' });
-    }
-    res.status(200).json({ message: 'URL copied successfully', url });
-  } catch (error) {
-    console.error('Error copying URL:', error);
-    res.status(500).json({ error: 'Error copying URL' });
-  }
-});
+})
 
 router.post(
+
+
   "/profile/image",
   isAdminLoggedIn,
   uploadProfile.single("userImage"),

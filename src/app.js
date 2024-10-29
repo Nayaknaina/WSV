@@ -38,10 +38,11 @@ const userRoute = require("./routes/users.route.js");
 const Route = require("./routes/index.route.js");
 const externalRoute = require("./routes/external.route.js");
 const { log } = require("console");
+const cors= require('cors')
 
 const { checkSubscription,capitalizeText } = require("./middilware/middilware.js");
 
-
+app.use(cors())
 // todo Whatsapp integrations-----------------------------------------
 const { startKeepAlive } = require("./middilware/whatsapp.js");
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
@@ -58,7 +59,7 @@ let client = new Client({
     headless: true,
     ignoreHTTPSErrors: true,
     args: [
-      "--ignore-certificate-errors",
+      "--ignore-certificate-errors",     
       "--no-sandbox",
       "--disable-setuid-sandbox",
       "--disable-dev-shm-usage",
@@ -84,6 +85,7 @@ const sessionStore =
 const static_path = path.join(__dirname, "../public");
 app.use(express.static(static_path));
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 // app.use(express.json());
 app.use(cookieParser());
@@ -757,6 +759,34 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     console.log("Error in /user/manual/lead :- ", err);
   }
 });
+
+//todo api lead creation
+
+// app.get("/api/:api", isAdminLoggedIn, checkSubscription, async (req, res) => {
+//   try {
+//     let user;
+//     if (req.user.role === "admin") {
+//       user = await logIncollection.findById(req.user.id);
+//     } else {
+//       user = await memberModel.findById(req.user.id);
+//     }
+
+//     const Admin = await logIncollection.findOne({ cid: user.cid });
+//     if(!req.session.access) {
+//       console.warn(`Subscription expired. Please renew to continue.`)
+//       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+//       return res.redirect('/leads')
+//     }
+
+//     const {name, email, phoneNumber, message } = req.query;
+   
+//     console.log(name,email,phoneNumber,message, req.params.api);
+    
+//     res.redirect("/leads");
+//   } catch (err) {
+//     console.log("Error in /user/manual/lead :- ", err);
+//   }
+// });
 
 //todo -- fetch lead from Fb when you have tocken and Subscription
 app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {

@@ -44,78 +44,104 @@
 </head>
 <style>
     #integration-tab {
-    width: 50%;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    font-family: Arial, sans-serif;
-    text-align: center;
-}
-
-#integration-tab button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin: 10px 0;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#integration-tab button:disabled {
-    background-color: #bfbfbf;
-    cursor: not-allowed;
-}
-
-#integration-tab button:hover:not(:disabled) {
-    background-color: #45a049;
-}
-
-#apiKeyDisplay {
-    font-weight: bold;
-    color: #333;
-}
-
-#generatedUrl {
-    width: 80%;
-    padding: 10px;
-    margin-top: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-#generatedUrl:focus {
-    outline: none;
-    border-color: #4CAF50;
-}
-
-#integration-tab input[readonly] {
-    background-color: #f1f1f1;
-}
-
-p {
-    margin: 15px 0;
-    font-size: 16px;
-    color: #555;
-}
-
-@media (max-width: 768px) {
-    #integration-tab {
-        width: 80%;
-        padding: 15px;
-    }
-
-    #generatedUrl {
         width: 100%;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 10px;
+        font-family: Arial, sans-serif;
+        text-align: center;
     }
-}
 
+    #integration-tab button {
+        background-color: #007bff;
+        /* Blue button */
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        margin: 15px 0;
+        font-size: 18px;
+        border-radius: 5px;
+        border: 1px solid #007bff;
+        cursor: pointer;
+
+    }
+
+    #integration-tab button:disabled {
+        background-color: #bfbfbf;
+        cursor: not-allowed;
+    }
+
+    #integration-tab button:hover:not(:disabled) {
+        background-color: #ffffff;
+
+        color: #007bff;
+        border: 1px solid #ddd;
+        border-color: #007bff;
+
+    }
+
+    #apiKeyDisplay {
+        font-weight: bold;
+        color: #333;
+        display: inline-block;
+        word-break: break-word;
+        /* Ensures long words break */
+        max-width: 100%;
+        /* Keeps within container */
+    }
+
+    /* Input Field Styling */
+    #generatedUrl {
+        width: 90%;
+        padding: 12px;
+        margin-top: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        background-color: #f1f1f1;
+    }
+
+    #generatedUrl:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    #integration-tab input[readonly] {
+        background-color: #f1f1f1;
+    }
+
+    p {
+        margin: 15px 0;
+        font-size: 18px;
+        color: #555;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        #integration-tab {
+            width: 80%;
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 454px) {
+        #integration-tab {
+            width: 95%;
+            padding: 15px;
+        }
+
+        #generatedUrl {
+            width: 100%;
+        }
+
+        button {
+            font-size: 16px;
+        }
+    }
 </style>
+
 <body>
     {{!-- {{> nav}} --}}
 
@@ -138,16 +164,17 @@ p {
                     <div class="container min-vh-100">
                         <div id="integration-tab">
                             <button id="generateKeyBtn">Generate API Key</button>
+                            <button id="refreshBtn" style="display:none;">Refresh</button>
                             <p>Your API Key: <span id="apiKeyDisplay">
-                                {{#if user.apiKey}}
-                                {{user.apiKey}}
-                                {{else}}
-                                Not Generated
-                                {{/if}}
+                                    {{#if user.apiKey}}
+                                    {{user.apiKey}}
+                                    {{else}}
+                                    Not Generated
+                                    {{/if}}
                                 </span></p>
 
-                            
-                            <p>Generated URL: <input type="text" value="**************" id="generatedUrl" readonly></p>
+
+                            <p>Generated URL: <input type="text" value="http://example.com/api/your-api-key?name={name}&phone={phone}&email={email}&message={message}" id="generatedUrl" readonly></p>
                             <button onclick="copyToClipboard('{{user.apiKey}}')">Copy URL</button>
                         </div>
                     </div>
@@ -157,33 +184,50 @@ p {
 
         </div>
     </div>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-<script>
-const apiKeyDisplay = document.getElementById('apiKeyDisplay');
-const generateKeyBtn = document.getElementById('generateKeyBtn');
-const generateUrlBtn = document.getElementById('generateUrlBtn');
-const generatedUrlInput = document.getElementById('generatedUrl');
+    <script>
+        const apiKeyDisplay = document.getElementById('apiKeyDisplay');
+        const generateKeyBtn = document.getElementById('generateKeyBtn');
+        const generatedUrlInput = document.getElementById('generatedUrl');
+        const refreshBtn = document.getElementById('refreshBtn');
+        let apiKeyGenerated = false;
 
-generateKeyBtn.addEventListener('click', async () => {
-    try {
-        const response = await axios.get('/user/generate-key');
-        const data = response.data;
-        apiKeyDisplay.textContent = data.apiKey;
-        generateUrlBtn.disabled = false;
-    } catch (error) {
-        alert('Error generating API key');
-    }
-});
+        async function generateKeyAndUrl() {
+            if (apiKeyGenerated) {
+                alert('API Key already generated!');
+                return;
+            }
+            try {
+                const response = await axios.get('/user/generate-key');
+                const data = response.data;
 
-function copyToClipboard(api=null) {
-    if(!api) return 
-    generatedUrlInput.value = `http://localhost:8000/${api}`;
-    generatedUrlInput.select();
-    document.execCommand('copy');
-    alert('URL copied to clipboard!');
-}
-</script>
+                apiKeyDisplay.textContent = data.apiKey;
+                generatedUrlInput.value =
+                    `http://localhost:8000/api/${data.apiKey}?name={name}&phoneNumber={phoneNumber}&email={email}&message={message}`;
+
+                apiKeyGenerated = true;
+                refreshBtn.style.display = 'inline'; // Show refresh button
+            } catch (error) {
+                alert('Error generating API key');
+            }
+        }
+
+        function refreshKeyAndUrl() {
+            apiKeyGenerated = false;
+            apiKeyDisplay.textContent = 'Not Generated';
+            generatedUrlInput.value = 'http://example.com/api/your-api-key?name={name}&phone={phone}&email={email}&message={message}';
+        }
+
+        function copyToClipboard() {
+            generatedUrlInput.select();
+            document.execCommand('copy');
+            alert('URL copied to clipboard!');
+        }
+
+        generateKeyBtn.addEventListener('click', generateKeyAndUrl);
+        refreshBtn.addEventListener('click', refreshKeyAndUrl);
+    </script>
 
 </body>
 
