@@ -64,7 +64,7 @@ body {
 }
 
 .form-group div {
-    width: 48%;
+   /* width: 48%; */
     margin-bottom: 10px;
 }
 
@@ -106,7 +106,7 @@ input:valid {
 
 @media (max-width: 600px) {
     .form-group div {
-        width: 100%;
+          /* width: 100%; */
 
     }
 

@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/css/intlTelInput.css">
     <link rel="stylesheet" type="text/css" href="./assets/css/leads.css">
     <link rel="stylesheet" type="text/css" href="/styles/loader.css">
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -50,38 +51,39 @@
                 {{> NameHead}}
                 <div class="container-fluid bg-white shadow-sm m-b-20">
                     <div class="row  flex-row justify-content-start px-3 col-11">
-                    {{#if successMSG}}
-                    <div class="col-sm-12">
-                        <div id="alert-success" class="alert alert-success alert-dismissible fade show" role="alert">
-                            <span class="badge badge-pill badge-success">Success</span> {{successMSG}}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                        {{#if successMSG}}
+                        <div class="col-sm-12">
+                            <div id="alert-success" class="alert alert-success alert-dismissible fade show"
+                                role="alert">
+                                <span class="badge badge-pill badge-success">Success</span> {{successMSG}}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    {{/if}}
+                        {{/if}}
 
-                    {{#if errorMSG}}
-                    <div class="col-sm-12">
-                        <div id="alert-error" class="alert  alert-danger alert-dismissible fade show" role="alert">
-                            <span class="badge badge-pill badge-danger">Alert</span> {{errorMSG}}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                        {{#if errorMSG}}
+                        <div class="col-sm-12">
+                            <div id="alert-error" class="alert  alert-danger alert-dismissible fade show" role="alert">
+                                <span class="badge badge-pill badge-danger">Alert</span> {{errorMSG}}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    {{/if}}
+                        {{/if}}
 
-                    {{#if warnMSG}}
-                    <div class="col-sm-12">
-                        <div id="alert-warn" class="alert  alert-warning alert-dismissible fade show" role="alert">
-                            <span class="badge badge-pill bg-warning text-dark">Warning</span> {{warnMSG}}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                        {{#if warnMSG}}
+                        <div class="col-sm-12">
+                            <div id="alert-warn" class="alert  alert-warning alert-dismissible fade show" role="alert">
+                                <span class="badge badge-pill bg-warning text-dark">Warning</span> {{warnMSG}}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    {{/if}}
+                        {{/if}}
                     </div>
 
                     <div class="row flex-row justify-content-start px-3">
@@ -139,68 +141,72 @@
                                 <form action="/manual/lead" method="post" id="customerForm" novalidate>
                                     <div class="form-group">
                                         <!-- Customer Name -->
-                                        <div>
+                                        <div style="width: 48%;">
                                             <label for="customerName">Customer Name</label>
                                             <input type="text" placeholder="Customer Name" id="customerName"
                                                 name="customerName" required>
-                                        </div>
-
-                                        <!-- Mobile -->
+                                        </div>  
                                         <div>
+                                            <label for="countycode">Country code</label>
+                                            
+                                            <input placeholder="Select Country" id="mobile_code" name="mobile" pattern="^\d{10,15}$" title="Please enter a valid phone number (10-15 digits)" required style=" pointer-events: none;" required>
+                                        </div>
+                                        <!-- Mobile -->
+                                        <div style="width: 48%;">
                                             <label for="mobile">Mobile Number</label>
                                             <input type="tel" id="mobile" placeholder="Mobile Number" name="mobile"
                                                 pattern="[0-9]{10}" maxlength="10" required>
                                         </div>
 
                                         <!-- Email -->
-                                        <div>
+                                        <div style="width: 48%;">
                                             <label for="email">Email</label>
                                             <input type="email" placeholder="Email" id="email" name="email">
                                         </div>
 
                                         <!-- City (Optional) -->
-                                        <div>
+                                        <div style="width: 48%;">
                                             <label for="city">City (Optional)</label>
                                             <input type="text" minlength="3" placeholder="city" id="City" name="city">
                                         </div>
 
                                         <!-- State (Optional) -->
-                                        <div>
+                                        <div style="width: 48%;">
                                             <label for="state">State (Optional)</label>
                                             <input type="text" placeholder="State" id="state" minlength="3"
                                                 name="state">
                                         </div>
 
                                         <!-- Alternate Number 1 -->
-                                        <div>
+                                        <div style="width: 48%;">
                                             <label for="alternate1">Alternate Number 1</label>
                                             <input type="tel" id="alternate1" placeholder="Mobile Number"
                                                 name="alternateMobile1" pattern="[0-9]{10}" maxlength="10">
                                         </div>
 
                                         <!-- Alternate Number 2 (Optional) -->
-                                        <div>
+                                        <div style="width: 48%;">
                                             <label for="alternate2">Alternate Number 2 (Optional)</label>
                                             <input type="tel" id="alternate2" placeholder="Mobile Number"
                                                 name="alternateMobile2" pattern="[0-9]{10}" maxlength="10">
                                         </div>
 
                                         <!-- Remark (DateTime) -->
-                                        <div>
+                                        <div style="width: 48%;">
                                             <label for="remark">Remark Text</label>
                                             <textarea placeholder="Remark Text" id="remark" name="remark"
                                                 required></textarea>
                                         </div>
 
                                         <!-- Next Followup (DateTime) -->
-                                        <div>
+                                        <div style="width: 48%;">
                                             <label for="nextFollowup">Next Followup (Date and Time)</label>
                                             <input type="datetime-local" placeholder="Next Followup" id="nextFollowup"
                                                 name="remarkTime" required>
                                         </div>
 
                                         <!-- Product/Service (Optional) -->
-                                        <div>
+                                        <div style="width: 48%;">
                                             <label for="productService">Product/Service (Optional)</label>
                                             <input type="text" id="productService" placeholder="Product/Service"
                                                 name="productService">
@@ -250,8 +256,7 @@
                                         </div>
 
                                         <!-- Centered Customer Info -->
-                                        <div class="customer-info"
-                                           >
+                                        <div class="customer-info">
                                             <div style="font-size: 18px; "> <strong>{{customerName}}</strong></div>
                                             <div style="font-size: 18px; "><strong>{{customerPhoneNumber}}</strong>
                                             </div>
@@ -483,9 +488,9 @@
 
 
                                 <div class="customer-info"
-                                    style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;    margin-top: 4rem; ">
+                                   >
                                     <div style="font-size: 18px; "> <strong>{{findAnswer ./leads_data}}</strong></div>
-                                    <div style="font-size: 18px; "> {{#each leads_data}}
+                                    <div > {{#each leads_data}}
                                         {{#if (containsPhoneNumber ans)}}
                                         <strong>{{ans}}</strong>
                                         {{/if}}
@@ -1106,6 +1111,18 @@
             }
         }
 
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/intlTelInput.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#mobile_code").intlTelInput({
+                initialCountry: "in",
+                separateDialCode: true,
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"
+            });
+        });
     </script>
 </body>
 
