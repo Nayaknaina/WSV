@@ -162,7 +162,6 @@ p {
 <script>
 const apiKeyDisplay = document.getElementById('apiKeyDisplay');
 const generateKeyBtn = document.getElementById('generateKeyBtn');
-const generateUrlBtn = document.getElementById('generateUrlBtn');
 const generatedUrlInput = document.getElementById('generatedUrl');
 
 generateKeyBtn.addEventListener('click', async () => {
@@ -170,7 +169,6 @@ generateKeyBtn.addEventListener('click', async () => {
         const response = await axios.get('/user/generate-key');
         const data = response.data;
         apiKeyDisplay.textContent = data.apiKey;
-        generateUrlBtn.disabled = false;
     } catch (error) {
         alert('Error generating API key');
     }

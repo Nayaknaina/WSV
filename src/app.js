@@ -1061,6 +1061,7 @@ app.get(
       user.role = "admin";
       user.signupDate = new Date();//added
       await user.save();
+      req.session.showForm = true;
     }
     if (!(user.myPipelines.length >= 4)) {
       const pipelines = [
@@ -1214,7 +1215,7 @@ app.get(
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
-    
+  
     res.redirect("/user/dashboard");
   }
 );

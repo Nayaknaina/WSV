@@ -108,17 +108,37 @@ router.get("/website-integration", isAdminLoggedIn, async (req, res) => {
   if (req.user.role === "admin")
     user = await logIncollection.findById(req.user.id);
   else user = await memberModel.findById(req.user.id);
-
+  console.log(user.apiKey);
+  
   res.render("WEBIntegration", { user });
 });
+
+router.get('/api/del', isAdminLoggedIn, async(req,res)=>{
+  try {
+    let user = await logIncollection.findById(req.user.id)
+    if (!user) return 
+    user.apiKey = '';
+    await user.save()
+    console.warn(user.apiKey);
+    
+    res.redirect('/user/website-integration');
+  } catch (err) {
+    console.log(err);
+    
+  }
+})
+
 router.get('/generate-key', isAdminLoggedIn, async (req, res) => {
   try {
-    console.log("enter");
+    console.log("enter in /user/genrate-key");
 
     const user = await logIncollection.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }  
+    if (user.apiKey) {
+      return res.status(404).json({ error: 'Api Exist' });
+    }
 
     const newApiKey = crypto.randomBytes(16).toString('hex');
     console.warn(newApiKey);
@@ -134,36 +154,6 @@ router.get('/generate-key', isAdminLoggedIn, async (req, res) => {
   }
 });
 
-
-router.get('/generate-url', isAdminLoggedIn, async (req, res) => {
-  try {
-    const user = await logIncollection.findById(req.user.id);
-    if (!user || !user.apiKey) {
-      return res.status(404).json({ error: 'User or API key not found' });
-    }
-    const baseUrl = 'https://360followups.com/api';
-    const exampleUrl = `${baseUrl}?apiKey=${user.apiKey}&name={name}&email={email}&phone={phone}&message={message}`;
-
-    res.json({ url: exampleUrl });
-  } catch (error) {
-    console.error('Error generating URL:', error);
-    res.status(500).json({ error: 'Error generating URL' });
-  }
-});
-
-
-router.post('/copy-url', (req, res) => {
-  try {
-    const { url } = req.body;
-    if (!url) {
-      return res.status(400).json({ error: 'URL not provided' });
-    }
-    res.status(200).json({ message: 'URL copied successfully', url });
-  } catch (error) {
-    console.error('Error copying URL:', error);
-    res.status(500).json({ error: 'Error copying URL' });
-  }
-});
 
 router.post(
   "/profile/image",
@@ -366,6 +356,7 @@ router.post("/signup", async (req, res) => {
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
+    req.session.showForm = false;
     res.status(200).json({ msg: "user signup success !" });
     // res.redirect("/user/dashboard");
   } catch (err) {
@@ -373,6 +364,34 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+router.post('/submit-form', isAdminLoggedIn, async (req,res)=>{
+  try {
+    const {name,email,countryCode,agentCode,whatsappNum,password,cPassword} = req.body;
+    console.log(req.body);
+    
+    const user = await logIncollection.findOne({email})
+    console.log(user);
+    if (!user) {
+      return res.redirect('/login')
+    }
+    
+    if (password != cPassword) {
+      return res.redirect('/login')
+    }
+    user.name = name;
+    user.email = email;
+    user.countryCode = countryCode;
+    user.mobile = whatsappNum;
+    user.password = password;
+    user.agentCode = agentCode;
+
+    await user.save()
+    req.session.showForm = false;
+    res.redirect('/user/dashboard')
+  } catch (err) {
+    console.log('Error in /user/submit-form -', err)
+  }
+})
 
 // ! pipeline are here
 
@@ -531,6 +550,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
       user,
       pipes,
       leads,
+      showForm: req.session.showForm,
       successMSG: msg,
       errorMSG: errMsg,
       warnMSG: warnMsg,

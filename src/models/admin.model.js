@@ -11,6 +11,9 @@ const logInSchema = new mongoose.Schema({
   cid: {
     type: String,
   },
+  agentCode: {
+    type: String,
+  },
   facebookToken: {
     type: String,
   },
@@ -137,12 +140,6 @@ logInSchema.pre("save", function (next) {
   }
   next();
 
-  if (!this.apiKey) {
-    const crypto = require("crypto");
-    this.apiKey = crypto.randomBytes(16).toString("hex");
-  }
-
-  next();
 });
 
 // Define the model
