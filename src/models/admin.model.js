@@ -11,6 +11,9 @@ const logInSchema = new mongoose.Schema({
   cid: {
     type: String,
   },
+  agentCode: {
+    type: String,
+  },
   facebookToken: {
     type: String,
   },
@@ -137,7 +140,6 @@ logInSchema.pre("save", function (next) {
   }
   next();
 
-  
 });
 
 // Define the model
