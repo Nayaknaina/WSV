@@ -4,6 +4,7 @@
 <link rel="preload stylesheet"
   href="https://d1z8p0imlkk5pt.cloudfront.net/static/fontawesome/css/all.min.9f39b1d134b7.css" as="style"
   onload="this.rel='stylesheet'">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/css/intlTelInput.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -152,14 +153,18 @@
   }
 
   .input-field input {
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 15px 19px;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #475F7B;
     background: none;
     outline: none;
     border: none;
-    line-height: 1;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #333;
   }
+
 
   .input-field input::placeholder {
     color: #aaa;
@@ -487,35 +492,49 @@
 
 <body>
 
-  <div id="loadBox" class="load w-screen h-screen absolute top-0 left-0 z-50 " style="background-color: #f8f8f883; display: none;">
-    <div class="img w-[200px] absolute top-2/4 left-2/4  " style="transform: translate(-50%, -50%); border-radius: 50%;">
+  <div id="loadBox" class="load w-screen h-screen absolute top-0 left-0 z-50 "
+    style="background-color: #f8f8f883; display: none;">
+    <div class="img w-[200px] absolute top-2/4 left-2/4  "
+      style="transform: translate(-50%, -50%); border-radius: 50%;">
       <img src="/images/loading.gif" style="background: transparent; border-radius: 50px;" alt="">
     </div>
   </div>
 
-  <div id="otpFillFormBox" style="background-color: #5d5d5d85; display: none;" class=" absolute w-screen h-screen top-0 left-0 z-50">
-    <div style="transform: translate(-50%, -50%); box-shadow: 1px 1px 20px rgb(80, 80, 80); " class="bg-white shadow-lg absolute top-2/4 left-2/4 rounded-lg px-4 py-8 max-w-xs md:max-w-md w-full">
-        <h2 class="text-xl md:text-2xl font-bold text-center text-gray-800 mb-6">Verify Your OTP</h2>
-        <p class="text-center text-gray-600 mb-4">Enter the 6-digit OTP sent to your email.</p>
-        <form id="otpForm">
-            <div class="flex space-x-2 justify-center mb-6">
-                <input type="text" maxlength="1" class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                <input type="text" maxlength="1" class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                <input type="text" maxlength="1" class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                <input type="text" maxlength="1" class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                <input type="text" maxlength="1" class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                <input type="text" maxlength="1" class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
-            </div>
-            <button type="button" onclick="matchVerifyOtp()" class="w-full bg-purple-500 text-white py-2 md:py-3 rounded-lg font-semibold hover:bg-purple-600 transition duration-200">Verify OTP</button>
-        </form>
-        <p class="text-center text-gray-600 mt-6">
-            Didn’t receive the code? <a href="#" class="text-purple-500 hover:underline">Resend OTP</a>
-        </p>
+  <div id="otpFillFormBox" style="background-color: #5d5d5d85; display: none;"
+    class=" absolute w-screen h-screen top-0 left-0 z-50">
+    <div style="transform: translate(-50%, -50%); box-shadow: 1px 1px 20px rgb(80, 80, 80); "
+      class="bg-white shadow-lg absolute top-2/4 left-2/4 rounded-lg px-4 py-8 max-w-xs md:max-w-md w-full">
+      <h2 class="text-xl md:text-2xl font-bold text-center text-gray-800 mb-6">Verify Your OTP</h2>
+      <p class="text-center text-gray-600 mb-4">Enter the 6-digit OTP sent to your email.</p>
+      <form id="otpForm">
+        <div class="flex space-x-2 justify-center mb-6">
+          <input type="text" maxlength="1"
+            class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
+          <input type="text" maxlength="1"
+            class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
+          <input type="text" maxlength="1"
+            class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
+          <input type="text" maxlength="1"
+            class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
+          <input type="text" maxlength="1"
+            class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
+          <input type="text" maxlength="1"
+            class="otp-input w-10 h-10 md:w-12 md:h-12 border border-gray-300 rounded-lg text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
+        </div>
+        <button type="button" onclick="matchVerifyOtp()"
+          class="w-full bg-purple-500 text-white py-2 md:py-3 rounded-lg font-semibold hover:bg-purple-600 transition duration-200">Verify
+          OTP</button>
+      </form>
+      <p class="text-center text-gray-600 mt-6">
+        Didn’t receive the code? <a href="#" class="text-purple-500 hover:underline">Resend OTP</a>
+      </p>
     </div>
   </div>
   <div class="container">
     <div class="forms-container">
       <div class="signin-signup">
+
+
 
         <form action="/user/login" method="post" class="sign-in-form">
           <h2 class="title">Sign in</h2>
@@ -523,6 +542,7 @@
             <i class="fas fa-user"></i>
             <input type="email" name="email" placeholder="Email" required />
           </div>
+
           <div class="input-field">
             <i class="fas fa-lock"></i>
 
@@ -539,13 +559,13 @@
             </a>--}}
             <a href="/auth/google" class="social-icon"><i class="fa-brands fa-google"></i>
               </i>
-               Login with Google
+              Login with Google
             </a>
             <a href="/member/login" class="social-icon">
               <i class="fa fa-plus" aria-hidden="true"></i>
               Already a TeamMember ?
             </a>
-            
+
             {{!-- <a href="#" class="social-icon">
               <i class="fab fa-linkedin-in"></i>
             </a> --}}
@@ -562,8 +582,14 @@
           </div>
           <div class="input-field">
             <i class="fas fa-envelope"></i>
-            <input placeholder="Email"  name="email"  id="emailInp" type="email" required>
+            <input placeholder="Email" name="email" id="emailInp" type="email" required>
           </div>
+          <div class="input-field">
+            <i class="fas fa-phone"></i>
+            <input placeholder="Phone Number" id="mobile_code" type="tel" name="mobile" pattern="^\d{10,15}$"
+              title="Please enter a valid phone number (10-15 digits)" required>
+          </div>
+
           <div class="input-field">
             <i class="fas fa-lock"></i>
             <input for="psw" id="psw" placeholder=" Password" name="password" type="password"
@@ -580,8 +606,7 @@
               required>
             <span class="password-toggle"> <i class="fas fa-eye"></i></span>
           </div>
-
-          <div id="message">
+           <div id="message">
             <h5>Password must contain the following:</h5>
             <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
             <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
@@ -589,9 +614,21 @@
             <p id="number" class="invalid">A <b>number</b></p>
             <p id="length" class="invalid">Minimum <b>8 characters</b></p>
           </div>
+
+          <div  style="align-items: center;">
+            <label>
+              <input type="checkbox" id="agentCheckbox" onclick="toggleAgentCodeInput()"> Do you have an agent code?
+            </label>
+            <div class="input-field" id="agentCodeInput" style="display: none; margin-left: 15px;">
+              <input placeholder="Enter Agent Code" id="agentCode" name="agentCode" type="text">
+            </div>
+          </div>
+
+
           <div class="row">
-            <input type="button" id="emailVerifyBtn" onclick="verifyEmail()" class="btn"  value="Verifiy email" />
-            <input type="button" id="signupSubmitBtn" onclick="submitSignupForm()"  class="btn" style="background-color: #696969; cursor: not-allowed;" disabled value="Submit" />
+            <input type="button" id="emailVerifyBtn" onclick="verifyEmail()" class="btn" value="Verifiy email" />
+            <input type="button" id="signupSubmitBtn" onclick="submitSignupForm()" class="btn"
+              style="background-color: #696969; cursor: not-allowed;" disabled value="Submit" />
           </div>
 
 
@@ -645,14 +682,15 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    {{#if errorMessage }}
+  {{#if errorMessage }}
   <script>
     toastr.error("{{errorMessage}}");
   </script>
-    {{/if }}
+  {{/if }}
   <script>
     const sign_in_btn = document.querySelector("#sign-in-btn");
     const sign_up_btn = document.querySelector("#sign-up-btn");
@@ -766,45 +804,45 @@
 
     // Sabhi input fields par ek event listener laga rahe hain
     otpInputs.forEach((input, index) => {
-        input.addEventListener('input', (e) => {
-            // Agr user ne koi value enter ki hai to agle input pe focus ho jaye
-            if (input.value.length === 1 && index < otpInputs.length - 1) {
-                otpInputs[index + 1].focus();
-            }
-        });
+      input.addEventListener('input', (e) => {
+        // Agr user ne koi value enter ki hai to agle input pe focus ho jaye
+        if (input.value.length === 1 && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+      });
 
-        // Agr user backspace press karta hai to pichle input pe wapas jaye
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && input.value === '' && index > 0) {
-                otpInputs[index - 1].focus();
-            }
-        });
+      // Agr user backspace press karta hai to pichle input pe wapas jaye
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && input.value === '' && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
     });
-</script>
+  </script>
 
   <script>
-      let loadBox = document.querySelector('#loadBox')
-      let otpForm = document.querySelector('#otpFillFormBox')
-      let submitBtn = document.querySelector('#signupSubmitBtn')
-      let emailVerifyBtn = document.querySelector('#emailVerifyBtn')
-      let emailInp = document.querySelector('#emailInp')
-    function verifyBtnDisplay(){
+    let loadBox = document.querySelector('#loadBox')
+    let otpForm = document.querySelector('#otpFillFormBox')
+    let submitBtn = document.querySelector('#signupSubmitBtn')
+    let emailVerifyBtn = document.querySelector('#emailVerifyBtn')
+    let emailInp = document.querySelector('#emailInp')
+    function verifyBtnDisplay() {
       document.querySelector('#emailVerifyBtn').style.display = 'initial'
     }
 
     async function verifyEmail() {
 
-    const emailInput = document.getElementById('emailInp');
-    const email = emailInput.value.trim();
+      const emailInput = document.getElementById('emailInp');
+      const email = emailInput.value.trim();
 
-    // Client-side validation
-    if (!validateEmail(email)) {
+      // Client-side validation
+      if (!validateEmail(email)) {
         let textContent = 'Please enter a valid email address.';
         toastr.error(textContent);
         return
-    }
+      }
 
-    try {
+      try {
         // Send request to the server for email verification
         loadBox.style.display = 'block'
         const response = await axios.post('/api/verify', { email });
@@ -814,110 +852,129 @@
           toastr.success(textContent)
           otpForm.style.display = 'block'
         } else {
-            let textContent = response.data.msg;
-            toastr.error(textContent);
-            loadBox.style.display = 'none'
+          let textContent = response.data.msg;
+          toastr.error(textContent);
+          loadBox.style.display = 'none'
         }
-    } catch (error) {
+      } catch (error) {
         console.error('Error verifying email:', error);
         let textContent = 'An error occurred while verifying the email. Please try again later.';
-            toastr.error(textContent);
-            loadBox.style.display = 'none'
-    }
-};
+        toastr.error(textContent);
+        loadBox.style.display = 'none'
+      }
+    };
 
     async function submitSignupForm() {
       const form = document.querySelector('#signUpForm')
-    const name = document.querySelector('#signUpForm #signName').value
-    const emailInp = document.querySelector('#signUpForm #emailInp').value
-    const pass = document.querySelector('#signUpForm #psw').value
-    const conPass = document.querySelector('#signUpForm #signConPassword').value
-    const email = emailInp.trim();
-    
-    let formData = {
-      name,
-      email,
-      password: pass,
-      confirmPassword: conPass
+      const name = document.querySelector('#signUpForm #signName').value
+      const emailInp = document.querySelector('#signUpForm #emailInp').value
+      const pass = document.querySelector('#signUpForm #psw').value
+      const conPass = document.querySelector('#signUpForm #signConPassword').value
+      const email = emailInp.trim();
+
+      let formData = {
+        name,
+        email,
+        password: pass,
+        confirmPassword: conPass
+      }
+      console.log(formData)
+      try {
+        let res = await axios.post("/user/signup", formData);
+        if (res.status === 200) {
+          form.reset()
+          toastr.success(res.data.msg);
+          setTimeout(() => {
+            window.location.href = "/user/dashboard";
+          }, 3000);
+        }
+
+      } catch (err) {
+
+      }
+
+
+
+    };
+
+
+    // send req to server for otp verfication
+    async function matchVerifyOtp() {
+      const inputs = document.querySelectorAll('.otp-input');
+
+      let otp = '';
+      inputs.forEach(input => {
+        otp += input.value;
+      });
+      if (otp.length !== 6) {
+        toastr.error('invailid otp')
+        return
+      }
+      loadBox.style.zIndex = '999999'
+      try {
+        let res = await axios.post("/api/otp/verify", { reqOtp: otp });
+        console.log(res);
+
+        if (res.status === 200) {
+          let textContent = res.data.msg;
+          toastr.success(textContent);
+          loadBox.style.display = 'none';
+          otpForm.style.display = 'none';
+          emailVerifyBtn.style.display = 'none';
+          submitBtn.style.cursor = 'pointer';
+          submitBtn.style.backgroundColor = '#5995fd';
+          submitBtn.disabled = false;
+          console.log(emailInp.value)
+          emailInp.disabled = true;
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          let textContent = error.response.data.msg;
+          toastr.error(textContent);
+          console.log("loadbox hata do");
+          loadBox.style.display = 'none';
+          otpForm.style.display = 'none';
+        } else if (error.response && error.response.status === 400) {
+          let textContent = error.response.data.msg;
+          toastr.error(textContent || 'Invalid OTP!');
+          loadBox.style.display = 'none';
+          otpForm.style.display = 'block'; // You can decide whether to show the form again
+        } else {
+          toastr.error('Ooops!, Something went wrong!');
+          loadBox.style.display = 'none';
+          otpForm.style.display = 'none';
+        }
+      }
     }
-    console.log(formData)
-    try{
-     let res = await axios.post("/user/signup", formData);
-     if (res.status === 200) {
-      form.reset()
-    toastr.success(res.data.msg);
-    setTimeout(() => {
-      window.location.href = "/user/dashboard";
-    }, 3000);
-  }
-
-    }catch(err) {
-
+    // Email validation function
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic regex for email validation
+      return re.test(String(email).toLowerCase());
     }
-
-
-    
-};
-
-
-// send req to server for otp verfication
-async function matchVerifyOtp(){
-  const inputs = document.querySelectorAll('.otp-input');
-
-  let otp = '';
-    inputs.forEach(input => {
-      otp += input.value;
-    });
-if (otp.length !== 6) {
-  toastr.error('invailid otp')
-  return
-}
-loadBox.style.zIndex = '999999'
-  try {
-  let res = await axios.post("/api/otp/verify", { reqOtp: otp });
-  console.log(res);
-
-  if (res.status === 200) {
-    let textContent = res.data.msg;
-    toastr.success(textContent);
-    loadBox.style.display = 'none';
-    otpForm.style.display = 'none';
-    emailVerifyBtn.style.display = 'none';
-    submitBtn.style.cursor = 'pointer';
-    submitBtn.style.backgroundColor = '#5995fd';
-    submitBtn.disabled = false;
-    console.log(emailInp.value)
-    emailInp.disabled = true;
-  }
-} catch (error) {
-  if (error.response && error.response.status === 403) {
-    let textContent = error.response.data.msg;
-    toastr.error(textContent);
-    console.log("loadbox hata do");
-    loadBox.style.display = 'none';
-    otpForm.style.display = 'none';
-  } else if (error.response && error.response.status === 400) {
-    let textContent = error.response.data.msg;
-    toastr.error(textContent || 'Invalid OTP!');
-    loadBox.style.display = 'none';
-    otpForm.style.display = 'block'; // You can decide whether to show the form again
-  } else {
-    toastr.error('Ooops!, Something went wrong!');
-    loadBox.style.display = 'none';
-    otpForm.style.display = 'none';
-  }
-}
-}
-// Email validation function
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic regex for email validation
-    return re.test(String(email).toLowerCase());
-}
 
 
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/intlTelInput.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"></script>
+  <script>
+    $(document).ready(function () {
+      $("#mobile_code").intlTelInput({
+        initialCountry: "in",
+        separateDialCode: true,
+        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"
+      });
+    });
+  </script>
+ 
+  <script>
+    function toggleAgentCodeInput() {
+      const agentCodeInput = document.getElementById('agentCodeInput');
+      const agentCheckbox = document.getElementById('agentCheckbox');
+      agentCodeInput.style.display = agentCheckbox.checked ? 'block' : 'none';
+    }
 
+  </script>
 </body>
 
 </html>

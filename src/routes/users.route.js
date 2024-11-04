@@ -141,21 +141,36 @@ router.get('/generate-key', isAdminLoggedIn, async (req, res) => {
     }
 
     const newApiKey = crypto.randomBytes(16).toString('hex');
-    console.warn(newApiKey);
+    console.warn(newApiKey,"this is key updated");
     
     user.apiKey = newApiKey;
     await user.save();
-    console.log(newApiKey,"jeweufnwu");
 
     res.status(200).json({ apiKey: newApiKey });
-  } catch (error) {
+  } catch (error) { 
     console.error('Error generating API key:', error);
     res.status(500).json({ error: 'Error generating API key' });
   }
 });
 
+router.get('/api/del', isAdminLoggedIn, async(req,res)=>{
+  try {
+    let user = await logIncollection.findById(req.user.id)
+    if (!user) return 
+    user.apiKey = '';
+    await user.save()
+    console.warn(user.apiKey);
+    
+    res.redirect('/user/website-integration');
+  } catch (err) {
+    console.log(err);
+    
+  }
+})
 
 router.post(
+
+
   "/profile/image",
   isAdminLoggedIn,
   uploadProfile.single("userImage"),
@@ -213,6 +228,7 @@ router.post("/signup", async (req, res) => {
       name,
       email,
       password,
+      mobile,
       cid,
       role: "admin",
     });
