@@ -607,10 +607,15 @@
                         class="fas fa-eye" style="margin: 0;"></i></span>
             </div>
 
+            <div class="check" style="margin-top: 6px; display: flex; justify-content: start; align-items: center; height: 25px; width: 100%;">
+                <input type="checkbox" onclick="toggleAgentCodeInput()" style="font-size: 20px; width: 16px; height: 16px; margin-right: 10px;" id="isAC">
+            <label for="isAC" style="margin: 0;"> Do you have an agent code?</label>
+            </div>
 
-
-            <label class="label-For-1st-Form" for="AC">Agent Code</label>
-            <input class="fst-form-inp" type="text" id="AC" placeholder="Agent Code..." name="agentCode" required>
+            <div class="AC" style="display: none;">
+                <label class="label-For-1st-Form" for="AC">Agent Code</label>
+            <input class="fst-form-inp" type="text" id="AC" placeholder="Agent Code..." name="agentCode">
+            </div>
 
 
             <button type="button" onclick="SubmitFirstForm()">Submit</button>
@@ -2179,6 +2184,13 @@
                 }
             });
         });
+
+        function toggleAgentCodeInput(){
+            console.log('checked')
+            let AC = document.querySelector('.AC')
+            let isCheck = document.querySelector('#isAC')
+            AC.style.display = isCheck.checked ? 'block' : 'none';
+        }
 
     </script>
 

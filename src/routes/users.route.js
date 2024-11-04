@@ -169,8 +169,6 @@ router.get('/api/del', isAdminLoggedIn, async(req,res)=>{
 })
 
 router.post(
-
-
   "/profile/image",
   isAdminLoggedIn,
   uploadProfile.single("userImage"),
@@ -399,9 +397,12 @@ router.post('/submit-form', isAdminLoggedIn, async (req,res)=>{
     user.countryCode = countryCode;
     user.mobile = whatsappNum;
     user.password = password;
-    user.agentCode = agentCode;
+    
+    user.agentCode = (agentCode !== null || agentCode !== '') ? agentCode : null ;
 
     await user.save()
+    console.log(user);
+    
     req.session.showForm = false;
     res.redirect('/user/dashboard')
   } catch (err) {
