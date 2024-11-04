@@ -1085,6 +1085,7 @@ app.get(
     console.log(req.user);
 
     let user = await logIncollection.findOne({ email: req.user.email });
+    const subscriptionLevel = user.subscriptionLevel;
     if (!user.cid) {
       const cid = uuidv4();
       user.cid = cid;
@@ -1235,7 +1236,7 @@ app.get(
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
     }
     else {// days left success left
-      req.session.successMSG = `Your free plan started. You have ${daysLeft} days remaining.`
+      req.session.successMSG = `Your  ${subscriptionLevel} plan started. You have ${daysLeft} days remaining.`
     }
 
     const token = await generateToken(user);

@@ -197,6 +197,7 @@ router.post("/signup", async (req, res) => {
     console.log(req.body);
 
     const user = await logIncollection.findOne({ email });
+    
 
     if (user)
       return res.render("signup", { errorMessage: "User already exists" });
@@ -559,6 +560,7 @@ router.get("/dashboard", isAdminLoggedIn, async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const user = await logIncollection.findOne({ email: req.body.email });
+    const subscriptionLevel = user.subscriptionLevel;
 
     if (!user || user.password !== req.body.password) {
       return res.render("signup", {
@@ -579,7 +581,7 @@ router.post("/login", async (req, res) => {
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
     }
     else {// days left success left
-      req.session.successMSG = `Your free plan started. You have ${daysLeft} days remaining.`
+      req.session.successMSG = `Your ${subscriptionLevel} plan started. You have ${daysLeft} days remaining.`
     };
     const token = await generateToken(user);
     await user.save()
