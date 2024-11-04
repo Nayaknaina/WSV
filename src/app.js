@@ -1727,7 +1727,7 @@ async function sendMessageToLead(
     console.warn("WhatsApp client is not ready. please connect mobile number");
     return;
   }
-  console.log();
+  console.log("Phone number",phoneNumber);
 
   // Check if WhatsApp client is ready
   if (adminWA && !adminWA.isConnected) {

@@ -39,9 +39,11 @@ router.get("/template", isAdminLoggedIn, async (req, res) => {
 router.post("/api/verify", async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("Email received:", email);
     let user = await logIncollection.findOne({ email });
     if (!user) user = await memberModel.findOne({ email });
 
+    console.log("User lookup result:", user);
     if (user) {
       return res.status(500).json({ msg: "try with another email !" });
     }
@@ -52,7 +54,7 @@ router.post("/api/verify", async (req, res) => {
       upperCaseAlphabets: false,
       specialChars: false,
     });
-
+    console.log("Generated OTP:", otpCode);
     const mailMsg = `
     <div style="font-family: Arial, sans-serif; color: #333;">
       <div style="text-align: center;">
@@ -86,6 +88,7 @@ router.post("/api/verify", async (req, res) => {
     res.json({ msg: "mail sent successfully !" });
   } catch (err) {
     console.log("error in /api/verify :- ", err);
+    res.status(500).json({ msg: "Server error occurred. Please try again later." }); // Add this line to send a response
   }
 });
 

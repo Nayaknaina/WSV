@@ -208,6 +208,7 @@ router.post("/signup", async (req, res) => {
       name,
       email,
       password,
+      mobile,
       cid,
       role: "admin",
     });
