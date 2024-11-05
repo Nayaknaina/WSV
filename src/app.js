@@ -1717,6 +1717,99 @@ function initializeWhatsAppClient() {
 
 initializeWhatsAppClient();
 
+app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
+  try {
+    const user = await logIncollection.findById(req.user.id);
+    if (user.teams.length >= 3 && user.subscriptionLevel === "free") {
+      req.session.errorMSG = `free`;
+      return res.redirect("/user/team");
+    }
+    if (user.teams.length >= 7 && user.subscriptionLevel === "basic") {
+      req.session.errorMSG = `basic`;
+      return res.redirect("/user/team");
+    }
+
+    const { name, email, mobile, countryCode,organizationName } = req.query;
+    // console.log(req.query);
+    
+    let preMem = await memberModel.findOne({ email: email });
+    if (preMem !== null) {
+      req.session.errorMSG = `This email ID is already registered`;
+      return res.redirect("/user/team");
+    }
+    preMem = await logIncollection.findOne({ email: email });
+    if (preMem !== null) {
+      req.session.errorMSG = `This email ID is already registered`;
+      return res.redirect("/user/team");
+    }
+
+    const password = otpGenerator.generate(8, {
+      digits: true,
+      lowerCaseAlphabets: true,
+      upperCaseAlphabets: true,
+      specialChars: false,
+    });
+
+  //   const mailMsg = `
+  //   <div style="font-family: Arial, sans-serif; color: #333;">
+  //     <div style="text-align: center;">
+  //       <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
+  //       <h2>Web Soft Valley</h2>
+  //       <p>Developing Future</p>
+  //     </div>
+  //     <h3>Hello ${name} !</h3>
+  //     <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
+  //     <p>Email: <a href="mailto:${email}">${email}</a></p>
+  //     <p>Password: <strong>${password}</strong></p>
+  //     <div style="text-align: center;">
+  //       <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+  //         Login to Dashboard
+  //       </a>
+  //     </div>
+  //     <p>Regards,<br>Web Soft Valley Technology</p>
+  //   </div>
+  // `;
+    
+    // const subject = Invitation from ${user.name};
+    // const isSent = await sendMail(email, mailMsg, subject);
+    // console.log(isSent);
+
+    const leadContactNo = `${countryCode}${mobile}`;
+    // console.log(name);
+    
+    const text = `Hello ${name} 👋🏻 \n\n Your account has been created successfully by ${organizationName} 🤗. You can log in now and start using our service. 
+    \n Your login credentials are stated below
+    \n Your email: ${email}
+    \n Your password : ${password}
+    \n🔗 https://360followups.com/member/login`;
+
+    let connStatus = await WaModel.findOne({ cid: user.cid });
+
+    const newMember = new memberModel({
+      name,
+      email,
+      password,
+      countryCode,
+      mobile,
+      cid: user.cid,
+      owner_id: user._id,
+    });
+    await newMember.save();
+    user.teams.push(newMember._id);
+    await user.save();
+
+    setTimeout(() => {
+      console.log("/team/invite route");
+      console.log(connStatus, leadContactNo);
+
+      sendMessageToLead(connStatus, leadContactNo, text); // after temp msg sending to lead
+    }, 4000);
+    req.session.successMSG = `you have invited ${name} as a team member !. `;
+  } catch (error) {
+    console.log(error);
+  }
+  return res.redirect("/user/team");
+});
 
 async function sendMessageToLead(
   adminWA,
@@ -1747,25 +1840,25 @@ async function sendMessageToLead(
       const imageMedia = MessageMedia.fromFilePath(imagePath);
       const pdfMedia = MessageMedia.fromFilePath(pdfPath);
 
-      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
+      await client.sendMessage(`${phoneNumber}@c.us`, imageMedia, {
         caption: message,
       });
 
-      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia);
+      await client.sendMessage(`${phoneNumber}@c.us`, pdfMedia);
     } else if ((imagePath && !pdfPath) || pdfPath == "") {
       // send Only a image with text message
       const imageMedia = MessageMedia.fromFilePath(imagePath);
-      await client.sendMessage(`91${phoneNumber}@c.us`, imageMedia, {
+      await client.sendMessage(`${phoneNumber}@c.us`, imageMedia, {
         caption: message,
       });
     } else if ((pdfPath && !imagePath) || imagePath == "") {
       // send Only a pdf with text message
       const pdfMedia = MessageMedia.fromFilePath(pdfPath);
-      await client.sendMessage(`91${phoneNumber}@c.us`, pdfMedia, {
+      await client.sendMessage(`${phoneNumber}@c.us`, pdfMedia, {
         caption: message,
       });
     } else {
-      await client.sendMessage(`91${phoneNumber}@c.us`, message);
+      await client.sendMessage(`${phoneNumber}@c.us`, message);
       console.log("Text message sent successfully!");
     }
   } catch (error) {
