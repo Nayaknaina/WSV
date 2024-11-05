@@ -110,7 +110,7 @@ input:valid {
 
     }
 
-    .form-group {
+    .form-group { 
         overflow: auto;
         max-height: 470px;
     }

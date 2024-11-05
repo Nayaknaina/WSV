@@ -316,7 +316,7 @@
             margin: 0;
         }
 
-       
+
         .fst-pass.wrongpass {
             border-color: #dc3545;
             /* Danger red border */
@@ -362,7 +362,8 @@
             <input class="fst-form-inp" type="text" id="name" value="{{user.name}}" name="name" required>
 
             <label class="label-For-1st-Form" for="email">Registered Email-Id:</label>
-            <input class="fst-form-inp" placeholder="Email" type="email" id="email" value="{{user.email}}" name="email" required>
+            <input class="fst-form-inp" placeholder="Email" type="email" id="email" value="{{user.email}}" name="email"
+                required>
 
             <label class="label-For-1st-Form" for="whatsapp">Enter WhatsApp Number</label>
             <div class="input-mobile">
@@ -600,21 +601,23 @@
             <label class="label-For-1st-Form" for="cPassword">Confirm Passwaord</label>
 
             <div class="input-field fst-pass">
-                <input  style="margin: 0; border: none;" placeholder="Confirm Password" name="cPassword" id="cPassword" type="password"
-                    required>
+                <input style="margin: 0; border: none;" placeholder="Confirm Password" name="cPassword" id="cPassword"
+                    type="password" required>
                 <span class="password-toggle"
                     style="height: 100%; display: flex; justify-content: center; align-items: center;"><i
                         class="fas fa-eye" style="margin: 0;"></i></span>
             </div>
 
-            <div class="check" style="margin-top: 6px; display: flex; justify-content: start; align-items: center; height: 25px; width: 100%;">
-                <input type="checkbox" onclick="toggleAgentCodeInput()" style="font-size: 20px; width: 16px; height: 16px; margin-right: 10px;" id="isAC">
-            <label for="isAC" style="margin: 0;"> Do you have an agent code?</label>
+            <div class="check"
+                style="margin-top: 6px; display: flex; justify-content: start; align-items: center; height: 25px; width: 100%;">
+                <input type="checkbox" onclick="toggleAgentCodeInput()"
+                    style="font-size: 20px; width: 16px; height: 16px; margin-right: 10px;" id="isAC">
+                <label for="isAC" style="margin: 0;"> Do you have an agent code?</label>
             </div>
 
             <div class="AC" style="display: none;">
                 <label class="label-For-1st-Form" for="AC">Agent Code</label>
-            <input class="fst-form-inp" type="text" id="AC" placeholder="Agent Code..." name="agentCode">
+                <input class="fst-form-inp" type="text" id="AC" placeholder="Agent Code..." name="agentCode">
             </div>
 
 
@@ -2113,8 +2116,8 @@
         }
 
     </script>
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
         let countryCodeInp = document.querySelector('#fst-countryCode')
@@ -2154,11 +2157,21 @@
             let password = document.querySelector('#pass')
             let form = document.querySelector('#org-form')
 
+            let isCheck = document.querySelector('#isAC').checked;
+            let agentCodeInput = document.querySelector('#AC');
 
-            if(cPassword.value === password.value){
+            
+            if (isCheck && agentCodeInput.value.trim() === "") {
+                alert("Please enter the agent code.");
+                agentCodeInput.focus();
+                return;
+            }
+
+
+            if (cPassword.value === password.value) {
                 form.submit()
             }
-            else{
+            else {
                 cPassword.parentElement.classList.add('wrongpass')
                 console.log("pass not matched")
             }
@@ -2185,7 +2198,7 @@
             });
         });
 
-        function toggleAgentCodeInput(){
+        function toggleAgentCodeInput() {
             console.log('checked')
             let AC = document.querySelector('.AC')
             let isCheck = document.querySelector('#isAC')
