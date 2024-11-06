@@ -282,12 +282,25 @@
         }
 
         .label-For-1st-Form {
-            text-align: start;
-            margin: 0 0 0 0;
+            /*  text-align: start; 
+     margin: 0 0 0 0; */
+            display: block;
+            text-align: left;
+            color: #1f4a7e;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.9em;
         }
 
         .fst-form-inp {
-            margin: 0 0 10px 0;
+            /*  margin: 0 0 10px 0; */
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #99c2ff;
+            border-radius: 4px;
+            box-sizing: border-box;
+            /*  font-size: 1em; */
         }
 
         .fst-form-select {
@@ -298,12 +311,15 @@
         }
 
         .input-mobile {
-            width: 100%;
-            display: flex;
-            justify-content: start;
-            align-items: center;
-            border: 1px solid gray;
-            border-radius: 6px;
+           width: 100%;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    border: 1px solid gray;
+    border-radius: 6px;
+    /* display: flex; */
+    /* align-items: center;*/
+            
         }
 
         #whatsapp {
@@ -2160,7 +2176,7 @@
             let isCheck = document.querySelector('#isAC').checked;
             let agentCodeInput = document.querySelector('#AC');
 
-            
+
             if (isCheck && agentCodeInput.value.trim() === "") {
                 alert("Please enter the agent code.");
                 agentCodeInput.focus();

@@ -1043,4 +1043,21 @@ router.get("/reset/all/pipes", isAdminLoggedIn, async (req, res) => {
   res.redirect("/template");
 });
 
+router.get('/get/users',async (req,res)=>{
+  try {
+    let allUsers = await logIncollection.find();
+    allUsers.forEach((user) => {
+      console.log("Username:- ",user.name)
+      if (user.facebookToken) {
+        console.log("User FB token :- ", user.facebookToken);
+      }else 
+      console.log("FB token not availiable");
+  })
+  res.redirect('/user/dashboard')
+  } catch (err) {
+    console.log(err);
+    
+  }
+})
+
 module.exports = router;

@@ -2256,7 +2256,7 @@ header .form-inline {
 
 /* Style for the popup form */
 #popup-form {
-  position: fixed;
+  /*position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -2265,7 +2265,21 @@ header .form-inline {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1000;*/
+    width: 100%;
+    height: 100%;   
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    border-radius: 8px;
+    padding: 20px;
+    margin: 0 auto;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+#popup-form h2 {
+  color: #2a7bd1;
+  margin-bottom: 15px;
 }
 
 form {
@@ -2279,11 +2293,30 @@ form {
 }
 
 input, select {
+     /* width: 100%; */
+    /* padding: 10px; */
+    /* margin: 10px 0; */
+    /* border: 1px solid #ccc; */
+    /* border-radius: 4px; */
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #99c2ff;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+#org-form button[type="submit"] {
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
+  padding: 12px;
+  background-color: #2a7bd1;
+  color: #fff;
+  border: none;
   border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .connectionbtn {

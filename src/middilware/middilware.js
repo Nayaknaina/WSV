@@ -426,7 +426,61 @@ function capitalizeText(text) {
   return text.replace(/(^\w{1}|\.\s*\w{1}|\*\w{1})/gm, (char) => char.toUpperCase());
 }
 
+function findMobileNumber(data) {
+  let mobileRegex = /^(\+\d{1,3})?\s?[6-9]\d{9}$/;
+
+  // for (const item of data) {
+  //   const answer = item.ans.trim();
+  //   if (mobileRegex.test(answer)) {
+  //     console.log("Valid Mobile Number found:", answer);
+  //     return answer; // First valid mobile number is returned
+  //   }
+  // }
+let mobile = null;
+  // data.forEach((item) => {
+  //   console.log(item)
+  //     const answer = item.ans.trim();
+  //     console.log(answer);
+      
+  //     if (mobileRegex.test(answer)) {
+  //       console.log("Valid Mobile Number found:", answer);
+  //       mobile = answer
+  //       return mobile;
+  //     }
+  //   })
+
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      console.log(item);
+      
+      const answer = item.ans.trim();
+      console.log(answer);
+      
+      if (mobileRegex.test(answer)) {
+        console.log("Valid Mobile Number found:", answer);
+        mobile = answer;
+        return mobile; // Valid mobile number mil gaya toh loop se exit karne ke liye break use kiya
+      }
+    }
+
+    if (mobile === null) {
+      mobileRegex = /^[6-9]\d{9}$/;
+      data.forEach((item) => {
+        const answer = item.ans.trim();
+  
+        if (mobileRegex.test(answer)) {
+          console.log("Valid Mobile Number without country code found:", answer);
+          mobile = answer
+          return mobile;
+        }
+      })
+    }
+  console.warn("No valid mobile number found.");
+  return null;
+}
+
 module.exports = {
+ 
   isAdminLoggedIn,
   isMemberLoggedIn,
   isMemberBlocked,
@@ -435,4 +489,5 @@ module.exports = {
   chalteRaho,
   checkSubscription,
   capitalizeText,
+  findMobileNumber,
 }

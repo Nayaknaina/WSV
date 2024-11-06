@@ -38,9 +38,9 @@ const userRoute = require("./routes/users.route.js");
 const Route = require("./routes/index.route.js");
 const externalRoute = require("./routes/external.route.js");
 const { log } = require("console");
-const cors= require('cors')
+const cors = require('cors')
 
-const { checkSubscription,capitalizeText } = require("./middilware/middilware.js");
+const { checkSubscription, capitalizeText, findMobileNumber, } = require("./middilware/middilware.js");
 
 app.use(cors())
 // todo Whatsapp integrations-----------------------------------------
@@ -59,7 +59,7 @@ let client = new Client({
     headless: true,
     ignoreHTTPSErrors: true,
     args: [
-      "--ignore-certificate-errors",     
+      "--ignore-certificate-errors",
       "--no-sandbox",
       "--disable-setuid-sandbox",
       "--disable-dev-shm-usage",
@@ -189,7 +189,7 @@ app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
   if (userWA) {
     // Update shared variable for frontend use
     // shared.connectedPhoneNumber = userWA.connectedPhoneNumber || "";
-    return res.json({ isConnected: userWA.isConnected});
+    return res.json({ isConnected: userWA.isConnected });
   } else {
     return res.json({ isConnected: false });
   }
@@ -274,7 +274,7 @@ app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
     return res.json({
       qrCodeData,
       isConnected: true,
-     
+
     });
   }
   else {
@@ -324,8 +324,8 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
         console.log(futureCount);
 
         req.session.warnMsg = `You’ve been logged out of WhatsApp. Please reconnect to send ${futureCount} pending remarks`;
-      
-        
+
+
         console.log("WhatsApp client logged out successfully.");
       } catch (logoutError) {
         console.error("Error during logout process:", logoutError);
@@ -358,10 +358,10 @@ app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
 
 
 // todo fetch leads 
-app.get("/fetch/leads", isAdminLoggedIn,checkSubscription, async (req, res) => {
+app.get("/fetch/leads", isAdminLoggedIn, checkSubscription, async (req, res) => {
   try {
     let user = await logIncollection.findOne({ cid: req.user.cid });
-    if(!req.session.access) {
+    if (!req.session.access) {
       console.warn(`Subscription expired. Please renew to continue.`)
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
       return res.redirect('/leads')
@@ -392,9 +392,9 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     }
 
     const Admin = await logIncollection.findOne({ cid: user.cid });
-    if(!req.session.access) {
+    if (!req.session.access) {
       console.warn(`Subscription expired. Please renew to continue.`)
-      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+      req.session.errorMSG = `Subscription expired. Please renew to continue`;
       return res.redirect('/leads')
     }
     const leads_data = Object.entries(req.body)
@@ -446,9 +446,10 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     }
     await newManualLead.save();
     await user.save();
-
-    const mobileRegex = /^[6-9]\d{9}$/;
-    let leadContactNo;
+    const mobileRegex = /^(?:\+91|91)?[6-9]\d{9}$/
+ 
+    // let leadContactNo=findMobileNumber(newManualLead.leads_data);
+    let leadContactNo = null;
     newManualLead.leads_data.forEach((item) => {
       const answer = item.ans.trim();
 
@@ -457,8 +458,9 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
         leadContactNo = answer;
       }
     });
+    
 
-    const searchStrings =  [
+    const searchStrings = [
       "name",
       "Name",
       "NAME",
@@ -538,9 +540,9 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       );
     }
 
-    let isWACnn = await WaModel.findOne({cid: user.cid})
-    if(isWACnn !== null) {
-      if(!isWACnn.isConnected){
+    let isWACnn = await WaModel.findOne({ cid: user.cid })
+    if (isWACnn !== null) {
+      if (!isWACnn.isConnected) {
         req.session.warnMsg = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
       }
     }
@@ -644,12 +646,12 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
           // reminderTempImagePath,
           // reminderTempPdfPath
         ); // after temp msg sending to lead
-        
-          sendMessageToLead(
-            connStatus,
-            userContact,
-            remark.text
-          );
+
+        sendMessageToLead(
+          connStatus,
+          userContact,
+          remark.text
+        );
 
       }, timeDifference);
     }
@@ -682,7 +684,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
 
         let personalizedMessage = msg
           .replace("[customer name]", `*${customerName}*`)
-          .replace("[company name]",`*${companyName}*` )
+          .replace("[company name]", `*${companyName}*`)
           .replace("[date]", `*${remarkDate}*`)
           .replace("[time]", `*${remarkTime}*`)
           .replace("[company name]", `*${companyName}*`);
@@ -779,9 +781,9 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
 //     }
 
 //     const {name, email, phoneNumber, message } = req.query;
-   
+
 //     console.log(name,email,phoneNumber,message, req.params.api);
-    
+
 //     res.redirect("/leads");
 //   } catch (err) {
 //     console.log("Error in /user/manual/lead :- ", err);
@@ -796,9 +798,9 @@ app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
     if (!user) {
       return res.redirect('/user/login')
     };
-   
-    
-    if(!req.session.access){
+
+
+    if (!req.session.access) {
       console.warn(`Subscription expired. Please renew to continue.`)
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
       return res.redirect('/leads')
@@ -824,7 +826,7 @@ app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
 })
 
 // todo remark addition
-app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) => {
+app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res) => {
   const { id } = req.params;
   const { text, time, date } = req.body;
   let user;
@@ -832,8 +834,8 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
   if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id);
   } else user = await memberModel.findById(user._id);
-  
-  if(!req.session.access) {
+
+  if (!req.session.access) {
     console.warn(`Subscription expired. Please renew to continue.`)
     req.session.errorMSG = `Subscription expired. Please renew to continue.`;
     return res.redirect('/leads')
@@ -858,7 +860,7 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
   await lead.save();
   // console.log(lead);
 
-  const mobileRegex = /^[6-9]\d{9}$/;
+  const mobileRegex = /^(?:\+91|91)?[6-9]\d{9}$/;
   let leadContactNo;
   lead.leads_data.forEach((item) => {
     const answer = item.ans.trim();
@@ -869,7 +871,7 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
     }
   });
 
-  const searchStrings =  [
+  const searchStrings = [
     "name",
     "Name",
     "NAME",
@@ -940,7 +942,7 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
 
   console.log(timeDifference);
 
-  let isWACnn = await WaModel.findOne({cid: user.cid});
+  let isWACnn = await WaModel.findOne({ cid: user.cid });
   if (!isWACnn.isConnected) {
     req.session.errorMSG = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
   }
@@ -972,7 +974,7 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
         .replace("[remark content]", remark.text)
         .replace("[company name]", `*${companyName}*`);
 
-        personalizedMessage = capitalizeText(personalizedMessage);
+      personalizedMessage = capitalizeText(personalizedMessage);
       sendMessageToLead(
         connStatus,
         userContact,
@@ -980,7 +982,7 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
         // reminderTempImagePath,
         // reminderTempPdfPath
       ); // after temp msg sending to lead
-    
+
     }, timeDifference);
   }
 
@@ -1018,7 +1020,7 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
         .replace("[company name]", `*${companyName}*`);
 
 
-        personalizedMessage = capitalizeText(personalizedMessage);
+      personalizedMessage = capitalizeText(personalizedMessage);
       sendMessageToLead(
         connStatus,
         leadContactNo,
@@ -1047,17 +1049,17 @@ app.post("/remark/add/:id", isAdminLoggedIn,checkSubscription, async (req, res) 
 
     let msg = thnakyouLeadTemplate.text;
     let companyName = Admin.organizationName !== null ||
-        Admin.organizationName !== undefined ||
-        Admin.organizationName !== ""
-        ? Admin.organizationName
-        : "360FollowUps";
-        console.warn(companyName,"RThanjks me commpany ni aa rahi");
-        companyName = companyName == undefined ? "360FollowUps" : companyName;
+      Admin.organizationName !== undefined ||
+      Admin.organizationName !== ""
+      ? Admin.organizationName
+      : "360FollowUps";
+    console.warn(companyName, "RThanjks me commpany ni aa rahi");
+    companyName = companyName == undefined ? "360FollowUps" : companyName;
     let personalizedMessage = msg
       .replace("[customer name]", `*${customerName}*`)
       .replace("[company name]", `*${companyName}*`);
 
-      personalizedMessage = capitalizeText(personalizedMessage);
+    personalizedMessage = capitalizeText(personalizedMessage);
 
     sendMessageToLead(
       connStatus,
@@ -1136,7 +1138,7 @@ app.get(
           team: false,
           num: 1,
         },
-    
+
         {
           title: "Reminder Message To Team Member",
           text: `*hello* [Team Member Name],
@@ -1154,7 +1156,7 @@ app.get(
           team: true,
           num: 2,
         },
-    
+
         {
           title: "Thankyou Message To Customer",
           text: `*dear* [Customer Name],
@@ -1169,7 +1171,7 @@ app.get(
           team: false,
           num: 5,
         },
-    
+
         {
           title: "Notification Message To Team Members",
           text: `*hello* [Team Member Name],
@@ -1188,7 +1190,7 @@ app.get(
           team: true,
           num: 3,
         },
-    
+
         {
           title: "Wellcome Message To Customer",
           text: `*Dear* [Customer Name],
@@ -1226,13 +1228,13 @@ app.get(
       await user.save();
     }
 
- 
+
     const subExp = new Date(user.subscriptionExpiry);
     const today = new Date();
     const diffTime = subExp - today;
     const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    if(daysLeft<=0) {
+
+    if (daysLeft <= 0) {
       console.warn(`Subscription expired. Please renew to continue.`)
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
     }
@@ -1246,7 +1248,7 @@ app.get(
       httpOnly: true,
       maxAge: 2 * 30 * 24 * 60 * 60 * 1000,
     });
-  
+
     res.redirect("/user/dashboard");
   }
 );
@@ -1434,7 +1436,7 @@ app.get("/auth/facebook", (req, res) => {
 //   }
 // });
 
-app.get("/auth/facebook/callback", isAdminLoggedIn,checkSubscription, async (req, res) => {
+app.get("/auth/facebook/callback", isAdminLoggedIn, checkSubscription, async (req, res) => {
   const { code } = req.query;
 
   if (!code) {
@@ -1464,11 +1466,11 @@ app.get("/auth/facebook/callback", isAdminLoggedIn,checkSubscription, async (req
 
     admin.facebookToken = accessToken;
     await admin.save();
-    
+
     req.session.successMSG = "Connected to Facebook account.";
 
     // todo if Subscription end i cant give you permission to fetch your leads 
-    if(!req.session.access){
+    if (!req.session.access) {
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
       console.warn(req.session.errorMSG);
       return res.redirect("/leads");
@@ -1728,10 +1730,10 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
       req.session.errorMSG = `basic`;
       return res.redirect("/user/team");
     }
-
-    const { name, email, mobile, countryCode,organizationName } = req.query;
+    let companyName = user.organizationName || "360FollowUps";
+    const { name, email, mobile, countryCode } = req.query;
     // console.log(req.query);
-    
+
     let preMem = await memberModel.findOne({ email: email });
     if (preMem !== null) {
       req.session.errorMSG = `This email ID is already registered`;
@@ -1750,34 +1752,34 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
       specialChars: false,
     });
 
-  //   const mailMsg = `
-  //   <div style="font-family: Arial, sans-serif; color: #333;">
-  //     <div style="text-align: center;">
-  //       <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
-  //       <h2>Web Soft Valley</h2>
-  //       <p>Developing Future</p>
-  //     </div>
-  //     <h3>Hello ${name} !</h3>
-  //     <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
-  //     <p>Email: <a href="mailto:${email}">${email}</a></p>
-  //     <p>Password: <strong>${password}</strong></p>
-  //     <div style="text-align: center;">
-  //       <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-  //         Login to Dashboard
-  //       </a>
-  //     </div>
-  //     <p>Regards,<br>Web Soft Valley Technology</p>
-  //   </div>
-  // `;
-    
+    //   const mailMsg = `
+    //   <div style="font-family: Arial, sans-serif; color: #333;">
+    //     <div style="text-align: center;">
+    //       <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
+    //       <h2>Web Soft Valley</h2>
+    //       <p>Developing Future</p>
+    //     </div>
+    //     <h3>Hello ${name} !</h3>
+    //     <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
+    //     <p>Email: <a href="mailto:${email}">${email}</a></p>
+    //     <p>Password: <strong>${password}</strong></p>
+    //     <div style="text-align: center;">
+    //       <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+    //         Login to Dashboard
+    //       </a>
+    //     </div>
+    //     <p>Regards,<br>Web Soft Valley Technology</p>
+    //   </div>
+    // `;
+
     // const subject = Invitation from ${user.name};
     // const isSent = await sendMail(email, mailMsg, subject);
     // console.log(isSent);
 
     const leadContactNo = `${countryCode}${mobile}`;
     // console.log(name);
-    
-    const text = `Hello ${name} 👋🏻 \n\n Your account has been created successfully by ${organizationName} 🤗. You can log in now and start using our service. 
+
+    const text = `Hello ${name} 👋🏻 \n\n Your account has been created successfully by ${companyName} 🤗. You can log in now and start using our service. 
     \n Your login credentials are stated below
     \n Your email: ${email}
     \n Your password : ${password}
@@ -1822,7 +1824,7 @@ async function sendMessageToLead(
     console.warn("WhatsApp client is not ready. please connect mobile number");
     return;
   }
-  console.log("Phone number",phoneNumber);
+  console.log("Phone number", phoneNumber);
 
   // Check if WhatsApp client is ready
   if (adminWA && !adminWA.isConnected) {
@@ -2157,7 +2159,7 @@ async function findNewLead(accessToken, user) {
               .replace("[date]", `*${formattedDate}*`)
               .replace("[lead source]", "*facebook*")
               .replace("[company name]", `*${companyName}*`);
-            console.log("notification to members new lead found", users[i].mobile);
+            console.log("notification to members new lead found", users[i].mobile); 
             personalizedMessage = capitalizeText(personalizedMessage);
             sendMessageToLead(connStatus, users[i].mobile, personalizedMessage);
           }, 2000);

@@ -138,26 +138,21 @@
                                     <h2>New Lead Information Form</h2>
                                     <button class="close-btn" id="closeFormBtn">&times;</button>
                                 </div>
-                                <form action="/manual/lead" method="post" id="customerForm" novalidate>
+                                <form id="customerForm" novalidate>
                                     <div class="form-group">
                                         <!-- Customer Name -->
                                         <div style="width: 48%;">
                                             <label for="customerName">Customer Name</label>
                                             <input type="text" placeholder="Customer Name" id="customerName"
                                                 name="customerName" required>
-                                        </div>  
-                                        <div>
-                                            <label for="countycode">Country code</label>
-                                            
-                                            <input placeholder="Select Country" id="mobile_code" name="mobile" pattern="^\d{10,15}$" title="Please enter a valid phone number (10-15 digits)" style=" pointer-events: none;" >
                                         </div>
+
                                         <!-- Mobile -->
                                         <div style="width: 48%;">
                                             <label for="mobile">Mobile Number</label>
                                             <input type="tel" id="mobile" placeholder="Mobile Number" name="mobile"
-                                                pattern="[0-9]{10}" maxlength="10" required>
+                                                required>
                                         </div>
-
                                         <!-- Email -->
                                         <div style="width: 48%;">
                                             <label for="email">Email</label>
@@ -176,28 +171,25 @@
                                             <input type="text" placeholder="State" id="state" minlength="3"
                                                 name="state">
                                         </div>
-
                                         <!-- Alternate Number 1 -->
                                         <div style="width: 48%;">
                                             <label for="alternate1">Alternate Number 1</label>
-                                            <input type="tel" id="alternate1" placeholder="Mobile Number"
-                                                name="alternateMobile1" pattern="[0-9]{10}" maxlength="10">
+                                            <input type="tel" id="alternate1" placeholder="Alternate Mobile"
+                                                name="alternateMobile1">
                                         </div>
 
-                                        <!-- Alternate Number 2 (Optional) -->
+                                        <!-- Alternate Number 2 -->
                                         <div style="width: 48%;">
                                             <label for="alternate2">Alternate Number 2 (Optional)</label>
-                                            <input type="tel" id="alternate2" placeholder="Mobile Number"
-                                                name="alternateMobile2" pattern="[0-9]{10}" maxlength="10">
+                                            <input type="tel" id="alternate2" placeholder="Alternate Mobile"
+                                                name="alternateMobile2">
                                         </div>
 
-                                        <!-- Remark (DateTime) -->
                                         <div style="width: 48%;">
                                             <label for="remark">Remark Text</label>
                                             <textarea placeholder="Remark Text" id="remark" name="remark"
                                                 required></textarea>
                                         </div>
-
                                         <!-- Next Followup (DateTime) -->
                                         <div style="width: 48%;">
                                             <label for="nextFollowup">Next Followup (Date and Time)</label>
@@ -212,7 +204,8 @@
                                                 name="productService">
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+                                    <button type="button" onclick="submitManulLeadForm()"
+                                        class="btn btn-primary btn-sm">Submit</button>
                                 </form>
                             </div>
                         </div>
@@ -220,8 +213,7 @@
 
 
                 </div>
-
-
+                
                 <div class="container-fluid bg-white shadow-sm m-b-20">
                     <div class="row flex-row justify-content-around">
                         <div class="col-auto text-center py-2">
@@ -487,10 +479,9 @@
                                 </div>
 
 
-                                <div class="customer-info"
-                                   >
+                                <div class="customer-info">
                                     <div style="font-size: 18px; "> <strong>{{findAnswer ./leads_data}}</strong></div>
-                                    <div > {{#each leads_data}}
+                                    <div> {{#each leads_data}}
                                         {{#if (containsPhoneNumber ans)}}
                                         <strong>{{ans}}</strong>
                                         {{/if}}
@@ -1091,7 +1082,7 @@
         }
     </script> --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
+<script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
 
         function fetchFacebookLeadFromFacebook() {
@@ -1115,14 +1106,47 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/intlTelInput.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"></script>
+
     <script>
         $(document).ready(function () {
-            $("#mobile_code").intlTelInput({
-                initialCountry: "in",
-                separateDialCode: true,
-                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"
+            // Initialize intl-tel-input on each phone input field
+            const phoneInputs = ["#mobile", "#alternate1", "#alternate2"];
+
+            phoneInputs.forEach(function (selector) {
+                $(selector).intlTelInput({
+                    initialCountry: "in", // Set default country
+                    separateDialCode: true,
+                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"
+                });
             });
+
+
         });
+
+
+
+       async function submitManulLeadForm() {
+            let form = document.querySelector('#customerForm')
+            let formdata = new FormData(form)
+            console.log(formdata)
+            let formDataObj = Object.fromEntries(formdata.entries());
+            const countryData = $("#mobile").intlTelInput("getSelectedCountryData");
+            const countryCode = countryData.dialCode; // Extracting the dial code
+            console.log(countryCode)
+
+            let {
+                customerName, email, mobile, alternateMobile1, alternateMobile2, remark, remarkTime, city, state, productService
+            } = formDataObj;
+
+            let data = { customerName, email, mobile: `${countryCode}${mobile}`, alternateMobile1: `${countryCode}${alternateMobile1}`, alternateMobile2: `${countryCode}${alternateMobile2}`, remark, remarkTime, city, state, productService }
+
+            try{
+                let res = await axios.post('/manual/lead',data)
+                if(res.status == 200)
+                    location.reload()
+            }catch(err){console.log(err)}
+
+        }
     </script>
 </body>
 
