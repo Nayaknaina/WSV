@@ -917,15 +917,15 @@ function authenticateToken(req, res, next) {
 }
 
 
-function findLeadsForEveryUsers() {
-  let i = 0;
+// function findLeadsForEveryUsers() {
+//   let i = 0;
 
-  setInterval(async () => {
-    let res = await axios.get("https://360followups.com/get/users");
-    console.log(res);
-    console.log(i);
-  }, 60000);
-}
+//   setInterval(async () => {
+//     let res = await axios.get("https://360followups.com/get/users");
+//     console.log(res);
+//     console.log(i);
+//   }, 60000);
+// }
 
 async function handleDisconnection(client, userId) {
   client.on('disconnected', async (reason) => {
@@ -950,7 +950,7 @@ async function handleDisconnection(client, userId) {
 }
 
 
-findLeadsForEveryUsers();
+// findLeadsForEveryUsers();
 
 // module.exports = sendMessageToLead
 function deleteSessionDirectory(userId) {
