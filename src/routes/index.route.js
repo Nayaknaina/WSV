@@ -665,7 +665,12 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
           ],
         });
     }
-
+    if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
+      // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
+      console.log("you not have fb token");
+      req.session.errorMSG = `Facebook Account Not Connected. Please Connect to Find New Leads.`;
+    
+    }
     // Build the filter object
     const filter = { cid: user.cid };
     if (customerName) {
@@ -733,7 +738,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
     // let userMyLeads = user.myleads
     let userMyLeads = [...user.myleads].reverse();
     userMyLeads.forEach(elem => console.log(elem._id))
-    console.log(userMyLeads[0]);
+    // console.log(userMyLeads[0]);
 
     res.render("leads", {
       user,

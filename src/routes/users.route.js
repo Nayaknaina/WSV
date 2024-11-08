@@ -211,10 +211,11 @@ router.post(
 
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password, confirmPassword } = req.body;
+    const { name,mobile, agentCode, countryCode ,email, password, confirmPassword } = req.body;
     console.log(req.body);
 
     const user = await logIncollection.findOne({ email });
+    console.log(user);
     
 
     if (user)
@@ -223,22 +224,27 @@ router.post("/signup", async (req, res) => {
       return res.render("signup", { errorMessage: "Passwords do not match" });
 
     const cid = uuidv4();
+    console.log(cid)
     const newUser = new logIncollection({
       name,
       email,
       password,
       mobile,
+      agentCode,
+      countryCode,
       cid,
       role: "admin",
-    });
+    })
     await newUser.save();
     console.log(newUser);
 
     const pipelines = [
-      { title: "win", color: "#28A745", defaultVal: false, num: 1 },
-      { title: "lost", color: "#DC3545", defaultVal: false, num: 2 },
-      { title: "on hold", color: "#007BFF", defaultVal: true, num: 3 },
-      { title: "pending", color: "#FFC107", defaultVal: false, num: 4 },
+      { title: "new lead", color: "#28A745", defaultVal: true, num: 1 },
+      { title: "initial contacted", color: "#0fbabd", defaultVal: false, num: 2 },
+      { title: "quatation sent", color: "#007BFF", defaultVal: false, num: 3 },
+      { title: "deal pending", color: "#FFC107", defaultVal: false, num: 4 },
+      { title: "deal closed", color: "#0FBABD", defaultVal: false, num: 5 },
+      { title: "deal cancelled", color: "#DC3545", defaultVal: false, num: 6 },
     ].map(
       (pipelineData) =>
         new pipelineModel({
@@ -262,7 +268,7 @@ router.post("/signup", async (req, res) => {
     const templates = [
       {
         title: "Reminder Message To Customer",
-        text: `*dear* [Customer Name],
+        text: `dear [Customer Name],
   
   This is a friendly reminder from [Company Name]. We have a scheduled follow-up call with you on [Date] at [Time]. Our representative will be reaching out to discuss your requirements.
   
@@ -279,13 +285,13 @@ router.post("/signup", async (req, res) => {
 
       {
         title: "Reminder Message To Team Member",
-        text: `*hello* [Team Member Name],
+        text: `hello [Team Member Name],
   
   Just a reminder that you have a follow-up call scheduled with [Customer Name] on [Date] at [Time]. Please make sure you are prepared with all the necessary details.
   
   Good luck with the call, and let us know if you need any assistance!
   
-  *Last Discussion:*
+  Last Discussion:
   [Remark Content].
   
   Best Regards,
@@ -297,7 +303,7 @@ router.post("/signup", async (req, res) => {
 
       {
         title: "Thankyou Message To Customer",
-        text: `*dear* [Customer Name],
+        text: `dear [Customer Name],
   
   Thank you for taking the time to speak with us today. We appreciate the opportunity to understand your needs better and to discuss how we can assist you further.
   
@@ -312,13 +318,13 @@ router.post("/signup", async (req, res) => {
 
       {
         title: "Notification Message To Team Members",
-        text: `*hello* [Team Member Name],
+        text: `hello [Team Member Name],
   
   A new lead has been added to the CRM. Here are the details:
-  - *Lead Name:* [Customer Name]
-  - *Contact Number:* [Customer Contact Number]
-  - *Date Received:* [Date]
-  - *Lead Source:* [Lead Source]
+  - Lead Name: [Customer Name]
+  - Contact Number: [Customer Contact Number]
+  - Date Received: [Date]
+  - Lead Source: [Lead Source]
   
   Please follow up with the lead at your earliest convenience to ensure a prompt response.
   
@@ -331,7 +337,7 @@ router.post("/signup", async (req, res) => {
 
       {
         title: "Wellcome Message To Customer",
-        text: `*Dear* [Customer Name],
+        text: `Dear [Customer Name],
   
   Welcome to [Company Name]! We’re thrilled to have you on board. Our team will be reaching out to you shortly to understand your needs and help you find the best solutions.
   
@@ -375,6 +381,8 @@ router.post("/signup", async (req, res) => {
     res.status(200).json({ msg: "user signup success !" });
     // res.redirect("/user/dashboard");
   } catch (err) {
+    console.warn(err);
+    
     res.status(500).send("Error signing up");
   }
 });
@@ -1014,10 +1022,12 @@ router.get("/reset/all/pipes", isAdminLoggedIn, async (req, res) => {
   }
 
   const pipelines = [
-    { title: "win", color: "#28A745", defaultVal: false, num: 1 },
-    { title: "lost", color: "#DC3545", defaultVal: false, num: 2 },
-    { title: "on hold", color: "#007BFF", defaultVal: true, num: 3 },
-    { title: "pending", color: "#FFC107", defaultVal: false, num: 4 },
+    { title: "new lead", color: "#28A745", defaultVal: true, num: 1 },
+    { title: "initial contacted", color: "#0fbabd", defaultVal: false, num: 2 },
+    { title: "quatation sent", color: "#007BFF", defaultVal: false, num: 3 },
+    { title: "deal pending", color: "#FFC107", defaultVal: false, num: 4 },
+    { title: "deal closed", color: "#0FBABD", defaultVal: false, num: 5 },
+    { title: "deal cancelled", color: "#DC3545", defaultVal: false, num: 6 },
   ].map(
     (pipelineData) =>
       new pipelineModel({

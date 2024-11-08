@@ -1,4 +1,5 @@
 require("dotenv").config();
+let IS_SERVER_RESTART = true;
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -32,6 +33,7 @@ const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
 const WaModel = require("./models/wA.model.js");
 
+const WhtasappRoute=require("./whatsappRoute/whatsapp.js");
 const paymentRoute = require("./routes/payment.route.js");
 const memberRoute = require("./routes/members.route.js");
 const userRoute = require("./routes/users.route.js");
@@ -54,24 +56,24 @@ let isConnected = false;
 let connectedPhoneNumber = "";
 
 // Initialize the WhatsApp Client with Local Authentication
-let client = new Client({
-  puppeteer: {
-    headless: true,
-    ignoreHTTPSErrors: true,
-    args: [
-      "--ignore-certificate-errors",
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-accelerated-2d-canvas",
-      "--no-first-run",
-      "--no-zygote",
-      "--single-process",
-      "--disable-gpu",
-    ],
-  },
-  authStrategy: new LocalAuth(),
-});
+// let client = new Client({
+//   puppeteer: {
+//     headless: true,
+//     ignoreHTTPSErrors: true,
+//     args: [
+//       "--ignore-certificate-errors",
+//       "--no-sandbox",
+//       "--disable-setuid-sandbox",
+//       "--disable-dev-shm-usage",
+//       "--disable-accelerated-2d-canvas",
+//       "--no-first-run",
+//       "--no-zygote",
+//       "--single-process",
+//       "--disable-gpu",
+//     ],
+//   },
+//   authStrategy: new LocalAuth(),
+// });
 
 const sessionStore =
   process.env.NODE_ENV === "production"
@@ -165,6 +167,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 app.use("/", Route);
+app.use("/", WhtasappRoute);
 app.use("/member", memberRoute);
 app.use("/user", userRoute);
 app.use("/payment", paymentRoute);
@@ -172,29 +175,29 @@ app.use("/external", externalRoute);
 
 // todo wtsapp Handle root request
 
-app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
-  let user;
-  if (req.user.role === "admin") {
-    user = await logIncollection.findById(req.user.id)
-  }
-  else {
-    user = await memberModel.findById(req.user.id);
-  }
+// app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
+//   let user;
+//   if (req.user.role === "admin") {
+//     user = await logIncollection.findById(req.user.id)
+//   }
+//   else {
+//     user = await memberModel.findById(req.user.id);
+//   }
 
-  let userWA = await WaModel.findOne({ cid: user.cid });
+//   let userWA = await WaModel.findOne({ cid: user.cid });
 
-  console.log(isConnected, user.name, "check connection//");
-  console.log("debug again", isConnected);
+//   console.log(isConnected, user.name, "check connection//");
+//   console.log("debug again", isConnected);
 
-  if (userWA) {
-    // Update shared variable for frontend use
-    // shared.connectedPhoneNumber = userWA.connectedPhoneNumber || "";
-    return res.json({ isConnected: userWA.isConnected });
-  } else {
-    return res.json({ isConnected: false });
-  }
+//   if (userWA) {
+//     // Update shared variable for frontend use
+//     // shared.connectedPhoneNumber = userWA.connectedPhoneNumber || "";
+//     return res.json({ isConnected: userWA.isConnected });
+//   } else {
+//     return res.json({ isConnected: false });
+//   }
 
-});
+// });
 // app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
 //   let user;
 //   if (req.user.role === "admin") {
@@ -221,164 +224,164 @@ app.get("/connection-status", isAdminLoggedIn, async (req, res) => {
 
 
 
-app.get("/qr", isAdminLoggedIn, async (req, res) => {
-  // console.log("qrCodeData genrated in /qr", req.user.name);
-  const user = req.user;
+// app.get("/qr", isAdminLoggedIn, async (req, res) => {
+//   // console.log("qrCodeData genrated in /qr", req.user.name);
+//   const user = req.user;
 
-  if (qrCodeData) {
-    console.log("Qr genrated");
-  }
-  console.log("debug again On First QR", isConnected);
+//   if (qrCodeData) {
+//     console.log("Qr genrated");
+//   }
+//   console.log("debug again On First QR", isConnected);
 
-  res.render("qr", {
-    user,
-    qrCodeData,
-    isConnected,
-  });
-});
-let iii = 0;
-app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
-  // console.log("qrCodeData genrated in /qr", req.user.name);
+//   res.render("qr", {
+//     user,
+//     qrCodeData,
+//     isConnected,
+//   });
+// });
+// let iii = 0;
+// app.get("/qr/again", isAdminLoggedIn, async (req, res) => {
+//   // console.log("qrCodeData genrated in /qr", req.user.name);
 
-  if (qrCodeData) {
-    console.log("Qr genrated");
-  }
-  console.log("debug again On Second QR", iii, isConnected);
-  iii++;
+//   if (qrCodeData) {
+//     console.log("Qr genrated");
+//   }
+//   console.log("debug again On Second QR", iii, isConnected);
+//   iii++;
 
-  if (isConnected) {
-    isConnected = false;
-    whatsappClientReady = false;
-    let userWA = await WaModel.findOne({ cid: req.user.cid })
-    if (!userWA) {
-      console.log("user WA Model Not present then creant new");
-      let userWA = new WaModel({
-        cid: req.user.cid,
-        isConnected: true,
-        whatsappClientReady: true,
-        connectedPhoneNumber: connectedPhoneNumber,
-      });
+//   if (isConnected) {
+//     isConnected = false;
+//     whatsappClientReady = false;
+//     let userWA = await WaModel.findOne({ cid: req.user.cid })
+//     if (!userWA) {
+//       console.log("user WA Model Not present then creant new");
+//       let userWA = new WaModel({
+//         cid: req.user.cid,
+//         isConnected: true,
+//         whatsappClientReady: true,
+//         connectedPhoneNumber: connectedPhoneNumber,
+//       });
 
-      await userWA.save();
-    } else {
-      console.log("user WA Model present then update it");
-      userWA.isConnected = true;
-      userWA.whatsappClientReady = true;
-      userWA.connectedPhoneNumber = connectedPhoneNumber;
-      await userWA.save();
-    }
+//       await userWA.save();
+//     } else {
+//       console.log("user WA Model present then update it");
+//       userWA.isConnected = true;
+//       userWA.whatsappClientReady = true;
+//       userWA.connectedPhoneNumber = connectedPhoneNumber;
+//       await userWA.save();
+//     }
 
-    console.log("debug again when client connected success", isConnected);
+//     console.log("debug again when client connected success", isConnected);
 
-    console.log("now we are blocking to refreshing qr page");
-    return res.json({
-      qrCodeData,
-      isConnected: true,
+//     console.log("now we are blocking to refreshing qr page");
+//     return res.json({
+//       qrCodeData,
+//       isConnected: true,
 
-    });
-  }
-  else {
-    return res.json({
-      qrCodeData,
-      isConnected: false,
-    });
-  }
+//     });
+//   }
+//   else {
+//     return res.json({
+//       qrCodeData,
+//       isConnected: false,
+//     });
+//   }
 
 
-});
+// });
 // todo logout whatsapp
-app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
-  let whatsapp = await WaModel.findOne({ cid: req.user.cid });
-  try {
-    whatsappClientReady = whatsapp.whatsappClientReady;
-    // Check if the client is ready before attempting logout
-    if (whatsappClientReady && client.pupPage && !client.pupPage.isClosed()) {
-      try {
-        await client.logout();
-        isConnected = false;
-        let userWA = await WaModel.findOne({ cid: req.user.cid });
-        if (userWA) {
+// app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
+//   let whatsapp = await WaModel.findOne({ cid: req.user.cid });
+//   try {
+//     whatsappClientReady = whatsapp.whatsappClientReady;
+//     // Check if the client is ready before attempting logout
+//     if (whatsappClientReady && client.pupPage && !client.pupPage.isClosed()) {
+//       try {
+//         await client.logout();
+//         isConnected = false;
+//         let userWA = await WaModel.findOne({ cid: req.user.cid });
+//         if (userWA) {
 
-          userWA.isConnected = false;
-          userWA.whatsappClientReady = false;
-          req.session.errorMSG = `Dis-Connected WhatsApp Number: ${connectedPhoneNumber}`;
-          userWA.connectedPhoneNumber = "";
-          await userWA.save();
-        }
+//           userWA.isConnected = false;
+//           userWA.whatsappClientReady = false;
+//           req.session.errorMSG = `Dis-Connected WhatsApp Number: ${connectedPhoneNumber}`;
+//           userWA.connectedPhoneNumber = "";
+//           await userWA.save();
+//         }
 
-        const today = moment().startOf("day");
-        let remarks = await remarkModel.find({ cid: req.user.cid });
+//         const today = moment().startOf("day");
+//         let remarks = await remarkModel.find({ cid: req.user.cid });
 
-        let futureCount = 0;
-        remarks.forEach((remark) => {
-          const remarkDate = moment(remark.date).startOf("day");
-          const remarkTime = remark.time;
+//         let futureCount = 0;
+//         remarks.forEach((remark) => {
+//           const remarkDate = moment(remark.date).startOf("day");
+//           const remarkTime = remark.time;
 
-          if (
-            remarkDate.isAfter(today) ||
-            (remarkDate.isSame(today) && remark.time > moment().format("HH:mm"))
-          ) {
-            futureCount++;
-          }
-        });
-        console.log(futureCount);
+//           if (
+//             remarkDate.isAfter(today) ||
+//             (remarkDate.isSame(today) && remark.time > moment().format("HH:mm"))
+//           ) {
+//             futureCount++;
+//           }
+//         });
+//         console.log(futureCount);
 
-        req.session.warnMsg = `You’ve been logged out of WhatsApp. Please reconnect to send ${futureCount} pending remarks`;
+//         req.session.warnMsg = `You’ve been logged out of WhatsApp. Please reconnect to send ${futureCount} pending remarks`;
 
 
-        console.log("WhatsApp client logged out successfully.");
-      } catch (logoutError) {
-        console.error("Error during logout process:", logoutError);
-      }
-    } else {
-      console.warn(
-        "WhatsApp client is not ready or session already closed, skipping logout."
-      );
-    }
+//         console.log("WhatsApp client logged out successfully.");
+//       } catch (logoutError) {
+//         console.error("Error during logout process:", logoutError);
+//       }
+//     } else {
+//       console.warn(
+//         "WhatsApp client is not ready or session already closed, skipping logout."
+//       );
+//     }
 
-    // Mark client as disconnected
-    whatsappClientReady = false;
-    isConnected = false;
+//     // Mark client as disconnected
+//     whatsappClientReady = false;
+//     isConnected = false;
 
-    // Retry cleanup logic for session files
-    await cleanupSessionFiles();
+//     // Retry cleanup logic for session files
+//     await cleanupSessionFiles();
 
-    // Redirect to dashboard or another appropriate page
-    console.log("whatsapp logout here !");
+//     // Redirect to dashboard or another appropriate page
+//     console.log("whatsapp logout here !");
 
-    res.redirect("/user/dashboard");
-  } catch (error) {
-    console.error("Error during logout:", error);
-    res.status(500).send("An error occurred during logout.");
-  } finally {
-    // Attempt to reinitialize the client in all cases
-    initializeWhatsAppClient();
-  }
-});
+//     res.redirect("/user/dashboard");
+//   } catch (error) {
+//     console.error("Error during logout:", error);
+//     res.status(500).send("An error occurred during logout.");
+//   } finally {
+//     // Attempt to reinitialize the client in all cases
+//     initializeWhatsAppClient();
+//   }
+// });
 
 
 // todo fetch leads 
-app.get("/fetch/leads", isAdminLoggedIn, checkSubscription, async (req, res) => {
-  try {
-    let user = await logIncollection.findOne({ cid: req.user.cid });
-    if (!req.session.access) {
-      console.warn(`Subscription expired. Please renew to continue.`)
-      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
-      return res.redirect('/leads')
-    }
-    if (!user.facebookToken) {
-      let errMsg = "Please connect your facebook account. ";
-      return res.json(errMsg);
-    }
+// app.get("/fetch/leads", isAdminLoggedIn, checkSubscription, async (req, res) => {
+//   try {
+//     let user = await logIncollection.findOne({ cid: req.user.cid });
+//     if (!req.session.access) {
+//       console.warn(`Subscription expired. Please renew to continue.`)
+//       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+//       return res.redirect('/leads')
+//     }
+//     if (!user.facebookToken) {
+//       let errMsg = "Please connect your facebook account. ";
+//       return res.json(errMsg);
+//     }
 
-    let data = await findNewLead(user.facebookToken, user);
-    console.log(data.length);
+//     let data = await findNewLead(user.facebookToken, user);
+//     console.log(data.length);
 
-    res.json(data.length);
-  } catch (err) {
-    console.warn("Error in fetching leads manualy", err);
-  }
-});
+//     res.json(data.length);
+//   } catch (err) {
+//     console.warn("Error in fetching leads manualy", err);
+//   }
+// });
 
 //------------------------------------------------------
 // todo manual lead addition
@@ -420,8 +423,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       userType,
     });
 
-    let userContact = user.mobile;
-    // console.log(req.body, "====", userContact);
+    let userContact = `${user.countryCode}${user.mobile}`;    // console.log(req.body, "====", userContact);
 
     const remarkDateTimeformat = new Date(req.body.remarkTime);
     const remarkDate = remarkDateTimeformat.toISOString().split("T")[0];
@@ -446,19 +448,18 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     }
     await newManualLead.save();
     await user.save();
-    const mobileRegex = /^(?:\+91|91)?[6-9]\d{9}$/
- 
-    // let leadContactNo=findMobileNumber(newManualLead.leads_data);
-    let leadContactNo = null;
+    const mobileRegex = /^[6-9]\d{9}$/;
+    let leadContactNo;
     newManualLead.leads_data.forEach((item) => {
       const answer = item.ans.trim();
 
       if (mobileRegex.test(answer)) {
         console.log("Valid Mobile Number found:", answer);
-        leadContactNo = answer;
+        return (leadContactNo = answer);
       }
     });
-    
+
+    leadContactNo = `${Admin.countryCode}${leadContactNo}`;
 
     const searchStrings = [
       "name",
@@ -496,7 +497,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       "ग्राहक_का_नाम",
       "शुभ नाम",
       "शुभ_नाम",
-    ];;
+    ];
 
     let customerName = "";
 
@@ -543,7 +544,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     let isWACnn = await WaModel.findOne({ cid: user.cid })
     if (isWACnn !== null) {
       if (!isWACnn.isConnected) {
-        req.session.warnMsg = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
+        req.session.warnMsg = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk';
       }
     }
     setTimeout(async () => {
@@ -556,14 +557,10 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       console.log("/manual/lead/");
       // console.log("wellcome to lead ", leadContactNo);
       let msg = wellcomeTemp.text;
-      let companyName =
-        Admin.organizationName !== null &&
-          Admin.organizationName !== undefined &&
-          Admin.organizationName !== ""
-          ? Admin.organizationName
-          : "360FollowUps";
-      console.log("company name", companyName);
-      console.log(Admin.organizationName);
+      let companyName = Admin.organizationName || "360FollowUps";
+        console.log("company name", companyName);
+        console.log(Admin.organizationName);
+
 
 
       let personalizedMessage = msg
@@ -592,7 +589,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       ); // reminder temp for user
     }, 4500);
 
-    // leadContactNo = "9755313770";
+   
     const remarkDateTime = new Date(`${remarkDate}T${remarkTime}`);
     const currentTime = new Date();
 
@@ -817,6 +814,8 @@ app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
     console.log("findinnngggg");
 
     let data = await findNewLead(user.facebookToken, user);
+
+
     console.log(data);
 
     return res.redirect('/leads');
@@ -824,6 +823,32 @@ app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
     console.warn("error in finding ne lead in /leads/pre - ", err);
   }
 })
+
+// function findLeadsForEveryUsers() {
+//   let i = 0;
+
+//   setInterval(async () => {
+//     let res = await axios.get("http://localhost:8000/get/users");
+//     console.log(res);
+//     console.log(i);
+//   }, 60000);
+// }
+
+// findLeadsForEveryUsers();
+// app.get("/get/users", async (req, res) => {
+//   try {
+//     let allUsers = await logIncollection.find();
+//     allUsers.forEach(async (user) => {
+//       console.log("Username:- ", user.name);
+//       if (user.facebookToken) {
+//         console.log("User FB token :- ", user.facebookToken);
+//         // await findNewLead(user.facebookToken, user);
+//       } else console.log("FB token not availiable");
+//     });
+//   } catch (err) {
+//     console.log(err);
+//   }
+// })
 
 // todo remark addition
 app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res) => {
@@ -833,7 +858,8 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
 
   if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id);
-  } else user = await memberModel.findById(user._id);
+    //CHNGES 
+  } else user = await memberModel.findById(req.user.id);
 
   if (!req.session.access) {
     console.warn(`Subscription expired. Please renew to continue.`)
@@ -842,7 +868,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
   }
   let Admin = await logIncollection.findOne({ cid: user.cid });
 
-  let userContact = user.mobile;
+  let userContact = `${user.countryCode}${user.mobile}`;
 
   let lead = await leadsModel.findById(id);
 
@@ -860,17 +886,61 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
   await lead.save();
   // console.log(lead);
 
-  const mobileRegex = /^(?:\+91|91)?[6-9]\d{9}$/;
-  let leadContactNo;
-  lead.leads_data.forEach((item) => {
-    const answer = item.ans.trim();
+  const mobileRegex = /^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/  ;
+  let leadContactNo =null;
+  // lead.leads_data.forEach((item) => {
+  //   const answer = item.ans.trim();
 
+  //   if (mobileRegex.test(answer)) {
+  //     console.log("Valid Mobile Number found: try 1", answer);
+  //     return (leadContactNo = answer);
+  //   }
+  // });
+  for (let i = 0; i < lead.leads_data.length; i++) {
+    const answer = lead.leads_data[i].ans.trim();
+  
     if (mobileRegex.test(answer)) {
-      console.log("Valid Mobile Number found:", answer);
-      return (leadContactNo = answer);
+      console.log("Valid Mobile Number found: try 1", answer);
+      leadContactNo = answer;
+      break; 
     }
-  });
+  }
+  
 
+  if (leadContactNo==null) {
+    const mobileRegex = /^\+?\d{1,3}\d{10}$/  ;
+
+    for (let i = 0; i < lead.leads_data.length; i++) {
+      const answer = lead.leads_data[i].ans.trim();
+    
+      if (mobileRegex.test(answer)) {
+        console.log("Valid Mobile Number found: try 2", answer);
+        leadContactNo = answer;
+        break; 
+      }
+    }
+  }
+
+  if (leadContactNo==null) {
+    const mobileRegex = /^\d{10}$/  ;
+
+    for (let i = 0; i < lead.leads_data.length; i++) {
+      const answer = lead.leads_data[i].ans.trim();
+    
+      if (mobileRegex.test(answer)) {
+        console.log("Valid Mobile Number found: try 3", answer);
+        leadContactNo = answer;
+        break; 
+      }
+    }
+  }
+  if (leadContactNo !== null) {
+    leadContactNo = `${Admin.countryCode}${leadContactNo}`
+    console.log("10 dig number found");
+    
+  }
+  console.warn("Lead contact number debugginngg",leadContactNo);
+  
   const searchStrings = [
     "name",
     "Name",
@@ -900,7 +970,6 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
     "आपका नाम",
     "आपका_नाम",
     "आपका_नाम:",
-    "नाम",
     "पूरा नाम",
     "पूरा_नाम",
     "ग्राहक का नाम",
@@ -928,7 +997,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
   }
 
   console.log(leadContactNo);
-  // leadContactNo = "9755313770";
+ 
   const remarkDateTime = new Date(`${date}T${time}:00`);
   const currentTime = new Date();
 
@@ -943,8 +1012,10 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
   console.log(timeDifference);
 
   let isWACnn = await WaModel.findOne({ cid: user.cid });
-  if (!isWACnn.isConnected) {
-    req.session.errorMSG = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
+  if (isWACnn) {
+    if (!isWACnn.isConnected) {
+      req.session.errorMSG = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
+    }
   }
 
   //todo  reminder message for team member
@@ -957,12 +1028,14 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
       console.log(leadContactNo);
       console.log("reminder to members ", userContact);
       let msg = reminderTemplateForMember.text;
+
       let companyName =
         Admin.organizationName !== null &&
           Admin.organizationName !== undefined &&
           Admin.organizationName !== ""
           ? Admin.organizationName
           : "360FollowUps";
+
       let personalizedMessage = msg
         .replace("[team member name]", `*${user.name}*`)
         .replace(
@@ -1048,12 +1121,8 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
     console.log("thanks to lead ", leadContactNo);
 
     let msg = thnakyouLeadTemplate.text;
-    let companyName = Admin.organizationName !== null ||
-      Admin.organizationName !== undefined ||
-      Admin.organizationName !== ""
-      ? Admin.organizationName
-      : "360FollowUps";
-    console.warn(companyName, "RThanjks me commpany ni aa rahi");
+    let companyName = Admin.organizationName || "360FollowUps"
+    console.warn(companyName, "Thanjks me commpany ni aa rahi");
     companyName = companyName == undefined ? "360FollowUps" : companyName;
     let personalizedMessage = msg
       .replace("[customer name]", `*${customerName}*`)
@@ -1096,12 +1165,14 @@ app.get(
       await user.save();
       req.session.showForm = true;
     }
-    if (!(user.myPipelines.length >= 4)) {
+    if (!(user.myPipelines.length >= 6)) {
       const pipelines = [
-        { title: "win", color: "#28A745", defaultVal: false },
-        { title: "lost", color: "#DC3545", defaultVal: false },
-        { title: "on hold", color: "#007BFF", defaultVal: true },
-        { title: "pending", color: "#FFC107", defaultVal: false },
+        { title: "new lead", color: "#28A745", defaultVal: true, num: 1 },
+        { title: "initial contacted", color: "#0fbabd", defaultVal: false, num: 2 },
+        { title: "quatation sent", color: "#007BFF", defaultVal: false, num: 3 },
+        { title: "deal pending", color: "#FFC107", defaultVal: false, num: 4 },
+        { title: "deal closed", color: "#0FBABD", defaultVal: false, num: 5 },
+        { title: "deal cancelled", color: "#DC3545", defaultVal: false, num: 6 },
       ].map(
         (pipelineData) =>
           new pipelineModel({
@@ -1112,6 +1183,7 @@ app.get(
             cid: user.cid,
           })
       );
+
 
       // Save all pipelines in parallel
       await Promise.all(
@@ -1124,7 +1196,7 @@ app.get(
       const templates = [
         {
           title: "Reminder Message To Customer",
-          text: `*dear* [Customer Name],
+          text: `*Dear* [Customer Name],
     
     This is a friendly reminder from [Company Name]. We have a scheduled follow-up call with you on [Date] at [Time]. Our representative will be reaching out to discuss your requirements.
     
@@ -1141,7 +1213,7 @@ app.get(
 
         {
           title: "Reminder Message To Team Member",
-          text: `*hello* [Team Member Name],
+          text: `*Hello* [Team Member Name],
     
     Just a reminder that you have a follow-up call scheduled with [Customer Name] on [Date] at [Time]. Please make sure you are prepared with all the necessary details.
     
@@ -1159,7 +1231,7 @@ app.get(
 
         {
           title: "Thankyou Message To Customer",
-          text: `*dear* [Customer Name],
+          text: `*Dear* [Customer Name],
     
     Thank you for taking the time to speak with us today. We appreciate the opportunity to understand your needs better and to discuss how we can assist you further.
     
@@ -1174,7 +1246,7 @@ app.get(
 
         {
           title: "Notification Message To Team Members",
-          text: `*hello* [Team Member Name],
+          text: `*Hello* [Team Member Name],
     
     A new lead has been added to the CRM. Here are the details:
     - *Lead Name:* [Customer Name]
@@ -1270,6 +1342,7 @@ app.get("/auth/facebook", (req, res) => {
 });
 
 // todo Facebook Callback Route
+
 // app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
 //   const { code } = req.query;
 //   console.log("Entering Facebook callback route");
@@ -1610,114 +1683,114 @@ function isAdminLoggedIn(req, res, next) {
   });
 }
 
-function ensureQRCodeEvent() {
-  // Avoid attaching multiple QR listeners by checking if it's already attached
-  if (!client.listenerCount("qr")) {
-    client.on("qr", (qrCode) => {
-      try {
-        const qrImage = qr.imageSync(qrCode, { type: "png" });
-        qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
-        // console.log("QR code generated and stored.");
-      } catch (error) {
-        console.error("Error generating QR Code:", error);
-      }
-    });
-  }
-}
+// function ensureQRCodeEvent() {
+//   // Avoid attaching multiple QR listeners by checking if it's already attached
+//   if (!client.listenerCount("qr")) {
+//     client.on("qr", (qrCode) => {
+//       try {
+//         const qrImage = qr.imageSync(qrCode, { type: "png" });
+//         qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
+//         // console.log("QR code generated and stored.");
+//       } catch (error) {
+//         console.error("Error generating QR Code:", error);
+//       }
+//     });
+//   }
+// }
 
-//  Cleanup Session Files with Retry Logic
-async function cleanupSessionFiles() {
-  const sessionPath = path.join(__dirname, ".wwebjs_auth/session");
-  for (let retries = 5; retries > 0; retries--) {
-    try {
-      if (fs.existsSync(sessionPath)) {
-        fs.rmSync(sessionPath, { recursive: true, force: true });
-        // console.log("Session files deleted successfully.");
-      }
-      break; // Exit loop if deletion is successful
-    } catch (error) {
-      console.error("Failed to delete session files:", error.message);
-      if (retries > 1) {
-        console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
-      }
-    }
-  }
-}
+// //  Cleanup Session Files with Retry Logic
+// async function cleanupSessionFiles() {
+//   const sessionPath = path.join(__dirname, ".wwebjs_auth/session");
+//   for (let retries = 5; retries > 0; retries--) {
+//     try {
+//       if (fs.existsSync(sessionPath)) {
+//         fs.rmSync(sessionPath, { recursive: true, force: true });
+//         // console.log("Session files deleted successfully.");
+//       }
+//       break; // Exit loop if deletion is successful
+//     } catch (error) {
+//       console.error("Failed to delete session files:", error.message);
+//       if (retries > 1) {
+//         console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
+//         await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
+//       }
+//     }
+//   }
+// }
 
-function initializeWhatsAppClient() {
-  // Remove all existing listeners to avoid duplication
-  if (client) {
-    client.removeAllListeners();
-  }
+// function initializeWhatsAppClient() {
+//   // Remove all existing listeners to avoid duplication
+//   if (client) {
+//     client.removeAllListeners();
+//   }
 
-  // Recreate the client to ensure fresh state
-  client = new Client({
-    puppeteer: {
-      headless: true,
-      ignoreHTTPSErrors: true,
-      args: [
-        "--ignore-certificate-errors",
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-accelerated-2d-canvas",
-        "--no-first-run",
-        "--no-zygote",
-        "--single-process",
-        "--disable-gpu",
-      ],
-    },
-    authStrategy: new LocalAuth(),
-  });
+//   // Recreate the client to ensure fresh state
+//   client = new Client({
+//     puppeteer: {
+//       headless: true,
+//       ignoreHTTPSErrors: true,
+//       args: [
+//         "--ignore-certificate-errors",
+//         "--no-sandbox",
+//         "--disable-setuid-sandbox",
+//         "--disable-dev-shm-usage",
+//         "--disable-accelerated-2d-canvas",
+//         "--no-first-run",
+//         "--no-zygote",
+//         "--single-process",
+//         "--disable-gpu",
+//       ],
+//     },
+//     authStrategy: new LocalAuth(),
+//   });
 
-  // Re-attach necessary event listeners
-  ensureQRCodeEvent();
+//   // Re-attach necessary event listeners
+//   ensureQRCodeEvent();
 
-  client.on("ready", async () => {
-    console.log("WhatsApp client is ready!");
-    whatsappClientReady = true;
-    isConnected = true;
-    // shared.connectedPhoneNumber = client.info.wid.user; // Store phone 
-    // console.log("Connected WhatsApp Number:", shared.connectedPhoneNumber);
-    connectedPhoneNumber = client.info.wid.user;
-    console.log("Connected WhatsApp Number:", connectedPhoneNumber);
-    // startKeepAlive(client);
-  });
+//   client.on("ready", async () => {
+//     console.log("WhatsApp client is ready!");
+//     whatsappClientReady = true;
+//     isConnected = true;
+//     // shared.connectedPhoneNumber = client.info.wid.user; // Store phone 
+//     // console.log("Connected WhatsApp Number:", shared.connectedPhoneNumber);
+//     connectedPhoneNumber = client.info.wid.user;
+//     console.log("Connected WhatsApp Number:", connectedPhoneNumber);
+//     // startKeepAlive(client);
+//   });
 
-  client.on("disconnected", async (reason) => {
-    console.log("WhatsApp client has been disconnected due to:", reason);
-    whatsappClientReady = false;
-    isConnected = false;
-    qrCodeData = "";
-    setTimeout(() => {
-      client.initialize();
-    }, 5000);
-    await cleanupSessionFiles();
-    initializeWhatsAppClient();
-  });
+//   client.on("disconnected", async (reason) => {
+//     console.log("WhatsApp client has been disconnected due to:", reason);
+//     whatsappClientReady = false;
+//     isConnected = false;
+//     qrCodeData = "";
+//     setTimeout(() => {
+//       client.initialize();
+//     }, 5000);
+//     await cleanupSessionFiles();
+//     initializeWhatsAppClient();
+//   });
 
-  client.on("auth_failure", async (message) => {
-    console.error("Authentication failure:", message);
-    whatsappClientReady = false;
-    isConnected = false;
-    qrCodeData = ""; // Reset QR code data on authentication failure
-    await cleanupSessionFiles();
-    initializeWhatsAppClient(); // Re-initialize to re-trigger QR code generation
-  });
+//   client.on("auth_failure", async (message) => {
+//     console.error("Authentication failure:", message);
+//     whatsappClientReady = false;
+//     isConnected = false;
+//     qrCodeData = ""; // Reset QR code data on authentication failure
+//     await cleanupSessionFiles();
+//     initializeWhatsAppClient(); // Re-initialize to re-trigger QR code generation
+//   });
 
-  whatsappClientReady = false; // Reset ready status
-  client
-    .initialize()
-    .then(() => {
-      console.log("Client re-initialized");
-    })
-    .catch((error) => {
-      console.error("Error re-initializing client:", error);
-    });
-}
+//   whatsappClientReady = false; // Reset ready status
+//   client
+//     .initialize()
+//     .then(() => {
+//       console.log("Client re-initialized");
+//     })
+//     .catch((error) => {
+//       console.error("Error re-initializing client:", error);
+//     });
+// }
 
-initializeWhatsAppClient();
+// initializeWhatsAppClient();
 
 app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
   try {
@@ -1835,6 +1908,14 @@ async function sendMessageToLead(
     "Trying to send message. Client ready status:",
     adminWA.isConnected
   );
+  const user = await logIncollection.findOne({ cid: adminWA.cid });
+  console.log(user);
+  const client = global.clients[user._id.toString()];
+  if (client) {
+    console.log("client availiable");
+  }
+  if (!client) return "User session not initialized";
+
 
   try {
     // If imagePath and captionText are provided, send image with caption
@@ -1868,310 +1949,8 @@ async function sendMessageToLead(
   }
 }
 
-let findNewLeadCount = 0;
-async function findNewLead(accessToken, user) {
-  console.log(findNewLeadCount, "aagyi lead");
-  findNewLeadCount++;
-  let admin;
-  try {
-    admin = await logIncollection.findOne({ cid: user.cid });
-  } catch (err) {
-    console.error("Error fetching admin: ", err);
-    return;
-  }
-
-  if (!admin) {
-    console.error("Admin not found.");
-    return;
-  }
-
-  let allNewLeads = [];
-  const pagesResponse = await axios.get(
-    `https://graph.facebook.com/v20.0/me/accounts`,
-    {
-      params: {
-        access_token: accessToken,
-        fields: "id,name,access_token",
-      },
-    }
-  );
-
-  const pages = pagesResponse.data.data;
-  console.log("Total pages fetched:", pages.length);
-  if (!pages.length) console.warn("No pages available for this account.");
-
-  let allLeads = [];
-
-  for (const page of pages) {
-    console.log(`Processing page: ${page.name} (ID: ${page.id})`);
-
-    try {
-      const leadFormsResponse = await axios.get(
-        `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
-        {
-          params: { access_token: page.access_token, fields: "id,name" },
-        }
-      );
-
-      const leadForms = leadFormsResponse.data.data;
-      console.log(`Forms fetched for page ${page.name}: ${leadForms.length}`);
-
-      // Loop through each form to fetch leads
-      for (const form of leadForms) {
-        console.log(`Fetching leads for form: ${form.name} (ID: ${form.id})`);
-
-        try {
-          const leadsResponse = await axios.get(
-            `https://graph.facebook.com/v20.0/${form.id}/leads`,
-            {
-              params: {
-                access_token: page.access_token,
-                fields: "id,created_time,field_data",
-              },
-            }
-          );
-
-          const leads = leadsResponse.data.data;
-          console.log(
-            `Total leads fetched for form ${form.name}: ${leads.length}`
-          );
-
-          leads.forEach((lead) => {
-            allLeads.push({
-              ...lead, // Include original lead data
-              page_id: page.id,
-              page_name: page.name,
-              form_id: form.id,
-              form_name: form.name,
-            });
-          });
-
-          if (leadsResponse.data.paging?.next) {
-            console.log(
-              `Pagination detected. Next page URL: ${leadsResponse.data.paging.next}`
-            );
-          }
-        } catch (err) {
-          console.error(
-            `Error fetching leads for form ${form.name}:`,
-            err.message
-          );
-        }
-      }
-    } catch (err) {
-      console.error(`Error fetching forms for page ${page.name}:`, err.message);
-    }
-  }
-
-  allLeads.forEach(async (lead) => {
-    const existingLead = await leadsModel.findOne({
-      lead_id: lead.id,
-      cid: admin.cid,
-    });
-
-    if (!existingLead) {
-      console.log("new lead found", lead);
-
-      let leads_datas = [];
-
-      lead.field_data.forEach((data) => {
-        leads_datas.push({
-          que: data.name,
-          ans: data.values[0],
-        });
-      });
-
-      // let defPipe = await pipelineModel.findOne({ num: 4 ,cid:user.cid});
-      const newLead = new leadsModel({
-        lead_id: lead.id,
-        income_time: lead.created_time,
-        page_id: lead.page_id,
-        page_name: lead.page_name,
-        form_id: lead.form_id,
-        form_name: lead.form_name,
-        cid: admin.cid,
-        leads_data: leads_datas,
-        // status: defPipe._id,
-        app: "facebook",
-      });
-      await newLead.save();
-
-      const mobileRegex = /^[6-9]\d{9}$/;
-      let leadContactNo;
-      newLead.leads_data.forEach((item) => {
-        const answer = item.ans.trim();
-
-        if (mobileRegex.test(answer)) {
-          console.log("Valid Mobile Number found:", answer);
-          leadContactNo = answer;
-        }
-      });
-
-      console.log(leadContactNo);
-      // leadContactNo = "9755313770";
-
-      const searchStrings = [
-        "name",
-        "your name",
-        "customer name",
-        "full name",
-        "first name",
-        "आपका नाम",
-        "नाम",
-        "पूरा नाम",
-        "ग्राहक का नाम",
-        "शुभ नाम",
-      ];
-
-      let customerName = "";
-
-      newLead.leads_data.forEach((item) => {
-        const isMatch = searchStrings.some((str) =>
-          item.que.toLowerCase().includes(str.toLowerCase())
-        );
-        if (isMatch) {
-          customerName = item.ans;
-        }
-      });
-
-      if (customerName) {
-        console.log("Matched customerName:", customerName);
-      } else {
-        customerName = "Sir/Madam";
-        console.log("Un-Matched then customerName:", customerName);
-      }
 
 
-      const wellcomeTemp = await templateModel.findOne({
-        cid: admin.cid,
-        num: 4,
-      });
-
-      // todo COUSTOMER Whatsapp Message
-      setTimeout(async () => {
-        let connStatus;
-        try {
-          connStatus = await WaModel.findOne({ cid: admin.cid });
-        } catch (err) {
-          console.error("Error fetching connStatus: ", err);
-        }
-
-        let imagePath, pdfPath;
-        if (wellcomeTemp.image !== "") {
-          imagePath = path.join(
-            __dirname,
-            "../template/images/uploads/whatsapp/",
-            wellcomeTemp.image
-          );
-        }
-        if (wellcomeTemp.pdf !== "") {
-          pdfPath = path.join(
-            __dirname,
-            "../template/images/uploads/whatsapp/",
-            wellcomeTemp.pdf
-          );
-        }
-        console.log("find new lead function auto call");
-
-        let msg = wellcomeTemp.text;
-
-        let companyName =
-          admin.organizationName !== null ||
-            admin.organizationName !== "undefined" ||
-            admin.organizationName !== ""
-            ? admin.organizationName
-            : "360FollowUps";
-
-        let personalizedMessage = msg
-          .replace("[customer name]", `*${customerName}*`)
-          .replace("[company name]", `*${companyName}*`)
-          .replace("[company name]", `*${companyName}*`);
-
-        // console.log(
-        //   connStatus,
-        //   leadContactNo,
-        //   personalizedMessage,
-        //   imagePath,
-        //   pdfPath
-        // );
-        console.log("Welcome to lead new lead found", leadContactNo);
-
-        personalizedMessage = capitalizeText(personalizedMessage);
-
-        sendMessageToLead(
-          connStatus,
-          leadContactNo,
-          personalizedMessage,
-          imagePath,
-          pdfPath
-        );
-      }, 5000);
-
-      // todo COUSTOMER Whatsapp Message for members
-      const notificationTemp = await templateModel.findOne({
-        cid: admin.cid,
-        num: 3,
-      });
-      setTimeout(async () => {
-        try {
-          connStatus = await WaModel.findOne({ cid: admin.cid });
-        } catch (err) {
-          console.error("Error fetching connStatus: ", err);
-        }
-        let msg = notificationTemp.text;
-
-        let companyName =
-          admin.organizationName !== null ||
-            admin.organizationName !== "" ||
-            admin.organizationName !== undefined
-            ? admin.organizationName
-            : "360FollowUps";
-        const today = new Date();
-
-        const day = String(today.getDate()).padStart(2, "0"); // Din (2 digits)
-        const month = String(today.getMonth() + 1).padStart(2, "0"); // Month (0-based index, isliye +1)
-        const year = today.getFullYear(); // Year
-
-        const formattedDate = `${day}-${month}-${year}`;
-
-        // todo new lead found msg to Admin
-        let personalizedMessage = msg
-          .replace("[team member name]", `*${admin.name}*`)
-          .replace("[customer name]", `*${customerName}*`)
-          .replace("[customer contact number]", `*${customerName}*`)
-          .replace("[date]", `*${formattedDate}*`)
-          .replace("[lead source]", "*facebook*")
-          .replace("[company name]", `*${companyName}*`);
-        console.log("notificaton to admin new lead found ", admin.mobile);
-
-        personalizedMessage = capitalizeText(personalizedMessage);
-
-        sendMessageToLead(connStatus, admin.mobile, personalizedMessage);
-
-        // todo new lead found msg to all Members
-        let users = await memberModel.find({ cid: admin.cid });
-        for (let i = 0; i < users.length; i++) {
-          setTimeout(() => {
-            let personalizedMessage = msg
-              .replace("[team member name]", `*${users[i].name}*`)
-              .replace("[customer name]", `*${customerName}*`)
-              .replace("[customer contact number]", `*${customerName}*`)
-              .replace("[date]", `*${formattedDate}*`)
-              .replace("[lead source]", "*facebook*")
-              .replace("[company name]", `*${companyName}*`);
-            console.log("notification to members new lead found", users[i].mobile); 
-            personalizedMessage = capitalizeText(personalizedMessage);
-            sendMessageToLead(connStatus, users[i].mobile, personalizedMessage);
-          }, 2000);
-        }
-      }, 2500);
-
-      allNewLeads.push(newLead);
-    }
-  });
-
-  return allLeads;
-}
 
 
 let chalteRahoId;
@@ -2179,6 +1958,9 @@ function chalteRaho(token, user) {
   let i = 0;
 
   chalteRahoId = setInterval(() => {
+    if (user && token) {
+      console.log(user.name, "token availiable");
+    }
     findNewLead(token, user);
     console.log("step", i++);
   }, 60000);
