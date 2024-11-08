@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const cron = require('node-cron');
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qr = require("qr-image");
 const fs = require("fs");
@@ -361,8 +361,10 @@ router.get("/get/users", async (req, res) => {
     let allUsers = await logIncollection.find();
     allUsers.forEach(async (user) => {
       console.log("Username:- ", user.name);
+
       if (user.facebookToken) {
         console.log("User FB token :- ", user.facebookToken);
+
         await findNewLead(user.facebookToken, user);
       } else console.log("FB token not availiable");
     });
@@ -963,3 +965,33 @@ function deleteSessionDirectory(userId) {
       console.log(`No session directory found for user ${userId}.`);
   }
 }
+
+
+
+// ! sir node crone work 
+cron.schedule('* * * * *', async () => {
+  try {
+    let allUsers = await logIncollection.find();
+    allUsers.forEach(async (user) => {
+      console.log("Username:- ", user.name);
+
+      if (user.facebookToken) {
+        console.log("User FB token :- ", user.facebookToken);
+        
+        await findNewLead(user.facebookToken, user);
+      } else console.log("FB token not availiable");
+    });
+    
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+// cron.schedule('* * * * *', async () => {
+//   try {
+//     const response = await axios.get("https://360followups.com/get/users");
+//     console.log(response.data);
+//   } catch (error) {
+//     console.error('Error fetching data', error);
+//   }
+// });
