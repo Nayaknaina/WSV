@@ -728,7 +728,7 @@
                                     </span>
                                 </div>
 
-                                <a href="/qr" id="whatsapp-Connect-Btn" class="btn btn-sm btn-outline-secondary">Connect
+                                <a href="/qr" onclick="findLead()" id="whatsapp-Connect-Btn" class="btn btn-sm btn-outline-secondary">Connect
                                     Now</a>
                                 <a href="/logoutWA" id="whatsapp-Logout-Btn" class="btn btn-sm btn-danger"
                                     style="display: none;">Logout</a>
@@ -2225,7 +2225,22 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+<script>
+    async function findLead(){
+        let loadBox = document.querySelector('#findNewLeadloader')
+            
+        
+        let body = document.querySelector('body')
+        if(loadBox){
+            console.log('clickkeeedddd')
+            loadBox.style.display = 'flex'
+            body.style.height =  100vh !important
+            body.style.overflow = 'hidden'
+        }
+       
+            window.location.href = '/leads/pre'
+    }
+</script>
 </body>
 
 </html>
