@@ -207,6 +207,7 @@ router.get("/qr", authenticateToken, async (req, res) => {
   const wa = await waModel.findOne({ cid: user.cid });
   console.log(user);
   // Create a new client for the user
+  if(wa) return res.render('qr',{qrCodeData: null});
   const client = createClient(user._id.toString());
 
   client.on("qr", async (qrCode) => {
@@ -285,6 +286,7 @@ router.get("/connection-status", authenticateToken, async (req, res) => {
   } else {
     user = await memberModel.findById(req.user.id);
   }
+
   let admin = await logIncollection.findOne({cid:req.user.cid});
   const client = global.clients[admin._id];
   if (client) {
@@ -948,7 +950,7 @@ async function handleDisconnection(client, userId) {
 }
 
 
-findLeadsForEveryUsers();
+// findLeadsForEveryUsers();
 
 // module.exports = sendMessageToLead
 function deleteSessionDirectory(userId) {

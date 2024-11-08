@@ -667,10 +667,11 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
     }
     if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
       // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
-      console.log("you not have fb token");
+      // console.log("you not have fb token");
       req.session.errorMSG = `Facebook Account Not Connected. Please Connect to Find New Leads.`;
     
     }
+    let ALLLEADS = await leadsModel.find({cid: user.cid})
     // Build the filter object
     const filter = { cid: user.cid };
     if (customerName) {
@@ -733,12 +734,12 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
     delete req.session.successMSG;
     delete req.session.errorMSG;
     delete req.session.warnMsg;
-    user.myleads.forEach(elem => console.log(elem._id + "====="))
+    // user.myleads.forEach(elem => console.log(elem._id + "====="))
 
     // let userMyLeads = user.myleads
     let userMyLeads = [...user.myleads].reverse();
-    userMyLeads.forEach(elem => console.log(elem._id))
-    // console.log(userMyLeads[0]);
+    // userMyLeads.forEach(elem => console.log(elem._id))
+    // console.log(leadsWithCustomerInfo.length);
 
     res.render("leads", {
       user,
@@ -747,6 +748,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
       myleads: leadsWithCustomerInfo,
       leads: leadsWithCustomerInfo,
       pipes,
+      ALLLEADS,
       members,
       currentPage: parseInt(page),
       totalPages,

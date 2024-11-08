@@ -65,6 +65,37 @@ hbs.registerHelper("formatDate", function (datetime) {
     return filteredLeads;
   });
   
+  hbs.registerHelper("filterLeadsArrayForMember", function (leads, userId) {
+    // Check if leads is defined and is an array
+    // userId = userId.toString()
+    if (!Array.isArray(leads)) {
+      return []; // Return an empty array if leads is not an array
+    }
+    console.warn(typeof userId);
+    let i = 0;
+    // Filter leads where `uid` is null, an empty string, or matches `userId`
+    const filteredLeads = leads.filter(
+      (lead) => {
+        
+          // console.log("lead.uid")
+          // console.warn(lead._id === userId)
+          // console.log("lead.uid")
+
+          if (lead.uid && lead.uid.toString() === userId.toString()) {
+            console.log("Match found!");
+            return true
+          }
+        
+        // if(lead.uid._id === '672c8e8db11d69f16acd2983'){
+        // }
+        lead.uid == userId
+
+      }
+    );
+
+    return filteredLeads;
+  });
+
   hbs.registerHelper("ifEquals", function (arg1, arg2, options) {
     return arg1 === arg2 ? options.fn(this) : options.inverse(this);
   });
@@ -82,7 +113,7 @@ hbs.registerHelper("formatDate", function (datetime) {
   
 
   hbs.registerHelper('findAnswer', function(leads_data) {
-    console.log(leads_data);
+    // console.log(leads_data);
     
     const searchStrings = [
       "name",
@@ -140,4 +171,22 @@ hbs.registerHelper("formatDate", function (datetime) {
       .replace(/_(.*?)_/g, '<em>$1</em>')            // Convert _text_ to <em>text</em>
       .replace(/\n/g, '<br>')  
     );
+  });
+
+  hbs.registerHelper('findMobileNumber', function(leads_data) {
+    // Mobile number regex for Indian numbers (10 digits)
+    const mobileRegex = /(?:\+91[\s\-]?)?(\d{10})/;
+  
+    // Loop over the leads_data array
+    for (let i = 0; i < leads_data.length; i++) {
+      const lead = leads_data[i];
+      
+      // Check if 'que' contains a mobile number
+      if (lead.que && mobileRegex.test(lead.que)) {
+        const match = lead.que.match(mobileRegex);
+        return match[0]; // Return the first matched mobile number
+      }
+    }
+  
+    return 'No mobile number found'; // Default response if no match is found
   });
