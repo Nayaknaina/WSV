@@ -33,7 +33,7 @@ const leadsModel = require("./models/leads.model.js");
 const templateModel = require("./models/temlate.model.js");
 const WaModel = require("./models/wA.model.js");
 
-const WhtasappRoute=require("./whatsappRoute/whatsapp.js");
+const WhtasappRoute = require("./whatsappRoute/whatsapp.js");
 const paymentRoute = require("./routes/payment.route.js");
 const memberRoute = require("./routes/members.route.js");
 const userRoute = require("./routes/users.route.js");
@@ -448,18 +448,59 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     }
     await newManualLead.save();
     await user.save();
-    const mobileRegex = /^[6-9]\d{9}$/;
-    let leadContactNo;
-    newManualLead.leads_data.forEach((item) => {
-      const answer = item.ans.trim();
+    const mobileRegex = /^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/;
+    let leadContactNo = null;
+    // newLead.leads_data.forEach((item) => {
+    //   const answer = item.ans.trim();
+
+    //   if (mobileRegex.test(answer)) {
+    //     console.log("Valid Mobile Number found: try 1", answer);
+    //     return (leadContactNo = answer);
+    //   }
+    // });
+    for (let i = 0; i < newManualLead.leads_data.length; i++) {
+      const answer = newManualLead.leads_data[i].ans.trim();
 
       if (mobileRegex.test(answer)) {
-        console.log("Valid Mobile Number found:", answer);
-        return (leadContactNo = answer);
+        console.log("Valid Mobile Number found: try 1", answer);
+        leadContactNo = answer;
+        break;
       }
-    });
+    }
 
-    leadContactNo = `${Admin.countryCode}${leadContactNo}`;
+
+    if (leadContactNo == null) {
+      const mobileRegex = /^\+?\d{1,3}\d{10}$/;
+
+      for (let i = 0; i < newManualLead.leads_data.length; i++) {
+        const answer = newManualLead.leads_data[i].ans.trim();
+
+        if (mobileRegex.test(answer)) {
+          console.log("Valid Mobile Number found: try 2", answer);
+          leadContactNo = answer;
+          break;
+        }
+      }
+    }
+
+    if (leadContactNo == null) {
+      const mobileRegex = /^\d{10}$/;
+
+      for (let i = 0; i < newManualLead.leads_data.length; i++) {
+        const answer = newManualLead.leads_data[i].ans.trim();
+
+        if (mobileRegex.test(answer)) {
+          console.log("Valid Mobile Number found: try 3", answer);
+          leadContactNo = answer;
+          break;
+        }
+      }
+    }
+
+
+    console.warn("new lead found and just store in DB", leadContactNo);
+
+
 
     const searchStrings = [
       "name",
@@ -558,8 +599,8 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       // console.log("wellcome to lead ", leadContactNo);
       let msg = wellcomeTemp.text;
       let companyName = Admin.organizationName || "360FollowUps";
-        console.log("company name", companyName);
-        console.log(Admin.organizationName);
+      console.log("company name", companyName);
+      console.log(Admin.organizationName);
 
 
 
@@ -589,7 +630,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       ); // reminder temp for user
     }, 4500);
 
-   
+
     const remarkDateTime = new Date(`${remarkDate}T${remarkTime}`);
     const currentTime = new Date();
 
@@ -720,6 +761,8 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       }
       console.log("/remark/add/:id");
       console.log("thanks to lead ", leadContactNo);
+      console.log("Yahin se");
+
 
       let msg = thnakyouLeadTemplate.text;
       let companyName =
@@ -858,7 +901,6 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
 
   if (req.user.role === "admin") {
     user = await logIncollection.findById(req.user.id);
-    //CHNGES 
   } else user = await memberModel.findById(req.user.id);
 
   if (!req.session.access) {
@@ -866,6 +908,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
     req.session.errorMSG = `Subscription expired. Please renew to continue.`;
     return res.redirect('/leads')
   }
+
   let Admin = await logIncollection.findOne({ cid: user.cid });
 
   let userContact = `${user.countryCode}${user.mobile}`;
@@ -886,61 +929,49 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
   await lead.save();
   // console.log(lead);
 
-  const mobileRegex = /^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/  ;
-  let leadContactNo =null;
-  // lead.leads_data.forEach((item) => {
-  //   const answer = item.ans.trim();
-
-  //   if (mobileRegex.test(answer)) {
-  //     console.log("Valid Mobile Number found: try 1", answer);
-  //     return (leadContactNo = answer);
-  //   }
-  // });
+  const mobileRegex = /^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/;
+  let leadContactNo = null;
   for (let i = 0; i < lead.leads_data.length; i++) {
     const answer = lead.leads_data[i].ans.trim();
-  
+
     if (mobileRegex.test(answer)) {
       console.log("Valid Mobile Number found: try 1", answer);
       leadContactNo = answer;
-      break; 
+      break;
     }
   }
-  
 
-  if (leadContactNo==null) {
-    const mobileRegex = /^\+?\d{1,3}\d{10}$/  ;
+
+  if (leadContactNo == null) {
+    const mobileRegex = /^\+?\d{1,3}\d{10}$/;
 
     for (let i = 0; i < lead.leads_data.length; i++) {
       const answer = lead.leads_data[i].ans.trim();
-    
+
       if (mobileRegex.test(answer)) {
         console.log("Valid Mobile Number found: try 2", answer);
         leadContactNo = answer;
-        break; 
+        break;
       }
     }
   }
 
-  if (leadContactNo==null) {
-    const mobileRegex = /^\d{10}$/  ;
+  if (leadContactNo == null) {
+    const mobileRegex = /^\d{10}$/;
 
     for (let i = 0; i < lead.leads_data.length; i++) {
       const answer = lead.leads_data[i].ans.trim();
-    
+
       if (mobileRegex.test(answer)) {
         console.log("Valid Mobile Number found: try 3", answer);
         leadContactNo = answer;
-        break; 
+        break;
       }
     }
   }
-  if (leadContactNo !== null) {
-    leadContactNo = `${Admin.countryCode}${leadContactNo}`
-    console.log("10 dig number found");
-    
-  }
-  console.warn("Lead contact number debugginngg",leadContactNo);
-  
+
+  console.warn("Lead contact number debugginngg", leadContactNo);
+
   const searchStrings = [
     "name",
     "Name",
@@ -997,7 +1028,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
   }
 
   console.log(leadContactNo);
- 
+
   const remarkDateTime = new Date(`${date}T${time}:00`);
   const currentTime = new Date();
 
@@ -1018,7 +1049,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
     }
   }
 
-  //todo  reminder message for team member
+  //!reminder message for team member
   if (timeDifference > 0) {
     // let reminderTempImagePath,reminderTempPdfPath;
     setTimeout(async () => {
