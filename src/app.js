@@ -55,6 +55,46 @@ let whatsappClientReady = false;
 let isConnected = false;
 let connectedPhoneNumber = "";
 
+function getFormattedTimestamp() {
+  const now = new Date();
+  const date = now.toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
+  const time = now.toLocaleTimeString('en-GB', { hour12: false }); // Format as HH:MM:SS in 24-hour
+  return `${date} T ${time}`;
+}
+const logFilePath = path.join(__dirname, 'Dev-server.log');
+
+// Create a write stream for logging into file
+const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
+// Override console.log to log to both file and terminal with custom timestamp format
+const originalConsoleLog = console.log;
+console.log = (...args) => {
+  const message = args.join(' ');
+  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+  logStream.write(timestampedMessage); // Write to file
+  originalConsoleLog(timestampedMessage); // Write to terminal
+};
+
+const originalConsoleError = console.error;
+console.error = (...args) => {
+const message = args.join(' ');
+const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+logStream.write(timestampedMessage); // Write to file
+originalConsoleError(timestampedMessage); // Write to terminal
+};
+const originalConsoleWarn = console.warn;
+console.warn = (...args) => {
+const message = args.join(' ');
+const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+logStream.write(timestampedMessage); // Write to file
+originalConsoleWarn(timestampedMessage); // Write to terminal
+};
+
+app.use((req, res, next) => {
+  const logMessage = ` ${req.method} ${req.url} ${res.statusCode}`;
+  console.log(logMessage); // This will log to both file and terminal
+  next();
+});
+
 // Initialize the WhatsApp Client with Local Authentication
 // let client = new Client({
 //   puppeteer: {
@@ -1679,6 +1719,100 @@ app.get("/logoutfacebook", isAdminLoggedIn, async (req, res) => {
   }
 });
 
+app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
+  try {
+    const user = await logIncollection.findById(req.user.id);
+    if (user.teams.length >= 3 && user.subscriptionLevel === "free") {
+      req.session.errorMSG = `free`;
+      return res.redirect("/user/team");
+    }
+    if (user.teams.length >= 7 && user.subscriptionLevel === "basic") {
+      req.session.errorMSG = `basic`;
+      return res.redirect("/user/team");
+    }
+    let companyName = user.organizationName || "360FollowUps";
+    const { name, email, mobile, countryCode } = req.query;
+    // console.log(req.query);
+
+    let preMem = await memberModel.findOne({ email: email });
+    if (preMem !== null) {
+      req.session.errorMSG = `This email ID is already registered`;
+      return res.redirect("/user/team");
+    }
+    preMem = await logIncollection.findOne({ email: email });
+    if (preMem !== null) {
+      req.session.errorMSG = `This email ID is already registered`;
+      return res.redirect("/user/team");
+    }
+
+    const password = otpGenerator.generate(8, {
+      digits: true,
+      lowerCaseAlphabets: true,
+      upperCaseAlphabets: true,
+      specialChars: false,
+    });
+
+    //   const mailMsg = `
+    //   <div style="font-family: Arial, sans-serif; color: #333;">
+    //     <div style="text-align: center;">
+    //       <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
+    //       <h2>Web Soft Valley</h2>
+    //       <p>Developing Future</p>
+    //     </div>
+    //     <h3>Hello ${name} !</h3>
+    //     <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
+    //     <p>Email: <a href="mailto:${email}">${email}</a></p>
+    //     <p>Password: <strong>${password}</strong></p>
+    //     <div style="text-align: center;">
+    //       <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+    //         Login to Dashboard
+    //       </a>
+    //     </div>
+    //     <p>Regards,<br>Web Soft Valley Technology</p>
+    //   </div>
+    // `;
+
+    // const subject = Invitation from ${user.name};
+    // const isSent = await sendMail(email, mailMsg, subject);
+    // console.log(isSent);
+
+    const leadContactNo = `${countryCode}${mobile}`;
+    // console.log(name);
+
+    const text = `Hello ${name} 👋🏻 \n\n Your account has been created successfully by ${companyName} 🤗. You can log in now and start using our service. 
+    \n Your login credentials are stated below
+    \n Your email: ${email}
+    \n Your password : ${password}
+    \n🔗 https://360followups.com/member/login`;
+
+    let connStatus = await WaModel.findOne({ cid: user.cid });
+
+    const newMember = new memberModel({
+      name,
+      email,
+      password,
+      countryCode,
+      mobile,
+      cid: user.cid,
+      owner_id: user._id,
+    });
+    await newMember.save();
+    user.teams.push(newMember._id);
+    await user.save();
+
+    setTimeout(() => {
+      console.log("/team/invite route");
+      console.log(connStatus, leadContactNo);
+
+      sendMessageToLead(connStatus, leadContactNo, text); // after temp msg sending to lead
+    }, 4000);
+    req.session.successMSG = `you have invited ${name} as a team member !. `;
+  } catch (error) {
+    console.log(error);
+  }
+  return res.redirect("/user/team");
+});
+
 app.get("/:page", (req, res) => {
   const page = req.params.page;
   const filePath = path.join(static_path, `${page}.html`);
@@ -1689,6 +1823,19 @@ app.get("/:page", (req, res) => {
     }
   });
 });
+
+
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1); // Exit the process to restart the server
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+  process.exit(1); // Exit the process to restart the server
+});
+
 
 // Start the server
 app.listen(port, () => {
@@ -1823,99 +1970,7 @@ function isAdminLoggedIn(req, res, next) {
 
 // initializeWhatsAppClient();
 
-app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
-  try {
-    const user = await logIncollection.findById(req.user.id);
-    if (user.teams.length >= 3 && user.subscriptionLevel === "free") {
-      req.session.errorMSG = `free`;
-      return res.redirect("/user/team");
-    }
-    if (user.teams.length >= 7 && user.subscriptionLevel === "basic") {
-      req.session.errorMSG = `basic`;
-      return res.redirect("/user/team");
-    }
-    let companyName = user.organizationName || "360FollowUps";
-    const { name, email, mobile, countryCode } = req.query;
-    // console.log(req.query);
 
-    let preMem = await memberModel.findOne({ email: email });
-    if (preMem !== null) {
-      req.session.errorMSG = `This email ID is already registered`;
-      return res.redirect("/user/team");
-    }
-    preMem = await logIncollection.findOne({ email: email });
-    if (preMem !== null) {
-      req.session.errorMSG = `This email ID is already registered`;
-      return res.redirect("/user/team");
-    }
-
-    const password = otpGenerator.generate(8, {
-      digits: true,
-      lowerCaseAlphabets: true,
-      upperCaseAlphabets: true,
-      specialChars: false,
-    });
-
-    //   const mailMsg = `
-    //   <div style="font-family: Arial, sans-serif; color: #333;">
-    //     <div style="text-align: center;">
-    //       <img src="https://example.com/logo.png" alt="Web Soft Valley" style="width: 100px;"/>
-    //       <h2>Web Soft Valley</h2>
-    //       <p>Developing Future</p>
-    //     </div>
-    //     <h3>Hello ${name} !</h3>
-    //     <p>Congratulations! Your account has been created successfully. You can log in now and start using our service.</p>
-    //     <p>Email: <a href="mailto:${email}">${email}</a></p>
-    //     <p>Password: <strong>${password}</strong></p>
-    //     <div style="text-align: center;">
-    //       <a href="https://360followups.com/member/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-    //         Login to Dashboard
-    //       </a>
-    //     </div>
-    //     <p>Regards,<br>Web Soft Valley Technology</p>
-    //   </div>
-    // `;
-
-    // const subject = Invitation from ${user.name};
-    // const isSent = await sendMail(email, mailMsg, subject);
-    // console.log(isSent);
-
-    const leadContactNo = `${countryCode}${mobile}`;
-    // console.log(name);
-
-    const text = `Hello ${name} 👋🏻 \n\n Your account has been created successfully by ${companyName} 🤗. You can log in now and start using our service. 
-    \n Your login credentials are stated below
-    \n Your email: ${email}
-    \n Your password : ${password}
-    \n🔗 https://360followups.com/member/login`;
-
-    let connStatus = await WaModel.findOne({ cid: user.cid });
-
-    const newMember = new memberModel({
-      name,
-      email,
-      password,
-      countryCode,
-      mobile,
-      cid: user.cid,
-      owner_id: user._id,
-    });
-    await newMember.save();
-    user.teams.push(newMember._id);
-    await user.save();
-
-    setTimeout(() => {
-      console.log("/team/invite route");
-      console.log(connStatus, leadContactNo);
-
-      sendMessageToLead(connStatus, leadContactNo, text); // after temp msg sending to lead
-    }, 4000);
-    req.session.successMSG = `you have invited ${name} as a team member !. `;
-  } catch (error) {
-    console.log(error);
-  }
-  return res.redirect("/user/team");
-});
 
 async function sendMessageToLead(
   adminWA,
