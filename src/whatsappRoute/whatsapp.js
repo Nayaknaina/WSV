@@ -412,7 +412,7 @@ async function sendMessageToLead(
   if (client) {
     console.log("client availiable");
   }
-  if (!client) return res.status(400).send("User session not initialized");
+  if (!client) return "User session not initialized";
 
   try {
     // If imagePath and captionText are provided, send image with caption
