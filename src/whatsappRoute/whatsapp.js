@@ -273,7 +273,6 @@ router.get("/send-message", authenticateToken, async (req, res) => {
     res.redirect("/user/dashboard");
   } catch (error) {
     console.log(error);
-    res.status(500).send("Failed to send message");
   }
 });
 
