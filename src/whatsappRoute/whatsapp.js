@@ -23,6 +23,7 @@ const {
 } = require("../middilware/middilware");
 const memberModel = require("../models/member.model");
 const { sendMail } = require("../service/mailSender");
+// const { startKeepAlive } = require("../middilware/whatsapp");
 
 // const logIncollection = require("../models/admin.model");
 
@@ -559,7 +560,7 @@ async function findNewLead(accessToken, user) {
         });
       });
 
-      let defPipe = await pipelineModel.findOne({ num: 1, cid: user.cid });
+      let defPipe = await pipelineModel.findOne({ defaultVal: true, cid: user.cid });
       const newLead = new leadsModel({
         lead_id: lead.id,
         income_time: lead.created_time,
@@ -738,14 +739,14 @@ console.warn("we just found lead and store and find costomer name ",customerName
       personalizedMessage = capitalizeText(personalizedMessage);
 
       console.warn(`in timeout`, leadContactNo);
-
-      sendMessageToLead(
-        connStatus,
-        leadContactNo,
-        personalizedMessage,
-        imagePath,
-        pdfPath
-      );
+      console.warn(`message sending for customer Wellcome template`, leadContactNo);
+      // sendMessageToLead(
+      //   connStatus,
+      //   leadContactNo,
+      //   personalizedMessage,
+      //   imagePath,
+      //   pdfPath
+      // );
       }, 100);
 
       // todo new lead Whatsapp Message for members and admin
@@ -877,25 +878,26 @@ function deleteSessionDirectory(userId) {
 
 
 // !  node crone work 
-// cron.schedule('* * * * *', async () => {
-//   try {
-//     let allUsers = await logIncollection.find();
-//     allUsers.forEach(async (user) => {
-//       console.log("Username:- ", user.name);
+cron.schedule('* * * * *', async () => {
+  try {
+    let allUsers = await logIncollection.find();
+    allUsers.forEach(async (user) => {
+      console.log("Username:- ", user.name);
 
-//       if (user.facebookToken) {
-//         console.log("User FB token :- ", user.facebookToken);
+      if (user.facebookToken) {
+        console.log("User FB token :- ", user.facebookToken);
         
-//         await findNewLead(user.facebookToken, user);
-//       } else console.log("FB token not availiable");
+        await findNewLead(user.facebookToken, user);
+      } else console.log("FB token not availiable");
 
-//       // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
-//     });
+      // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
+    });
     
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
+  } catch (err) {
+    console.log(err);
+  }
+
+});
 
 // todo  to delete un-used whtasapp session file in 5 hours interval using crone
 
@@ -978,3 +980,26 @@ async function removeSessionDirectoriesOnRestartServer() {
 
 removeSessionDirectoriesOnRestartServer()
 // todo remove all whatsapp session files from dir and delete docs from db fun
+
+// todo light weight activitys using client
+// cron.schedule('* * * * *', async () => {
+//   try {
+//      const sessionPath = path.join(__dirname, "sessions");
+//     if (!fs.existsSync(sessionPath)) return;
+  
+//     // Read each client directory in the sessions folder
+//     const userIds = fs
+//       .readdirSync(sessionPath)
+//       .map((userId) => userId.replace("session-", ""));
+//     console.log(...userIds)
+
+//     userIds.forEach((user_id)=>{
+//       const client = global.clients[user_id];
+//       startKeepAlive(client)
+//     })
+ 
+//   } catch (err) {
+//     console.log(err);
+//   }
+
+// });
