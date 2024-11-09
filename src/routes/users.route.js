@@ -875,8 +875,9 @@ router.get("/member/un-blocked/:id", isAdminLoggedIn, async (req, res) => {
 
 router.post('/upload-csv', isAdminLoggedIn, uploadCSV.single('file'), csvFileDataChangIntoLeadHandler);
 
-router.get("/reset/all/temp", isAdminLoggedIn, async (req, res) => {
-  let user = await logIncollection.findById(req.user.id);
+router.get("/reset/all-users/temp", async (req, res) => {
+  let users = await logIncollection.find();
+  users.forEach(async (user) => {
 
   try {
     const result = await templateModel.deleteMany({ cid: user.cid });
@@ -992,8 +993,9 @@ The [Company Name] Team`,
     })
   );
   await user.save();
-
-  return res.status(200).json({ msg: 'done' });
+  
+});
+  return res.redirect('/template');
 });
 
 
@@ -1009,9 +1011,9 @@ router.get("/mysubscription", isAdminLoggedIn, async (req, res) => {
 });
 
 
-router.get("/reset/all/pipes", isAdminLoggedIn, async (req, res) => {
-  let user = await logIncollection.findById(req.user.id);
-
+router.get("/reset/all-users/pipes", async (req, res) => {
+  let users = await logIncollection.find();
+users.forEach(async (user) => {
   try {
     const result = await pipelineModel.deleteMany({ cid: user.cid });
     console.log(`${result.deletedCount} documents deleted.`);
@@ -1049,8 +1051,8 @@ router.get("/reset/all/pipes", isAdminLoggedIn, async (req, res) => {
   );
 
   await user.save();
-
-  res.redirect("/template");
+});
+  res.redirect("/dashbooard");
 });
 
 router.get('/get/users',async (req,res)=>{
