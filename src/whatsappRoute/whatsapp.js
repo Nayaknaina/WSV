@@ -13,12 +13,16 @@ const leadsModel = require("../models/leads.model");
 const pipelineModel = require("../models/pipeline.model");
 const remarkModel = require("../models/remark.model");
 const templateModel = require("../models/temlate.model");
+// const Agenda = require('agenda');
+
+
 const {
   findMobileNumber,
   capitalizeText,
   checkSubscription,
 } = require("../middilware/middilware");
 const memberModel = require("../models/member.model");
+const { sendMail } = require("../service/mailSender");
 
 // const logIncollection = require("../models/admin.model");
 
@@ -65,39 +69,7 @@ function createClient(userId) {
   });
 }
 
-// todo backup
-async function createClientOld(userId) {
-  console.log("Creating client for user:", userId);
-
-  const client = new Client({
-    authStrategy: new LocalAuth({
-      clientId: userId, // Unique client ID for each user
-      dataPath: path.join(__dirname, "sessions"), // Session data path
-    }),
-  });
-
-  client.on("ready", () => {
-    console.log(`WhatsApp client is ready for user ${userId}`);
-  });
-
-  client.on("auth_failure", (msg) => {
-    console.error("Authentication failure for user:", userId, msg);
-  });
-
-  client.on("disconnected", () => {
-    console.log("Client disconnected for user:", userId);
-    delete global.clients[userId]; // Cleanup on disconnect
-  });
-  client.initialize();
-  console.log("before delay");
-
-  await delay(10000);
-  console.log("afterdelay");
-  return client;
-}
-// Function to restore all clients from session directory on server startup
-// todo backup
-
+// // todo backup
 // async function createClientOld(userId) {
 //   console.log("Creating client for user:", userId);
 
@@ -120,14 +92,88 @@ async function createClientOld(userId) {
 //     console.log("Client disconnected for user:", userId);
 //     delete global.clients[userId]; // Cleanup on disconnect
 //   });
+//   client.initialize();
+//   console.log("before delay");
 
-//   // Initialize the client
-//   await client.initialize();
-
+//   await delay(10000);
+//   console.log("afterdelay");
 //   return client;
 // }
+// // Function to restore all clients from session directory on server startup
+// // todo backup
 
-// todo backup
+// // async function createClientOld(userId) {
+// //   console.log("Creating client for user:", userId);
+
+// //   const client = new Client({
+// //     authStrategy: new LocalAuth({
+// //       clientId: userId, // Unique client ID for each user
+// //       dataPath: path.join(__dirname, "sessions"), // Session data path
+// //     }),
+// //   });
+
+// //   client.on("ready", () => {
+// //     console.log(`WhatsApp client is ready for user ${userId}`);
+// //   });
+
+// //   client.on("auth_failure", (msg) => {
+// //     console.error("Authentication failure for user:", userId, msg);
+// //   });
+
+// //   client.on("disconnected", () => {
+// //     console.log("Client disconnected for user:", userId);
+// //     delete global.clients[userId]; // Cleanup on disconnect
+// //   });
+
+// //   // Initialize the client
+// //   await client.initialize();
+
+// //   return client;
+// // }
+
+// // todo backup
+// // async function restoreClients() {
+// //   const sessionPath = path.join(__dirname, "sessions");
+// //   if (!fs.existsSync(sessionPath)) return;
+
+// //   // Read each client directory in the sessions folder
+// //   const userIds = fs
+// //     .readdirSync(sessionPath)
+// //     .map((userId) => userId.replace("session-", ""));
+
+// //   // for (const userId of userIds) {
+// //   //   try {
+// //   //     // Create and await client to be ready
+// //   //     const client = await createClientOld(userId); // Wait for client to initialize and be ready
+// //   //     global.clients[userId] = client; // Storing client in global object
+
+// //   //     console.warn(`before delay in loop for user ${userId}`);
+// //   //     await delay(10000);
+// //   //     console.log(`after delay in loop for user ${userId}`);
+// //   //     console.log(`Client restored for user ${userId}`);
+// //   //   } catch (error) {
+// //   //     console.error(`Failed to restore client for user ${userId}:`, error);
+// //   //   }
+// //   // }
+
+// //   const clientPromises = userIds.map(async (userId) => {
+// //     try {
+// //       // Create and await client to be ready
+// //       const client = await createClientOld(userId); // Wait for client to initialize and be ready
+// //       global.clients[userId] = client; // Storing client in global object
+// //       console.log(`Client restored for user ${userId}`);
+// //     } catch (error) {
+// //       console.error(`Failed to restore client for user ${userId}:`, error);
+// //     }
+// //   });
+
+// //   // Wait for all clients to initialize
+// //   await Promise.all(clientPromises); // This ensures that all clients initialize simultaneously
+// //   console.log("All clients have been restored successfully.");
+
+// // }
+
+// // todo backup
 // async function restoreClients() {
 //   const sessionPath = path.join(__dirname, "sessions");
 //   if (!fs.existsSync(sessionPath)) return;
@@ -136,21 +182,6 @@ async function createClientOld(userId) {
 //   const userIds = fs
 //     .readdirSync(sessionPath)
 //     .map((userId) => userId.replace("session-", ""));
-
-//   // for (const userId of userIds) {
-//   //   try {
-//   //     // Create and await client to be ready
-//   //     const client = await createClientOld(userId); // Wait for client to initialize and be ready
-//   //     global.clients[userId] = client; // Storing client in global object
-
-//   //     console.warn(`before delay in loop for user ${userId}`);
-//   //     await delay(10000);
-//   //     console.log(`after delay in loop for user ${userId}`);
-//   //     console.log(`Client restored for user ${userId}`);
-//   //   } catch (error) {
-//   //     console.error(`Failed to restore client for user ${userId}:`, error);
-//   //   }
-//   // }
 
 //   const clientPromises = userIds.map(async (userId) => {
 //     try {
@@ -166,43 +197,19 @@ async function createClientOld(userId) {
 //   // Wait for all clients to initialize
 //   await Promise.all(clientPromises); // This ensures that all clients initialize simultaneously
 //   console.log("All clients have been restored successfully.");
-
 // }
 
-// todo backup
-async function restoreClients() {
-  const sessionPath = path.join(__dirname, "sessions");
-  if (!fs.existsSync(sessionPath)) return;
-
-  // Read each client directory in the sessions folder
-  const userIds = fs
-    .readdirSync(sessionPath)
-    .map((userId) => userId.replace("session-", ""));
-
-  const clientPromises = userIds.map(async (userId) => {
-    try {
-      // Create and await client to be ready
-      const client = await createClientOld(userId); // Wait for client to initialize and be ready
-      global.clients[userId] = client; // Storing client in global object
-      console.log(`Client restored for user ${userId}`);
-    } catch (error) {
-      console.error(`Failed to restore client for user ${userId}:`, error);
-    }
-  });
-
-  // Wait for all clients to initialize
-  await Promise.all(clientPromises); // This ensures that all clients initialize simultaneously
-  console.log("All clients have been restored successfully.");
-}
-
-// todo Restore clients on server startup
-restoreClients();
+// // todo Restore clients on server startup
+// restoreClients();
 
 let connectedPhoneNumber = "";
 let connSt = false;
 
 // Endpoint to initialize a WhatsApp session for a user
 router.get("/qr", authenticateToken, async (req, res) => {
+  try {
+    
+  
   const user = await logIncollection.findById(req.user.id);
   const wa = await waModel.findOne({ cid: user.cid });
   console.log(user);
@@ -255,6 +262,9 @@ router.get("/qr", authenticateToken, async (req, res) => {
   // Ensure global.clients exists and store the client for this user
   global.clients = global.clients || {};
   global.clients[user._id.toString()] = client;
+} catch (error) {
+    console.log(err);
+}
 });
 
 router.get("/send-message", authenticateToken, async (req, res) => {
@@ -305,18 +315,19 @@ router.get("/connection-status", authenticateToken, async (req, res) => {
 
 // Endpoint to logout a specific user's session
 router.get("/logoutWA", authenticateToken, async (req, res) => {
-  // const { user._id } = req.body;
+
   let userId = req.user.id;
   const client = global.clients[userId];
   if (!client) return res.status(400).send("User session not initialized");
-  console.warn("try to go in logout try ", client);
+  console.warn("try to go in logout try and client is availiable" );
 
   try {
+    console.log("we dont have any idea is client ready or not")
     await client.logout();
-    console.log(userId);
+    console.log(`client logout ${req.user.name}`);
     let delWA = await waModel.findOneAndDelete({ cid: req.user.cid });
     if (delWA) {
-      console.warn("user wa deleted");
+      console.warn("user Whatsapp document deleted");
     }
     if (global.clients[userId]) {
       delete global.clients[userId];
@@ -342,18 +353,6 @@ router.get("/logoutWA", authenticateToken, async (req, res) => {
   }
 });
 
-router.get("/ready/client/:userId", async (req, res) => {
-  try {
-    console.warn(`/ready/client/: ${req.params.userId}`);
-    const client = await createClientByRoute(req.params.userId); // Wait for client to initialize and be ready
-    console.log("/ready/client/ client intialize");
-
-    global.clients[userId] = client;
-    res.status(200);
-  } catch (err) {
-    console.log(err);
-  }
-});
 
 // router.get("/get/users", async (req, res) => {
 //   try {
@@ -443,82 +442,6 @@ async function sendMessageToLead(
   } catch (error) {
     console.error("Error sending message:", error);
   }
-}
-
-// async function tryToReadyAllClients() {
-//   let i = 0;
-//   const sessionPath = path.join(__dirname, "sessions");
-//   if (!fs.existsSync(sessionPath)) return;
-
-//   // Read each client directory in the sessions folder
-//   const userIds = fs
-//     .readdirSync(sessionPath)
-//     .map((userId) => userId.replace("session-", ""));
-
-//   // for (const userId of userIds) {
-//   //   try {
-//   //     // Create and await client to be ready
-//   //     const client = await createClientOld(userId); // Wait for client to initialize and be ready
-//   //     global.clients[userId] = client; // Storing client in global object
-
-//   //     console.warn(`before delay in loop for user ${userId}`);
-//   //     await delay(10000);
-//   //     console.log(`after delay in loop for user ${userId}`);
-//   //     console.log(`Client restored for user ${userId}`);
-//   //   } catch (error) {
-//   //     console.error(`Failed to restore client for user ${userId}:`, error);
-//   //   }
-//   // }
-//   console.log(userIds.length)
-//   for (let id = 0; id < userIds.length; id++) {
-//     try {
-//       console.warn(id,userIds[id])
-//       let res = await axios.get(
-//         `http://localhost:8000/ready/client/${userIds[id]}`
-//       );
-//       console.warn(res)
-//     } catch (err) {
-//       console.log(err.message);
-//     }
-//     console.log(id)
-//   }
-// }
-
-// tryToReadyAllClients();
-
-async function createClientByRoute(userId) {
-  const client = new Client({
-    authStrategy: new LocalAuth({
-      clientId: userId,
-      dataPath: path.join(__dirname, "sessions"),
-    }),
-  });
-
-  // Return a promise that resolves when the client is ready
-  return new Promise(async (resolve, reject) => {
-    client.on("ready", () => {
-      console.log(`WhatsApp client is ready for user ${userId}`);
-      resolve(client); // Resolve the promise with the client instance
-    });
-
-    client.on("auth_failure", (msg) => {
-      console.error("Authentication failure for user:", userId, msg);
-      reject(new Error("Authentication failure")); // Reject the promise on auth failure
-    });
-
-    client.on("disconnected", () => {
-      console.log("Client disconnected for user:", userId);
-      delete global.clients[userId];
-    });
-
-    // Initialize the client
-    client.initialize().catch((err) => {
-      reject(err); // Reject if there's an error initializing
-    });
-
-    await delay(40000);
-    return reject(new Error("client not initialize"));
-  });
 }
 
 let findNewLeadCount = 0;
@@ -917,17 +840,6 @@ function authenticateToken(req, res, next) {
   });
 }
 
-
-// function findLeadsForEveryUsers() {
-//   let i = 0;
-
-//   setInterval(async () => {
-//     let res = await axios.get("https://360followups.com/get/users");
-//     console.log(res);
-//     console.log(i);
-//   }, 60000);
-// }
-
 async function handleDisconnection(client, userId) {
   client.on('disconnected', async (reason) => {
       console.log(`User ${userId} has been disconnected: ${reason}`);
@@ -950,9 +862,6 @@ async function handleDisconnection(client, userId) {
   });
 }
 
-
-// findLeadsForEveryUsers();
-
 // module.exports = sendMessageToLead
 function deleteSessionDirectory(userId) {
   const userSessionPath = path.join(__dirname, "sessions", `session-${userId}`);
@@ -966,31 +875,105 @@ function deleteSessionDirectory(userId) {
 }
 
 
-
-// ! sir node crone work 
-cron.schedule('* * * * *', async () => {
-  try {
-    let allUsers = await logIncollection.find();
-    allUsers.forEach(async (user) => {
-      console.log("Username:- ", user.name);
-
-      if (user.facebookToken) {
-        console.log("User FB token :- ", user.facebookToken);
-        
-        await findNewLead(user.facebookToken, user);
-      } else console.log("FB token not availiable");
-    });
-    
-  } catch (err) {
-    console.log(err);
-  }
-});
-
+// !  node crone work 
 // cron.schedule('* * * * *', async () => {
 //   try {
-//     const response = await axios.get("https://360followups.com/get/users");
-//     console.log(response.data);
-//   } catch (error) {
-//     console.error('Error fetching data', error);
+//     let allUsers = await logIncollection.find();
+//     allUsers.forEach(async (user) => {
+//       console.log("Username:- ", user.name);
+
+//       if (user.facebookToken) {
+//         console.log("User FB token :- ", user.facebookToken);
+        
+//         await findNewLead(user.facebookToken, user);
+//       } else console.log("FB token not availiable");
+
+//       // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
+//     });
+    
+//   } catch (err) {
+//     console.log(err);
 //   }
 // });
+
+// todo  to delete un-used whtasapp session file in 5 hours interval using crone
+
+// async function removeSessionDirectoriesTimeToTime() {
+//   try {
+//     const admins = await logIncollection.find();
+//     const waDocuments = await waModel.find();
+
+//     admins.forEach(admin => {
+//       const adminCid = admin.cid;
+//       let hasMatchingCid = false;
+
+//       waDocuments.forEach(doc => {
+//         if (doc.cid === adminCid) {
+//           hasMatchingCid = true;
+//         }
+//       });
+
+//       if (!hasMatchingCid) {
+//         const userSessionPath = path.join(__dirname, "sessions", `session-${admin._id}`);
+
+//         if (fs.existsSync(userSessionPath)) {
+//           fs.rmSync(userSessionPath, { recursive: true, force: true });
+//           console.log(`Session directory for admin ${admin.name} deleted.`);
+//         } else {
+//           console.log(`No session directory found for admin ${admin._id}.`);
+//         }
+//       } else {
+//         console.log(`Admin ${admin.name} has a matching CID in waModel. No directory removed.`);
+//       }
+//     });
+//   } catch (error) {
+//     console.error('Error while removing session directories:', error);
+//   }
+// }
+
+// cron.schedule('0 */5 * * *', async () => {
+//   try {
+//     console.warn('try to delete un-used whtasapp session file')
+//     await removeSessionDirectoriesTimeToTime();
+//     console.warn('try to delete un-used whtasapp session file success next calling 5 hour later')
+//   } catch (err) {
+//     console.log(err);
+//   }
+// });
+// todo  to delete un-used whtasapp session file in 5 hours interval using crone
+
+// todo remove all whatsapp session files from dir and delete docs from db fun
+async function removeSessionDirectoriesOnRestartServer() {
+  try {
+    console.warn(' remove all whatsapp session files from dir and delete docs from db fun')
+    const sessionPath = path.join(__dirname, "sessions");
+    if (!fs.existsSync(sessionPath)) return;
+  
+    // Read each client directory in the sessions folder
+    const userIds = fs
+      .readdirSync(sessionPath)
+      .map((userId) => userId.replace("session-", ""));
+    console.log(...userIds)
+
+      userIds.forEach(async (user)=>{
+        let admin = await logIncollection.findById(user)
+        await waModel.findOneAndDelete({cid: admin.cid});
+      })
+
+    userIds.forEach((userid)=>{
+      const userSessionPath = path.join(__dirname, "sessions", `session-${userid}`);
+      if (fs.existsSync(userSessionPath)) {
+        fs.rmSync(userSessionPath, { recursive: true, force: true });
+        console.log(`Session directory for admin ${userid} deleted.`);
+      } else {
+        console.log(`No session directory found for admin ${userid}.`);
+      }
+    })
+
+  } catch (error) {
+    console.error('Error while removing session directories:', error);
+  }
+}
+
+removeSessionDirectoriesOnRestartServer()
+// todo remove all whatsapp session files from dir and delete docs from db fun
