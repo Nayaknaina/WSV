@@ -95,6 +95,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 // Initialize the WhatsApp Client with Local Authentication
 // let client = new Client({
 //   puppeteer: {
