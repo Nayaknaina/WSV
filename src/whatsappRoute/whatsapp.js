@@ -284,7 +284,6 @@ router.get("/send-message", authenticateToken, async (req, res) => {
     res.redirect("/user/dashboard");
   } catch (error) {
     console.log(error);
-    res.status(500).send("Failed to send message");
   }
 });
 
@@ -356,23 +355,23 @@ router.get("/logoutWA", authenticateToken, async (req, res) => {
 });
 
 
-router.get("/get/users", async (req, res) => {
-  try {
-    let allUsers = await logIncollection.find();
-    allUsers.forEach(async (user) => {
-      console.log("Username:- ", user.name);
+// router.get("/get/users", async (req, res) => {
+//   try {
+//     let allUsers = await logIncollection.find();
+//     allUsers.forEach(async (user) => {
+//       console.log("Username:- ", user.name);
 
-      if (user.facebookToken) {
-        console.log("User FB token :- ", user.facebookToken);
+//       if (user.facebookToken) {
+//         console.log("User FB token :- ", user.facebookToken);
 
-        await findNewLead(user.facebookToken, user);
-      } else console.log("FB token not availiable");
-    });
+//         await findNewLead(user.facebookToken, user);
+//       } else console.log("FB token not availiable");
+//     });
     
-  } catch (err) {
-    console.log(err);
-  }
-});
+//   } catch (err) {
+//     console.log(err);
+//   }
+// });
 
 // module.exports = global;
 

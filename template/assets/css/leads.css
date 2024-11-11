@@ -188,7 +188,8 @@ nav>label {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease;
-    background-color: #f9f9f9;
+   /* background-color: #f9f9f9;*/
+   background-image: radial-gradient(at 50% 100%, #fff 0%, rgb(184 99 220 / 4%) 100%), linear-gradient(to bottom, rgb(168 181 243 / 64%) 0%, rgb(196 182 182 / 40%) 100%);
     padding: 0 15px;
 }
 
