@@ -740,6 +740,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
     let userMyLeads = [...user.myleads].reverse();
     // userMyLeads.forEach(elem => console.log(elem._id))
     // console.log(leadsWithCustomerInfo.length);
+    const Membersleads = await leadsModel.find({cid: user.cid, $or: [{ uid: null },{ uid: user._id }]}) .sort({ createdAt: -1 });
 
     res.render("leads", {
       user,
@@ -748,6 +749,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
       myleads: leadsWithCustomerInfo,
       leads: leadsWithCustomerInfo,
       pipes,
+      Membersleads,
       ALLLEADS,
       members,
       currentPage: parseInt(page),

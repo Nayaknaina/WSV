@@ -488,47 +488,47 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     }
     await newManualLead.save();
     await user.save();
+    let leadContactNo = req.body.mobile;
     // const mobileRegex = /^[6-9]\d{9}$/;
     // const mobileRegex = /^\d{1,4}[6-9]\d{9}$/
-    let leadContactNo = req.body.mobile;
     // newManualLead.leads_data.forEach((item) => {
     //   const answer = item.ans.trim();
 
-      if (mobileRegex.test(answer)) {
-        console.log("Valid Mobile Number found: try 1", answer);
-        leadContactNo = answer;
-        break;
-      }
-    }
+      // if (mobileRegex.test(answer)) {
+      //   console.log("Valid Mobile Number found: try 1", answer);
+      //   leadContactNo = answer;
+      //   break;
+    //   }
+    // }
 
 
-    if (leadContactNo == null) {
-      const mobileRegex = /^\+?\d{1,3}\d{10}$/;
+    // if (leadContactNo == null) {
+    //   const mobileRegex = /^\+?\d{1,3}\d{10}$/;
 
-      for (let i = 0; i < newManualLead.leads_data.length; i++) {
-        const answer = newManualLead.leads_data[i].ans.trim();
+    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
+    //     const answer = newManualLead.leads_data[i].ans.trim();
 
-        if (mobileRegex.test(answer)) {
-          console.log("Valid Mobile Number found: try 2", answer);
-          leadContactNo = answer;
-          break;
-        }
-      }
-    }
+    //     if (mobileRegex.test(answer)) {
+    //       console.log("Valid Mobile Number found: try 2", answer);
+    //       leadContactNo = answer;
+    //       break;
+    //     }
+    //   }
+    // }
 
-    if (leadContactNo == null) {
-      const mobileRegex = /^\d{10}$/;
+    // if (leadContactNo == null) {
+    //   const mobileRegex = /^\d{10}$/;
 
-      for (let i = 0; i < newManualLead.leads_data.length; i++) {
-        const answer = newManualLead.leads_data[i].ans.trim();
+    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
+    //     const answer = newManualLead.leads_data[i].ans.trim();
 
-        if (mobileRegex.test(answer)) {
-          console.log("Valid Mobile Number found: try 3", answer);
-          leadContactNo = answer;
-          break;
-        }
-      }
-    }
+    //     if (mobileRegex.test(answer)) {
+    //       console.log("Valid Mobile Number found: try 3", answer);
+    //       leadContactNo = answer;
+    //       break;
+    //     }
+    //   }
+    // }
 
 
     console.warn("new lead found and just store in DB", leadContactNo);

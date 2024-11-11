@@ -757,6 +757,13 @@
                
                 </div>
             </div>
+            <div class="input-group">
+              
+                <div class="input-icon">
+                    <input type="text" id="INP-pass-{{_id}}" name="password" value="{{password}}" required>
+               
+                </div>
+            </div>
              
             <button type="button" class="button" onclick="submitTeamMemberEditForm('{{_id}}')">Save</button>
         </form>
@@ -849,14 +856,17 @@ async function submitTeamMemberEditForm(id){
   let name = document.querySelector(`#INP-name-${id}`).value
   let mobile = document.querySelector(`#INP-mobile-${id}`).value
   let email = document.querySelector(`#INP-email-${id}`).value
+  let password = document.querySelector(`#INP-pass-${id}`).value
   let formData = {
     name,
     mobile,
     email,
+    password,
   }
     const actionUrl = `/user/member/update/${id}`;
   console.log(formData)
     try {
+      findLead()
       // Send POST request using Axios
       const response = await axios.post(actionUrl, formData);
       console.log("Form submitted successfully:", response.data);

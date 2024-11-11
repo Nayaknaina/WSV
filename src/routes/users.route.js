@@ -428,11 +428,11 @@ router.post("/pipeline", isAdminLoggedIn, async (req, res) => {
   const user = await logIncollection.findById(req.user.id);
   const pipes = await pipelineModel.find({ cid: req.user.cid });
 
-  if (pipes.length >= 5) {
-    // Correcting the condition to "greater than or equal to 5"
-    req.session.errorMSG = `You can't add more than 5 pipelines status`;
-    return res.status(400).json({ error: req.session.errorMSG });
-  }
+  // if (pipes.length >= 5) {
+  //   // Correcting the condition to "greater than or equal to 5"
+  //   req.session.errorMSG = `You can't add more than 5 pipelines status`;
+  //   return res.status(400).json({ error: req.session.errorMSG });
+  // }
 
   const pipeline = new pipelineModel({
     uid: user._id,
@@ -455,12 +455,19 @@ router.post("/pipeline", isAdminLoggedIn, async (req, res) => {
 });
 
 router.get("/pipeline/del/:id", isAdminLoggedIn, async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
   let pipeline = await pipelineModel.findByIdAndDelete(id);
   // console.log(pipeline);
   let allPipes = await pipelineModel.find({ cid: req.user.cid });
   req.session.successMSG = `${pipeline.title} pipline deletion sucessfull !. `;
-  res.json(allPipes);
+  await delay(3000)
+  return res.status(200).json(allPipes);
+  } catch (err) {
+    console.log("Error in /pipeline/del/:id, = ",err)
+    res.redirect('/user/dashboard');
+  }
+  
 });
 // router.get("/pipe/abc", isAdminLoggedIn, async (req, res) => {
 //   let pipe = await pipelineModel.findById(req.session.pipe);
@@ -476,7 +483,9 @@ router.get("/pipeline/del/:id", isAdminLoggedIn, async (req, res) => {
 // });
 router.post("/pipeline/update", isAdminLoggedIn, async (req, res) => {
   // const { title, color, defaultVal, id} = req.body;
-  console.log(req.body);
+  console.log("/user/pipeline/update");
+  try {
+    
   req.body.forEach(async (dataObj) => {
     const { title, color, defaultVal, id } = dataObj;
 
@@ -499,10 +508,24 @@ router.post("/pipeline/update", isAdminLoggedIn, async (req, res) => {
 
     await pipeline.save();
   });
-  req.session.successMSG = `pipline updatation successfully !. `;
-  let allPipes = await pipelineModel.find({ cid: req.user.cid });
-  return res.json(allPipes);
+  
+  res.status(200).json({msg:"success"});
+  
+} catch (err) {
+    console.log(err)
+}
 });
+
+router.get('/get-all/pipes', isAdminLoggedIn ,async(req,res)=>{
+  console.log('/user/get-all/pipes',req.user.name)
+try {
+  let allPipes = await pipelineModel.find({ cid: req.user.cid });
+  await delay(2000);
+  return res.json(allPipes);
+} catch (err) {
+  console.log(err)
+}
+})
 
 // router.get("/profile", isAdminLoggedIn, async (req, res) => {
 //   const user = await logIncollection.findById(req.user.id);
@@ -844,13 +867,15 @@ router.get("/member/blocked/:id", isAdminLoggedIn, async (req, res) => {
 
 router.post('/member/update/:memId', isAdminLoggedIn, async (req, res) => {
   try {
-    const { name, email, mobile } = req.body;
+    const { name, email, mobile, password } = req.body;
+    console.log(req.body)
 
     let member = await memberModel.findById(req.params.memId);
 
     member.name = name;
     member.email = email;
     member.mobile = mobile;
+    member.password = password;
     member.save()
 
     res.json({ msg: "Member details update sucessfully !" })
@@ -1011,6 +1036,49 @@ router.get("/mysubscription", isAdminLoggedIn, async (req, res) => {
 });
 
 
+router.get("/reset/pipes", isAdminLoggedIn,async (req, res) => {
+
+  try {
+    let user = await logIncollection.findById(req.user.id)
+    const result = await pipelineModel.deleteMany({ cid: user.cid });
+    console.log(`${result.deletedCount} documents deleted.`);
+    user.myPipelines = [];
+    await user.save()
+  
+
+  const pipelines = [
+    { title: "new lead", color: "#28A745", defaultVal: true, num: 1 },
+    { title: "initial contacted", color: "#0fbabd", defaultVal: false, num: 2 },
+    { title: "quatation sent", color: "#007BFF", defaultVal: false, num: 3 },
+    { title: "deal pending", color: "#FFC107", defaultVal: false, num: 4 },
+    { title: "deal closed", color: "#0FBABD", defaultVal: false, num: 5 },
+    { title: "deal cancelled", color: "#DC3545", defaultVal: false, num: 6 },
+  ].map(
+    (pipelineData) =>
+      new pipelineModel({
+        uid: user._id,
+        defaultVal: pipelineData.defaultVal,
+        color: pipelineData.color,
+        title: pipelineData.title,
+        num: pipelineData.num,
+        cid: user.cid,
+      })
+  );
+
+  // Save all pipelines in parallel
+  await Promise.all(
+    pipelines.map(async (pipeline) => {
+      await pipeline.save();
+      user.myPipelines.push(pipeline._id);
+    })
+  );
+
+  await user.save();
+} catch (error) {
+  console.error("Error deleting documents:", error);
+}
+  res.redirect("/user/dashboard");
+});
 router.get("/reset/all-users/pipes", async (req, res) => {
   let users = await logIncollection.find();
 users.forEach(async (user) => {
@@ -1052,7 +1120,7 @@ users.forEach(async (user) => {
 
   await user.save();
 });
-  res.redirect("/dashbooard");
+  res.redirect("/user/dashbooard");
 });
 
 router.get('/get/users',async (req,res)=>{
@@ -1073,3 +1141,8 @@ router.get('/get/users',async (req,res)=>{
 })
 
 module.exports = router;
+
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

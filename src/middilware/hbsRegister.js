@@ -175,18 +175,27 @@ hbs.registerHelper("formatDate", function (datetime) {
 
   hbs.registerHelper('findMobileNumber', function(leads_data) {
     // Mobile number regex for Indian numbers (10 digits)
-    const mobileRegex = /(?:\+91[\s\-]?)?(\d{10})/;
-  
-    // Loop over the leads_data array
+    const mobileRegex =  /^[6-9]\d{4}\s?\d{5}$/;
+    // const mobileRegex = /^\+?(\d{1,4})\s?[6-9]\d{4}\s?\d{5}$|^\d{10}$|^\d{5}\s?\d{5}$/
+    // const mobileRegex = /^\+?\d{1,4}?[6-9]\d{9}$/
+
+
+    // console.log(leads_data.length);
+    try {
+
     for (let i = 0; i < leads_data.length; i++) {
       const lead = leads_data[i];
-      
-      // Check if 'que' contains a mobile number
-      if (lead.que && mobileRegex.test(lead.que)) {
-        const match = lead.que.match(mobileRegex);
+      if (mobileRegex.test(lead.ans)) {
+        const match = lead.ans.replace(/\s+/g, '').match(mobileRegex);
+        // console.log(match)  
         return match[0]; // Return the first matched mobile number
+      }else{
+        // console.warn(lead.ans.replace(/\s+/g, ''))
       }
     }
+  } catch (err) {
+      
+  }
   
     return 'No mobile number found'; // Default response if no match is found
   });
