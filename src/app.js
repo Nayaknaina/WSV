@@ -49,6 +49,7 @@ app.use(cors())
 const { startKeepAlive } = require("./middilware/whatsapp.js");
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qr = require("qr-image");
+const { trusted } = require("mongoose");
 // Initialize variables
 let qrCodeData = "";
 let whatsappClientReady = false;
@@ -428,11 +429,14 @@ app.use("/external", externalRoute);
 // todo manual lead addition
 app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) => {
   try {
-    let user;
+    console.log(req.body)
+    let user,uid=null,userType=null;
     if (req.user.role === "admin") {
       user = await logIncollection.findById(req.user.id);
     } else {
       user = await memberModel.findById(req.user.id);
+      uid=user._id;
+      userType = 'teamMember';
     }
 
     const Admin = await logIncollection.findOne({ cid: user.cid });
@@ -449,19 +453,15 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       }));
     // console.log(req.body);
     // console.log(leads_data);
-    let userType = "logIncollection";
-    if (user.role === "admin") {
-      userType = "logIncollection";
-    } else {
-      userType = "teamMember";
-    }
+    
+    // let defPipe = await pipelineModel.findOne({cid: user.cid, defaultVal: true})
     let newManualLead = new leadsModel({
       app: "manual",
       cid: user.cid,
-      uid: user._id,
+      uid,
+      userType,
       income_time: new Date(),
       leads_data,
-      userType,
     });
 
     let userContact = `${user.countryCode}${user.mobile}`;    // console.log(req.body, "====", userContact);
@@ -483,60 +483,53 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     user.myleads.push(newManualLead._id);
     newManualLead.remarks.push(remark._id);
 
-    let defPipe = await pipelineModel.findOne({ num: 4, cid: user.cid });
+    let defPipe = await pipelineModel.findOne({ defaultVal: true, cid: user.cid });
     if (defPipe) {
       newManualLead.status = defPipe._id;
     }
     await newManualLead.save();
     await user.save();
-    const mobileRegex = /^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/;
-    let leadContactNo = null;
-    // newLead.leads_data.forEach((item) => {
+    let leadContactNo = req.body.mobile;
+    // const mobileRegex = /^[6-9]\d{9}$/;
+    // const mobileRegex = /^\d{1,4}[6-9]\d{9}$/
+    // newManualLead.leads_data.forEach((item) => {
     //   const answer = item.ans.trim();
 
-    //   if (mobileRegex.test(answer)) {
-    //     console.log("Valid Mobile Number found: try 1", answer);
-    //     return (leadContactNo = answer);
+      // if (mobileRegex.test(answer)) {
+      //   console.log("Valid Mobile Number found: try 1", answer);
+      //   leadContactNo = answer;
+      //   break;
     //   }
-    // });
-    for (let i = 0; i < newManualLead.leads_data.length; i++) {
-      const answer = newManualLead.leads_data[i].ans.trim();
-
-      if (mobileRegex.test(answer)) {
-        console.log("Valid Mobile Number found: try 1", answer);
-        leadContactNo = answer;
-        break;
-      }
-    }
+    // }
 
 
-    if (leadContactNo == null) {
-      const mobileRegex = /^\+?\d{1,3}\d{10}$/;
+    // if (leadContactNo == null) {
+    //   const mobileRegex = /^\+?\d{1,3}\d{10}$/;
 
-      for (let i = 0; i < newManualLead.leads_data.length; i++) {
-        const answer = newManualLead.leads_data[i].ans.trim();
+    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
+    //     const answer = newManualLead.leads_data[i].ans.trim();
 
-        if (mobileRegex.test(answer)) {
-          console.log("Valid Mobile Number found: try 2", answer);
-          leadContactNo = answer;
-          break;
-        }
-      }
-    }
+    //     if (mobileRegex.test(answer)) {
+    //       console.log("Valid Mobile Number found: try 2", answer);
+    //       leadContactNo = answer;
+    //       break;
+    //     }
+    //   }
+    // }
 
-    if (leadContactNo == null) {
-      const mobileRegex = /^\d{10}$/;
+    // if (leadContactNo == null) {
+    //   const mobileRegex = /^\d{10}$/;
 
-      for (let i = 0; i < newManualLead.leads_data.length; i++) {
-        const answer = newManualLead.leads_data[i].ans.trim();
+    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
+    //     const answer = newManualLead.leads_data[i].ans.trim();
 
-        if (mobileRegex.test(answer)) {
-          console.log("Valid Mobile Number found: try 3", answer);
-          leadContactNo = answer;
-          break;
-        }
-      }
-    }
+    //     if (mobileRegex.test(answer)) {
+    //       console.log("Valid Mobile Number found: try 3", answer);
+    //       leadContactNo = answer;
+    //       break;
+    //     }
+    //   }
+    // }
 
 
     console.warn("new lead found and just store in DB", leadContactNo);
@@ -872,41 +865,41 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
 // });
 
 //todo -- fetch lead from Fb when you have tocken and Subscription
-app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
-  try {
-    let user = await logIncollection.findOne({ cid: req.user.cid })
+// app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
+//   try {
+//     let user = await logIncollection.findOne({ cid: req.user.cid })
 
-    if (!user) {
-      return res.redirect('/user/login')
-    };
-
-
-    if (!req.session.access) {
-      console.warn(`Subscription expired. Please renew to continue.`)
-      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
-      return res.redirect('/leads')
-    }
-
-    console.log(user.facebookToken, "usrer facebook token");
-
-    if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
-      // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
-      console.log("you not have fb token");
-      req.session.errorMSG = `Facebook Account Not Connected. Please Connect to Find New Leads.`;
-      return res.redirect('/leads')
-    }
-    console.log("findinnngggg");
-
-    let data = await findNewLead(user.facebookToken, user);
+//     if (!user) {
+//       return res.redirect('/user/login')
+//     };
 
 
-    console.log(data);
+//     if (!req.session.access) {
+//       console.warn(`Subscription expired. Please renew to continue.`)
+//       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+//       return res.redirect('/leads')
+//     }
 
-    return res.redirect('/leads');
-  } catch (err) {
-    console.warn("error in finding ne lead in /leads/pre - ", err);
-  }
-})
+//     console.log(user.facebookToken, "usrer facebook token");
+
+//     if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
+//       // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
+//       console.log("you not have fb token");
+//       req.session.errorMSG = `Facebook Account Not Connected. Please Connect to Find New Leads.`;
+//       return res.redirect('/leads')
+//     }
+//     console.log("findinnngggg");
+
+   // let data = await findNewLead(user.facebookToken, user);
+
+
+//     console.log(data);
+
+//     return res.redirect('/leads');
+//   } catch (err) {
+//     console.warn("error in finding ne lead in /leads/pre - ", err);
+//   }
+// })
 
 // function findLeadsForEveryUsers() {
 //   let i = 0;

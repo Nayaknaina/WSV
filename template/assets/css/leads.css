@@ -327,8 +327,8 @@ input[type="checkbox"]:checked+.slide {
 }
 
 .drop-circle {
-    width: 18px;
-    height: 18px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
     border: 2px solid rgb(0, 0, 0);
 }
