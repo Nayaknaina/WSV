@@ -450,7 +450,13 @@
 
                                     <div class="details-container">
                                         <strong>Page:</strong> {{page_name}} <br>
-                                        <strong>Form:</strong> {{form_name}}
+                                        <strong>Form:</strong> {{form_name}} <br>
+                                        {{#if status.title}}
+                                        <span style="display: flex; height: 30px; justify-content: start; gap: 8px; align-items: center;">
+                                            <span style="font-size: 18px; font-weight: 600;">{{status.title}}</span>
+                                        <span class="drop-circle" style="background-color: {{status.color}};"></span>
+                                        </span>
+                                        {{/if}}
                                     </div>
 
 
@@ -552,7 +558,7 @@
                 <ul id="allLeads" style="display: block;">
                     {{#if (filterLeadsForMember ALLLEADS)}}
                     {{!-- {{#each (filterLeadsForMember leads)}} --}}
-                    {{#each (filterLeadsArrayForMember ALLLEADS user._id)}}
+                    {{#each Membersleads}}
                     <li style="margin-bottom: 10px;">
                         <nav>
                             <label class="created-time-label">
