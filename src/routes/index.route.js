@@ -248,7 +248,8 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
           ],
         });
     }
-    if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
+    let admin = logIncollection.findOne({cid: user.cid})
+    if (admin.facebookToken === null || admin.facebookToken === undefined || admin.facebookToken === '') {
       // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
       // console.log("you not have fb token");
       req.session.errorMSG = `Facebook Account Not Connected. Please Connect to Find New Leads.`;
