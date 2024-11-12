@@ -133,6 +133,7 @@ router.get("/apps", isAdminLoggedIn, (req, res) => {
   res.render("app", { user });
 });
 
+//to update account management of PROFILE
 router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
   let user;
   const { name, mobile, countryCode, address, city, state, organisation, sector } = req.body;
@@ -157,6 +158,50 @@ router.post("/update/profile", isAdminLoggedIn, async (req, res) => {
   }
 });
 
+//to update security management of PROFILE
+router.post("/update/security", isAdminLoggedIn, async (req, res) => {
+ let user;
+  const { oldPassword, newPassword, confirmPassword, setPassword, confirmSetPassword } = req.body;
+  console.log("Request body has:", JSON.stringify(req.body, null, 2));
+
+  try {
+    if (req.user.role === "admin") {
+      user = await logIncollection.findById(req.user.id);
+    } else {
+      user = await memberModel.findById(req.user.id);
+    }
+
+    if (user && user.password) {
+      if (user.password !== oldPassword) {
+        return res.status(400).json({ error: "Old password is incorrect" });
+      }
+      if (newPassword === confirmPassword) {
+        user.password = newPassword;
+        await user.save();
+        res.redirect("/profile");
+        console.log("password",user.password);
+        
+      } else {
+        return res.status(400).json({ error: "New passwords do not match" });
+      }
+    } else {
+      if (setPassword === confirmSetPassword) {
+        user.password = setPassword;
+        await user.save();
+        return res.json({ success: "Password set successfully!" });
+      } else {
+        return res.status(400).json({ error: "New passwords do not match" });
+      }
+      
+    }
+    console.log("Now password",user.password);
+    
+  } catch (err) {
+    console.log("error in /user/update/security route ---- :", err);
+    res.redirect("/profile");
+  }
+});
+
 router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
   let user;
   if (req.user.role === "admin")
@@ -165,468 +210,6 @@ router.get("/gethelp", isAdminLoggedIn, async (req, res) => {
 
   res.render("gethelp", { user });
 });
-
-
-// router.get("/leads", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     const { page = 1 } = req.query; // Get the page number from query params, default to 1
-//     const limit = 25; // Number of leads per page
-
-//     console.log("leads page");
-//     let user;
-
-//     if (req.user.role === "admin") {
-//       user = await logIncollection
-//         .findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           populate: [
-//             { path: "status" },
-//             { path: "remarks", options: { sort: { createdAt: -1 } } },
-//           ],
-//         })
-//         .populate("teams");
-//     } else {
-//       user = await memberModel
-//         .findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           populate: [
-//             { path: "status" },
-//             { path: "remarks", options: { sort: { createdAt: -1 } } },
-//           ],
-//         });
-//     }
-
-//     // Fetch paginated leads
-//     const leads = await leadsModel
-//       .find({ cid: user.cid })
-//       .populate("status")
-//       .populate("uid")
-//       .sort({ createdAt: -1 })
-//       .skip((page - 1) * limit)
-//       .limit(limit);
-
-//     const totalLeads = await leadsModel.countDocuments({ cid: user.cid });
-//     const totalPages = Math.ceil(totalLeads / limit);
-
-//     const pipes = await pipelineModel.find({ cid: user.cid });
-//     const members = await memberModel.find({ cid: user.cid });
-
-//     // Render the leads page
-//     res.render("leads", {
-//       user,
-//       leads,
-//       pipes,
-//       members,
-//       currentPage: parseInt(page),
-//       totalPages,
-//       showPagination: leads.length > 0, // Only show pagination if leads exist
-//     });
-//   } catch (error) {
-//     console.error("Error fetching leads:", error);
-//     res.status(500).send("Error fetching leads");
-//   }
-// });
-
-// router.get("/leads", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     const { page = 1 } = req.query; // Get the page number from query params, default to 1
-//     const limit = 25; // Number of leads per page
-
-//     let user;
-
-//     if (req.user.role === "admin") {
-//       user = await logIncollection
-//         .findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           populate: [
-//             { path: "status" },
-//             { path: "remarks", options: { sort: { createdAt: -1 } } },
-//           ],
-//         })
-//         .populate("teams");
-//     } else {
-//       user = await memberModel
-//         .findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           populate: [
-//             { path: "status" },
-//             { path: "remarks", options: { sort: { createdAt: -1 } } },
-//           ],
-//         });
-//     }
-
-//     // Fetch paginated leads
-//     const leads = await leadsModel
-//       .find({ cid: user.cid })
-//       .populate("status")
-//       .populate("uid")
-//       .sort({ createdAt: -1 })
-//       .skip((page - 1) * limit)
-//       .limit(limit);
-
-//     // Extract customer name and phone number from leads data
-//     const leadsWithCustomerInfo = leads.map(lead => {
-//       const customerName = lead.leads_data.find(data => 
-//         data.que.toLowerCase().includes("name") || 
-//         data.que.toLowerCase().includes("customer name")
-//       )?.ans || "Unknown";
-
-//       const customerPhoneNumber = lead.leads_data.find(data => 
-//         /^[6-9]\d{9}$/.test(data.ans.trim())
-//       )?.ans || "N/A";
-
-//       return {
-//         ...lead.toObject(), // Convert lead to plain object
-//         customerName,
-//         customerPhoneNumber
-//       };
-//     });
-
-//     const totalLeads = await leadsModel.countDocuments({ cid: user.cid });
-//     const totalPages = Math.ceil(totalLeads / limit);
-
-//     const pipes = await pipelineModel.find({ cid: user.cid });
-//     const members = await memberModel.find({ cid: user.cid });
-
-//     // Render the leads page with customer information
-//     res.render("leads", {
-//       user,
-//       leads: leadsWithCustomerInfo, // Pass modified leads to the template
-//       pipes,
-//       members,
-//       currentPage: parseInt(page),
-//       totalPages,
-//       showPagination: leads.length > 0, // Only show pagination if leads exist
-//     });
-//   } catch (error) {
-//     console.error("Error fetching leads:", error);
-//     res.status(500).send("Error fetching leads");
-//   }
-// });
-//working fIne for leads section
-// router.get("/leads", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     const { page = 1, customerName, customerPhoneNumber, date } = req.query; 
-//     const limit = 25; 
-
-//     let user;
-//     if (req.user.role === "admin") {
-//       user = await logIncollection
-//         .findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
-//         })
-//         .populate("teams");
-//     } else {
-//       user = await memberModel
-//         .findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
-//         });
-//     }
-
-//     // filter query
-//     const filter = { cid: user.cid };
-//     if (customerName) {
-//       filter['leads_data.ans'] = new RegExp(customerName, 'i'); // Case-insensitive name search
-//     }
-//     if (customerPhoneNumber) {
-//       filter['leads_data.ans'] = customerPhoneNumber;
-//     }
-//     if (date) {
-//       filter.income_time = {
-//         $gte: new Date(date).setHours(0, 0, 0),
-//         $lt: new Date(date).setHours(23, 59, 59),
-//       };
-//     }
-
-//     // Fetch leads with filtering and pagination
-//     const leads = await leadsModel
-//       .find(filter)
-//       .populate("status")
-//       .populate("uid")
-//       .sort({ createdAt: -1 })
-//       .skip((page - 1) * limit)
-//       .limit(limit);
-
-//     const leadsWithCustomerInfo = leads.map((lead) => {
-//       const customerName = lead.leads_data.find((data) =>
-//         data.que.toLowerCase().includes("name") || data.que.toLowerCase().includes("customer name") ||data.que.toLowerCase().includes("आपका_नाम")|| data.que.toLowerCase().includes("नाम")
-//       )?.ans || "Unknown";
-
-//       const customerPhoneNumber = lead.leads_data.find((data) =>
-//         /^[6-9]\d{9}$/.test(data.ans.trim())
-//       )?.ans || "N/A";
-
-//       return { ...lead.toObject(), customerName, customerPhoneNumber };
-//     });
-
-//     const totalLeads = await leadsModel.countDocuments(filter);
-//     const totalPages = Math.ceil(totalLeads / limit);
-
-//     const pipes = await pipelineModel.find({ cid: user.cid });
-//     const members = await memberModel.find({ cid: user.cid });
-
-//     res.render("leads", {
-//       user,
-//       leads: leadsWithCustomerInfo,
-//       pipes,
-//       members,
-//       currentPage: parseInt(page),
-//       totalPages,
-//       showPagination: leads.length > 0,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching leads:", error);
-//     res.status(500).send("Error fetching leads");
-//   }
-// });
-
-// router.get("/leads", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     const { page = 1, customerName, customerPhoneNumber, date, section = "all" } = req.query;
-//     const limit = 25;
-
-//     let user;
-//     if (req.user.role === "admin") {
-//       user = await logIncollection.findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           options: { sort: { createdAt: -1 } },
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
-//         })
-//         .populate("teams");
-//     } else {
-//       user = await memberModel.findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           options: { sort: { createdAt: -1 } }, 
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
-//         });
-//     }
-
-
-//     const filter = { cid: user.cid };
-//     if (customerName) {
-//       filter['leads_data.ans'] = new RegExp(customerName, 'i');
-//     }
-//     if (customerPhoneNumber) {
-//       filter['leads_data.ans'] = customerPhoneNumber;
-//     }
-//     if (date) {
-//       filter.income_time = {
-//         $gte: new Date(date).setHours(0, 0, 0),
-//         $lt: new Date(date).setHours(23, 59, 59),
-//       };
-//     }
-
-
-//     let leadsSource;
-//     if (section === "myleads") {
-//       leadsSource = user.myleads.filter(lead => {
-
-
-//         let matches = true;
-//         if (customerName) {
-//           matches = matches && lead.leads_data.some(data => new RegExp(customerName, 'i').test(data.ans));
-//         }
-//         if (customerPhoneNumber) {
-//           matches = matches && lead.leads_data.some(data => data.ans === customerPhoneNumber);
-//         }
-//         if (date) {
-//           const incomeDate = new Date(lead.income_time);
-//           matches = matches && incomeDate >= new Date(date).setHours(0, 0, 0) && incomeDate < new Date(date).setHours(23, 59, 59);
-//         }
-//         return matches;
-//       });
-//     } else {
-//       leadsSource = await leadsModel
-//         .find(filter)
-//         .populate("status")
-//         .populate("uid")
-//         .sort({ createdAt: -1 })
-//         .skip((page - 1) * limit)
-//         .limit(limit);
-//     }
-
-
-//     const leadsWithCustomerInfo = leadsSource.map((lead) => {
-//       const customerName = lead.leads_data.find((data) =>
-//         data.que.toLowerCase().includes("name") ||
-//         data.que.toLowerCase().includes("customer name") ||
-//         data.que.toLowerCase().includes("आपका_नाम") ||
-//         data.que.toLowerCase().includes("नाम")
-//       )?.ans || "Unknown";
-
-//       const customerPhoneNumber = lead.leads_data.find((data) =>
-//         /^[6-9]\d{9}$/.test(data.ans.trim())
-//       )?.ans || "N/A";
-
-//       return { ...lead.toObject(), customerName, customerPhoneNumber };
-//     });
-
-//     const totalLeads = section === "myleads" ? leadsWithCustomerInfo.length : await leadsModel.countDocuments(filter);
-//     const totalPages = Math.ceil(totalLeads / limit);
-
-//     const pipes = await pipelineModel.find({ cid: user.cid });
-//     const members = await memberModel.find({ cid: user.cid });
-
-//     res.render("leads", {
-//       user,
-//       leads: leadsWithCustomerInfo,
-//       myleads: leadsWithCustomerInfo,
-//       pipes,
-//       members,
-//       currentPage: parseInt(page),
-//       totalPages,
-//       showPagination: leadsWithCustomerInfo.length > 0,
-//       activeTab: section, 
-//     });
-//   } catch (error) {
-//     console.error("Error fetching leads:", error);
-//     res.status(500).send("Error fetching leads");
-//   }
-// });
-
-
-// router.get("/leads", isAdminLoggedIn, async (req, res) => {
-//   try {
-//     const { 
-//       page = 1, 
-//       customerName, 
-//       customerPhoneNumber, 
-//       date, 
-//       pageName, 
-//       formName, 
-//       section = "all" 
-//     } = req.query;
-
-//     const limit = 25;
-//     let user;
-
-//     if (req.user.role === "admin") {
-//       user = await logIncollection.findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           options: { sort: { createdAt: -1 } },
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
-//         })
-//         .populate("teams");
-//     } else {
-//       user = await memberModel.findById(req.user.id)
-//         .populate({
-//           path: "myleads",
-//           options: { sort: { createdAt: -1 } },
-//           populate: [{ path: "status" }, { path: "remarks", options: { sort: { createdAt: -1 } } }],
-//         });
-//     }
-
-//     // Build the filter object
-//     const filter = { cid: user.cid };
-//     if (customerName) {
-//       filter['leads_data.ans'] = new RegExp(customerName, 'i');
-//     }
-//     if (customerPhoneNumber) {
-//       filter['leads_data.ans'] = customerPhoneNumber;
-//     }
-//     if (date) {
-//       filter.income_time = {
-//         $gte: new Date(date).setHours(0, 0, 0),
-//         $lt: new Date(date).setHours(23, 59, 59),
-//       };
-//     }
-//     if (pageName) {
-//       filter.page_name = new RegExp(pageName, 'i');  // Case-insensitive match
-//     }
-//     if (formName) {
-//       filter.form_name = new RegExp(formName, 'i');  // Case-insensitive match
-//     }
-
-//     // Fetch leads based on section and filter
-//     let leadsSource;
-//     if (section === "myleads") {
-//       leadsSource = user.myleads.filter(lead => {
-//         let matches = true;
-//         if (customerName) {
-//           matches = matches && lead.leads_data.some(data => new RegExp(customerName, 'i').test(data.ans));
-//         }
-//         if (customerPhoneNumber) {
-//           matches = matches && lead.leads_data.some(data => data.ans === customerPhoneNumber);
-//         }
-//         if (date) {
-//           const incomeDate = new Date(lead.income_time);
-//           matches = matches && incomeDate >= new Date(date).setHours(0, 0, 0) && incomeDate < new Date(date).setHours(23, 59, 59);
-//         }
-//         if (pageName) {
-//           matches = matches && new RegExp(pageName, 'i').test(lead.page_name);
-//         }
-//         if (formName) {
-//           matches = matches && new RegExp(formName, 'i').test(lead.form_name);
-//         }
-//         return matches;
-//       });
-//     } else {
-//       leadsSource = await leadsModel
-//         .find(filter)
-//         .populate("status")
-//         .populate("uid")
-//         .sort({ createdAt: -1 })
-//         .skip((page - 1) * limit)
-//         .limit(limit);
-//     }
-
-//     // Add customer information to leads
-//     const leadsWithCustomerInfo = leadsSource.map((lead) => {
-//       const customerName = lead.leads_data.find((data) =>
-//         data.que.toLowerCase().includes("name") ||
-//         data.que.toLowerCase().includes("customer name") ||
-//         data.que.toLowerCase().includes("आपका_नाम") ||
-//         data.que.toLowerCase().includes("नाम")
-//       )?.ans || "Unknown";
-
-//       const customerPhoneNumber = lead.leads_data.find((data) =>
-//         /^[6-9]\d{9}$/.test(data.ans.trim())
-//       )?.ans || "N/A";
-
-//       return { ...lead.toObject(), customerName, customerPhoneNumber };
-//     });
-
-//     const totalLeads = section === "myleads" ? leadsWithCustomerInfo.length : await leadsModel.countDocuments(filter);
-//     const totalPages = Math.ceil(totalLeads / limit);
-
-//     const pipes = await pipelineModel.find({ cid: user.cid });
-//     const members = await memberModel.find({ cid: user.cid });
-// // console.log(leadsWithCustomerInfo);
-// user.myleads.forEach(lead => {
-//   console.log("Lead ID:", lead.lead_id);
-//   console.log("Leads Data:", JSON.stringify(lead.leads_data, null, 2));
-// });
-
-
-//     res.render("leads", {
-//       user,
-//        myleads: leadsWithCustomerInfo,
-//       leadsWithCustomerInfo,
-//       leads: leadsWithCustomerInfo,
-
-//       pipes,
-//       members,
-//       currentPage: parseInt(page),
-//       totalPages,
-//       showPagination: leadsWithCustomerInfo.length > 0,
-//       activeTab: section,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching leads:", error);
-//     res.status(500).send("Error fetching leads");
-//   }
-// });
 
 router.get("/leads", isAdminLoggedIn, async (req, res) => {
   try {
@@ -670,9 +253,9 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
       // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
       // console.log("you not have fb token");
       req.session.errorMSG = `Facebook Account Not Connected. Please Connect to Find New Leads.`;
-    
+
     }
-    let ALLLEADS = await leadsModel.find({cid: user.cid})
+    let ALLLEADS = await leadsModel.find({ cid: user.cid })
     // Build the filter object
     const filter = { cid: user.cid };
     if (customerName) {
