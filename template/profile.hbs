@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="./" />
   <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/custom.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -19,33 +19,26 @@
 
 
   <link rel="stylesheet" type="text/css" href="/styles/loader.css">
-  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
-    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
-    window.heap = window.heap || [], heap.load = function (e, t) {
-      window.heap.appid = e, window.heap.config = t = t || {};
-      var r = t.forceSSL || "https:" === document.location.protocol,
-        a = document.createElement("script");
-      a.type = "text/javascript", a.async = !0, a.src = (r ? "https:" : "http:") + "//cdn.heapanalytics.com/js/heap-" + e + ".js";
-      var n = document.getElementsByTagName("script")[0];
-      n.parentNode.insertBefore(a, n);
-      for (var o = function (e) {
-        return function () {
-          heap.push([e].concat(Array.prototype.slice.call(arguments, 0)))
-        }
-      }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], c = 0; c < p.length; c++) heap[p[c]] = o(p[c])
-    };
-    heap.load("490363613");
-  </script>
-  <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
-    src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
 
 
 </head>
 
 <body>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  {{#if errorMessage}}
+  <script>
+    toastr.error("{{errorMessage}}");
+  </script>
+  {{/if}}
 
-
+  {{#if successMessage}}
+  <script>
+    toastr.success("{{successMessage}}");
+  </script>
+  {{/if}}
 
   <div class="container-fluid">
     <div class="row">
@@ -302,14 +295,14 @@
 
               <div class="col-6">
                 <label for="mobile" class="form-label">Mobile</label>
-                <input placeholder="Mobile" disabled maxlength="10" value="{{user.mobile}}" name="mobile" id="mobile" type="tel"
-                  class="form-control input" required>
+                <input placeholder="Mobile" disabled maxlength="10" value="{{user.mobile}}" name="mobile" id="mobile"
+                  type="tel" class="form-control input" required>
               </div>
 
               <div class="col-6">
                 <label for="inputAddress" class="form-label">Address</label>
-                <input value="{{user.address}}" disabled name="address" type="text" class="form-control input" id="inputAddress"
-                  placeholder="Address">
+                <input value="{{user.address}}" disabled name="address" type="text" class="form-control input"
+                  id="inputAddress" placeholder="Address">
               </div>
 
               <div class="col-md-6 mb-3">
@@ -320,8 +313,8 @@
 
               <div class="col-md-6 mb-3">
                 <label for="inputState" class="form-label">State</label>
-                <input value="{{user.state}}" disabled name="state" type="text" class="form-control input" id="inputState"
-                  placeholder="State">
+                <input value="{{user.state}}" disabled name="state" type="text" class="form-control input"
+                  id="inputState" placeholder="State">
               </div>
 
               <div class="col-6 mb-3">
@@ -332,7 +325,7 @@
 
               <div class="col-6 mb-3">
                 <label for="Sector" class="form-label">Sector</label>
-                <select id="sector" name="sector" class="form-control input" disabled >
+                <select id="sector" name="sector" class="form-control input" disabled>
                   <option value="{{#if user.sector}}{{user.sector}}{{else}}''{{/if}}" selected>
                     {{#if user.sector}}{{user.sector}}{{else}}Select Sector{{/if}}
                   </option>
@@ -354,6 +347,52 @@
                 <button type="button" id="edit" class="btn btn-primary" onclick="updateProfileData()">Edit</button>
                 <button type="submit" id="save" disabled class="btn btn-secondary">Save</button>
               </div>
+            </form>
+            <div class="row page-titles p-t-35 p-b-15">
+              <div class="col-md-12 col-12 align-self-center">
+                <h1 class="text-bodycolor">Security Management<b> </b></h1>
+              </div>
+            </div>
+
+            <form id="security-form" action="/update/security" method="post" class="row g-3">
+              {{#if user.password}}
+              <div class="col-md-6 mb-3">
+                <label for="oldPassword" class="form-label">Old Password</label>
+                <input name="oldPassword" type="password" class="form-control input" id="oldPassword"
+                  placeholder="Old Password" disabled required>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="newPassword" class="form-label">New Password</label>
+                <input name="newPassword" type="password" class="form-control input" id="newPassword"
+                  placeholder="New Password" disabled required>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input name="confirmPassword" type="password" class="form-control input" id="confirmPassword"
+                  placeholder="Confirm Password"  disabled required>
+              </div>
+              {{else}}
+              <div class="col-md-6 mb-3">
+                <label for="setPassword" class="form-label">Set Password</label>
+                <input name="setPassword" type="password" class="form-control input" id="setPassword"
+                  placeholder="Set Password" disabled required>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="confirmSetPassword" class="form-label">Confirm Password</label>
+                <input name="confirmSetPassword" type="password" class="form-control input" id="confirmSetPassword"
+                  placeholder="Confirm Password" disabled required>
+              </div>
+              {{/if}}
+
+              <div class="col-12">
+                <button type="button" id="editSecurity" class="btn btn-primary"
+                  onclick="updateSecurityData()">Edit</button>
+                <button type="submit" id="saveSecurity" disabled class="btn btn-secondary">Save</button>
+              </div>
+
             </form>
           </div>
 
@@ -465,9 +504,34 @@
 
     }
   </script>
+  <script>
+    function updateSecurityData() {
+      let securityInputs = document.querySelectorAll('#security-form .input');
+      let editSecurityBtn = document.querySelector('#security-form #editSecurity');
+      let saveSecurityBtn = document.querySelector('#security-form #saveSecurity');
+      if (editSecurityBtn.textContent === 'Edit') {
+        editSecurityBtn.textContent = 'Cancel';
+        saveSecurityBtn.disabled = false;
+        securityInputs.forEach((securityInput) => {
+          securityInput.disabled = false;
+        });
+      } else {
+        editSecurityBtn.textContent = 'Edit';
+        saveSecurityBtn.disabled = true;
+        securityInputs.forEach((securityInput) => {
+          securityInput.disabled = true;
+        });
+      }
+    }
 
-
-
+//   async function submit-security(){
+//     let form = document.querySelector('#security-form');
+//     let formData = new FormData(form)
+// 
+//     console.log("formData logs security")
+//     console.log(formData)
+//   }
+  </script>
 
 </body>
 
