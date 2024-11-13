@@ -395,7 +395,6 @@ async function findNewLead(accessToken, user) {
   console.log(pagesResponse)
   if(pagesResponse == null) return
 
-
   const pages = pagesResponse.data.data;
   console.log("Total pages fetched:", pages.length);
   if (!pages.length) console.warn("No pages available for this account.");
@@ -994,31 +993,27 @@ function setupClientEvents(client, userId) {
 }
 
 // !  node crone work from sir
-cron.schedule("* * * * *", async () => {
-  try {
-    let allUsers = await logIncollection.find();
-    allUsers.forEach(async (user) => {
-      console.log("Username:- ", user.name);
+// cron.schedule('* * * * *', async () => {
+//   try {
+//     let allUsers = await logIncollection.find();
+//     allUsers.forEach(async (user) => {
+//       console.log("Username:- ", user.name);
 
-      if (user.facebookToken) {
-        try{
-        console.log("User FB token :- ", user.facebookToken);
+//       if (user.facebookToken) {
+//         try{
+//         console.log("User FB token :- ", user.facebookToken);
 
-        await findNewLead(user.facebookToken, user);
-        }catch(err){
-          console.log("crone find new lead",err);
-          
-        }
-      } else console.log("FB token not availiable");
+//         await findNewLead(user.facebookToken, user);
+//         }catch(err){
+//           console.log("Error in crone findLead",err)
+//         }
+//       } else console.log("FB token not availiable");
 
-        } catch (error) {
-          console.log(error)
-        }
-      } else console.log("FB token not availiable");
-      // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
-    });
-  } catch (err) {
-    console.log(err);
-  }
+//       // await sendMail('websoftvalley@gmail.com',last crone time ${new Date()})
+//     });
 
-});
+//   } catch (err) {
+//     console.log(err);
+//   }
+
+// });
