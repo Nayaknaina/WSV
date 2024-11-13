@@ -15,7 +15,6 @@ const remarkModel = require("../models/remark.model");
 const templateModel = require("../models/temlate.model");
 // const Agenda = require('agenda');
 
-
 const {
   findMobileNumber,
   capitalizeText,
@@ -24,7 +23,9 @@ const {
 } = require("../middilware/middilware");
 const memberModel = require("../models/member.model");
 const { sendMail } = require("../service/mailSender");
-const { startKeepAlive } = require("../middilware/whatsapp");
+const {
+  startKeepAlive,
+} = require("../middilware/whatsapp");
 const { isAsyncFunction } = require("util/types");
 
 // const logIncollection = require("../models/admin.model");
@@ -89,12 +90,17 @@ function createClient(userId) {
     }),
   });
   //todo client store in global obj
-  global.clients[userId] = {
-    IS_CONNECTED: false, // Whether the client is connected
-    CONNECTED_PHONE: null, // Mobile number of the client
-    QR_CODE_DATA: null, // QR code string or image data
-    client: client, // Client object (could be a user or client instance)
-  };
+  try {
+    
+    global.clients[userId] = {
+      IS_CONNECTED: false, // Whether the client is connected
+      CONNECTED_PHONE: null, // Mobile number of the client
+      QR_CODE_DATA: null, // QR code string or image data
+      client: client, // Client object (could be a user or client instance)
+    };
+  } catch (error) {
+    console.log("ERROR in create client when client created and initia")
+  }
   return client;
 }
 
@@ -110,7 +116,7 @@ router.get("/qr", authenticateToken, async (req, res) => {
       // removeSession(user._id)
     } else {
       try {
-        removeSession(user._id.toString())
+        removeSession(user._id.toString());
         const client = createClient(user._id.toString());
         setupClientEvents(client, user._id);
         client.initialize();
@@ -130,7 +136,7 @@ router.get("/qr", authenticateToken, async (req, res) => {
 router.get("/ready", isAdminLoggedIn, async (req, res) => {
   console.warn("try to ready client when scan qr");
   try {
-    console.log(global.clients[req.user.id].IS_CONNECTED)
+    console.log(global.clients[req.user.id].IS_CONNECTED);
     if (global.clients[req.user.id].IS_CONNECTED) {
       let WA = await waModel.findOne({ cid: req.user.cid });
       if (!WA) {
@@ -148,7 +154,6 @@ router.get("/ready", isAdminLoggedIn, async (req, res) => {
       console.warn("is connected false send whatsapp not connected ");
       res.json({ isConnected: false });
     }
-   
   } catch (err) {
     console.log("error in /ready", err);
   }
@@ -160,30 +165,48 @@ router.get("/scan", isAdminLoggedIn, async (req, res) => {
 });
 
 router.get("/again", isAdminLoggedIn, async (req, res) => {
+  try {
+    
+  
   console.warn("req for QR in /again in time interval");
-  console.log(global.clients[req.user.id].QR_CODE_DATA)
-  if (global.clients[req.user.id].QR_CODE_DATA) {
-    console.warn("req accept for QR in /again & QR sent");
-    res.json({ qrCodeData: global.clients[req.user.id].QR_CODE_DATA });
-  } else {
+  if(global.clients[req.user.id]){
+  console.log(global.clients[req.user.id].QR_CODE_DATA);
+  try {
+    if (global.clients[req.user.id].QR_CODE_DATA) {
+      console.warn("req accept for QR in /again & QR sent");
+      res.json({ qrCodeData: global.clients[req.user.id].QR_CODE_DATA });
+    } 
+  } catch (err) {
+    
+    console.log("error in /again when check the value of QR_CODE_DATA in global obj")
+    console.log(err)
+  }
+}
+  else {
     console.warn("qr not genrate in /again");
     res.json({ qrCodeData: null });
   }
+} catch (error) {
+    console.log(error)
+}
 });
 
 router.get("/send-message", authenticateToken, async (req, res) => {
-  message = `hyy ajay`;
+  message = `hyy from 360followups`;
   const user = await logIncollection.findById(req.user.id);
   console.log(user);
-  const client = global.clients[user._id.toString()].client;
+  let client;
+  if(global.clients[user._id.toString()]){
+    client = global.clients[user._id.toString()].client;
+  }
   if (client) {
     console.log("client availiable");
   }
   if (!client) return res.status(400).send("User session not initialized");
 
   try {
-    await client.sendMessage(`${916267181871}@c.us`, message);
-    console.error("message send on whats num - 916267181871");
+    await client.sendMessage(`${919755313770}@c.us`, message);
+    console.error("message send on whats num - 919755313770");
     res.redirect("/user/dashboard");
   } catch (error) {
     console.log(error);
@@ -201,9 +224,9 @@ router.get("/connection-status", authenticateToken, async (req, res) => {
   }
 
   let admin = await logIncollection.findOne({ cid: req.user.cid });
-  let client 
-  if(global.clients[admin._id]){
-  client = global.clients[admin._id].client;
+  let client;
+  if (global.clients[admin._id]) {
+    client = global.clients[admin._id].client;
   }
   if (client) {
     // console.warn(global.clients[admin._id].IS_CONNECTED)
@@ -225,18 +248,18 @@ router.get("/connection-status", authenticateToken, async (req, res) => {
 
 // Endpoint to logout a specific user's session
 router.get("/logoutWA", authenticateToken, async (req, res) => {
-
   let userId = req.user.id;
   const client = global.clients[userId].client;
-  if (!client) return res.status(200).json({errorMsg:"User session not initialized"});
+  if (!client)
+    return res.status(200).json({ errorMsg: "User session not initialized" });
   console.warn("try to go in logout try and client is availiable");
 
   try {
     console.log("we dont have any idea is client ready or not");
     try {
-        await client.logout();
+      await client.logout();
     } catch (er) {
-        console.log("error in /logoutWA when i logout client",er)
+      console.log("error in /logoutWA when i logout client", er);
     }
     console.log(`client logout ${req.user.name}`);
     let delWA = await waModel.findOneAndDelete({ cid: req.user.cid });
@@ -249,9 +272,9 @@ router.get("/logoutWA", authenticateToken, async (req, res) => {
       console.log(`Client removed from global clients: ${userId}`);
       console.log(`remain clients ${Object.keys(global.clients).length}`);
     }
-    console.warn('session folder automatically deleted ')
+    console.warn("session folder automatically deleted ");
     removeSession(userId);
-    
+
     client.on("disconnected", () => {
       console.warn("whatsapp logout in clint on disconnected");
     });
@@ -295,7 +318,11 @@ async function sendMessageToLead(
 
   const user = await logIncollection.findOne({ cid: adminWA.cid });
   console.log(user);
-  const client = global.clients[user._id.toString()].client;
+  let client 
+  if( global.clients[user._id.toString()]){
+
+    client = global.clients[user._id.toString()].client;
+  }
   if (client) {
     console.log("client availiable");
   }
@@ -755,26 +782,26 @@ function authenticateToken(req, res, next) {
 // }
 
 // !  node crone work
-// cron.schedule('* * * * *', async () => {
-//   try {
-//     let allUsers = await logIncollection.find();
-//     allUsers.forEach(async (user) => {
-//       console.log("Username:- ", user.name);
+cron.schedule('* * * * *', async () => {
+  try {
+    let allUsers = await logIncollection.find();
+    allUsers.forEach(async (user) => {
+      console.log("Username:- ", user.name);
 
-//       if (user.facebookToken) {
-//         console.log("User FB token :- ", user.facebookToken);
+      if (user.facebookToken) {
+        console.log("User FB token :- ", user.facebookToken);
 
-//         await findNewLead(user.facebookToken, user);
-//       } else console.log("FB token not availiable");
+        await findNewLead(user.facebookToken, user);
+      } else console.log("FB token not availiable");
 
-//       // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
-//     });
+      // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
+    });
 
-//   } catch (err) {
-//     console.log(err);
-//   }
+  } catch (err) {
+    console.log(err);
+  }
 
-// });
+});
 
 // todo  to delete un-used whtasapp session file in 5 hours interval using crone
 
@@ -864,83 +891,98 @@ removeSessionDirectoriesOnRestartServer();
 // todo remove all whatsapp session files from dir and delete docs from db fun
 
 // todo light weight activitys using client
-cron.schedule('* * * * *', async () => {
+cron.schedule("* * * * *", async () => {
   try {
-     const sessionPath = path.join(__dirname, "sessions");
+    const sessionPath = path.join(__dirname, "sessions");
     if (!fs.existsSync(sessionPath)) return;
 
     // Read each client directory in the sessions folder
     const userIds = fs
       .readdirSync(sessionPath)
       .map((userId) => userId.replace("session-", ""));
-    console.log("allusers for start keaap alive functions ",userIds)
+    console.log("allusers for start keaap alive functions ", userIds);
 
-    userIds.forEach(async (user_id)=>{
-      let admin = await logIncollection.findById(user_id)
-      let WA = await waModel.findOne({cid: admin.cid})
-      console.log(WA)
-      if(WA){
-        console.log("WA is availiable")
-        
+    userIds.forEach(async (user_id) => {
+      let admin = await logIncollection.findById(user_id);
+      let WA = await waModel.findOne({ cid: admin.cid });
+      console.log(WA);
+      if (WA) {
+        console.log("WA is availiable");
+
         const client = global.clients[user_id].client;
-        if(client){
-
-          console.log("try to start keepAliveFun")
-          console.log(global.clients[user_id].IS_CONNECTED)
-          startKeepAlive(client)
-        }else{
+        if (client) {
+          console.log("try to start keepAliveFun");
+          console.log(global.clients[user_id].IS_CONNECTED);
+          startKeepAlive(client);
+        } else {
           console.log("client not availiable");
-          
+
           try {
-            removeSession(user_id)
+            removeSession(user_id);
           } catch (error) {
-            console.log("error in start keep alive crone function when i remove session folder", error)
+            console.log(
+              "error in start keep alive crone function when i remove session folder",
+              error
+            );
           }
         }
       }
-    })
-
+    });
   } catch (err) {
     console.log(err);
   }
-
 });
 
 function setupClientEvents(client, userId) {
   client.on("qr", (qrCode) => {
     console.log(`QR code generated for user ${userId}`);
     // Generate QR code image
+    try {
     const qrImage = qr.imageSync(qrCode, { type: "png" });
     let qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
     console.log("qrCodeData genrated here");
     global.clients[userId].QR_CODE_DATA = qrCodeData;
+  } catch (error) {
+      console.log("error in client.on-QR when qr storing in QR_CODE_DATA ",error)
+  }
   });
 
   client.on("ready", () => {
     console.log(`Client ready for user ${userId}`);
-    global.clients[userId].CONNECTED_PHONE = client.info.wid.user;
-    global.clients[userId].IS_CONNECTED = true;
+    try {
+      
+      global.clients[userId].CONNECTED_PHONE = client.info.wid.user;
+      global.clients[userId].IS_CONNECTED = true;
+    } catch (error) {
+      console.log("ERROR in client.on-ready when mobile num and isConnected store in global obj",error)
+    }
   });
-
+  
   client.on("auth_failure", (msg) => {
     console.error(`Auth failure for user ${userId}:`, msg);
   });
-try {
+  try {
     
-  client.on("disconnected", (reason) => {
-    console.log(`WhatsApp disconnected for user ${userId}:`, reason);
-    if (global.clients[userId]) delete global.clients[userId];
-    removeSession(userId);
+    client.on("disconnected", (reason) => {
+      console.log(`WhatsApp disconnected for user ${userId}:`, reason);
+      try {
+        if (global.clients[userId]) delete global.clients[userId];
+        removeSession(userId);
+        
+      } catch (error) {
+      console.log("ERROR in client.on-disconnected when delete global obj",error)
+      
+    }
     console.log(`Session cleared for user ${userId}`);
   });
-  
+
 } catch (error) {
     console.log(error)
 }
 }
 
 // !  node crone work from sir
-cron.schedule('* * * * *', async () => {
+cron.schedule("* * * * *", async () => {
   try {
     let allUsers = await logIncollection.find();
     allUsers.forEach(async (user) => {
@@ -948,13 +990,12 @@ cron.schedule('* * * * *', async () => {
 
       if (user.facebookToken) {
         console.log("User FB token :- ", user.facebookToken);
-        
+
         await findNewLead(user.facebookToken, user);
       } else console.log("FB token not availiable");
 
       // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
     });
-    
   } catch (err) {
     console.log(err);
   }
