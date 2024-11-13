@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
 
     <style>
-        
         .container {
             display: flex;
             height: 100vh;
@@ -174,6 +173,114 @@
         }
     </style>
 
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #startup {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            position: absolute;
+            background-color: transparent;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner-container {
+            animation: rotate 2s linear infinite;
+            -webkit-animation: rotate 2s linear infinite;
+        }
+
+        .spinner-container .path {
+            stroke-dasharray: 1, 150;
+            /* 1%, 101% circumference */
+            stroke-dashoffset: 0;
+            stroke: rgba(27, 154, 89, 0.7);
+            stroke-linecap: round;
+            animation: dash 1.5s ease-in-out infinite;
+            -webkit-animation: dash 1.5s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes dash {
+            0% {
+                stroke-dasharray: 1, 150;
+                /* 1%, 101% circumference */
+                stroke-dashoffset: 0;
+            }
+
+            50% {
+                stroke-dasharray: 90, 150;
+                /* 70%, 101% circumference */
+                stroke-dashoffset: -35;
+                /* 25% circumference */
+            }
+
+            100% {
+                stroke-dasharray: 90, 150;
+                /* 70%, 101% circumference */
+                stroke-dashoffset: -124;
+                /* -99% circumference */
+            }
+        }
+
+        @-webkit-keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @-webkit-keyframes dash {
+            0% {
+                stroke-dasharray: 1, 150;
+                /* 1%, 101% circumference */
+                stroke-dashoffset: 0;
+            }
+
+            50% {
+                stroke-dasharray: 90, 150;
+                /* 70%, 101% circumference */
+                stroke-dashoffset: -35;
+                /* 25% circumference */
+            }
+
+            100% {
+                stroke-dasharray: 90, 150;
+                /* 70%, 101% circumference */
+                stroke-dashoffset: -124;
+                /* -99% circumference */
+            }
+        }
+
+        .app-wrapper {
+            width: 100%;
+            height: 100%;
+        }
+
+        @media screen and (max-width: 600px) {
+            body {
+                overflow-x: auto;
+            }
+
+            .app-wrapper {
+                width: 600px;
+            }
+        }
+    </style>
+
     <link rel="stylesheet" href="/assets/css/argon.css" type="text/css">
     <link rel="stylesheet" href="/assets/css/custom.css" type="text/css">
     <link rel="stylesheet" type="text/css"
@@ -210,9 +317,16 @@
                             <div class="d-flex justify-content-center qr-area">
                                 <div class="scanner-section">
 
-                                    <div class="qr-code">
-                                        <img id="qrImage" src="{{qrCodeData}}">
+                                    <div class="qr-code" style="position: relative; overflow: hidden;">
 
+                                        <img id="qrImage"  src="{{qrCodeData}}">
+                                        <div id="startup">
+                                            <svg class="spinner-container" width="65px" height="65px"
+                                                viewBox="0 0 52 52">
+                                                <circle class="path" cx="26px" cy="26px" r="20px" fill="none"
+                                                    stroke-width="4px" />
+                                            </svg>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -320,16 +434,16 @@
         </div>
     </div>
 
-<script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-            const qrCode = document.getElementById('qrImage');
+        const qrCode = document.getElementById('qrImage');
         function updateDisplayOnConnection(isConnected) {
-                    console.log("isConn true in update displaye")
+            console.log("isConn true in update displaye")
             const existingTickMark = document.getElementById('tickMark');
 
             if (isConnected) {
                 qrCode.style.display = 'none';
-                    console.log("isConn true qr none")
+                console.log("isConn true qr none")
 
                 // if (!existingTickMark) {
                 const tickMark = document.createElement('div');
@@ -372,7 +486,7 @@
         }
 
         function logoutWhatsApp() {
-                    console.log("logout whatsapp fun")
+            console.log("logout whatsapp fun")
             window.location.href = '/logoutWA';
         }
 
@@ -383,11 +497,11 @@
         //         .then(response => response.json())
         //         .then(data => {
         //             if (!data.isConnected) {
-// 
+        // 
         //             console.log("isConn true")
         //             location.reload();
         //               // axios.get('/qr').then(res => console.log(res.data))
-// 
+        // 
         //             }
         //             else{
         //             console.log("isConn false")
@@ -401,31 +515,74 @@
         // }, 5000);
 
 
-const pageRefreshInterval = setInterval(async () => {
-    console.log("start");
-    try {
-        const response = await axios.get('/connection-status');
-        const data = response.data;
+        // const pageRefreshInterval = setInterval(async () => {
+        //     console.log("start");
+        //     try {
+        //         const response = await axios.get('/connection-status');
+        //         const data = response.data;
+        // 
+        //         if (!data.isConnected) {
+        //             console.log("isConn false");
+        //            // location.reload(); 
+        //            const qrResponse = await axios.get('/qr/again');
+        //             qrCode.setAttribute('src', qrResponse.data.qrCodeData)
+        // 
+        //             if(qrResponse.data.isConnected){
+        //                 updateDisplayOnConnection(true); 
+        //                 clearInterval(pageRefreshInterval); 
+        //             }
+        //         } else {
+        //             console.log("isConn false");
+        //             updateDisplayOnConnection(true); 
+        //             clearInterval(pageRefreshInterval); 
+        //         }
+        //     } catch (error) {
+        //         console.error('Error during page refresh:', error);
+        //     }
+        // }, 5000);
+        // 
 
-        if (!data.isConnected) {
-            console.log("isConn true");
-           // location.reload(); 
-           const qrResponse = await axios.get('/qr/again');
-            qrCode.setAttribute('src', qrResponse.data.qrCodeData)
+        async function tryGenQr() {
+            console.log("try req to qr");
+            await axios.get('/qr');
+            console.log("try req to qr end");
 
-            if(qrResponse.data.isConnected){
-                updateDisplayOnConnection(true); 
-                clearInterval(pageRefreshInterval); 
-            }
-        } else {
-            console.log("isConn false");
-            updateDisplayOnConnection(true); 
-            clearInterval(pageRefreshInterval); 
         }
-    } catch (error) {
-        console.error('Error during page refresh:', error);
-    }
-}, 5000);
+        tryGenQr();
+        let is_QRCODE = false;
+        let qrResponse;
+
+        let isClearFistInterval = false;
+        const getQrIntervalId = setInterval(async () => {
+            try {
+                let qrResponse = await axios.get('/again');
+                qrCode.setAttribute('src', qrResponse.data.qrCodeData)
+                if (qrResponse.data.qrCodeData !== null) {
+                    isClearFistInterval = true;
+                    let load = document.querySelector('#startup')
+                    load.style.display = 'none';
+                    clearInterval(getQrIntervalId)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }, 5000)
+
+        const showConnectedIntervalId = setInterval(async () => {
+            try {
+                if (isClearFistInterval) {
+                    let isConnResponse = await axios.get('/ready');
+                    if (isConnResponse.data.isConnected) {
+                        updateDisplayOnConnection(true);
+                        clearInterval(showConnectedIntervalId)
+                    }
+
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }, 5000)
+
 
     </script>
 

@@ -24,6 +24,233 @@
 
 </head>
 
+<style>
+  body,
+  html {
+    width: 100%;
+    height: 100% !important;
+  }
+
+  #findNewLeadloader {
+    width: 100vw;
+    min-height: 100%;
+    height: 100vh;
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999999;
+    background-color: #908f8faa;
+    background-color: #000000aa;
+    display: none;
+    overflow: hidden;
+  }
+
+  #addPipeLoader {
+    height: 100%;
+
+  }
+
+  #addPipeLoader #finSec {
+    position: absolute;
+  }
+
+  #addPipeLoader #finSec .loader-11 {
+    width: 48px;
+    height: 48px;
+    border: 3px solid;
+    border-color: #FFF #FFF transparent transparent;
+  }
+
+  #addPipeLoader #finSec .loader-11:after {
+    width: 40px;
+    height: 40px;
+    border: 3px solid;
+    border-color: transparent transparent #047 #047;
+  }
+
+  #addPipeLoader #finSec .loader-11::before {
+    width: 40px;
+    height: 40px;
+    border: 3px solid;
+    border-color: transparent transparent #047 #047;
+  }
+
+  #finSec {
+    min-width: 200px;
+    width: 33.33%;
+    height: 200px;
+    padding: 10px;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    cursor: pointer;
+    transition: 0.3s linear;
+  }
+
+
+  .loader-11 {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    border: 6px solid;
+    border-color: #FFF #FFF transparent transparent;
+    -webkit-animation: rotation 1s linear infinite;
+    animation: rotation 1s linear infinite;
+  }
+
+  .loader-11:after,
+  .loader-11:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    border: 6px solid;
+    border-color: transparent transparent #047 #047;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    -webkit-animation: rotationBack 0.5s linear infinite;
+    animation: rotationBack 0.5s linear infinite;
+    transform-origin: center center;
+  }
+
+  .loader-11:before {
+    width: 64px;
+    height: 64px;
+    border-color: #FFF #FFF transparent transparent;
+    -webkit-animation: rotation 1.5s linear infinite;
+    animation: rotation 1.5s linear infinite;
+
+  }
+
+  @media (max-width: 600px) {
+    .loader-11:before {
+      width: 32px;
+      height: 32px;
+      border-color: #FFF #FFF transparent transparent;
+    }
+
+    .loader-11:after,
+    .loader-11:before {
+      width: 40px;
+      height: 40px;
+      border: 3px solid;
+      border-color: transparent transparent #047 #047;
+    }
+
+    .loader-11 {
+      width: 48px;
+      height: 48px;
+      border: 3px solid;
+      border-color: #FFF #FFF transparent transparent;
+    }
+  }
+
+
+  @-webkit-keyframes rotationBack {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(-360deg);
+    }
+  }
+
+  @keyframes rotationBack {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(-360deg);
+    }
+  }
+
+  @-webkit-keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .modal {
+    display: none;
+
+    position: fixed;
+    z-index: 100000000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+
+    position: fixed;
+    z-index: 100000000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    text-align: center;
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  #whatsappReadyMessage {
+    display: none;
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+</style>
+
 <body>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -46,6 +273,9 @@
       <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0">
         {{> NameHead}}
         <div class="container-fluid bg-white shadow-sm m-b-40">
+          <div id="findNewLeadloader" class="findNewLeadloader">
+            <section id="finSec"><span class="loader-11"> </span></section>
+          </div>
           <div class="container">
             <div class="row page-titles p-t-35 p-b-15">
               <div class="col-md-12 col-12 align-self-center">
@@ -54,7 +284,7 @@
               </div>
             </div>
 
-            <form id="profile-form" action="/update/profile" method="post" class="row g-3">
+            <form id="profile-form" action="/update/profile" onsubmit="findLead()" method="post" class="row g-3">
               <div class="col-md-6 mb-3">
                 <label for="name" class="form-label">Name</label>
                 <input value="{{user.name}}" disabled name="name" type="text" class="form-control input" id="name"
@@ -316,7 +546,7 @@
                 <input value="{{user.state}}" disabled name="state" type="text" class="form-control input"
                   id="inputState" placeholder="State">
               </div>
-
+            {{#ifEquals user.role 'admin'}}
               <div class="col-6 mb-3">
                 <label for="organisation" class="form-label">Organization Name</label>
                 <input placeholder="organisation" value="{{user.organizationName}}" name="organisation"
@@ -343,6 +573,8 @@
                 </select>
               </div>
 
+              {{/ifEquals}}
+
               <div class="col-12">
                 <button type="button" id="edit" class="btn btn-primary" onclick="updateProfileData()">Edit</button>
                 <button type="submit" id="save" disabled class="btn btn-secondary">Save</button>
@@ -354,7 +586,7 @@
               </div>
             </div>
 
-            <form id="security-form" action="/update/security" method="post" class="row g-3">
+            <form id="security-form" action="/update/security" onsubmit="findLead()" method="post" class="row g-3">
               {{#if user.password}}
               <div class="col-md-6 mb-3">
                 <label for="oldPassword" class="form-label">Old Password</label>
@@ -371,7 +603,7 @@
               <div class="col-md-6 mb-3">
                 <label for="confirmPassword" class="form-label">Confirm Password</label>
                 <input name="confirmPassword" type="password" class="form-control input" id="confirmPassword"
-                  placeholder="Confirm Password"  disabled required>
+                  placeholder="Confirm Password" disabled required>
               </div>
               {{else}}
               <div class="col-md-6 mb-3">
@@ -524,13 +756,28 @@
       }
     }
 
-//   async function submit-security(){
-//     let form = document.querySelector('#security-form');
-//     let formData = new FormData(form)
-// 
-//     console.log("formData logs security")
-//     console.log(formData)
-//   }
+    //   async function submit-security(){
+    //     let form = document.querySelector('#security-form');
+    //     let formData = new FormData(form)
+    // 
+    //     console.log("formData logs security")
+    //     console.log(formData)
+    //   }
+  </script>
+
+  <script>
+    async function findLead() {
+      let loadBox = document.querySelector('#findNewLeadloader')
+
+
+      let body = document.querySelector('body')
+      if (loadBox) {
+        console.log('clickkeeedddd')
+        loadBox.style.display = 'flex'
+        body.style.height = '100vh !important'
+        body.style.overflow = 'hidden'
+      }
+    }
   </script>
 
 </body>

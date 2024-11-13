@@ -52,7 +52,23 @@
         display: none;
         overflow: hidden;
     }
-
+    body{
+        position: relative;
+    }
+    #fullPageLoader {
+        width: 100vw;
+        min-height: 100%;
+        height: 100vh;
+        background-size: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 999999;
+        background-color: #908f8faa;
+        background-color: #000000aa;
+        display: none;
+        overflow: hidden;
+    }
     #finSec {
         min-width: 200px;
         width: 33.33%;
@@ -70,6 +86,64 @@
         background: none;
         box-shadow: none;
     }
+     #finSecFullPage {
+        min-width: 200px;
+        width: 33.33%;
+        height: 200px;
+        padding: 10px;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ccc;
+        cursor: pointer;
+        transition: 0.3s linear;
+    }
+
+    .loader-11 {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        border: 6px solid;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1s linear infinite;
+        animation: rotation 1s linear infinite;
+    }
+
+    .fullPageLoader-11:after,
+    .fullPageLoader-11:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        border: 6px solid;
+        border-color: transparent transparent #047 #047;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        -webkit-animation: rotationBack 0.5s linear infinite;
+        animation: rotationBack 0.5s linear infinite;
+        transform-origin: center center;
+    }
+
+    .fullPageLoader-11:before {
+        width: 64px;
+        height: 64px;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1.5s linear infinite;
+        animation: rotation 1.5s linear infinite;
+
+    }
+
+
 
     .loader-11 {
         width: 70px;
@@ -234,6 +308,9 @@
     <form hidden id="csv-form" enctype="multipart/form-data">
         <input type="file" onchange="uploadCsvFile()" name="file" id="csv-file" accept=".csv" required>
     </form>
+    <div id="fullPageLoader">
+        <section id="finSecFullPage"><span class="fullPageLoader-11"> </span></section>
+    </div>
 
     <div class="container-fluid">
         <div class="row  justify-content-center">
@@ -481,7 +558,7 @@
                                             </span>
                                             {{else}}
                                             <!-- Single Check Icon when uid is null -->
-                                            <a href="/lead/book/{{_id}}">
+                                            <a href="/lead/book/{{_id}}" onclick="fullLoader()">
                                                 <i class="fa-solid fa-check" style="color: #36383a;"></i>
                                             </a>
                                             {{/if}}
@@ -602,7 +679,7 @@
                                     <span class="user-name-style" id="name-{{_id}}">{{name}} </span>
                                     {{else}}
                                     <!-- Single Check Icon when uid is null -->
-                                    <a href="/lead/book/{{_id}}">
+                                    <a href="/lead/book/{{_id}}" >
                                         <i class="fa-solid fa-check" style="color: #36383a;"></i>
                                     </a>
                                     {{/if}}
@@ -1362,6 +1439,14 @@
      <script>
     async function loader(){
         let loadBox = document.querySelector('#findNewLeadloader')
+            
+        if(loadBox){
+            console.log('loader for remark add')
+            loadBox.style.display = 'flex'
+         }  
+    }
+    async function fullLoader(){
+        let loadBox = document.querySelector('#fullPageLoader')
             
         if(loadBox){
             console.log('loader for remark add')

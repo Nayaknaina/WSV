@@ -29,6 +29,7 @@
 
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 
 
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -760,10 +761,10 @@
                                     </span>
                                 </div>
 
-                                <a href="/qr" onclick="findLead()" id="whatsapp-Connect-Btn"
+                                <a href="/scan" onclick="findLead()" id="whatsapp-Connect-Btn"
                                     class="btn btn-sm btn-outline-secondary">Connect
                                     Now</a>
-                                <a href="/logoutWA" onclick="findLead()"  id="whatsapp-Logout-Btn" class="btn btn-sm btn-danger"
+                                <a onclick="logoutWhatsapp()"  id="whatsapp-Logout-Btn" class="btn btn-sm btn-danger"
                                     style="display: none;">Logout</a>
                             </div>
                         </div>
@@ -1214,6 +1215,8 @@
     </div>
     {{/if }}
     <!-- jQuery CDN for AJAX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -1233,7 +1236,7 @@
         src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
 
     <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
     </script>
@@ -1718,6 +1721,7 @@
             try {
                 const response = await fetch('/connection-status');
                 const data = await response.json();
+                
                 const isConnected = data.isConnected;
                 const connectBtn = document.getElementById('whatsapp-Connect-Btn');
                 const logoutBtn = document.getElementById('whatsapp-Logout-Btn');
@@ -1748,6 +1752,36 @@
 
         // Call the function when the page loads
         document.addEventListener('DOMContentLoaded', checkConnectionStatus);
+
+function logoutWhatsapp() {
+    // Show loader if necessary
+    findLead();
+
+    $.ajax({
+        url: '/logoutWA',  // API endpoint to logout WhatsApp
+        type: 'GET',       // Request type
+        success: function(res) {
+            // On success (response status 200)
+            toastr.success("WhatsApp logged out successfully!");
+            removeLoader(); // Remove loader after success
+        },
+        error: function(xhr, status, error) {
+            // If error occurs, handle the response
+            let errorMsg = xhr.responseJSON && xhr.responseJSON.Msg ? xhr.responseJSON.Msg : "Something went wrong! Please try again.";
+            toastr.error(errorMsg); // Show error message
+            console.log("Error: ", errorMsg);
+            removeLoader(); // Remove loader after error
+        }
+    });
+}
+
+        async function removeLoader() {
+            let loadBox = document.querySelector('#findNewLeadloader')
+            if (loadBox) {
+                console.log('remove Loader')
+                loadBox.style.display = 'none'
+            }
+        }
     </script>
 
     {{!--
@@ -2276,8 +2310,6 @@
                 body.style.height = '100vh !important'
                 body.style.overflow = 'hidden'
             }
-
-            window.location.href = '/leads/pre'
         }
     </script>
 </body>
