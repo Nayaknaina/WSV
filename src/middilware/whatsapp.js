@@ -1,6 +1,6 @@
 
 // Keep-Alive Ping Function with Random Activity
- function startKeepAlive(client) {
+async function startKeepAlive(client) {
   console.log("Starting keep-alive mechanism...");
 
   const activities = [
@@ -31,7 +31,7 @@
   ];
 
   // Perform a random action every 1 minute
-  setInterval(async () => {
+
     try {
       // Select a random activity from the list
       if (client.pupPage && client.pupPage.isClosed()) {
@@ -47,7 +47,6 @@
     } catch (error) {
       console.error("Error in keep-alive ping:", error);
     }
-  }, 60000); // 1 minute interval
 }
 
 
