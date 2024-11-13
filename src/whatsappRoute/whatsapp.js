@@ -106,7 +106,7 @@ router.get("/qr", authenticateToken, async (req, res) => {
     const wa = await waModel.findOne({ cid: user.cid });
     if (wa) {
       global.clients[user._id].IS_CONNECTED = true;
-      res.json({ msg: "success" });
+      return res.json({ msg: "success" });
       // removeSession(user._id)
     } else {
       try {
@@ -201,7 +201,10 @@ router.get("/connection-status", authenticateToken, async (req, res) => {
   }
 
   let admin = await logIncollection.findOne({ cid: req.user.cid });
-  const client = global.clients[admin._id];
+  let client 
+  if(global.clients[admin._id]){
+  client = global.clients[admin._id].client;
+  }
   if (client) {
     // console.warn(global.clients[admin._id].IS_CONNECTED)
     // console.warn(global.clients[admin._id].CONNECTED_PHONE)
@@ -870,12 +873,30 @@ cron.schedule('* * * * *', async () => {
     const userIds = fs
       .readdirSync(sessionPath)
       .map((userId) => userId.replace("session-", ""));
-    console.log(...userIds)
+    console.log("allusers for start keaap alive functions ",userIds)
 
-    userIds.forEach((user_id)=>{
-      const client = global.clients[user_id].client;
-      if(client){
-        startKeepAlive(client)
+    userIds.forEach(async (user_id)=>{
+      let admin = await logIncollection.findById(user_id)
+      let WA = await waModel.findOne({cid: admin.cid})
+      console.log(WA)
+      if(WA){
+        console.log("WA is availiable")
+        
+        const client = global.clients[user_id].client;
+        if(client){
+
+          console.log("try to start keepAliveFun")
+          console.log(global.clients[user_id].IS_CONNECTED)
+          startKeepAlive(client)
+        }else{
+          console.log("client not availiable");
+          
+          try {
+            removeSession(user_id)
+          } catch (error) {
+            console.log("error in start keep alive crone function when i remove session folder", error)
+          }
+        }
       }
     })
 
