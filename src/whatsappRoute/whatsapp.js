@@ -378,15 +378,23 @@ async function findNewLead(accessToken, user) {
   }
 
   let allNewLeads = [];
-  const pagesResponse = await axios.get(
-    `https://graph.facebook.com/v20.0/me/accounts`,
-    {
-      params: {
-        access_token: accessToken,
-        fields: "id,name,access_token",
-      },
-    }
-  );
+  let pagesResponse = null;
+  try {
+    pagesResponse = await axios.get(
+      `https://graph.facebook.com/v20.0/me/accounts`,
+      {
+        params: {
+          access_token: accessToken,
+          fields: "id,name,access_token",
+        },
+      }
+    );
+  } catch (error) {
+    console.log("Error from FB in Page Response",error.response.status)
+  }
+  console.log(pagesResponse)
+  if(pagesResponse == null) return
+
 
   const pages = pagesResponse.data.data;
   console.log("Total pages fetched:", pages.length);
@@ -989,9 +997,14 @@ cron.schedule("* * * * *", async () => {
       console.log("Username:- ", user.name);
 
       if (user.facebookToken) {
+        try{
         console.log("User FB token :- ", user.facebookToken);
 
         await findNewLead(user.facebookToken, user);
+        }catch(err){
+          console.log("crone find new lead",err);
+          
+        }
       } else console.log("FB token not availiable");
 
       // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
