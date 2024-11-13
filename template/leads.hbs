@@ -37,7 +37,7 @@
 
 </style>
 
-{{!-- todo remark add Loadr css  --}}
+{{!-- todo remark add Loadr css --}}
 <style>
     #findNewLeadloader {
         width: 100%;
@@ -175,43 +175,7 @@
         }
     }
 
-    .modal {
-        display: none;
 
-        position: fixed;
-        z-index: 100000000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        display: none;
-
-        position: fixed;
-        z-index: 100000000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-content {
-        background-color: #fff;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 300px;
-        text-align: center;
-    }
-
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
 
     .close:hover,
     .close:focus {
@@ -227,7 +191,8 @@
         margin-top: 10px;
     }
 </style>
-{{!-- todo remark add Loadr css  --}}
+{{!-- todo remark add Loadr css --}}
+
 <body class>
 
     {{!-- {{> nav}} --}}
@@ -305,7 +270,8 @@
                                 <div class="form-group">
                                     <label for="customerPhoneNumber">Phone Number</label>
                                     <input type="tel" id="customerPhoneNumber" name="customerPhoneNumber"
-                                        placeholder="Phone Number" pattern="[0-9]{10}" maxlength="10" />
+                                        placeholder="Phone Number" pattern="(91\s?)?(\d{5}\s?\d{5})" maxlength="14"
+                                        title="Enter a 10-digit number or start with 91 for the country code" />
                                 </div>
                                 <div class="form-group">
                                     <label for="pageName">Page Name</label>
@@ -342,7 +308,9 @@
                                         <div style="width: 48%;">
                                             <label for="mobile">Mobile Number</label>
                                             <input type="tel" id="mobile" placeholder="Mobile Number" name="mobile"
-                                                required>
+                                               
+           pattern="[0-9]{10}" maxlength="10" 
+           title="Enter a 10-digit number " required>
                                         </div>
                                         <!-- Email -->
                                         <div style="width: 48%;">
@@ -366,14 +334,16 @@
                                         <div style="width: 48%;">
                                             <label for="alternate1">Alternate Number 1</label>
                                             <input type="tel" id="alternate1" placeholder="Alternate Mobile"
-                                                name="alternateMobile1">
+                                                name="alternateMobile1" pattern="[0-9]{10}" maxlength="10" 
+           title="Enter a 10-digit number ">
                                         </div>
 
                                         <!-- Alternate Number 2 -->
                                         <div style="width: 48%;">
                                             <label for="alternate2">Alternate Number 2 (Optional)</label>
                                             <input type="tel" id="alternate2" placeholder="Alternate Mobile"
-                                                name="alternateMobile2">
+                                                name="alternateMobile2" pattern="[0-9]{10}" maxlength="10" 
+           title="Enter a 10-digit number ">
                                         </div>
 
                                         <div style="width: 48%;">
@@ -404,7 +374,7 @@
 
 
                 </div>
-                
+
                 <div class="container-fluid bg-white shadow-sm m-b-20">
                     <div class="row flex-row justify-content-around">
                         <div class="col-auto text-center py-2">
@@ -440,7 +410,8 @@
 
                                         <!-- Centered Customer Info -->
                                         <div class="customer-info">
-                                            <div style="font-size: 18px;color: #0032ff; "> <strong>{{customerName}}</strong></div>
+                                            <div style="font-size: 18px;color: #0032ff; ">
+                                                <strong>{{customerName}}</strong></div>
                                             <div style="font-size: 18px; "><strong>{{customerPhoneNumber}}</strong>
                                             </div>
                                         </div>
@@ -452,9 +423,11 @@
                                         <strong>Page:</strong> {{page_name}} <br>
                                         <strong>Form:</strong> {{form_name}} <br>
                                         {{#if status.title}}
-                                        <span style="display: flex; height: 30px; justify-content: start; gap: 8px; align-items: center;">
+                                        <span
+                                            style="display: flex; height: 30px; justify-content: start; gap: 8px; align-items: center;">
                                             <span style="font-size: 18px; font-weight: 600;">{{status.title}}</span>
-                                        <span class="drop-circle" style="background-color: {{status.color}};"></span>
+                                            <span class="drop-circle"
+                                                style="background-color: {{status.color}};"></span>
                                         </span>
                                         {{/if}}
                                     </div>
@@ -546,10 +519,6 @@
 
                 </ul>
 
-
-
-
-
                 {{/ifEquals}}
 
 
@@ -576,7 +545,8 @@
                                     <!-- Centered Customer Info -->
                                     <div class="customer-info"
                                         style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;    margin-top: 4rem; ">
-                                        <div style="font-size: 18px;color: #0032ff; "> <strong>{{findAnswer leads_data}}</strong></div>
+                                        <div style="font-size: 18px;color: #0032ff; "> <strong>{{findAnswer
+                                                leads_data}}</strong></div>
                                         <div style="font-size: 18px; "><strong>{{findMobileNumber leads_data}}</strong>
                                         </div>
                                     </div>
@@ -585,11 +555,12 @@
                                     <strong>Page:</strong> {{page_name}} <br>
                                     <strong>Form:</strong> {{form_name}} <br>
                                     {{#if status.title}}
-                                        <span style="display: flex; height: 30px; justify-content: start; gap: 8px; align-items: center;">
-                                            <span style="font-size: 18px; font-weight: 600;">{{status.title}}</span>
+                                    <span
+                                        style="display: flex; height: 30px; justify-content: start; gap: 8px; align-items: center;">
+                                        <span style="font-size: 18px; font-weight: 600;">{{status.title}}</span>
                                         <span class="drop-circle" style="background-color: {{status.color}};"></span>
-                                        </span>
-                                        {{/if}}
+                                    </span>
+                                    {{/if}}
                                 </div>
 
 
@@ -686,7 +657,8 @@
 
 
                                 <div class="customer-info">
-                                    <div style="font-size: 18px;color: #0032ff; "> <strong>{{findAnswer ./leads_data}}</strong></div>
+                                    <div style="font-size: 18px;color: #0032ff; "> <strong>{{findAnswer
+                                            ./leads_data}}</strong></div>
                                     <div> {{#each leads_data}}
                                         {{#if (containsPhoneNumber ans)}}
                                         <strong>{{ans}}</strong>
@@ -744,9 +716,9 @@
                 </li>
                 <li id="remark-form-list{{_id}}" style="display: none;">
                     <div class="content">
-                         <div id="findNewLeadloader">
-        <section id="finSec"><span class="loader-11"> </span></section>
-    </div>
+                        <div id="findNewLeadloader">
+                            <section id="finSec"><span class="loader-11"> </span></section>
+                        </div>
                         <form id="remarkForm" onsubmit="createNewRemark('{{_id}}')">
                             <textarea placeholder="setting up next followup" required maxlength="150" name="text"
                                 id="remark-form-text{{id}}" cols="30" rows="5"></textarea>
@@ -1291,8 +1263,9 @@
         }
     </script> --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    {{!-- <script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    {{!--
+    <script>
 
         function fetchFacebookLeadFromFacebook() {
             try {
@@ -1312,14 +1285,14 @@
         }
 
     </script> --}}
-    
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/intlTelInput.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"></script>
 
     <script>
         $(document).ready(function () {
-            
+
             const phoneInputs = ["#mobile", "#alternate1", "#alternate2"];
 
             phoneInputs.forEach(function (selector) {
@@ -1335,7 +1308,7 @@
 
 
 
-       async function submitManulLeadForm() {
+        async function submitManulLeadForm() {
             let form = document.querySelector('#customerForm')
             let formdata = new FormData(form)
             console.log(formdata)
@@ -1350,25 +1323,25 @@
 
             let data = { customerName, email, mobile: `${countryCode}${mobile}`, alternateMobile1: `${countryCode}${alternateMobile1}`, alternateMobile2: `${countryCode}${alternateMobile2}`, remark, remarkTime, city, state, productService }
 
-            try{
-                let res = await axios.post('/manual/lead',data)
-                if(res.status == 200)
+            try {
+                let res = await axios.post('/manual/lead', data)
+                if (res.status == 200)
                     location.reload()
-            }catch(err){console.log(err)}
+            } catch (err) { console.log(err) }
 
         }
     </script>
 
-     <script>
-    async function loader(){
-        let loadBox = document.querySelector('#findNewLeadloader')
-            
-        if(loadBox){
-            console.log('loader for remark add')
-            loadBox.style.display = 'flex'
-         }  
-    }
-</script>
+    <script>
+        async function loader() {
+            let loadBox = document.querySelector('#findNewLeadloader')
+
+            if (loadBox) {
+                console.log('loader for remark add')
+                loadBox.style.display = 'flex'
+            }
+        }
+    </script>
 </body>
 
 </html>
