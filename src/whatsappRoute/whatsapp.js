@@ -249,6 +249,10 @@ router.get("/connection-status", authenticateToken, async (req, res) => {
 // Endpoint to logout a specific user's session
 router.get("/logoutWA", authenticateToken, async (req, res) => {
   let userId = req.user.id;
+  if(!global.clients[userId]) {
+    console.log("client not found")
+    return
+  }
   const client = global.clients[userId].client;
   if (!client)
     return res.status(200).json({ errorMsg: "User session not initialized" });
@@ -880,6 +884,14 @@ async function removeSessionDirectoriesOnRestartServer() {
       await waModel.findOneAndDelete({ cid: admin.cid });
     });
 
+    try {
+      const result = await waModel.deleteMany({});
+      console.log(result.lenght,"all users whatsapp remove on restart")
+    } catch (error) {
+      console.log(error)
+    }
+try {
+  
     userIds.forEach((userid) => {
       const userSessionPath = path.join(
         __dirname,
@@ -893,6 +905,9 @@ async function removeSessionDirectoriesOnRestartServer() {
         console.log(`No session directory found for admin ${userid}.`);
       }
     });
+  } catch (error) {
+    console.log("Error in session file removing when server restart ",error)
+  }
   } catch (error) {
     console.error("Error while removing session directories:", error);
   }
