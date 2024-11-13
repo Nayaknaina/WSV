@@ -393,7 +393,7 @@ async function findNewLead(accessToken, user) {
   console.log("Error in find fB access",err)
 }
 // console.log("FB page responce ",pagesResponse)
-if(pagesResponse.status === 403) return;
+if(pagesResponse.response.status === 403) return;
   const pages = pagesResponse.data.data;
   console.log("Total pages fetched:", pages.length);
   if (!pages.length) console.warn("No pages available for this account.");
@@ -795,9 +795,13 @@ cron.schedule('* * * * *', async () => {
       console.log("Username:- ", user.name);
 
       if (user.facebookToken) {
-        console.log("User FB token :- ", user.facebookToken);
-
-        await findNewLead(user.facebookToken, user);
+        
+        try {
+          console.log("User FB token :- ", user.facebookToken);
+          await findNewLead(user.facebookToken, user);
+        } catch (error) {
+          console.log('Error at whatsapp js line 800', error)
+        }
       } else console.log("FB token not availiable");
 
       // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
