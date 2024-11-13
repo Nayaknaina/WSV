@@ -378,22 +378,24 @@ async function findNewLead(accessToken, user) {
   }
 
   let allNewLeads = [];
-  let pagesResponse = 1;
-  try{
+  let pagesResponse = null;
+  try {
     pagesResponse = await axios.get(
-    `https://graph.facebook.com/v20.0/me/accounts`,
-    {
-      params: {
-        access_token: accessToken,
-        fields: "id,name,access_token",
-      },
-    }
-  );
-}catch(err){
-  console.log("Error in find fB access",err)
-}
-// console.log("FB page responce ",pagesResponse)
-if(pagesResponse.response.status === 403) return;
+      `https://graph.facebook.com/v20.0/me/accounts`,
+      {
+        params: {
+          access_token: accessToken,
+          fields: "id,name,access_token",
+        },
+      }
+    );
+  } catch (error) {
+    console.log("Error from FB in Page Response",error.response.status)
+  }
+  console.log(pagesResponse)
+  if(pagesResponse == null) return
+
+
   const pages = pagesResponse.data.data;
   console.log("Total pages fetched:", pages.length);
   if (!pages.length) console.warn("No pages available for this account.");
@@ -999,9 +1001,15 @@ cron.schedule("* * * * *", async () => {
       console.log("Username:- ", user.name);
 
       if (user.facebookToken) {
+        try{
         console.log("User FB token :- ", user.facebookToken);
-        try {
-          await findNewLead(user.facebookToken, user);
+
+        await findNewLead(user.facebookToken, user);
+        }catch(err){
+          console.log("crone find new lead",err);
+          
+        }
+      } else console.log("FB token not availiable");
 
         } catch (error) {
           console.log(error)
