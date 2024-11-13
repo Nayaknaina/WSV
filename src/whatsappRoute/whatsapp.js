@@ -873,7 +873,7 @@ cron.schedule('* * * * *', async () => {
     console.log(...userIds)
 
     userIds.forEach((user_id)=>{
-      const client = global.clients[user_id];
+      const client = global.clients[user_id].client;
       if(client){
         startKeepAlive(client)
       }
