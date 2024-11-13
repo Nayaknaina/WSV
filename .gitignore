@@ -7,3 +7,279 @@ card.css
 card.html
 .wwebjs_auth
 .wwebjs_cache
+template/images/uploads
+package-lock.json
+package-lock.json
+.vscode/sftp.json
+.gitignore
+src/whatsappRoute/sessions
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Crashpad/metadata
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Crashpad/settings.dat
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/chrome_debug.log
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cookies
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cookies-journal
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/data_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/data_1
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/data_2
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/data_3
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00000a
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00000b
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00000c
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00000d
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00000e
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00000f
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000001
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00001a
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00001b
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00001c
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00001d
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00001e
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00001f
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000002
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00002a
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00002b
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00002c
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00002d
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00002e
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00002f
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000003
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00003a
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00003b
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00003c
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00003d
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00003e
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00003f
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000004
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00004a
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00004b
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00004c
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00004d
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00004e
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00004f
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000005
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00005a
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00005b
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00005c
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00005d
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00005e
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_00005f
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000006
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000007
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000008
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000009
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000010
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000011
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000012
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000013
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000014
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000015
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000016
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000017
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000018
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000019
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000020
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000021
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000022
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000023
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000024
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000025
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000026
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000027
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000028
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000029
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000030
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000031
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000032
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000033
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000034
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000035
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000036
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000037
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000038
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000039
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000040
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000041
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000042
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000043
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000044
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000045
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000046
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000047
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000048
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000049
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000050
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000051
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000052
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000053
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000054
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000055
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000056
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000057
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000058
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000059
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000060
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000061
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000062
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000063
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000064
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000065
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000066
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/f_000067
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Cache/Cache_Data/index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/0a987e23989afdf1_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/0b5f06ada4e0b075_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/3abea2a15304b846_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/4ae9ab046075ed34_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/4c1beac17996b21d_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/5d5b084025f2fcd5_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/6ab079f426af7245_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/6b80f42ba1ce5151_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/6c7397cc70e1eb65_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/6f23ab4df13a44c7_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/7c2af7a6104769a5_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/7e5e87717792ee1f_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/7f8a33fcb39787a1_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/8b00d5990cd8334a_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/8d0ca693d8da6aa6_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/8f803ffcaf51e8e9_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/8fabac3c029d2354_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/8fb499f7a1e126f4_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/9a69ee1b1baafd85_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/16f9a54273d87c09_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/57f55a7d7d611750_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/73be806dc26fadc5_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/84b9a43899f12131_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/97a3810e67b85655_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/98ab475f3c4d0e93_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/185b6766a4b6e5ad_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/197b8696df3bd8f2_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/491d576ac4ba84cd_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/527b93341b6e9919_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/534bb7b44bd2356f_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/673acbfcbad08621_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/877e35a8581b6df2_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/930bf33f63d58448_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/987d601d938cf4d4_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/1521fad739313530_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/1614dea9d1572a0b_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/4212a2388256f11b_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/5201e07930f678d0_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/7522e572ecaa8d0a_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/52752da60baf4ce3_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/93912b33747db8d6_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/225646ceb8202990_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/530982e5d858c92c_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/5221347b2232407b_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/6092317b80829014_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/5726274039641d6e_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/a2c0cb47b8936fe5_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/a42d90ab26409530_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/b7a028409b479d1f_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/b41e79b0226b447b_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/b53a75a2b3c82464_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/b13095244df7b400_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/bbd0bba30c5e174b_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/c2a20e5895c53853_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/c10aa0d5bfd7b056_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/c90c27f89c204699_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/ceafe83e53987c63_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/d7df63c8552beda0_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/d76117cbc7f14711_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/da896cb09dd50823_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/f8713ab5ab6bc338_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/js/index-dir/the-real-index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/wasm/index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Code Cache/wasm/index-dir/the-real-index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/DawnCache/data_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/DawnCache/data_1
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/DawnCache/data_2
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/DawnCache/data_3
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/DawnCache/index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/GPUCache/data_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/GPUCache/data_1
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/GPUCache/data_2
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/GPUCache/data_3
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/GPUCache/index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.blob/10/00/1a
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000733.log
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000737.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000738.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000739.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000740.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000741.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000742.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000743.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000744.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000745.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000746.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000747.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000748.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/000749.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/CURRENT
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/LOCK
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/LOG
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/LOG.old
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Local Storage/leveldb/000005.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Local Storage/leveldb/000007.log
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Local Storage/leveldb/000008.ldb
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Local Storage/leveldb/CURRENT
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Local Storage/leveldb/LOCK
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Local Storage/leveldb/LOG
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Local Storage/leveldb/LOG.old
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Local Storage/leveldb/MANIFEST-000001
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/index.txt
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/5e6d8348263135c9_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/29a6a47c1cc60240_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/8427bdb5bc92bd0e_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/9070f5eaf2dd025e_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/a7fd73800fd27b1c_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/c7e6cebe45cf8b22_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/ce919c9598362b91_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/e16a97207fb1da41_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/f0ae312814f54641_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/00835ea7-525c-4264-a29b-139fa225467d/index-dir/the-real-index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/02e56e8e-a116-4754-a19b-067f6858724a/index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/02e56e8e-a116-4754-a19b-067f6858724a/index-dir/the-real-index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/ae99ed4a-89c8-413b-98dd-375f229891d8/2a2b7cbbc61290b4_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/ae99ed4a-89c8-413b-98dd-375f229891d8/6ea66fa5b36b4157_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/ae99ed4a-89c8-413b-98dd-375f229891d8/92172a9e586cee2a_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/ae99ed4a-89c8-413b-98dd-375f229891d8/e6039a61e4d2a504_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/ae99ed4a-89c8-413b-98dd-375f229891d8/index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/CacheStorage/0bf6ab7f94a21cdc9c1649f884333ec20f40a544/ae99ed4a-89c8-413b-98dd-375f229891d8/index-dir/the-real-index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/Database/000003.log
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/Database/CURRENT
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/Database/LOCK
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/Database/LOG
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/Database/LOG.old
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/Database/MANIFEST-000001
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/ScriptCache/7b4fd8111178d5b1_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/ScriptCache/7b4fd8111178d5b1_1
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/ScriptCache/08b99d499107ba17_0
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/ScriptCache/08b99d499107ba17_1
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/ScriptCache/index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Service Worker/ScriptCache/index-dir/the-real-index
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Session Storage/000003.log
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Session Storage/CURRENT
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Session Storage/LOCK
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Session Storage/LOG
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Session Storage/LOG.old
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/Session Storage/MANIFEST-000001
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/VideoDecodeStats/LOCK
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/VideoDecodeStats/LOG
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/WebStorage/QuotaManager
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/WebStorage/QuotaManager-journal
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/databases/Databases.db
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/databases/Databases.db-journal
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/000003.log
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/CURRENT
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/LOCK
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/LOG
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/MANIFEST-000001
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/metadata/000003.log
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/metadata/CURRENT
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/metadata/LOCK
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/metadata/LOG
+src/whatsappRoute/sessions/session-672da152e9bc904e27881148/Default/shared_proto_db/metadata/MANIFEST-000001

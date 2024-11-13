@@ -1,0 +1,22 @@
+{
+    "timeline.pageOnScroll": true
+}
+
+{
+"todohighlight.keywords": [
+    {
+        "text": "TODO",
+        "color": "yellow"
+    },
+    {
+        "text": "FIXME",
+        "color": "red",
+        "backgroundColor": "rgba(255,0,0,0.2)"
+    },
+    {
+        "text": "! IMPORTANT",
+        "color": "cyan",
+        "backgroundColor": "rgba(0,255,255,0.2)"
+    }
+]
+}

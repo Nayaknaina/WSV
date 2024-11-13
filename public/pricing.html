@@ -199,9 +199,9 @@
                     style="border-radius: 50px 0px 0px 0px;">
                     <h2 class="text-thd-color-violet-90 thd-heading-lg ">Followups Lite</h2>
                     <p class="text-thd-color-violet-80 mb-lg thd-body-lg">For individuals</p>
-                    <div class="flex items-center mb-xl"><span
-                            class="thd-color-magenta-100 thd-body-lg">Try now 15 Days for Free</span></div> <a href="/user/dashboard"
-                        class="btn btn-lg btn-primary wow pulse" data-wow-delay="0.4s">
+                    <div class="flex items-center mb-xl"><span class="thd-color-magenta-100 thd-body-lg">Try now 15 Days
+                            for Free</span></div> <a href="/user/dashboard" class="btn btn-lg btn-primary wow pulse"
+                        data-wow-delay="0.4s">
                         Get Started</a>
                     <p class="font-bold mb-fixed-sm my-16 ">Includes:</p>
                     <ul class="thd-body-sm mb-lg list-disc list-inside flex flex-col justify-center">
@@ -317,7 +317,8 @@
                     <form id="form1" action="/payment/pay" hidden method="post">
                         <input type="submit" value="Buy">
                     </form>
-                    <button  id="pay-button" onclick="submitForm()" class="btn btn-lg btn-primary wow pulse" data-wow-delay="0.4s">
+                    <button id="pay-button" onclick="submitForm()" class="btn btn-lg btn-primary wow pulse"
+                        data-wow-delay="0.4s">
                         Get Started</button>
                     <div class="flex items-center "><span id="pro-price"
                             class="text-thd-color-violet-90 my-16 thd-heading-md">$10.00</span>
@@ -623,7 +624,7 @@
 
 
 
-   
+
     <!-- Include jQuery and Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
@@ -689,6 +690,7 @@
 
 
     </script> -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         function handlePlanSelection(plan) {
             if (plan === 'monthly') {
@@ -707,29 +709,50 @@
         }
 
         // Trigger fetch request when user selects a plan and clicks a button
-        function initiatePayment(plan) {
-            console.log("Selected Plan:", plan);
-            axios.post('/payment/pay', { plan })
-                .then((response) => {
-                    console.log(response.data); // Log response for debugging
-
-                    // Check if the response contains the approval URL
-                    if (response.data && response.data.approvalUrl) {
-                        console.log(`Redirecting to: ${response.data.approvalUrl}`);
-                        window.location.href = response.data.approvalUrl; // Redirect to PayPal
-                    } else {
-                        alert('Error: Invalid payment response.');
-                        console.error('Invalid response:', response);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Axios error:', error);
-                    const errorMessage = error.response?.data || 'An error occurred during payment.';
-                    alert(errorMessage);
+        async function initiatePayment(plan) {
+            try {
+                const response = await fetch('/payment/pay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan })
                 });
-        }
+                const { orderId, amount, currency } = await response.json();
 
-        // Set up event listeners for plan options
+                const options = {
+                    key: 'rzp_test_OqOrf7Nc8Ueiv7', // Replace with your Razorpay key ID
+                    amount: amount,
+                    currency: currency,
+                    order_id: orderId,
+                    name: "Subscription Purchase",
+                    description: `Purchase of ${plan} subscription`,
+                    handler: async function (response) {
+                        // Send payment details back to the server
+                        await fetch('/payment/success', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                order_id: orderId,
+                                payment_id: response.razorpay_payment_id,
+                                signature: response.razorpay_signature
+                            })
+                        });
+                    },
+                    prefill: {
+                        name: "Your Name",
+                        email: "youremail@example.com",
+                        contact: "9999999999"
+                    },
+                    theme: {
+                        color: "#3399cc"
+                    }
+                };
+
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+            } catch (error) {
+                console.error("Error initiating payment:", error.message);
+            }
+        }  // Set up event listeners for plan options
         document.getElementById('option_monthly').addEventListener('click', () => {
             handlePlanSelection('monthly');
         });

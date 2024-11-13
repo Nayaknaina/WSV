@@ -461,7 +461,7 @@ router.get("/pipeline/del/:id", isAdminLoggedIn, async (req, res) => {
   // console.log(pipeline);
   let allPipes = await pipelineModel.find({ cid: req.user.cid });
   req.session.successMSG = `${pipeline.title} pipline deletion sucessfull !. `;
-  await delay(3000)
+  // await delay(3000)
   return res.status(200).json(allPipes);
   } catch (err) {
     console.log("Error in /pipeline/del/:id, = ",err)
@@ -520,7 +520,7 @@ router.get('/get-all/pipes', isAdminLoggedIn ,async(req,res)=>{
   console.log('/user/get-all/pipes',req.user.name)
 try {
   let allPipes = await pipelineModel.find({ cid: req.user.cid });
-  await delay(2000);
+  // await delay(2000);
   return res.json(allPipes);
 } catch (err) {
   console.log(err)
@@ -1143,6 +1143,6 @@ router.get('/get/users',async (req,res)=>{
 module.exports = router;
 
 
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+// function delay(ms) {
+//   return new Promise((resolve) => setTimeout(resolve, ms));
+// }

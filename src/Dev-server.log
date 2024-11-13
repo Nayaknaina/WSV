@@ -1,0 +1,116 @@
+13/11/2024 T 14:09:16 Server is running at PORT:8000
+13/11/2024 T 14:09:16 Connection Successful:)
+13/11/2024 T 14:10:00 allusers for start keaap alive functions  
+13/11/2024 T 14:10:00 Username:-  karan
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  shivay
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  Shiv shambu
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  Story Time
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  Nina
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  Demo
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  kkk
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  rajesgh
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  naina nayak
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  Shivani Sahu
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  Karan Ghorse
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  Naina Nayak
+13/11/2024 T 14:10:00 FB token not availiable
+13/11/2024 T 14:10:00 Username:-  Naina Nayak
+13/11/2024 T 14:10:00 User FB token :-  EAAGWQI5stPcBO3hZAxS9hZBJGzxzsklmnah7OO6Di32KMZBKlMxaKqRXK6rpdNnoeeq6ebGTmCp4koU4jPzkIfgK5MGTtNtZCnWx3bOL8iRZA5c8gnA21NSNlnhg7dnZBG86PPeZC5Ia3B9uoyb3wZAWGxkLCf386nUxzxF0wEIdpfEolKZBF5C7msWSbOloqSHF6d93bWhPFk0ZCDXC15aiZA7TQdEZAk85rQr53zNumJ2vwZCPu4s7ZAMCJdIesJKRrPhJfQDAZDZD
+13/11/2024 T 14:10:00 0 aagyi lead
+13/11/2024 T 14:10:02 Total pages fetched: 1
+13/11/2024 T 14:10:02 Processing page: Web Soft Valley Technologies (ID: 1062263437250835)
+13/11/2024 T 14:10:02 Forms fetched for page Web Soft Valley Technologies: 12
+13/11/2024 T 14:10:02 Fetching leads for form: WSV-Ecommerce-inquiry-USA (ID: 435844565878579)
+13/11/2024 T 14:10:03 Total leads fetched for form WSV-Ecommerce-inquiry-USA: 0
+13/11/2024 T 14:10:03 Fetching leads for form: WSV_BPL_FORM-copy (ID: 478791208014566)
+13/11/2024 T 14:10:04 Total leads fetched for form WSV_BPL_FORM-copy: 25
+13/11/2024 T 14:10:04 Pagination detected. Next page URL: https://graph.facebook.com/v20.0/478791208014566/leads?access_token=EAAGWQI5stPcBO6ugarxOjXnSZCgvDdl1sDNtNEfYFmBFLixxx3uPR8R5tkGoJqCZBPrFHvZChDeGRslYA0ueuwluPU1h6gsWGVxE1krTYZBypmXpciEMETRqkOIWlbL2GStufEL127Ro8RQZCRNVK8yLCekZCvV3YZBBrVOEVhjZB4dfp1tODcWgZAF2bccbO3M39ZAGioy7kjyU6LKjvA&fields=id,created_time,field_data&limit=25&after=QVFIUmFoZATh1RjZABZAnBsdm5mQXVFa29ERFZATVE9XWVI5SVY1N1Y4NlFaeTczZAGVKZAkUyc3RLUlRLMFc0cjROdldUUWlCRDNRQ3FnRHFZARlVwc1NSN2pHRGRn
+13/11/2024 T 14:10:04 Fetching leads for form: WSV_BPL_FORM (ID: 1139746787040177)
+13/11/2024 T 14:10:04 Error fetching leads for form WSV_BPL_FORM: Request failed with status code 400
+13/11/2024 T 14:10:04 Fetching leads for form: WSV-Ecommerce-inquiry-copy (ID: 312162618582684)
+13/11/2024 T 14:10:04 Error fetching leads for form WSV-Ecommerce-inquiry-copy: Request failed with status code 400
+13/11/2024 T 14:10:04 Fetching leads for form: WSV-Ecommerce-inquiry (ID: 944797823847043)
+13/11/2024 T 14:10:05 Error fetching leads for form WSV-Ecommerce-inquiry: Request failed with status code 400
+13/11/2024 T 14:10:05 Fetching leads for form: WSV-form 2024-03-12 (ID: 973706101142690)
+13/11/2024 T 14:10:05 Error fetching leads for form WSV-form 2024-03-12: Request failed with status code 400
+13/11/2024 T 14:10:05 Fetching leads for form: WSV-USA (ID: 863586121922074)
+13/11/2024 T 14:10:05 Error fetching leads for form WSV-USA: Request failed with status code 400
+13/11/2024 T 14:10:05 Fetching leads for form: WSV-IND-5k-Offer (ID: 3149346392039107)
+13/11/2024 T 14:10:06 Total leads fetched for form WSV-IND-5k-Offer: 0
+13/11/2024 T 14:10:06 Fetching leads for form: web soft valley form-converted (ID: 274414704986762)
+13/11/2024 T 14:10:06 Total leads fetched for form web soft valley form-converted: 0
+13/11/2024 T 14:10:06 Fetching leads for form: Untitled form 03/18/23, 4:57 PM (ID: 588122046561462)
+13/11/2024 T 14:10:07 Error fetching leads for form Untitled form 03/18/23, 4:57 PM: Request failed with status code 400
+13/11/2024 T 14:10:07 Fetching leads for form: web soft valley form (ID: 1510984725653262)
+13/11/2024 T 14:10:07 Total leads fetched for form web soft valley form: 0
+13/11/2024 T 14:10:07 Fetching leads for form: Untitled form 2017-09-30 (ID: 135181980556689)
+13/11/2024 T 14:10:07 Total leads fetched for form Untitled form 2017-09-30: 0
+13/11/2024 T 14:10:42 Server is running at PORT:8000
+13/11/2024 T 14:10:44 Connection Successful:)
+13/11/2024 T 14:11:00 allusers for start keaap alive functions  
+13/11/2024 T 14:11:01 Username:-  karan
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  shivay
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  Shiv shambu
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  Story Time
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  Nina
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  Demo
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  kkk
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  rajesgh
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  naina nayak
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  Shivani Sahu
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  Karan Ghorse
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  Naina Nayak
+13/11/2024 T 14:11:01 FB token not availiable
+13/11/2024 T 14:11:01 Username:-  Naina Nayak
+13/11/2024 T 14:11:01 User FB token :-  EAAGWQI5stPcBO3hZAxS9hZBJGzxzsklmnah7OO6Di32KMZBKlMxaKqRXK6rpdNnoeeq6ebGTmCp4koU4jPzkIfgK5MGTtNtZCnWx3bOL8iRZA5c8gnA21NSNlnhg7dnZBG86PPeZC5Ia3B9uoyb3wZAWGxkLCf386nUxzxF0wEIdpfEolKZBF5C7msWSbOloqSHF6d93bWhPFk0ZCDXC15aiZA7TQdEZAk85rQr53zNumJ2vwZCPu4s7ZAMCJdIesJKRrPhJfQDAZDZD
+13/11/2024 T 14:11:01 0 aagyi lead
+13/11/2024 T 14:11:02 Total pages fetched: 1
+13/11/2024 T 14:11:02 Processing page: Web Soft Valley Technologies (ID: 1062263437250835)
+13/11/2024 T 14:11:02 Forms fetched for page Web Soft Valley Technologies: 12
+13/11/2024 T 14:11:02 Fetching leads for form: WSV-Ecommerce-inquiry-USA (ID: 435844565878579)
+13/11/2024 T 14:11:02 Total leads fetched for form WSV-Ecommerce-inquiry-USA: 0
+13/11/2024 T 14:11:02 Fetching leads for form: WSV_BPL_FORM-copy (ID: 478791208014566)
+13/11/2024 T 14:11:03 Total leads fetched for form WSV_BPL_FORM-copy: 25
+13/11/2024 T 14:11:03 Pagination detected. Next page URL: https://graph.facebook.com/v20.0/478791208014566/leads?access_token=EAAGWQI5stPcBO4eJrekSvFAoZBoNhfhnxIIVOpfBihvvPYSU2HUt1UTdU7iTQq3UIZBSRCGH9cZCuPh95uZCK6Leh5YOp5hGphI6D4XWXBRWyZAerQuHf7lnJh7gUJeQRZBmCpW3d9zXR3vir9ofZAIuDzEPDd7KNzLD8myWize0eDqpYEqumpYS5yI0h5a0g6sYZBLo04fQV4Wl5r6T&fields=id,created_time,field_data&limit=25&after=QVFIUmFoZATh1RjZABZAnBsdm5mQXVFa29ERFZATVE9XWVI5SVY1N1Y4NlFaeTczZAGVKZAkUyc3RLUlRLMFc0cjROdldUUWlCRDNRQ3FnRHFZARlVwc1NSN2pHRGRn
+13/11/2024 T 14:11:03 Fetching leads for form: WSV_BPL_FORM (ID: 1139746787040177)
+13/11/2024 T 14:11:04 Total leads fetched for form WSV_BPL_FORM: 0
+13/11/2024 T 14:11:04 Fetching leads for form: WSV-Ecommerce-inquiry-copy (ID: 312162618582684)
+13/11/2024 T 14:11:04 Total leads fetched for form WSV-Ecommerce-inquiry-copy: 0
+13/11/2024 T 14:11:04 Fetching leads for form: WSV-Ecommerce-inquiry (ID: 944797823847043)
+13/11/2024 T 14:11:05 Total leads fetched for form WSV-Ecommerce-inquiry: 0
+13/11/2024 T 14:11:05 Fetching leads for form: WSV-form 2024-03-12 (ID: 973706101142690)
+13/11/2024 T 14:11:05 Total leads fetched for form WSV-form 2024-03-12: 0
+13/11/2024 T 14:11:05 Fetching leads for form: WSV-USA (ID: 863586121922074)
+13/11/2024 T 14:11:05 Total leads fetched for form WSV-USA: 0
+13/11/2024 T 14:11:05 Fetching leads for form: WSV-IND-5k-Offer (ID: 3149346392039107)
+13/11/2024 T 14:11:06 Total leads fetched for form WSV-IND-5k-Offer: 0
+13/11/2024 T 14:11:06 Fetching leads for form: web soft valley form-converted (ID: 274414704986762)
+13/11/2024 T 14:11:06 Total leads fetched for form web soft valley form-converted: 0
+13/11/2024 T 14:11:06 Fetching leads for form: Untitled form 03/18/23, 4:57 PM (ID: 588122046561462)
+13/11/2024 T 14:11:07 Total leads fetched for form Untitled form 03/18/23, 4:57 PM: 0
+13/11/2024 T 14:11:07 Fetching leads for form: web soft valley form (ID: 1510984725653262)
+13/11/2024 T 14:11:08 Total leads fetched for form web soft valley form: 0
+13/11/2024 T 14:11:08 Fetching leads for form: Untitled form 2017-09-30 (ID: 135181980556689)
+13/11/2024 T 14:11:08 Total leads fetched for form Untitled form 2017-09-30: 0

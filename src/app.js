@@ -56,43 +56,58 @@ let whatsappClientReady = false;
 let isConnected = false;
 let connectedPhoneNumber = "";
 
+
+function getLogFilePath() {
+  const now = new Date();
+  const date = now.toISOString().slice(0, 10).replace(/-/g, ''); // Format as YYYYMMDD
+  const time = now.toTimeString().slice(0, 8).replace(/:/g, ''); // Format as HHMMSS
+  return path.join(__dirname, `adminlog-${date}-${time}.log`);
+}
+
+const logFilePath = getLogFilePath();
+
 function getFormattedTimestamp() {
   const now = new Date();
   const date = now.toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
   const time = now.toLocaleTimeString('en-GB', { hour12: false }); // Format as HH:MM:SS in 24-hour
   return `${date} T ${time}`;
 }
-const logFilePath = path.join(__dirname, 'Dev-server.log');
+const logFilePathAll = path.join(__dirname, 'Dev-server.log');
 
-// Create a write stream for logging into file
+// // Create a write stream for logging into file
+const logStreamAll = fs.createWriteStream(logFilePathAll, { flags: 'a' });
 const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
-// Override console.log to log to both file and terminal with custom timestamp format
+
 const originalConsoleLog = console.log;
 console.log = (...args) => {
   const message = args.join(' ');
   const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-  logStream.write(timestampedMessage); // Write to file
-  originalConsoleLog(timestampedMessage); // Write to terminal
+  logStream.write(timestampedMessage);
+  logStreamAll.write(timestampedMessage);
+  originalConsoleLog(timestampedMessage);
 };
 
 const originalConsoleError = console.error;
 console.error = (...args) => {
-const message = args.join(' ');
-const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-logStream.write(timestampedMessage); // Write to file
-originalConsoleError(timestampedMessage); // Write to terminal
+  const message = args.join(' ');
+  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+  logStream.write(timestampedMessage);
+  logStreamAll.write(timestampedMessage);
+  originalConsoleError(timestampedMessage);
 };
+
 const originalConsoleWarn = console.warn;
 console.warn = (...args) => {
-const message = args.join(' ');
-const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-logStream.write(timestampedMessage); // Write to file
-originalConsoleWarn(timestampedMessage); // Write to terminal
+  const message = args.join(' ');
+  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+  logStream.write(timestampedMessage);
+  logStreamAll.write(timestampedMessage);
+  originalConsoleWarn(timestampedMessage);
 };
 
 app.use((req, res, next) => {
-  const logMessage = ` ${req.method} ${req.url} ${res.statusCode}`;
-  console.log(logMessage); // This will log to both file and terminal
+  const logMessage = `${req.method} ${req.url} ${res.statusCode}`;
+  console.log(logMessage);
   next();
 });
 
@@ -1990,7 +2005,7 @@ async function sendMessageToLead(
   );
   const user = await logIncollection.findOne({ cid: adminWA.cid });
   console.log(user);
-  const client = global.clients[user._id.toString()];
+  const client = global.clients[user._id.toString()].client;
   if (client) {
     console.log("client availiable");
   }
