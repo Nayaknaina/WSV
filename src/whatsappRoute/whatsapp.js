@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const cron = require('node-cron');
+const cron = require("node-cron");
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qr = require("qr-image");
 const fs = require("fs");
@@ -20,10 +20,12 @@ const {
   findMobileNumber,
   capitalizeText,
   checkSubscription,
+  isAdminLoggedIn,
 } = require("../middilware/middilware");
 const memberModel = require("../models/member.model");
 const { sendMail } = require("../service/mailSender");
-// const { startKeepAlive } = require("../middilware/whatsapp");
+const { startKeepAlive } = require("../middilware/whatsapp");
+const { isAsyncFunction } = require("util/types");
 
 // const logIncollection = require("../models/admin.model");
 
@@ -33,21 +35,39 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function removeSession(userId) {
+  // Define the path to the session directory for the given userId
+  const sessionPath = path.join(__dirname, "sessions", `session-${userId}`);
+
+  // Check if the session directory exists
+  if (fs.existsSync(sessionPath)) {
+    try {
+      // Remove the session directory recursively
+      fs.rmSync(sessionPath, { recursive: true, force: true });
+      console.log(`Session for user ${userId} removed successfully.`);
+    } catch (err) {
+      console.error(`Error removing session for user ${userId}:`, err);
+    }
+  } else {
+    console.log(`No session found for user ${userId}.`);
+  }
+}
+function removeClientFromGlobalObj(userId) {
+  if (global.clients[userId]) {
+    console.log(`Client for user ${userId} already exists. Removing it...`);
+    delete global.clients[userId];
+  }
+}
 function createClient(userId) {
   const sessionPath = path.join(__dirname, "sessions", `session-${userId}`);
-  console.log("try to create client", sessionPath);
-  if (fs.existsSync(sessionPath)) {
-    fs.rm(sessionPath, { recursive: true, force: true }, (err) => {
-      if (err) {
-        console.error("Error deleting sessions folder:", err);
-        return;
-      } else {
-        console.log("Sessions folder deleted successfully.");
-      }
-    });
-  }
+  console.log("Attempting to create client for:", sessionPath);
+  // todo remove session from dir if exist
+  removeSession(userId);
+  //todo remove client from globle obj if exist
+  removeClientFromGlobalObj(userId);
 
-  return new Client({
+  // todo create new client and session file
+  const client = new Client({
     puppeteer: {
       headless: true,
       ignoreHTTPSErrors: true,
@@ -64,215 +84,98 @@ function createClient(userId) {
       ],
     },
     authStrategy: new LocalAuth({
-      clientId: userId, // Each user will have a unique client ID
-      dataPath: path.join(__dirname, "sessions"), // Path to store session data
+      clientId: userId,
+      dataPath: path.join(__dirname, "sessions"),
     }),
   });
+  //todo client store in global obj
+  global.clients[userId] = {
+    IS_CONNECTED: false, // Whether the client is connected
+    CONNECTED_PHONE: null, // Mobile number of the client
+    QR_CODE_DATA: null, // QR code string or image data
+    client: client, // Client object (could be a user or client instance)
+  };
+  return client;
 }
-
-// // todo backup
-// async function createClientOld(userId) {
-//   console.log("Creating client for user:", userId);
-
-//   const client = new Client({
-//     authStrategy: new LocalAuth({
-//       clientId: userId, // Unique client ID for each user
-//       dataPath: path.join(__dirname, "sessions"), // Session data path
-//     }),
-//   });
-
-//   client.on("ready", () => {
-//     console.log(`WhatsApp client is ready for user ${userId}`);
-//   });
-
-//   client.on("auth_failure", (msg) => {
-//     console.error("Authentication failure for user:", userId, msg);
-//   });
-
-//   client.on("disconnected", () => {
-//     console.log("Client disconnected for user:", userId);
-//     delete global.clients[userId]; // Cleanup on disconnect
-//   });
-//   client.initialize();
-//   console.log("before delay");
-
-//   await delay(10000);
-//   console.log("afterdelay");
-//   return client;
-// }
-// // Function to restore all clients from session directory on server startup
-// // todo backup
-
-// // async function createClientOld(userId) {
-// //   console.log("Creating client for user:", userId);
-
-// //   const client = new Client({
-// //     authStrategy: new LocalAuth({
-// //       clientId: userId, // Unique client ID for each user
-// //       dataPath: path.join(__dirname, "sessions"), // Session data path
-// //     }),
-// //   });
-
-// //   client.on("ready", () => {
-// //     console.log(`WhatsApp client is ready for user ${userId}`);
-// //   });
-
-// //   client.on("auth_failure", (msg) => {
-// //     console.error("Authentication failure for user:", userId, msg);
-// //   });
-
-// //   client.on("disconnected", () => {
-// //     console.log("Client disconnected for user:", userId);
-// //     delete global.clients[userId]; // Cleanup on disconnect
-// //   });
-
-// //   // Initialize the client
-// //   await client.initialize();
-
-// //   return client;
-// // }
-
-// // todo backup
-// // async function restoreClients() {
-// //   const sessionPath = path.join(__dirname, "sessions");
-// //   if (!fs.existsSync(sessionPath)) return;
-
-// //   // Read each client directory in the sessions folder
-// //   const userIds = fs
-// //     .readdirSync(sessionPath)
-// //     .map((userId) => userId.replace("session-", ""));
-
-// //   // for (const userId of userIds) {
-// //   //   try {
-// //   //     // Create and await client to be ready
-// //   //     const client = await createClientOld(userId); // Wait for client to initialize and be ready
-// //   //     global.clients[userId] = client; // Storing client in global object
-
-// //   //     console.warn(`before delay in loop for user ${userId}`);
-// //   //     await delay(10000);
-// //   //     console.log(`after delay in loop for user ${userId}`);
-// //   //     console.log(`Client restored for user ${userId}`);
-// //   //   } catch (error) {
-// //   //     console.error(`Failed to restore client for user ${userId}:`, error);
-// //   //   }
-// //   // }
-
-// //   const clientPromises = userIds.map(async (userId) => {
-// //     try {
-// //       // Create and await client to be ready
-// //       const client = await createClientOld(userId); // Wait for client to initialize and be ready
-// //       global.clients[userId] = client; // Storing client in global object
-// //       console.log(`Client restored for user ${userId}`);
-// //     } catch (error) {
-// //       console.error(`Failed to restore client for user ${userId}:`, error);
-// //     }
-// //   });
-
-// //   // Wait for all clients to initialize
-// //   await Promise.all(clientPromises); // This ensures that all clients initialize simultaneously
-// //   console.log("All clients have been restored successfully.");
-
-// // }
-
-// // todo backup
-// async function restoreClients() {
-//   const sessionPath = path.join(__dirname, "sessions");
-//   if (!fs.existsSync(sessionPath)) return;
-
-//   // Read each client directory in the sessions folder
-//   const userIds = fs
-//     .readdirSync(sessionPath)
-//     .map((userId) => userId.replace("session-", ""));
-
-//   const clientPromises = userIds.map(async (userId) => {
-//     try {
-//       // Create and await client to be ready
-//       const client = await createClientOld(userId); // Wait for client to initialize and be ready
-//       global.clients[userId] = client; // Storing client in global object
-//       console.log(`Client restored for user ${userId}`);
-//     } catch (error) {
-//       console.error(`Failed to restore client for user ${userId}:`, error);
-//     }
-//   });
-
-//   // Wait for all clients to initialize
-//   await Promise.all(clientPromises); // This ensures that all clients initialize simultaneously
-//   console.log("All clients have been restored successfully.");
-// }
-
-// // todo Restore clients on server startup
-// restoreClients();
-
-let connectedPhoneNumber = "";
-let connSt = false;
 
 // Endpoint to initialize a WhatsApp session for a user
 router.get("/qr", authenticateToken, async (req, res) => {
+  console.log("req to QR in /qr ");
   try {
-    
-  
-  const user = await logIncollection.findById(req.user.id);
-  const wa = await waModel.findOne({ cid: user.cid });
-  console.log(user);
-  // Create a new client for the user
-  if(wa) return res.render('qr',{qrCodeData: null});
-  const client = createClient(user._id.toString());
+    const user = await logIncollection.findById(req.user.id);
+    const wa = await waModel.findOne({ cid: user.cid });
+    if (wa) {
+      global.clients[user._id].IS_CONNECTED = true;
+      res.json({ msg: "success" });
+      // removeSession(user._id)
+    } else {
+      try {
+        removeSession(user._id.toString())
+        const client = createClient(user._id.toString());
+        setupClientEvents(client, user._id);
+        client.initialize();
+        global.clients = global.clients || {};
+        global.clients[user._id.toString()].client = client;
+        res.json({ msg: "success" });
+      } catch (err) {
+        console.log("Error in qr genrating ", err);
+      }
+    }
+    // Ensure global.clients exists and store the client for this user
+  } catch (error) {
+    console.log(err);
+  }
+});
 
-  client.on("qr", async (qrCode) => {
-    console.log("client created");
-    console.log(qrCode);
-
-    // Send QR code back to the client as a response
-    const qrImage = qr.imageSync(qrCode, { type: "png" });
-    let qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
-    console.log(qrCodeData);
-
-    res.render("qr", { qrCodeData });
-  });
-
-  client.on("ready", async () => {
-    console.log(`WhatsApp client is ready for user ${user._id} connSt true`);
-    connectedPhoneNumber = client.info.wid.user;
-    connSt = true;
-    if (connSt) {
-      if (!wa) {
+router.get("/ready", isAdminLoggedIn, async (req, res) => {
+  console.warn("try to ready client when scan qr");
+  try {
+    console.log(global.clients[req.user.id].IS_CONNECTED)
+    if (global.clients[req.user.id].IS_CONNECTED) {
+      let WA = await waModel.findOne({ cid: req.user.cid });
+      if (!WA) {
         let wa = new waModel({
           whatsappClientReady: true,
           isConnected: true,
-          connectedPhoneNumber: connectedPhoneNumber,
-          cid: user.cid,
+          connectedPhoneNumber: global.clients[req.user.id].CONNECTED_PHONE,
+          cid: req.user.cid,
         });
         await wa.save();
-        console.log("wa create connSt true");
       }
+      console.warn("is connected true send whatsapp connected ");
+      res.json({ isConnected: global.clients[req.user.id].IS_CONNECTED });
+    } else {
+      console.warn("is connected false send whatsapp not connected ");
+      res.json({ isConnected: false });
     }
-  });
+   
+  } catch (err) {
+    console.log("error in /ready", err);
+  }
+});
 
-  client.on("auth_failure", (msg) => {
-    console.error("Authentication failure for user:", user._id, msg);
-    res.status(500).send("Authentication failed, please try again.");
-  });
+router.get("/scan", isAdminLoggedIn, async (req, res) => {
+  console.warn("render qr page only with qr null");
+  res.render("qr", { qrCodeData: null });
+});
 
-  client.on("disconnected", () => {
-    console.log("Client disconnected for user:", user._id);
-    delete global.clients[user._id]; // Session cleanup
-  });
-
-  client.initialize();
-
-  // Ensure global.clients exists and store the client for this user
-  global.clients = global.clients || {};
-  global.clients[user._id.toString()] = client;
-} catch (error) {
-    console.log(err);
-}
+router.get("/again", isAdminLoggedIn, async (req, res) => {
+  console.warn("req for QR in /again in time interval");
+  console.log(global.clients[req.user.id].QR_CODE_DATA)
+  if (global.clients[req.user.id].QR_CODE_DATA) {
+    console.warn("req accept for QR in /again & QR sent");
+    res.json({ qrCodeData: global.clients[req.user.id].QR_CODE_DATA });
+  } else {
+    console.warn("qr not genrate in /again");
+    res.json({ qrCodeData: null });
+  }
 });
 
 router.get("/send-message", authenticateToken, async (req, res) => {
   message = `hyy ajay`;
   const user = await logIncollection.findById(req.user.id);
   console.log(user);
-  const client = global.clients[user._id.toString()];
+  const client = global.clients[user._id.toString()].client;
   if (client) {
     console.log("client availiable");
   }
@@ -297,17 +200,20 @@ router.get("/connection-status", authenticateToken, async (req, res) => {
     user = await memberModel.findById(req.user.id);
   }
 
-  let admin = await logIncollection.findOne({cid:req.user.cid});
+  let admin = await logIncollection.findOne({ cid: req.user.cid });
   const client = global.clients[admin._id];
   if (client) {
-    handleDisconnection(client,admin._id)
+    // console.warn(global.clients[admin._id].IS_CONNECTED)
+    // console.warn(global.clients[admin._id].CONNECTED_PHONE)
+    // console.warn(global.clients[admin._id].QR_CODE_DATA)
+    // handleDisconnection(client, admin._id);
   }
   let userWA = await waModel.findOne({ cid: user.cid });
 
   // isConnected = false;
   if (userWA) {
     console.log(userWA.isConnected, user.name, "check connection//");
-    
+
     return res.json({ isConnected: userWA.isConnected });
   } else {
     return res.json({ isConnected: false });
@@ -318,64 +224,43 @@ router.get("/connection-status", authenticateToken, async (req, res) => {
 router.get("/logoutWA", authenticateToken, async (req, res) => {
 
   let userId = req.user.id;
-  const client = global.clients[userId];
-  if (!client) return res.status(400).send("User session not initialized");
-  console.warn("try to go in logout try and client is availiable" );
+  const client = global.clients[userId].client;
+  if (!client) return res.status(200).json({errorMsg:"User session not initialized"});
+  console.warn("try to go in logout try and client is availiable");
 
   try {
-    console.log("we dont have any idea is client ready or not")
-    await client.logout();
+    console.log("we dont have any idea is client ready or not");
+    try {
+        await client.logout();
+    } catch (er) {
+        console.log("error in /logoutWA when i logout client",er)
+    }
     console.log(`client logout ${req.user.name}`);
     let delWA = await waModel.findOneAndDelete({ cid: req.user.cid });
     if (delWA) {
       console.warn("user Whatsapp document deleted");
     }
+    // todo global client removing
     if (global.clients[userId]) {
       delete global.clients[userId];
       console.log(`Client removed from global clients: ${userId}`);
-      console.log(`remain clients ${global.clients.length}`);
+      console.log(`remain clients ${Object.keys(global.clients).length}`);
     }
-
-    // Delete the session directory for the user
-    const sessionDir = path.join(__dirname, "sessions", `session-${userId}`);
-    if (fs.existsSync(sessionDir)) {
-      console.log(`try del session file for user: ${userId}`);
-      fs.rmSync(sessionDir, { recursive: true, force: true });
-      console.log(`Session directory deleted for user: ${userId}`);
-    }
+    console.warn('session folder automatically deleted ')
+    removeSession(userId);
+    
     client.on("disconnected", () => {
       console.warn("whatsapp logout in clint on disconnected");
     });
 
-    await delay(10000);
-    res.redirect('/user/dashboard')
+    await delay(5000);
+    res.redirect("/user/dashboard");
   } catch (error) {
     res.status(500).send("Failed to logout");
   }
 });
 
-
-// router.get("/get/users", async (req, res) => {
-//   try {
-//     let allUsers = await logIncollection.find();
-//     allUsers.forEach(async (user) => {
-//       console.log("Username:- ", user.name);
-
-//       if (user.facebookToken) {
-//         console.log("User FB token :- ", user.facebookToken);
-
-//         await findNewLead(user.facebookToken, user);
-//       } else console.log("FB token not availiable");
-//     });
-    
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
-
-// module.exports = global;
-
-module.exports = {sendMessageToLead};
+module.exports = { sendMessageToLead };
 module.exports = router;
 
 async function sendMessageToLead(
@@ -407,7 +292,7 @@ async function sendMessageToLead(
 
   const user = await logIncollection.findOne({ cid: adminWA.cid });
   console.log(user);
-  const client = global.clients[user._id.toString()];
+  const client = global.clients[user._id.toString()].client;
   if (client) {
     console.log("client availiable");
   }
@@ -541,7 +426,6 @@ async function findNewLead(accessToken, user) {
   }
   // todo all lead foreach start here
   allLeads.forEach(async (lead) => {
-    
     const existingLead = await leadsModel.findOne({
       lead_id: lead.id,
       cid: admin.cid,
@@ -559,7 +443,14 @@ async function findNewLead(accessToken, user) {
         });
       });
 
-      let defPipe = await pipelineModel.findOne({ defaultVal: true, cid: user.cid });
+      let defPipe = await pipelineModel.findOne({
+        defaultVal: true,
+        cid: user.cid,
+      });
+      let status = null;
+      if (defPipe) {
+        status = defPipe._id;
+      }
       const newLead = new leadsModel({
         lead_id: lead.id,
         income_time: lead.created_time,
@@ -569,16 +460,16 @@ async function findNewLead(accessToken, user) {
         form_name: lead.form_name,
         cid: admin.cid,
         leads_data: leads_datas,
-        status: defPipe._id,
+        status,
         app: "facebook",
       });
       await newLead.save();
 
-      const mobileRegex = /^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/  ;
-      let leadContactNo =null;
+      const mobileRegex = /^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/;
+      let leadContactNo = null;
       // newLead.leads_data.forEach((item) => {
       //   const answer = item.ans.trim();
-    
+
       //   if (mobileRegex.test(answer)) {
       //     console.log("Valid Mobile Number found: try 1", answer);
       //     return (leadContactNo = answer);
@@ -586,49 +477,47 @@ async function findNewLead(accessToken, user) {
       // });
       for (let i = 0; i < newLead.leads_data.length; i++) {
         const answer = newLead.leads_data[i].ans.trim();
-      
+
         if (mobileRegex.test(answer)) {
           console.log("Valid Mobile Number found: try 1", answer);
           leadContactNo = answer;
-          break; 
+          break;
         }
       }
-      
-    
-      if (leadContactNo==null) {
-        const mobileRegex = /^\+?\d{1,3}\d{10}$/  ;
-    
+
+      if (leadContactNo == null) {
+        const mobileRegex = /^\+?\d{1,3}\d{10}$/;
+
         for (let i = 0; i < newLead.leads_data.length; i++) {
           const answer = newLead.leads_data[i].ans.trim();
-        
+
           if (mobileRegex.test(answer)) {
             console.log("Valid Mobile Number found: try 2", answer);
             leadContactNo = answer;
-            break; 
+            break;
           }
         }
       }
-    
-      if (leadContactNo==null) {
-        const mobileRegex = /^\d{10}$/  ;
-    
+
+      if (leadContactNo == null) {
+        const mobileRegex = /^\d{10}$/;
+
         for (let i = 0; i < newLead.leads_data.length; i++) {
           const answer = newLead.leads_data[i].ans.trim();
-        
+
           if (mobileRegex.test(answer)) {
             console.log("Valid Mobile Number found: try 3", answer);
             leadContactNo = answer;
-            break; 
+            break;
           }
         }
       }
       if (leadContactNo !== null) {
-        leadContactNo = `${admin.countryCode}${leadContactNo}`
+        leadContactNo = `${admin.countryCode}${leadContactNo}`;
         console.log("10 dig number found");
-        
       }
 
-      console.warn("new lead found and just store in DB",leadContactNo);
+      console.warn("new lead found and just store in DB", leadContactNo);
       // leadContactNo = "9755313770";
       // console.warn(leadContactNo)
       const searchStrings = [
@@ -685,7 +574,10 @@ async function findNewLead(accessToken, user) {
         customerName = "Sir/Madam";
         console.log("Un-Matched then customerName:", customerName);
       }
-console.warn("we just found lead and store and find costomer name ",customerName )
+      console.warn(
+        "we just found lead and store and find costomer name ",
+        customerName
+      );
       const wellcomeTemp = await templateModel.findOne({
         cid: admin.cid,
         num: 4,
@@ -693,59 +585,65 @@ console.warn("we just found lead and store and find costomer name ",customerName
 
       // todo COUSTOMER Whatsapp Message
       setTimeout(async () => {
-      // const lead
-      let connStatus;
-      try {
-        connStatus = await waModel.findOne({ cid: admin.cid });
-      } catch (err) {
-        console.error("Error fetching connStatus: ", err);
-      }
+        // const lead
+        let connStatus;
+        try {
+          connStatus = await waModel.findOne({ cid: admin.cid });
+        } catch (err) {
+          console.error("Error fetching connStatus: ", err);
+        }
 
-      let imagePath, pdfPath;
-      if (wellcomeTemp.image !== "") {
-        imagePath = path.join(
-          __dirname,
-          "../../template/images/uploads/whatsapp/",
-          wellcomeTemp.image
+        let imagePath, pdfPath;
+        if (wellcomeTemp.image !== "") {
+          imagePath = path.join(
+            __dirname,
+            "../../template/images/uploads/whatsapp/",
+            wellcomeTemp.image
+          );
+        }
+        if (wellcomeTemp.pdf !== "") {
+          pdfPath = path.join(
+            __dirname,
+            "../../template/images/uploads/whatsapp/",
+            wellcomeTemp.pdf
+          );
+        }
+        console.log("find new lead welcome msg sending on whatsapp ");
+
+        let msg = wellcomeTemp.text;
+        let companyName = admin.organizationName || "360FollowUps";
+
+        let personalizedMessage = msg
+          .replace("[customer name]", `*${customerName}*`)
+          .replace("[company name]", `*${companyName}*`)
+          .replace("[company name]", `*${companyName}*`);
+
+        // console.log(
+        //   connStatus,
+        //   leadContactNo,
+        //   personalizedMessage,
+        //   imagePath,
+        //   pdfPath
+        // );
+        console.log(
+          "Welcome to lead new lead found and send whatsapp msg",
+          leadContactNo
         );
-      }
-      if (wellcomeTemp.pdf !== "") {
-        pdfPath = path.join(
-          __dirname,
-          "../../template/images/uploads/whatsapp/",
-          wellcomeTemp.pdf
+
+        personalizedMessage = capitalizeText(personalizedMessage);
+
+        console.warn(`in timeout`, leadContactNo);
+        console.warn(
+          `message sending for customer Wellcome template`,
+          leadContactNo
         );
-      }
-      console.log("find new lead welcome msg sending on whatsapp ");
-
-      let msg = wellcomeTemp.text;
-      let companyName = admin.organizationName || "360FollowUps";
-
-      let personalizedMessage = msg
-        .replace("[customer name]", `*${customerName}*`)
-        .replace("[company name]", `*${companyName}*`)
-        .replace("[company name]", `*${companyName}*`);
-
-      // console.log(
-      //   connStatus,
-      //   leadContactNo,
-      //   personalizedMessage,
-      //   imagePath,
-      //   pdfPath
-      // );
-      console.log("Welcome to lead new lead found and send whatsapp msg", leadContactNo);
-
-      personalizedMessage = capitalizeText(personalizedMessage);
-
-      console.warn(`in timeout`, leadContactNo);
-      console.warn(`message sending for customer Wellcome template`, leadContactNo);
-      // sendMessageToLead(
-      //   connStatus,
-      //   leadContactNo,
-      //   personalizedMessage,
-      //   imagePath,
-      //   pdfPath
-      // );
+        // sendMessageToLead(
+        //   connStatus,
+        //   leadContactNo,
+        //   personalizedMessage,
+        //   imagePath,
+        //   pdfPath
+        // );
       }, 100);
 
       // todo new lead Whatsapp Message for members and admin
@@ -841,62 +739,39 @@ function authenticateToken(req, res, next) {
   });
 }
 
-async function handleDisconnection(client, userId) {
-  client.on('disconnected', async (reason) => {
-      console.log(`User ${userId} has been disconnected: ${reason}`);
-
-      // Perform cleanup tasks:
-      // todo 1. Update the user status in the database to reflect the disconnected status
-      try {
-        await waModel.findOneAndDelete({cid:userId})
-      } catch (err) {
-        console.error(err)
-      }
-      // todo 2. Remove the client instance from memory
-      if (global.clients && global.clients[userId]) {
-        delete global.clients[userId];
-      }
-      // todo 3. trying Remove the client session from memory
-      deleteSessionDirectory(userId)
-      // Optional: Notify the user via email, SMS, or other means
-      // notifyUser(userId, "Your WhatsApp session has been disconnected.");
-  });
-}
-
 // module.exports = sendMessageToLead
-function deleteSessionDirectory(userId) {
-  const userSessionPath = path.join(__dirname, "sessions", `session-${userId}`);
-  
-  if (fs.existsSync(userSessionPath)) {
-      fs.rmSync(userSessionPath, { recursive: true, force: true });
-      console.log(`Session directory for user ${userId} deleted.`);
-  } else {
-      console.log(`No session directory found for user ${userId}.`);
-  }
-}
+// function deleteSessionDirectory(userId) {
+//   const userSessionPath = path.join(__dirname, "sessions", `session-${userId}`);
 
+//   if (fs.existsSync(userSessionPath)) {
+//       fs.rmSync(userSessionPath, { recursive: true, force: true });
+//       console.log(`Session directory for user ${userId} deleted.`);
+//   } else {
+//       console.log(`No session directory found for user ${userId}.`);
+//   }
+// }
 
-// !  node crone work 
-cron.schedule('* * * * *', async () => {
-  try {
-    let allUsers = await logIncollection.find();
-    allUsers.forEach(async (user) => {
-      console.log("Username:- ", user.name);
+// !  node crone work
+// cron.schedule('* * * * *', async () => {
+//   try {
+//     let allUsers = await logIncollection.find();
+//     allUsers.forEach(async (user) => {
+//       console.log("Username:- ", user.name);
 
-      if (user.facebookToken) {
-        console.log("User FB token :- ", user.facebookToken);
-        
-        await findNewLead(user.facebookToken, user);
-      } else console.log("FB token not availiable");
+//       if (user.facebookToken) {
+//         console.log("User FB token :- ", user.facebookToken);
 
-      // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
-    });
-    
-  } catch (err) {
-    console.log(err);
-  }
+//         await findNewLead(user.facebookToken, user);
+//       } else console.log("FB token not availiable");
 
-});
+//       // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
+//     });
+
+//   } catch (err) {
+//     console.log(err);
+//   }
+
+// });
 
 // todo  to delete un-used whtasapp session file in 5 hours interval using crone
 
@@ -933,7 +808,7 @@ cron.schedule('* * * * *', async () => {
 //   }
 // }
 
-// cron.schedule('0 */5 * * *', async () => {
+// cron.schedule('*/2 * * * *', async () => {
 //   try {
 //     console.warn('try to delete un-used whtasapp session file')
 //     await removeSessionDirectoriesTimeToTime();
@@ -947,58 +822,120 @@ cron.schedule('* * * * *', async () => {
 // todo remove all whatsapp session files from dir and delete docs from db fun
 async function removeSessionDirectoriesOnRestartServer() {
   try {
-    console.warn(' remove all whatsapp session files from dir and delete docs from db fun')
+    console.warn(
+      " remove all whatsapp session files from dir and delete docs from db fun"
+    );
     const sessionPath = path.join(__dirname, "sessions");
     if (!fs.existsSync(sessionPath)) return;
-  
+
     // Read each client directory in the sessions folder
     const userIds = fs
       .readdirSync(sessionPath)
       .map((userId) => userId.replace("session-", ""));
-    console.log(...userIds)
+    console.log(...userIds);
 
-      userIds.forEach(async (user)=>{
-        let admin = await logIncollection.findById(user)
-        await waModel.findOneAndDelete({cid: admin.cid});
-      })
+    userIds.forEach(async (user) => {
+      let admin = await logIncollection.findById(user);
+      await waModel.findOneAndDelete({ cid: admin.cid });
+    });
 
-    userIds.forEach((userid)=>{
-      const userSessionPath = path.join(__dirname, "sessions", `session-${userid}`);
+    userIds.forEach((userid) => {
+      const userSessionPath = path.join(
+        __dirname,
+        "sessions",
+        `session-${userid}`
+      );
       if (fs.existsSync(userSessionPath)) {
         fs.rmSync(userSessionPath, { recursive: true, force: true });
         console.log(`Session directory for admin ${userid} deleted.`);
       } else {
         console.log(`No session directory found for admin ${userid}.`);
       }
-    })
-
+    });
   } catch (error) {
-    console.error('Error while removing session directories:', error);
+    console.error("Error while removing session directories:", error);
   }
 }
 
-removeSessionDirectoriesOnRestartServer()
+removeSessionDirectoriesOnRestartServer();
 // todo remove all whatsapp session files from dir and delete docs from db fun
 
 // todo light weight activitys using client
-// cron.schedule('* * * * *', async () => {
-//   try {
-//      const sessionPath = path.join(__dirname, "sessions");
-//     if (!fs.existsSync(sessionPath)) return;
+cron.schedule('* * * * *', async () => {
+  try {
+     const sessionPath = path.join(__dirname, "sessions");
+    if (!fs.existsSync(sessionPath)) return;
+
+    // Read each client directory in the sessions folder
+    const userIds = fs
+      .readdirSync(sessionPath)
+      .map((userId) => userId.replace("session-", ""));
+    console.log(...userIds)
+
+    userIds.forEach((user_id)=>{
+      const client = global.clients[user_id];
+      if(client){
+        startKeepAlive(client)
+      }
+    })
+
+  } catch (err) {
+    console.log(err);
+  }
+
+});
+
+function setupClientEvents(client, userId) {
+  client.on("qr", (qrCode) => {
+    console.log(`QR code generated for user ${userId}`);
+    // Generate QR code image
+    const qrImage = qr.imageSync(qrCode, { type: "png" });
+    let qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
+    console.log("qrCodeData genrated here");
+    global.clients[userId].QR_CODE_DATA = qrCodeData;
+  });
+
+  client.on("ready", () => {
+    console.log(`Client ready for user ${userId}`);
+    global.clients[userId].CONNECTED_PHONE = client.info.wid.user;
+    global.clients[userId].IS_CONNECTED = true;
+  });
+
+  client.on("auth_failure", (msg) => {
+    console.error(`Auth failure for user ${userId}:`, msg);
+  });
+try {
+    
+  client.on("disconnected", (reason) => {
+    console.log(`WhatsApp disconnected for user ${userId}:`, reason);
+    if (global.clients[userId]) delete global.clients[userId];
+    removeSession(userId);
+    console.log(`Session cleared for user ${userId}`);
+  });
   
-//     // Read each client directory in the sessions folder
-//     const userIds = fs
-//       .readdirSync(sessionPath)
-//       .map((userId) => userId.replace("session-", ""));
-//     console.log(...userIds)
+} catch (error) {
+    console.log(error)
+}
+}
 
-//     userIds.forEach((user_id)=>{
-//       const client = global.clients[user_id];
-//       startKeepAlive(client)
-//     })
- 
-//   } catch (err) {
-//     console.log(err);
-//   }
+// !  node crone work from sir
+cron.schedule('* * * * *', async () => {
+  try {
+    let allUsers = await logIncollection.find();
+    allUsers.forEach(async (user) => {
+      console.log("Username:- ", user.name);
 
-// });
+      if (user.facebookToken) {
+        console.log("User FB token :- ", user.facebookToken);
+        
+        await findNewLead(user.facebookToken, user);
+      } else console.log("FB token not availiable");
+
+      // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
+    });
+    
+  } catch (err) {
+    console.log(err);
+  }
+
+});

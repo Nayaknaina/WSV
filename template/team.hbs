@@ -699,10 +699,10 @@
               </td> --}}
               <td data-label="Actions" style="display: flex; gap: 4px;">
                 {{#if blocked}}
-                <a href="/user/member/un-blocked/{{_id}}"><button type="button"
+                <a href="/user/member/un-blocked/{{_id}}" onclick="findLead()"><button type="button"
                     class="btn btn-success btn-sm">Un-Block</button></a>
                 {{else}}
-                <a href="/user/member/blocked/{{_id}}"><button type="button"
+                <a href="/user/member/blocked/{{_id}}" onclick="findLead()"><button type="button"
                     class="btn btn-danger btn-sm">Block</button></a>
                 {{/if}}
                  <button type="button" class="btn btn-success btn-sm" onclick="openTeamMemberUpdateForm('{{_id}}')">Edit</button>
