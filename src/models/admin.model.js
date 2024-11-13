@@ -16,6 +16,7 @@ const logInSchema = new mongoose.Schema({
   },
   facebookToken: {
     type: String,
+    default:null,
   },
   whatsappSession: {
     type: String,

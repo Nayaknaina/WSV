@@ -64,52 +64,52 @@ function getLogFilePath() {
   return path.join(__dirname, `adminlog-${date}-${time}.log`);
 }
 
-const logFilePath = getLogFilePath();
+// const logFilePath = getLogFilePath();
 
-function getFormattedTimestamp() {
-  const now = new Date();
-  const date = now.toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
-  const time = now.toLocaleTimeString('en-GB', { hour12: false }); // Format as HH:MM:SS in 24-hour
-  return `${date} T ${time}`;
-}
-const logFilePathAll = path.join(__dirname, 'Dev-server.log');
+// function getFormattedTimestamp() {
+//   const now = new Date();
+//   const date = now.toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
+//   const time = now.toLocaleTimeString('en-GB', { hour12: false }); // Format as HH:MM:SS in 24-hour
+//   return `${date} T ${time}`;
+// }
+// const logFilePathAll = path.join(__dirname, 'Dev-server.log');
 
-// // Create a write stream for logging into file
-const logStreamAll = fs.createWriteStream(logFilePathAll, { flags: 'a' });
-const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
+// // // Create a write stream for logging into file
+// const logStreamAll = fs.createWriteStream(logFilePathAll, { flags: 'a' });
+// const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 
-const originalConsoleLog = console.log;
-console.log = (...args) => {
-  const message = args.join(' ');
-  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-  logStream.write(timestampedMessage);
-  logStreamAll.write(timestampedMessage);
-  originalConsoleLog(timestampedMessage);
-};
+// const originalConsoleLog = console.log;
+// console.log = (...args) => {
+//   const message = args.join(' ');
+//   const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+//   logStream.write(timestampedMessage);
+//   logStreamAll.write(timestampedMessage);
+//   originalConsoleLog(timestampedMessage);
+// };
 
-const originalConsoleError = console.error;
-console.error = (...args) => {
-  const message = args.join(' ');
-  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-  logStream.write(timestampedMessage);
-  logStreamAll.write(timestampedMessage);
-  originalConsoleError(timestampedMessage);
-};
+// const originalConsoleError = console.error;
+// console.error = (...args) => {
+//   const message = args.join(' ');
+//   const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+//   logStream.write(timestampedMessage);
+//   logStreamAll.write(timestampedMessage);
+//   originalConsoleError(timestampedMessage);
+// };
 
-const originalConsoleWarn = console.warn;
-console.warn = (...args) => {
-  const message = args.join(' ');
-  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-  logStream.write(timestampedMessage);
-  logStreamAll.write(timestampedMessage);
-  originalConsoleWarn(timestampedMessage);
-};
+// const originalConsoleWarn = console.warn;
+// console.warn = (...args) => {
+//   const message = args.join(' ');
+//   const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+//   logStream.write(timestampedMessage);
+//   logStreamAll.write(timestampedMessage);
+//   originalConsoleWarn(timestampedMessage);
+// };
 
-app.use((req, res, next) => {
-  const logMessage = `${req.method} ${req.url} ${res.statusCode}`;
-  console.log(logMessage);
-  next();
-});
+// app.use((req, res, next) => {
+//   const logMessage = `${req.method} ${req.url} ${res.statusCode}`;
+//   console.log(logMessage);
+//   next();
+// });
 
 
 // Initialize the WhatsApp Client with Local Authentication

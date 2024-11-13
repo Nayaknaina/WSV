@@ -378,7 +378,9 @@ async function findNewLead(accessToken, user) {
   }
 
   let allNewLeads = [];
-  const pagesResponse = await axios.get(
+  let pagesResponse = 1;
+  try{
+    pagesResponse = await axios.get(
     `https://graph.facebook.com/v20.0/me/accounts`,
     {
       params: {
@@ -387,7 +389,11 @@ async function findNewLead(accessToken, user) {
       },
     }
   );
-
+}catch(err){
+  console.log("Error in find fB access",err)
+}
+// console.log("FB page responce ",pagesResponse)
+if(pagesResponse.status === 403) return;
   const pages = pagesResponse.data.data;
   console.log("Total pages fetched:", pages.length);
   if (!pages.length) console.warn("No pages available for this account.");
@@ -990,15 +996,17 @@ cron.schedule("* * * * *", async () => {
 
       if (user.facebookToken) {
         console.log("User FB token :- ", user.facebookToken);
+        try {
+          await findNewLead(user.facebookToken, user);
 
-        await findNewLead(user.facebookToken, user);
+        } catch (error) {
+          console.log(error)
+        }
       } else console.log("FB token not availiable");
-
       // await sendMail('websoftvalley@gmail.com',`last crone time ${new Date()}`)
     });
   } catch (err) {
     console.log(err);
   }
 
-  
 });
