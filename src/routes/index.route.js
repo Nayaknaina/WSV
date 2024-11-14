@@ -249,7 +249,7 @@ router.get("/leads", isAdminLoggedIn, async (req, res) => {
         });
     }
     let admin = logIncollection.findOne({cid: user.cid})
-    if (admin.facebookToken === null ) {
+    if (admin.facebookToken === null) {
       // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
       // console.log("you not have fb token");
       req.session.errorMSG = `Facebook Account Not Connected. Please Connect to Find New Leads.`;
@@ -400,6 +400,7 @@ function extractCustomerPhone(lead) {
   const phoneData = lead.leads_data.find((data) =>
     /^\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,5}[-.\s]?\d{4,10}$/.test(data.ans.trim())
   );
+
   return phoneData?.ans || "N/A";
 }
 

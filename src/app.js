@@ -64,52 +64,51 @@ function getLogFilePath() {
   return path.join(__dirname, `adminlog-${date}-${time}.log`);
 }
 
-// const logFilePath = getLogFilePath();
+const logFilePath = getLogFilePath();
 
-// function getFormattedTimestamp() {
-//   const now = new Date();
-//   const date = now.toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
-//   const time = now.toLocaleTimeString('en-GB', { hour12: false }); // Format as HH:MM:SS in 24-hour
-//   return `${date} T ${time}`;
-// }
-// const logFilePathAll = path.join(__dirname, 'Dev-server.log');
+function getFormattedTimestamp() {
+  const now = new Date();
+  const date = now.toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
+  const time = now.toLocaleTimeString('en-GB', { hour12: false }); // Format as HH:MM:SS in 24-hour
+  return `${date} T ${time}`;
+}
+const logFilePathAll = path.join(__dirname, 'Dev-server.log');
 
-// // // Create a write stream for logging into file
-// const logStreamAll = fs.createWriteStream(logFilePathAll, { flags: 'a' });
-// const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
+const logStreamAll = fs.createWriteStream(logFilePathAll, { flags: 'a' });
+const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 
-// const originalConsoleLog = console.log;
-// console.log = (...args) => {
-//   const message = args.join(' ');
-//   const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-//   logStream.write(timestampedMessage);
-//   logStreamAll.write(timestampedMessage);
-//   originalConsoleLog(timestampedMessage);
-// };
+const originalConsoleLog = console.log;
+console.log = (...args) => {
+  const message = args.join(' ');
+  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+  logStream.write(timestampedMessage);
+  logStreamAll.write(timestampedMessage);
+  originalConsoleLog(timestampedMessage);
+};
 
-// const originalConsoleError = console.error;
-// console.error = (...args) => {
-//   const message = args.join(' ');
-//   const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-//   logStream.write(timestampedMessage);
-//   logStreamAll.write(timestampedMessage);
-//   originalConsoleError(timestampedMessage);
-// };
+const originalConsoleError = console.error;
+console.error = (...args) => {
+  const message = args.join(' ');
+  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+  logStream.write(timestampedMessage);
+  logStreamAll.write(timestampedMessage);
+  originalConsoleError(timestampedMessage);
+};
 
-// const originalConsoleWarn = console.warn;
-// console.warn = (...args) => {
-//   const message = args.join(' ');
-//   const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-//   logStream.write(timestampedMessage);
-//   logStreamAll.write(timestampedMessage);
-//   originalConsoleWarn(timestampedMessage);
-// };
+const originalConsoleWarn = console.warn;
+console.warn = (...args) => {
+  const message = args.join(' ');
+  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+  logStream.write(timestampedMessage);
+  logStreamAll.write(timestampedMessage);
+  originalConsoleWarn(timestampedMessage);
+};
 
-// app.use((req, res, next) => {
-//   const logMessage = `${req.method} ${req.url} ${res.statusCode}`;
-//   console.log(logMessage);
-//   next();
-// });
+app.use((req, res, next) => {
+  const logMessage = `${req.method} ${req.url} ${res.statusCode}`;
+  console.log(logMessage);
+  next();
+});
 
 
 // Initialize the WhatsApp Client with Local Authentication
@@ -151,7 +150,7 @@ app.use(cookieParser());
 
 app.use(
   session({
-    secret: "your_secret_key", // Replace with your own secret key
+    secret: "your_secret_key",
     resave: false,
     saveUninitialized: true,
     store: sessionStore,
@@ -505,46 +504,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     await newManualLead.save();
     await user.save();
     let leadContactNo = req.body.mobile;
-    // const mobileRegex = /^[6-9]\d{9}$/;
-    // const mobileRegex = /^\d{1,4}[6-9]\d{9}$/
-    // newManualLead.leads_data.forEach((item) => {
-    //   const answer = item.ans.trim();
-
-      // if (mobileRegex.test(answer)) {
-      //   console.log("Valid Mobile Number found: try 1", answer);
-      //   leadContactNo = answer;
-      //   break;
-    //   }
-    // }
-
-
-    // if (leadContactNo == null) {
-    //   const mobileRegex = /^\+?\d{1,3}\d{10}$/;
-
-    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
-    //     const answer = newManualLead.leads_data[i].ans.trim();
-
-    //     if (mobileRegex.test(answer)) {
-    //       console.log("Valid Mobile Number found: try 2", answer);
-    //       leadContactNo = answer;
-    //       break;
-    //     }
-    //   }
-    // }
-
-    // if (leadContactNo == null) {
-    //   const mobileRegex = /^\d{10}$/;
-
-    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
-    //     const answer = newManualLead.leads_data[i].ans.trim();
-
-    //     if (mobileRegex.test(answer)) {
-    //       console.log("Valid Mobile Number found: try 3", answer);
-    //       leadContactNo = answer;
-    //       break;
-    //     }
-    //   }
-    // }
+   
 
 
     console.warn("new lead found and just store in DB", leadContactNo);
@@ -676,7 +636,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
         personalizedMessage,
         wellcomeTempImagePath,
         wellcomeTempPdfPath
-      ); // reminder temp for user
+      ); 
     }, 4500);
 
 
@@ -1017,6 +977,10 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
         break;
       }
     }
+  }
+
+  if(leadContactNo.toString().length === 10){
+    leadContactNo = `${Admin.countryCode}${leadContactNo}`
   }
 
   console.warn("Lead contact number debugginngg", leadContactNo);
@@ -2005,7 +1969,12 @@ async function sendMessageToLead(
   );
   const user = await logIncollection.findOne({ cid: adminWA.cid });
   console.log(user);
-  const client = global.clients[user._id.toString()].client;
+  
+  if(!global.clients[user._id.toString()]) {
+    console.log("client not find in findNewLead fun")
+    return
+  }
+  let client = global.clients[user._id.toString()].client;
   if (client) {
     console.log("client availiable");
   }

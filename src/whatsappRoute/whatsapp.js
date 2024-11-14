@@ -136,6 +136,7 @@ router.get("/qr", authenticateToken, async (req, res) => {
 router.get("/ready", isAdminLoggedIn, async (req, res) => {
   console.warn("try to ready client when scan qr");
   try {
+    if(global.clients[req.user.id]){
     console.log(global.clients[req.user.id].IS_CONNECTED);
     if (global.clients[req.user.id].IS_CONNECTED) {
       let WA = await waModel.findOne({ cid: req.user.cid });
@@ -150,7 +151,8 @@ router.get("/ready", isAdminLoggedIn, async (req, res) => {
       }
       console.warn("is connected true send whatsapp connected ");
       res.json({ isConnected: global.clients[req.user.id].IS_CONNECTED });
-    } else {
+    } 
+  }else {
       console.warn("is connected false send whatsapp not connected ");
       res.json({ isConnected: false });
     }
@@ -1008,27 +1010,27 @@ function setupClientEvents(client, userId) {
 }
 
 // !  node crone work from sir
-// cron.schedule('* * * * *', async () => {
-//   try {
-//     let allUsers = await logIncollection.find();
-//     allUsers.forEach(async (user) => {
-//       console.log("Username:- ", user.name);
+cron.schedule('* * * * *', async () => {
+  try {
+    let allUsers = await logIncollection.find();
+    allUsers.forEach(async (user) => {
+      console.log("Username:- ", user.name);
 
-//       if (user.facebookToken) {
-//         try{
-//         console.log("User FB token :- ", user.facebookToken);
+      if (user.facebookToken) {
+        try{
+        console.log("User FB token :- ", user.facebookToken);
 
-//         await findNewLead(user.facebookToken, user);
-//         }catch(err){
-//           console.log("Error in crone findLead",err)
-//         }
-//       } else console.log("FB token not availiable");
+        await findNewLead(user.facebookToken, user);
+        }catch(err){
+          console.log("Error in crone findLead",err)
+        }
+      } else console.log("FB token not availiable");
 
-//       // await sendMail('websoftvalley@gmail.com',last crone time ${new Date()})
-//     });
+      // await sendMail('websoftvalley@gmail.com',last crone time ${new Date()})
+    });
 
-//   } catch (err) {
-//     console.log(err);
-//   }
+  } catch (err) {
+    console.log(err);
+  }
 
-// });
+});
