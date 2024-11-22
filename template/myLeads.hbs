@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+
+    <title>
+        Connect
+    </title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="./" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
+
+    <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/custom.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/css/intlTelInput.css">
+    <link rel="stylesheet" type="text/css" href="./assets/css/leads.css">
+    <link rel="stylesheet" type="text/css" href="/styles/loader.css">
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
+        src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+    <link rel="stylesheet" href="/assets/css/remark.css">
+</head>
+<style>
+
+</style>
+
+{{!-- todo remark add Loadr css --}}
+<style>
+    #findNewLeadloader {
+        width: 100%;
+        min-height: 100%;
+        background-size: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 999999;
+        /*background-color: #908f8faa;
+        background-color: #000000aa;*/
+        display: none;
+        overflow: hidden;
+    }
+
+    body {
+        position: relative;
+    }
+
+    #fullPageLoader {
+        width: 100vw;
+        min-height: 100%;
+        height: 100vh;
+        background-size: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 999999;
+        background-color: #908f8faa;
+        background-color: #000000aa;
+        display: none;
+        overflow: hidden;
+    }
+
+    #finSec {
+        min-width: 200px;
+        width: 33.33%;
+        height: 200px;
+        padding: 10px;
+        top: 43%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ccc;
+        cursor: pointer;
+        transition: 0.3s linear;
+        background: none;
+        box-shadow: none;
+    }
+
+    #finSecFullPage {
+        min-width: 200px;
+        width: 33.33%;
+        height: 200px;
+        padding: 10px;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ccc;
+        cursor: pointer;
+        transition: 0.3s linear;
+    }
+
+    .loader-11 {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        border: 6px solid;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1s linear infinite;
+        animation: rotation 1s linear infinite;
+    }
+
+    .fullPageLoader-11:after,
+    .fullPageLoader-11:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        border: 6px solid;
+        border-color: transparent transparent #047 #047;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        -webkit-animation: rotationBack 0.5s linear infinite;
+        animation: rotationBack 0.5s linear infinite;
+        transform-origin: center center;
+    }
+
+    .fullPageLoader-11:before {
+        width: 64px;
+        height: 64px;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1.5s linear infinite;
+        animation: rotation 1.5s linear infinite;
+
+    }
+
+
+
+    .loader-11 {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        border: 5px solid;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1s linear infinite;
+        animation: rotation 1s linear infinite;
+    }
+
+    .loader-11:after,
+    .loader-11:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        border: 5px solid;
+        border-color: transparent transparent #047 #047;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        -webkit-animation: rotationBack 0.5s linear infinite;
+        animation: rotationBack 0.5s linear infinite;
+        transform-origin: center center;
+    }
+
+    .loader-11:before {
+        width: 40px;
+        height: 40px;
+        border-color: #FFF #FFF transparent transparent;
+        -webkit-animation: rotation 1.5s linear infinite;
+        animation: rotation 1.5s linear infinite;
+
+    }
+
+    @media (max-width: 600px) {
+        .loader-11:before {
+            width: 32px;
+            height: 32px;
+            border-color: #FFF #FFF transparent transparent;
+        }
+
+        .loader-11:after,
+        .loader-11:before {
+            width: 40px;
+            height: 40px;
+            border: 3px solid;
+            border-color: transparent transparent #047 #047;
+        }
+
+        .loader-11 {
+            width: 48px;
+            height: 48px;
+            border: 3px solid;
+            border-color: #FFF #FFF transparent transparent;
+        }
+    }
+
+
+    @-webkit-keyframes rotationBack {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(-360deg);
+        }
+    }
+
+    @keyframes rotationBack {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(-360deg);
+        }
+    }
+
+    @-webkit-keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #whatsappReadyMessage {
+        display: none;
+        color: green;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+</style>
+{{!-- todo remark add Loadr css --}}
+
+<body class>
+
+    {{!-- {{> nav}} --}}
+    <form hidden id="csv-form" enctype="multipart/form-data">
+        <input type="file" onchange="uploadCsvFile()" name="file" id="csv-file" accept=".csv" required>
+    </form>
+    <div id="fullPageLoader">
+        <section id="finSecFullPage"><span class="fullPageLoader-11"> </span></section>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row  justify-content-center">
+            {{> sidebar}}
+            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-12 p-0  ">
+                {{> NameHead}}
+                <div class="container-fluid bg-white shadow-sm m-b-20">
+                    <div class="row  flex-row justify-content-start px-3 col-11">
+                        {{#if successMSG}}
+                        <div class="col-sm-12">
+                            <div id="alert-success" class="alert alert-success alert-dismissible fade show"
+                                role="alert">
+                                <span class="badge badge-pill badge-success">Success</span> {{successMSG}}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                        {{/if}}
+
+                        {{#if errorMSG}}
+                        <div class="col-sm-12">
+                            <div id="alert-error" class="alert  alert-danger alert-dismissible fade show" role="alert">
+                                <span class="badge badge-pill badge-danger">Alert</span> {{errorMSG}}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                        {{/if}}
+
+                        {{#if warnMSG}}
+                        <div class="col-sm-12">
+                            <div id="alert-warn" class="alert  alert-warning alert-dismissible fade show" role="alert">
+                                <span class="badge badge-pill bg-warning text-dark">Warning</span> {{warnMSG}}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                        {{/if}}
+                    </div>
+
+                    <div class="row flex-row justify-content-start px-3">
+                        <button type="button" class="btn my-2 mx-2 btn-outline-warning btn-sm" id="filterBtn">
+                            Filter <i class="ri-filter-3-fill"></i>
+                        </button>
+
+                        <label for="csv-file" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="csv-file-upload-btn">
+                            Import from CSV
+                        </label>
+
+                        <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm" id="openFormBtn">
+                            Add New Lead
+                        </button>
+
+                        {{!-- <button type="button" class="btn my-2 mx-2 btn-outline-primary btn-sm"
+                            onclick="fetchFacebookLeadFromFacebook()">Fetch leads</button> --}}
+
+                        <div id="filterForm" class="filter-container" style="display: none;">
+                            <form id="leadFilterForm" method="GET" action="/my-leads">
+                                <input type="hidden" name="section" value="{{section}}" />
+
+                                <div class="form-group">
+                                    <label for="customerName">Customer Name</label>
+                                    <input type="text" id="customerName" name="customerName"
+                                        placeholder="Customer Name" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="customerPhoneNumber">Phone Number</label>
+                                    <input type="tel" id="customerPhoneNumber" name="customerPhoneNumber"
+                                        placeholder="Phone Number" pattern="(91\s?)?(\d{5}\s?\d{5})" maxlength="14"
+                                        title="Enter a 10-digit number or start with 91 for the country code" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pageName">Page Name</label>
+                                    <input type="text" id="pageName" name="pageName" placeholder="Page Name" />
+                                </div>
+                                {{!-- <div class="form-group">
+                                    <label for="formName">Form Name</label>
+                                    <input type="text" id="formName" name="formName" placeholder="Form Name" />
+                                </div> --}}
+                                <div class="form-group">
+                                    <label for="date">Date</label>
+                                    <input type="date" id="date" name="date" />
+                                </div>
+                                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                                <button type="button" class="btn btn-secondary" id="resetBtn">Reset Filters</button>
+                            </form>
+                        </div>
+                        <div class="custom-modal" id="customModal">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2>New Lead Information Form</h2>
+                                    <button class="close-btn" id="closeFormBtn">&times;</button>
+                                </div>
+                                <form id="customerForm" novalidate>
+                                    <div class="form-group">
+                                        <!-- Customer Name -->
+                                        <div style="width: 48%;">
+                                            <label for="customerName">Customer Name</label>
+                                            <input type="text" placeholder="Customer Name" id="customerName"
+                                                name="customerName" required>
+                                        </div>
+
+                                        <!-- Mobile -->
+                                        <div style="width: 48%;">
+                                            <label for="mobile">Mobile Number</label>
+                                            <input type="tel" id="mobile" placeholder="Mobile Number" name="mobile"
+                                                pattern="[0-9]{10}" maxlength="10" title="Enter a 10-digit number "
+                                                required>
+                                        </div>
+                                        <!-- Email -->
+                                        <div style="width: 48%;">
+                                            <label for="email">Email</label>
+                                            <input type="email" placeholder="Email" id="email" name="email">
+                                        </div>
+
+                                        <!-- City (Optional) -->
+                                        <div style="width: 48%;">
+                                            <label for="city">City (Optional)</label>
+                                            <input type="text" minlength="3" placeholder="city" id="City" name="city">
+                                        </div>
+
+                                        <!-- State (Optional) -->
+                                        <div style="width: 48%;">
+                                            <label for="state">State (Optional)</label>
+                                            <input type="text" placeholder="State" id="state" minlength="3"
+                                                name="state">
+                                        </div>
+                                        <!-- Alternate Number 1 -->
+                                        <div style="width: 48%;">
+                                            <label for="alternate1">Alternate Number 1</label>
+                                            <input type="tel" id="alternate1" placeholder="Alternate Mobile"
+                                                name="alternateMobile1" pattern="[0-9]{10}" maxlength="10"
+                                                title="Enter a 10-digit number ">
+                                        </div>
+
+                                        <!-- Alternate Number 2 -->
+                                        <div style="width: 48%;">
+                                            <label for="alternate2">Alternate Number 2 (Optional)</label>
+                                            <input type="tel" id="alternate2" placeholder="Alternate Mobile"
+                                                name="alternateMobile2" pattern="[0-9]{10}" maxlength="10"
+                                                title="Enter a 10-digit number ">
+                                        </div>
+
+                                        <div style="width: 48%;">
+                                            <label for="remark">Remark Text</label>
+                                            <textarea placeholder="Remark Text" id="remark" name="remark"
+                                                required></textarea>
+                                        </div>
+                                        <!-- Next Followup (DateTime) -->
+                                        <div style="width: 48%;">
+                                            <label for="nextFollowup">Next Followup (Date and Time)</label>
+                                            <input type="datetime-local" placeholder="Next Followup" id="nextFollowup"
+                                                name="remarkTime" required>
+                                        </div>
+
+                                        <!-- Product/Service (Optional) -->
+                                        <div style="width: 48%;">
+                                            <label for="productService">Product/Service (Optional)</label>
+                                            <input type="text" id="productService" placeholder="Product/Service"
+                                                name="productService">
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="submitManulLeadForm()"
+                                        class="btn btn-primary btn-sm">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="container-fluid bg-white shadow-sm m-b-20">
+                    <div class="row flex-row justify-content-around">
+                        <div class="col-auto text-center py-2">
+                            <button id="all-lead-btn" onclick="showAllLeads()"
+                                class="btn btn-outline-primary p-x-8">
+                                <a href="/leads">Leads</a>
+                            </button>
+                        </div>
+                        <div class="col-auto text-center py-2">
+                            <button id="my-lead-btn" class="btn btn-primary p-x-8">
+                            <a href="/my-leads">My Leads</a>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container min-vh-100">
+                
+                    <style>
+                        .table {
+                            border: 1px solid #dee2e6;
+                            margin-bottom: 0;
+                        }
+
+                        .table thead th {
+                            text-align: center;
+                        }
+
+                        .table tbody tr:hover {
+                            background-color: #f0f8ff;
+                        }
+
+                        .status-indicator {
+                            display: inline-block;
+                            margin-left: 4px;
+                        }
+
+                        .pagination {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            gap: 10px;
+                        }
+
+                        .pagination a {
+                            color: #316ff6;
+                        }
+
+                        .pagination a:hover {
+                            background-color: #4a90e2;
+                            color: white;
+                        }
+
+                        .table-responsive {
+                            overflow-x: auto;
+                            -webkit-overflow-scrolling: touch;
+                        }
+
+                        .table-responsive::-webkit-scrollbar {
+                            height: 8px;
+                        }
+
+                        .table-responsive::-webkit-scrollbar-thumb {
+                            background: #316ff6;
+                            border-radius: 10px;
+                        }
+
+                        .table-responsive::-webkit-scrollbar-track {
+                            background: #e0e0e0;
+                        }
+
+                        @media screen and (max-width: 768px) {
+                            .table {
+                                font-size: 14px;
+                            }
+
+                            .table thead th {
+                                font-size: 14px;
+                            }
+
+                            .pagination span {
+                                font-size: 14px;
+                            }
+
+                            .table tbody td {
+                                font-size: 13px;
+                            }
+                        }
+
+                        @media screen and (max-width: 576px) {
+                            .table {
+                                font-size: 12px;
+                            }
+
+                            .table tbody td,
+                            .table thead th {
+                                font-size: 12px;
+                            }
+
+                            .pagination span {
+                                font-size: 12px;
+                            }
+                        }
+                    </style>
+    
+                <ul id="myLeads">
+                    {{#if user.myleads.length}}
+                    {{#each userMyLeads}}
+                    <li style="margin-bottom: 10px;">
+                        <nav style="position: relative;">
+                            <label class="created-time-label">
+
+                                <label class="start-drowp-app" for="touch2-{{@index}}"
+                                    style="display: flex; align-items: center; width: 100%; margin-bottom: 0; gap: 10px; position: relative;">
+
+
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <strong class="formateDate">{{formatDate income_time}}</strong>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                        <i class="fa-brands fa-square-{{app}}"
+                                            style="font-size: 22px; color: #316ff6;"></i>
+                                    </div>
+
+
+                                    <div class="customer-info">
+                                        <div style="font-size: 18px;color: #0032ff; "> <strong>{{findAnswer
+                                                ./leads_data}}</strong></div>
+                                        <div> {{#each leads_data}}
+                                            {{#if (containsPhoneNumber ans)}}
+                                            <strong>{{ans}}</strong>
+                                            {{/if}}
+                                            {{/each}}
+                                        </div>
+                                    </div>
+                                </label>
+                                <div class="details-container">
+                                    <strong>Page:</strong> {{page_name}} <br>
+                                    <strong>Form:</strong> {{form_name}}
+                                </div>
+                                <span class="icon-container-myleads" style="display: flex; align-items: center;">
+
+
+                                    {{#each leads_data}}
+                                    {{#if (containsPhoneNumber ans)}}
+                                    <a href="tel:{{ans}}">
+                                        <i class="fa-solid fa-phone" style="color: #23CC93;"></i>
+                                    </a>
+
+                                    {{!-- <a href="https://wa.me/{{ans}}" target="_blank">
+                                        <i class="fa-brands fa-square-whatsapp" style="color: #31B746;"></i>
+                                    </a> --}}
+                                    {{/if}}
+
+                                    {{/each}}
+                                    <i onclick="openRemarkPopUp('{{_id}}')" class="fa-solid fa-file-pen"
+                                        style="color: #007bff;"></i>
+
+                                    <span id="st-box{{_id}}" class="status-circle" onclick="toggleDropdown('{{_id}}')"
+                                        style="background-color: {{status.color}};">
+                                        <div class="ul-box" id="ul-box{{_id}}">
+                                            {{#each ../pipes}}
+                    <li onclick="submitForm('{{../_id}}','{{title}}', '{{_id}}')">
+                        <span>{{title}}</span>
+                        <span class="drop-circle" style="background-color: {{color}};"></span>
+                    </li>
+                    {{/each}}
+            </div>
+            </span>
+
+            </span>
+            </label>
+
+            <section class="timeline" id="timeline{{_id}}" style="">
+                <ul id="timeline-ul-list">
+                    <h3 style="color: #28292a; text-align: center;">Your Remarks</h3>
+                    <li onclick="openAddRemarkForm('{{_id}}')" style="cursor: pointer;">
+                        <div class="content add-remark" id="add-remark-content">
+                            <h2><span class="add-remark-txt">click to add remark</span></h2>
+                        </div>
+                    </li>
+                    <li id="remark-form-list{{_id}}" style="display: none;">
+                        <div class="content">
+                            <div id="findNewLeadloader">
+                                <section id="finSec"><span class="loader-11"> </span></section>
+                            </div>
+                            <form id="remarkForm" onsubmit="createNewRemark('{{_id}}')">
+                                <textarea placeholder="setting up next followup" required maxlength="150" name="text"
+                                    id="remark-form-text{{id}}" cols="30" rows="5"></textarea>
+                                <label style="margin: 0;" for="remark-form-time{{id}}"><small
+                                        style="color: #28292a;">Next
+                                        Followup Time</small></label><br>
+                                <input type="time" placeholder="time" min="current-time" name="time"
+                                    id="remark-form-time{{id}}" class="time" required> <br>
+
+                                <label style="margin: 0;" for="remark-form-date{{id}}"><small
+                                        style="color: #28292a;">Next
+                                        Followup Date</small></label><br>
+                                <input type="date" min="current-date" name="date" id="remark-form-date{{id}}"
+                                    class="date" required> <br>
+
+                                <button class="btn btn-primary mt-1" id="add-btn" style="font-size: 12px;"
+                                    type="submit">add</button>
+                                <button class="btn btn-danger mt-1" id="add-btn" style="font-size: 12px;"
+                                    onclick="closeAddRemarkForm('{{_id}}')" type="button">cancel</button>
+                            </form>
+                        </div>
+                    </li>
+
+                    <span id="new-remark-down{{_id}}"></span>
+                    {{#each remarks}}
+                    <li>
+                        <div class="content">
+                            <div class="createdTime">CreatedAt {{formatTime createdAt}} {{formatDate createdAt}}</div>
+                            <p>{{text}}</p>
+                            <div class="createdTime">AlertAt {{time}} {{formatDate date}}</div>
+                        </div>
+                    </li>
+                    {{/each}}
+                </ul>
+            </section>
+            <input type="checkbox" id="touch2-{{@index}}">
+            <ul class="slide">
+                {{#each leads_data}}
+                <li>
+                    <strong>{{que}}:</strong> {{ans}}
+                </li>
+                {{/each}}
+                {{!-- <!-- Pagination -->
+                {{#if showPagination}}
+                <div class="pagination">
+                    {{#if (gt currentPage 1)}}
+                    <a href="/leads?page={{subtract currentPage 1}}&section={{section}}"
+                        class="btn btn-primary">Previous</a>
+                    {{/if}}
+                    <span>Page {{currentPage}} of {{totalPages}}</span>
+                    {{#if (lt currentPage totalPages)}}
+                    <a href="/leads?page={{add currentPage 1}}&section={{section}}"
+                        class="btn btn-outline-primary">Next</a>
+                    {{/if}}
+                </div>
+                {{/if}} --}}
+            </ul>
+            </nav>
+            </li>
+            {{/each}}
+
+            <!-- Pagination Controls -->
+            {{!-- {{#if showPagination}}
+            <div class="pagination">
+                {{#if (gt currentPage 1)}}
+                <a href="/leads?page={{subtract currentPage 1}}" class="btn btn-primary p-x-8">Previous</a>
+                {{/if}}
+
+                <span>Page {{currentPage}} of {{totalPages}}</span>
+
+                {{#if (lt currentPage totalPages)}}
+                <a href="/leads?page={{add currentPage 1}}" class="btn btn-outline-primary p-x-8">Next</a>
+                {{/if}}
+            </div>
+            {{/if}} --}}
+
+
+            {{else}}
+            <li class="noLead">No leads
+                added here</li>
+            {{/if}}
+            </ul>
+        </div>
+
+
+
+
+        <script>
+            function submitForm(leadId, status, pipeId) {
+                fetch(`/lead/status/update/${leadId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'  // Specify that we're sending JSON
+                    },
+                    body: JSON.stringify({ status, pipeId })  // Convert the status to a JSON string
+                })
+                    .then(response => {
+                        // Ensure the response is JSON
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                        // location.reload()
+                    })
+                    .then(data => {
+                        let circle = document.querySelector(`#st-box${leadId}`);
+                        circle.style.backgroundColor = data.color;
+
+                    })
+            }
+
+
+            // for leads drop-down
+            document.querySelectorAll('.lead-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    const currentOpenItem = document.querySelector('.lead-item.open');
+
+                    if (currentOpenItem && currentOpenItem !== this) {
+                        currentOpenItem.classList.remove('open');
+                        currentOpenItem.querySelector('.slide').style.height = '0px';
+                    }
+
+                    this.classList.toggle('open');
+                    const slide = this.querySelector('.slide');
+
+                    if (this.classList.contains('open')) {
+                        slide.style.height = slide.scrollHeight + 'px';
+                    } else {
+                        slide.style.height = '0px';
+                    }
+                });
+            });
+
+            function toggleDropdown(id) {
+                let box = document.querySelector(`#ul-box${id}`)
+                box.classList.toggle('open')
+
+                let timelineBox = document.querySelector(`#timeline${id}`)
+                timelineBox.classList.remove('openTimeline')
+
+            }
+
+
+            function showStatusBox() {
+                let box = document.querySelector('#status-box')
+
+                console.log(box)
+                box.style.display = 'block'
+            }
+
+            function createNewRemark(id) {
+                event.preventDefault(); // Prevent the default form submission
+
+                const text = document.getElementById(`remark-form-text${id}`).value;
+                const time = document.getElementById(`remark-form-time${id}`).value;
+                const date = document.getElementById(`remark-form-date${id}`).value;
+
+                const now = new Date();
+
+                const selectedDateTime = new Date(`${date}T${time}`);
+
+                // Check if the selected date and time is in the past
+                if (selectedDateTime < now) {
+                    alert("You cannot select a past date or time.");
+                    return false; // Prevent form submission
+                }
+
+                const formData = {
+                    text: text,
+                    time: time,
+                    date: date
+                };
+                // console.log(formData)
+                loader()
+                fetch(`/remark/add/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json(); // Assuming server responds with JSON
+                    })
+                    .then(remark => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            
+                                <div class="content">
+                                    <div class="createdTime">${formatDate(remark.createdAt)}</div>
+                                    <p>${remark.text}</p>
+                                    <div class="createdTime">${remark.time} ${formatDate(remark.date)}</div>
+                                </div>`;
+                        const span = document.getElementById(`new-remark-down${id}`);
+
+
+                        if (span) {
+                            span.insertAdjacentElement('afterend', li);
+                        }
+
+                        //  const timelineList = document.getElementById('timeline-ul-list');
+                        //  timelineList.innerHTML += liElem;
+
+                        document.getElementById('remarkForm').reset();
+                        closeAddRemarkForm(id)
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+
+            }
+
+
+            function formatDate(datetime) {
+
+                if (!datetime) {
+                    return '';
+                }
+
+                const date = new Date(datetime);
+
+                if (isNaN(date)) {
+                    console.warn('Invalid date:', datetime);
+                    return '';
+                }
+                return date.toISOString().split("T")[0];
+            }
+
+
+        </script>
+    </div>
+
+    </div>
+
+
+
+
+    </div>
+    </div>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh"
+        crossorigin="anonymous"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/js/bootstrap-select.js"></script>
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ=="
+        src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+    <script src="/js/dependencies/sweetalert.min.js?nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="/assets/js/timezones.full.min.js"></script>
+
+    <script src="/assets/js/custom-new.js"></script>
+    <script>
+        // Handlebars helper to add/subtract numbers
+        Handlebars.registerHelper('add', (a, b) => a + b);
+        Handlebars.registerHelper('subtract', (a, b) => a - b);
+    </script>
+
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+        $(document).ready(function () {
+            $('#signup').on('submit', function () {
+                $('.loader-display').css('display', 'block');
+            });
+        });
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+        $(window).scroll(function () {
+            if ($(window).scrollTop() >= 72) {
+                $('#top_header').addClass('sticky');
+            } else {
+                $('#top_header').removeClass('sticky');
+            }
+        });
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==">
+        $('#nav-tab a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+
+        // store the currently selected tab in the hash value
+        $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
+            var id = $(e.target).attr("href").substr(1);
+            console.log("id", id);
+            window.location.hash = id;
+        });
+
+        // on load of the page: switch to the currently selected tab
+        var hash = window.location.hash;
+        $('#nav-tab a[href="' + hash + '"]').tab('show');
+    </script>
+
+    <script>
+        function showMyLeads() {
+            document.querySelector('#myLeads').style.display = 'block';
+            document.querySelector('#allLeads').style.display = 'none';
+            document.querySelector('#my-lead-btn').classList.add('btn-primary');
+            document.querySelector('#my-lead-btn').classList.remove('btn-outline-primary');
+            document.querySelector('#all-lead-btn').classList.add('btn-outline-primary');
+            document.querySelector('#all-lead-btn').classList.remove('btn-primary');
+            document.querySelector('input[name="section"]').value = 'myleads';
+        }
+
+        function showAllLeads() {
+            document.querySelector('#allLeads').style.display = 'block';
+            document.querySelector('#myLeads').style.display = 'none';
+            document.querySelector('#all-lead-btn').classList.add('btn-primary');
+            document.querySelector('#all-lead-btn').classList.remove('btn-outline-primary');
+            document.querySelector('#my-lead-btn').classList.add('btn-outline-primary');
+            document.querySelector('#my-lead-btn').classList.remove('btn-primary');
+            document.querySelector('input[name="section"]').value = 'all';
+        }
+
+        function openRemarkPopUp(id) {
+            // console.log(id)
+            let timelineBox = document.querySelector(`#timeline${id}`)
+            timelineBox.classList.toggle('openTimeline')
+        }
+
+        function openAddRemarkForm(id) {
+            // console.log(id)
+            let form = document.querySelector(`#remark-form-list${id}`)
+            form.style.display = 'block'
+        }
+        function closeAddRemarkForm(id) {
+            let form = document.querySelector(`#remark-form-list${id}`)
+            form.style.display = 'none'
+        }
+    </script>
+
+    <script>
+        function toggleUserNameDropdown(id) {
+            let name = document.querySelector(`#user-name-box${id}`)
+            let userlist = document.querySelector(`#other-user-box${id}`)
+            //console.log(name)
+            userlist.classList.toggle('open')
+        }
+
+        //modified
+        function assignToOtherUserForm(assignMemId, leadId, currentMemId, nid) {
+            let nameElement = document.querySelector(`#name-${leadId}`);
+            let leadElement = document.querySelector(`#lead-${leadId}`);
+            let leadList = document.querySelector('#lead-list');
+
+            fetch(`/user/change/lead/owner/${leadId}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ assignMemId, currentMemId })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    nameElement.innerHTML = data.name;
+
+
+                    leadList.prepend(leadElement);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+    </script>
+
+
+    <script>
+
+        const openFormBtn = document.getElementById('openFormBtn');
+        const closeFormBtn = document.getElementById('closeFormBtn');
+        const customModal = document.getElementById('customModal');
+
+        // Open the modal
+        openFormBtn.addEventListener('click', function () {
+            customModal.style.display = 'flex';
+        });
+
+        closeFormBtn.addEventListener('click', function () {
+            customModal.style.display = 'none';
+        });
+
+        window.onclick = function (event) {
+            if (event.target === customModal) {
+                customModal.style.display = 'none';
+            }
+        };
+
+        document.getElementById('customerForm').addEventListener('submit', function (event) {
+            if (!this.checkValidity()) {
+                event.preventDefault(); // Prevent form submission if invalid
+                alert('Please fill in all required fields correctly.');
+            }
+        });
+    </script>
+
+    <script>
+        async function uploadCsvFile() {
+            const fileInput = document.getElementById('csv-file');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a CSV file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await axios.post('/user/upload-csv', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' // Required for file upload
+                    }
+                });
+                console.log(response)
+                if (response.status === 200) {
+                    toastr.success(response.data.msg)
+                    location.reload()
+                }
+                return
+            } catch (error) {
+                console.error('Error uploading file:', error); // Error handling
+            }
+        }
+    </script>
+
+
+    <script>
+        const filterBtn = document.getElementById('filterBtn');
+        const filterForm = document.getElementById('filterForm');
+        const resetBtn = document.getElementById('resetBtn');
+        const leadFilterForm = document.getElementById('leadFilterForm');
+
+        filterBtn.addEventListener('click', () => {
+            filterForm.style.display = filterForm.style.display === 'none' ? 'block' : 'none';
+        });
+
+        resetBtn.addEventListener('click', () => {
+            leadFilterForm.reset();
+            window.location.href = "/leads";
+        });
+        /* const filterForm = document.getElementById('leadFilterForm');
+          filterForm.addEventListener('submit', function (event) {
+              event.preventDefault();
+              const section = document.querySelector('input[name="section"]').value; // Get current section
+              const url = new URL('/leads', window.location.origin);
+              const params = new URLSearchParams({
+                  customerName: document.getElementById('customerName').value,
+                  customerPhoneNumber: document.getElementById('customerPhoneNumber').value,
+                  date: document.getElementById('date').value,
+                  section: section, // Pass the current section
+              });
+              url.search = params.toString();
+              window.location.href = url.toString(); // Redirect to the new URL with filters
+          });
+          */
+
+        // Pagination logic
+        const paginationLinks = document.querySelectorAll('.pagination a');
+        paginationLinks.forEach((link) => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const section = document.querySelector('input[name="section"]').value;
+                const url = new URL(link.href, window.location.origin);
+                const params = new URLSearchParams(url.search);
+                params.set('section', section);
+                url.search = params.toString();
+                window.location.href = url.toString();
+            });
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/intlTelInput.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            const phoneInputs = ["#mobile", "#alternate1", "#alternate2"];
+
+            phoneInputs.forEach(function (selector) {
+                $(selector).intlTelInput({
+                    initialCountry: "in", // Set default country
+                    separateDialCode: true,
+                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.13/build/js/utils.js"
+                });
+            });
+
+
+        });
+
+
+
+        async function submitManulLeadForm() {
+            let form = document.querySelector('#customerForm')
+            let formdata = new FormData(form)
+            console.log(formdata)
+            let formDataObj = Object.fromEntries(formdata.entries());
+            const countryData = $("#mobile").intlTelInput("getSelectedCountryData");
+            const countryCode = countryData.dialCode; // Extracting the dial code
+            console.log(countryCode)
+
+            let {
+                customerName, email, mobile, alternateMobile1, alternateMobile2, remark, remarkTime, city, state, productService
+            } = formDataObj;
+
+            let data = { customerName, email, mobile: `${countryCode}${mobile}`, alternateMobile1: `${countryCode}${alternateMobile1}`, alternateMobile2: `${countryCode}${alternateMobile2}`, remark, remarkTime, city, state, productService }
+
+            try {
+                let res = await axios.post('/manual/lead', data)
+                if (res.status == 200)
+                    location.reload()
+            } catch (err) { console.log(err) }
+
+        }
+    </script>
+
+    <script>
+        async function loader() {
+            let loadBox = document.querySelector('#findNewLeadloader')
+
+            if (loadBox) {
+                console.log('loader for remark add')
+                loadBox.style.display = 'flex'
+            }
+        }
+        async function fullLoader() {
+            let loadBox = document.querySelector('#fullPageLoader')
+
+            if (loadBox) {
+                console.log('loader for remark add')
+                loadBox.style.display = 'flex'
+            }
+        }
+    </script>
+</body>
+
+</html>
