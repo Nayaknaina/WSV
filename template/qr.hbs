@@ -173,201 +173,201 @@
         }
     </style>
 
-<style>
-    body,
-    html {
-        width: 100%;
-        height: 100% !important;
-    }
+    <style>
+        body,
+        html {
+            width: 100%;
+            height: 100% !important;
+        }
 
-    #findNewLeadloader {
-        width: 100vw;
-        min-height: 100%;
-        height: 100vh;
-        background-size: cover;
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 999999;
-        background-color: #908f8faa;
-        background-color: #000000aa;
-        display: none;
-        overflow: hidden;
-    }
+        #findNewLeadloader {
+            width: 100vw;
+            min-height: 100%;
+            height: 100vh;
+            background-size: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 999999;
+            background-color: #908f8faa;
+            background-color: #000000aa;
+            display: none;
+            overflow: hidden;
+        }
 
-    #finSec {
-        min-width: 200px;
-        width: 33.33%;
-        height: 200px;
-        padding: 10px;
-        position: relative;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #ccc;
-        cursor: pointer;
-        transition: 0.3s linear;
-    }
+        #finSec {
+            min-width: 200px;
+            width: 33.33%;
+            height: 200px;
+            padding: 10px;
+            position: relative;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            cursor: pointer;
+            transition: 0.3s linear;
+        }
 
-    .loader-11 {
-        width: 96px;
-        height: 96px;
-        border-radius: 50%;
-        display: inline-block;
-        position: relative;
-        border: 6px solid;
-        border-color: #FFF #FFF transparent transparent;
-        -webkit-animation: rotation 1s linear infinite;
-        animation: rotation 1s linear infinite;
-    }
-
-    .loader-11:after,
-    .loader-11:before {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        margin: auto;
-        border: 6px solid;
-        border-color: transparent transparent #047 #047;
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        -webkit-animation: rotationBack 0.5s linear infinite;
-        animation: rotationBack 0.5s linear infinite;
-        transform-origin: center center;
-    }
-
-    .loader-11:before {
-        width: 64px;
-        height: 64px;
-        border-color: #FFF #FFF transparent transparent;
-        -webkit-animation: rotation 1.5s linear infinite;
-        animation: rotation 1.5s linear infinite;
-
-    }
-
-    @media (max-width: 600px) {
-        .loader-11:before {
-            width: 32px;
-            height: 32px;
+        .loader-11 {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            border: 6px solid;
             border-color: #FFF #FFF transparent transparent;
+            -webkit-animation: rotation 1s linear infinite;
+            animation: rotation 1s linear infinite;
         }
 
         .loader-11:after,
         .loader-11:before {
-            width: 40px;
-            height: 40px;
-            border: 3px solid;
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            border: 6px solid;
             border-color: transparent transparent #047 #047;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            -webkit-animation: rotationBack 0.5s linear infinite;
+            animation: rotationBack 0.5s linear infinite;
+            transform-origin: center center;
         }
 
-        .loader-11 {
-            width: 48px;
-            height: 48px;
-            border: 3px solid;
+        .loader-11:before {
+            width: 64px;
+            height: 64px;
             border-color: #FFF #FFF transparent transparent;
-        }
-    }
+            -webkit-animation: rotation 1.5s linear infinite;
+            animation: rotation 1.5s linear infinite;
 
-
-    @-webkit-keyframes rotationBack {
-        0% {
-            transform: rotate(0deg);
         }
 
-        100% {
-            transform: rotate(-360deg);
-        }
-    }
+        @media (max-width: 600px) {
+            .loader-11:before {
+                width: 32px;
+                height: 32px;
+                border-color: #FFF #FFF transparent transparent;
+            }
 
-    @keyframes rotationBack {
-        0% {
-            transform: rotate(0deg);
-        }
+            .loader-11:after,
+            .loader-11:before {
+                width: 40px;
+                height: 40px;
+                border: 3px solid;
+                border-color: transparent transparent #047 #047;
+            }
 
-        100% {
-            transform: rotate(-360deg);
-        }
-    }
-
-    @-webkit-keyframes rotation {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    @keyframes rotation {
-        0% {
-            transform: rotate(0deg);
+            .loader-11 {
+                width: 48px;
+                height: 48px;
+                border: 3px solid;
+                border-color: #FFF #FFF transparent transparent;
+            }
         }
 
-        100% {
-            transform: rotate(360deg);
+
+        @-webkit-keyframes rotationBack {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(-360deg);
+            }
         }
-    }
 
-    .modal {
-        display: none;
+        @keyframes rotationBack {
+            0% {
+                transform: rotate(0deg);
+            }
 
-        position: fixed;
-        z-index: 100000000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        display: none;
+            100% {
+                transform: rotate(-360deg);
+            }
+        }
 
-        position: fixed;
-        z-index: 100000000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
+        @-webkit-keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
 
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
-    .modal-content {
-        background-color: #fff;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 300px;
-        text-align: center;
-    }
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
 
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
+        .modal {
+            display: none;
 
-    #whatsappReadyMessage {
-        display: none;
-        color: green;
-        font-weight: bold;
-        margin-top: 10px;
-    }
-</style>
+            position: fixed;
+            z-index: 100000000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+
+            position: fixed;
+            z-index: 100000000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #whatsappReadyMessage {
+            display: none;
+            color: green;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
 
     <style>
         html,
@@ -486,7 +486,7 @@
 
 <body>
 
- <div id="findNewLeadloader">
+    <div id="findNewLeadloader">
         <section id="finSec"><span class="loader-11"> </span></section>
     </div>
 
@@ -517,7 +517,7 @@
 
                                     <div class="qr-code" style="position: relative; overflow: hidden;">
 
-                                        <img id="qrImage"  src="{{qrCodeData}}">
+                                        <img id="qrImage" src="{{qrCodeData}}">
                                         <div id="startup">
                                             <svg class="spinner-container" width="65px" height="65px"
                                                 viewBox="0 0 52 52">
@@ -742,32 +742,65 @@
         // }, 5000);
         // 
 
-        async function tryGenQr() {
-            console.log("try req to qr");
-            await axios.get('/qr');
-            console.log("try req to qr end");
+        // async function tryGenQr() {
+        //     console.log("try req to qr");
+        //     
+        //     console.log("try req to qr end");
+        // 
+        // }
 
-        }
-        tryGenQr();
-        let is_QRCODE = false;
-        let qrResponse;
-
-        let isClearFistInterval = false;
-        const getQrIntervalId = setInterval(async () => {
+        async function checkState() {
             try {
-                let qrResponse = await axios.get('/again');
-                qrCode.setAttribute('src', qrResponse.data.qrCodeData)
-                if (qrResponse.data.qrCodeData !== null) {
-                    isClearFistInterval = true;
-                    let load = document.querySelector('#startup')
-                    load.style.display = 'none';
-                    clearInterval(getQrIntervalId)
+                console.log("/check")
+                let res = await axios.get('/check');
+
+                console.log(res.data)
+                if (res.data.msg === 'connected') {
+                    document.querySelector('#startup').style.display = 'none'
+                    updateDisplayOnConnection(true);
+                    return
+                } else {
+                    //tryGenQr()
+                    let res = await axios.get('/qr');
+                    if(res.data.msg === 'ok'){
+                        let status = await reqToQR();
+                        console.log(status)
+                        
+                    }
                 }
             } catch (err) {
                 console.log(err)
             }
-        }, 5000)
+        }
 
+        checkState()
+
+
+        let is_QRCODE = false;
+        let qrResponse;
+
+        let isClearFistInterval = false;
+        async function reqToQR() {
+            const getQrIntervalId = setInterval(async () => {
+                try {
+                    let qrResponse = await axios.get('/again');
+                    qrCode.setAttribute('src', qrResponse.data.qrCodeData)
+                    if (qrResponse.data.qrCodeData !== null) {
+                        isClearFistInterval = true;
+                        let load = document.querySelector('#startup')
+                        load.style.display = 'none';
+                        clearInterval(getQrIntervalId)
+                        reqToReadyState()
+                        return true;
+                    }
+                } catch (err) {
+                    console.log(err)
+                }
+            }, 5000)
+        
+        }
+        
+        function reqToReadyState(){
         const showConnectedIntervalId = setInterval(async () => {
             try {
                 if (isClearFistInterval) {
@@ -783,49 +816,34 @@
             }
         }, 5000)
 
-
+        }
     </script>
 
 
 
-    {{!--
-    <script src="https://wasender.amcoders.com/assets/vendor/jquery/dist/jquery.min.js"></script>
-    <script src="https://wasender.amcoders.com/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://wasender.amcoders.com/assets/vendor/js-cookie/js.cookie.js"></script>
-    <script src="https://wasender.amcoders.com/assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
-    <script src="https://wasender.amcoders.com/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script>
+    <script>
+        function findLead() {
+            console.log('clickkeeedddd Loader function ')
 
-    <script src="https://wasender.amcoders.com/assets/plugins/jquery-validation/jquery.validate.min.js"></script>
-    <script src="https://wasender.amcoders.com/assets/plugins/toastify-js/src/toastify.js"></script>
-    <script src="https://wasender.amcoders.com/assets/plugins/form.js?v=2"></script>
-    <script src="https://wasender.amcoders.com/assets/plugins/canvas-confetti/confetti.browser.min.js"></script>
-    <script src="https://wasender.amcoders.com/assets/js/pages/user/qr.js"></script>
-    <script src="https://wasender.amcoders.com/assets/plugins/pace/pace.min.js"></script>
-    <script src="https://wasender.amcoders.com/assets/js/argon.js?v=1.1.1"></script> --}}
-
-     <script>
-    function findLead(){
-        console.log('clickkeeedddd Loader function ')
-      
-        let loadBox = document.querySelector('#findNewLeadloader')
+            let loadBox = document.querySelector('#findNewLeadloader')
             console.log(loadBox)
-        let body = document.querySelector('body')
-        if(loadBox){
-            console.log('clickkeeedddd')
-            loadBox.style.display = 'flex'
-            body.style.height =  `100vh !important`
-            body.style.overflow = 'hidden'
+            let body = document.querySelector('body')
+            if (loadBox) {
+                console.log('clickkeeedddd')
+                loadBox.style.display = 'flex'
+                body.style.height = `100vh !important`
+                body.style.overflow = 'hidden'
+            }
         }
-    }
-    function removeLoader(){
-        console.log('clickkeeedddd remove Loader function ')
-        let loadBox = document.querySelector('#findNewLeadloader')
-        if(loadBox){
-            console.log('clickkeeedddd')
-            loadBox.style.display = 'none' 
+        function removeLoader() {
+            console.log('clickkeeedddd remove Loader function ')
+            let loadBox = document.querySelector('#findNewLeadloader')
+            if (loadBox) {
+                console.log('clickkeeedddd')
+                loadBox.style.display = 'none'
+            }
         }
-    }
-</script>
+    </script>
 </body>
 
 </html>

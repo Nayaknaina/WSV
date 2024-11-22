@@ -56,80 +56,66 @@ let whatsappClientReady = false;
 let isConnected = false;
 let connectedPhoneNumber = "";
 
-
-function getLogFilePath() {
-  const now = new Date();
-  const date = now.toISOString().slice(0, 10).replace(/-/g, ''); // Format as YYYYMMDD
-  const time = now.toTimeString().slice(0, 8).replace(/:/g, ''); // Format as HHMMSS
-  return path.join(__dirname, `adminlog-${date}-${time}.log`);
-}
-
-const logFilePath = getLogFilePath();
-
 function getFormattedTimestamp() {
   const now = new Date();
   const date = now.toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
   const time = now.toLocaleTimeString('en-GB', { hour12: false }); // Format as HH:MM:SS in 24-hour
   return `${date} T ${time}`;
 }
-const logFilePathAll = path.join(__dirname, 'Dev-server.log');
+const logFilePath = path.join(__dirname, 'Dev-server.log');
 
-const logStreamAll = fs.createWriteStream(logFilePathAll, { flags: 'a' });
+// Create a write stream for logging into file
 const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
-
+// Override console.log to log to both file and terminal with custom timestamp format
 const originalConsoleLog = console.log;
 console.log = (...args) => {
   const message = args.join(' ');
   const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-  logStream.write(timestampedMessage);
-  logStreamAll.write(timestampedMessage);
-  originalConsoleLog(timestampedMessage);
+  logStream.write(timestampedMessage); // Write to file
+  originalConsoleLog(timestampedMessage); // Write to terminal
 };
 
 const originalConsoleError = console.error;
 console.error = (...args) => {
-  const message = args.join(' ');
-  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-  logStream.write(timestampedMessage);
-  logStreamAll.write(timestampedMessage);
-  originalConsoleError(timestampedMessage);
+const message = args.join(' ');
+const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+logStream.write(timestampedMessage); // Write to file
+originalConsoleError(timestampedMessage); // Write to terminal
 };
-
 const originalConsoleWarn = console.warn;
 console.warn = (...args) => {
-  const message = args.join(' ');
-  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-  logStream.write(timestampedMessage);
-  logStreamAll.write(timestampedMessage);
-  originalConsoleWarn(timestampedMessage);
+const message = args.join(' ');
+const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+logStream.write(timestampedMessage); // Write to file
+originalConsoleWarn(timestampedMessage); // Write to terminal
 };
 
 app.use((req, res, next) => {
-  const logMessage = `${req.method} ${req.url} ${res.statusCode}`;
-  console.log(logMessage);
+  const logMessage = ` ${req.method} ${req.url} ${res.statusCode}`;
+  console.log(logMessage); // This will log to both file and terminal
   next();
 });
 
 
-// Initialize the WhatsApp Client with Local Authentication
-// let client = new Client({
-//   puppeteer: {
-//     headless: true,
-//     ignoreHTTPSErrors: true,
-//     args: [
-//       "--ignore-certificate-errors",
-//       "--no-sandbox",
-//       "--disable-setuid-sandbox",
-//       "--disable-dev-shm-usage",
-//       "--disable-accelerated-2d-canvas",
-//       "--no-first-run",
-//       "--no-zygote",
-//       "--single-process",
-//       "--disable-gpu",
-//     ],
-//   },
-//   authStrategy: new LocalAuth(),
-// });
+// // Initialize the WhatsApp Client with Local Authentication
+let client = new Client({
+  puppeteer: {
+    headless: true,
+    ignoreHTTPSErrors: true,
+    args: [
+      "--ignore-certificate-errors",
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process",
+      "--disable-gpu",
+    ],
+  },
+  authStrategy: new LocalAuth(),
+});
 
 const sessionStore =
   process.env.NODE_ENV === "production"
@@ -150,7 +136,7 @@ app.use(cookieParser());
 
 app.use(
   session({
-    secret: "your_secret_key",
+    secret: "your_secret_key", // Replace with your own secret key
     resave: false,
     saveUninitialized: true,
     store: sessionStore,
@@ -441,6 +427,7 @@ app.use("/external", externalRoute);
 
 //------------------------------------------------------
 // todo manual lead addition
+
 app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) => {
   try {
     console.log(req.body)
@@ -504,7 +491,46 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     await newManualLead.save();
     await user.save();
     let leadContactNo = req.body.mobile;
-   
+    // const mobileRegex = /^[6-9]\d{9}$/;
+    // const mobileRegex = /^\d{1,4}[6-9]\d{9}$/
+    // newManualLead.leads_data.forEach((item) => {
+    //   const answer = item.ans.trim();
+
+      // if (mobileRegex.test(answer)) {
+      //   console.log("Valid Mobile Number found: try 1", answer);
+      //   leadContactNo = answer;
+      //   break;
+    //   }
+    // }
+
+
+    // if (leadContactNo == null) {
+    //   const mobileRegex = /^\+?\d{1,3}\d{10}$/;
+
+    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
+    //     const answer = newManualLead.leads_data[i].ans.trim();
+
+    //     if (mobileRegex.test(answer)) {
+    //       console.log("Valid Mobile Number found: try 2", answer);
+    //       leadContactNo = answer;
+    //       break;
+    //     }
+    //   }
+    // }
+
+    // if (leadContactNo == null) {
+    //   const mobileRegex = /^\d{10}$/;
+
+    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
+    //     const answer = newManualLead.leads_data[i].ans.trim();
+
+    //     if (mobileRegex.test(answer)) {
+    //       console.log("Valid Mobile Number found: try 3", answer);
+    //       leadContactNo = answer;
+    //       break;
+    //     }
+    //   }
+    // }
 
 
     console.warn("new lead found and just store in DB", leadContactNo);
@@ -591,16 +617,16 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       );
     }
 
-    let isWACnn = await WaModel.findOne({ cid: user.cid })
-    if (isWACnn !== null) {
-      if (!isWACnn.isConnected) {
+    let isWACnn = await logIncollection.findOne({ cid: user.cid })
+    if (global.sessions[isWACnn._id.toString()]) {
+      if (!global.sessions[isWACnn._id.toString()].IS_CONNECTED) {
         req.session.warnMsg = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk';
       }
     }
     setTimeout(async () => {
       let connStatus;
       try {
-        connStatus = await WaModel.findOne({ cid: req.user.cid });
+        connStatus = await logIncollection.findOne({ cid: req.user.cid });
       } catch (err) {
         console.error("Error fetching connStatus: ", err);
       }
@@ -629,6 +655,10 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       //   // wellcomeTempImagePath,
       //   // wellcomeTempPdfPath
       // );
+
+      if(leadContactNo.toString().length === 10){
+        leadContactNo = `${connStatus.countryCode}${leadContactNo}`
+      }
       personalizedMessage = capitalizeText(personalizedMessage);
       sendMessageToLead(
         connStatus,
@@ -636,7 +666,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
         personalizedMessage,
         wellcomeTempImagePath,
         wellcomeTempPdfPath
-      ); 
+      ); // reminder temp for user
     }, 4500);
 
 
@@ -659,7 +689,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       setTimeout(async () => {
         let connStatus;
         try {
-          connStatus = await WaModel.findOne({ cid: req.user.cid });
+          connStatus = await logIncollection.findOne({ cid: req.user.cid });
         } catch (err) {
           console.error("Error fetching connStatus: ", err);
         }
@@ -694,11 +724,11 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
           // reminderTempPdfPath
         ); // after temp msg sending to lead
 
-        sendMessageToLead(
-          connStatus,
-          userContact,
-          remark.text
-        );
+        // sendMessageToLead(
+        //   connStatus,
+        //   userContact,
+        //   remark.text
+        // );
 
       }, timeDifference);
     }
@@ -714,7 +744,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       setTimeout(async () => {
         let connStatus
         try {
-          connStatus = await WaModel.findOne({ cid: req.user.cid });
+          connStatus = await logIncollection.findOne({ cid: req.user.cid });
         } catch (err) {
           console.error("Error fetching connStatus: ", err);
         }
@@ -738,7 +768,9 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
         console.log("reminder to lead ", leadContactNo);
 
         personalizedMessage = capitalizeText(personalizedMessage);
-
+        if(leadContactNo.toString().length === 10){
+          leadContactNo = `${connStatus.countryCode}${leadContactNo}`
+        }
         sendMessageToLead(
           connStatus,
           leadContactNo,
@@ -764,7 +796,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     setTimeout(async () => {
       let connStatus
       try {
-        connStatus = await WaModel.findOne({ cid: req.user.cid });
+        connStatus = await logIncollection.findOne({ cid: req.user.cid });
       } catch (err) {
         console.error("Error fetching connStatus: ", err);
       }
@@ -795,7 +827,9 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       // );
 
       personalizedMessage = capitalizeText(personalizedMessage);
-
+      if(leadContactNo.toString().length === 10){
+        leadContactNo = `${connStatus.countryCode}${leadContactNo}`
+      }
       sendMessageToLead(
         connStatus,
         leadContactNo,
@@ -811,98 +845,6 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
   }
 });
 
-//todo api lead creation
-
-// app.get("/api/:api", isAdminLoggedIn, checkSubscription, async (req, res) => {
-//   try {
-//     let user;
-//     if (req.user.role === "admin") {
-//       user = await logIncollection.findById(req.user.id);
-//     } else {
-//       user = await memberModel.findById(req.user.id);
-//     }
-
-//     const Admin = await logIncollection.findOne({ cid: user.cid });
-//     if(!req.session.access) {
-//       console.warn(`Subscription expired. Please renew to continue.`)
-//       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
-//       return res.redirect('/leads')
-//     }
-
-//     const {name, email, phoneNumber, message } = req.query;
-
-//     console.log(name,email,phoneNumber,message, req.params.api);
-
-//     res.redirect("/leads");
-//   } catch (err) {
-//     console.log("Error in /user/manual/lead :- ", err);
-//   }
-// });
-
-//todo -- fetch lead from Fb when you have tocken and Subscription
-// app.get('/leads/pre', isAdminLoggedIn, checkSubscription, async (req, res) => {
-//   try {
-//     let user = await logIncollection.findOne({ cid: req.user.cid })
-
-//     if (!user) {
-//       return res.redirect('/user/login')
-//     };
-
-
-//     if (!req.session.access) {
-//       console.warn(`Subscription expired. Please renew to continue.`)
-//       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
-//       return res.redirect('/leads')
-//     }
-
-//     console.log(user.facebookToken, "usrer facebook token");
-
-//     if (user.facebookToken === null || user.facebookToken === undefined || user.facebookToken === '') {
-//       // await new Promise(resolve => setTimeout(resolve, 5000));  // 5 seconds delay
-//       console.log("you not have fb token");
-//       req.session.errorMSG = `Facebook Account Not Connected. Please Connect to Find New Leads.`;
-//       return res.redirect('/leads')
-//     }
-//     console.log("findinnngggg");
-
-   // let data = await findNewLead(user.facebookToken, user);
-
-
-//     console.log(data);
-
-//     return res.redirect('/leads');
-//   } catch (err) {
-//     console.warn("error in finding ne lead in /leads/pre - ", err);
-//   }
-// })
-
-// function findLeadsForEveryUsers() {
-//   let i = 0;
-
-//   setInterval(async () => {
-//     let res = await axios.get("http://localhost:8000/get/users");
-//     console.log(res);
-//     console.log(i);
-//   }, 60000);
-// }
-
-// findLeadsForEveryUsers();
-// app.get("/get/users", async (req, res) => {
-//   try {
-//     let allUsers = await logIncollection.find();
-//     allUsers.forEach(async (user) => {
-//       console.log("Username:- ", user.name);
-//       if (user.facebookToken) {
-//         console.log("User FB token :- ", user.facebookToken);
-//         // await findNewLead(user.facebookToken, user);
-//       } else console.log("FB token not availiable");
-//     });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// })
-
-// todo remark addition
 app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res) => {
   const { id } = req.params;
   const { text, time, date } = req.body;
@@ -979,10 +921,6 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
     }
   }
 
-  if(leadContactNo.toString().length === 10){
-    leadContactNo = `${Admin.countryCode}${leadContactNo}`
-  }
-
   console.warn("Lead contact number debugginngg", leadContactNo);
 
   const searchStrings = [
@@ -1055,9 +993,9 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
 
   console.log(timeDifference);
 
-  let isWACnn = await WaModel.findOne({ cid: user.cid });
-  if (isWACnn) {
-    if (!isWACnn.isConnected) {
+  let isWACnn = await logIncollection.findOne({ cid: user.cid });
+  if (global.sessions[isWACnn._id.toString()]) {
+    if (!global.sessions[isWACnn._id.toString()].IS_CONNECTED) {
       req.session.errorMSG = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
     }
   }
@@ -1066,7 +1004,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
   if (timeDifference > 0) {
     // let reminderTempImagePath,reminderTempPdfPath;
     setTimeout(async () => {
-      let connStatus = await WaModel.findOne({ cid: req.user.cid });
+      let connStatus = await logIncollection.findOne({ cid: req.user.cid });
 
       console.log("/remark/add/:id");
       console.log(leadContactNo);
@@ -1114,7 +1052,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
     setTimeout(async () => {
       let connStatus;
       try {
-        connStatus = await WaModel.findOne({ cid: req.user.cid });
+        connStatus = await logIncollection.findOne({ cid: req.user.cid });
       } catch (err) {
         console.error("Error fetching connStatus: ", err);
       }
@@ -1138,6 +1076,9 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
 
 
       personalizedMessage = capitalizeText(personalizedMessage);
+      if(leadContactNo.toString().length === 10){
+        leadContactNo = `${connStatus.countryCode}${leadContactNo}`
+      }
       sendMessageToLead(
         connStatus,
         leadContactNo,
@@ -1157,7 +1098,7 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
   setTimeout(async () => {
     let connStatus;
     try {
-      connStatus = await WaModel.findOne({ cid: req.user.cid });
+      connStatus = await logIncollection.findOne({ cid: req.user.cid });
     } catch (err) {
       console.error("Error fetching connStatus: ", err);
     }
@@ -1173,7 +1114,9 @@ app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res)
       .replace("[company name]", `*${companyName}*`);
 
     personalizedMessage = capitalizeText(personalizedMessage);
-
+    if(leadContactNo.toString().length === 10){
+      leadContactNo = `${connStatus.countryCode}${leadContactNo}`
+    }
     sendMessageToLead(
       connStatus,
       leadContactNo,
@@ -1385,174 +1328,6 @@ app.get("/auth/facebook", (req, res) => {
   res.redirect(facebookAuthUrl);
 });
 
-// todo Facebook Callback Route
-
-// app.get("/auth/facebook/callback", isAdminLoggedIn, async (req, res) => {
-//   const { code } = req.query;
-//   console.log("Entering Facebook callback route");
-
-//   if (!code) {
-//     console.log("No authorization code provided.");
-//     return res.status(400).send("Invalid authorization code");
-//   }
-
-//   try {
-//     // Get access token from Facebook OAuth
-//     const tokenResponse = await axios.get(
-//       "https://graph.facebook.com/v20.0/oauth/access_token",
-//       {
-//         params: {
-//           client_id: process.env.FB_CLIENT_ID,
-//           redirect_uri: process.env.REDIRECT_URI,
-//           client_secret: process.env.FB_CLIENT_SECRET,
-//           code,
-//         },
-//       }
-//     );
-
-//     const accessToken = tokenResponse.data.access_token;
-//     console.log("User Access token received:", accessToken);
-
-//     // Find the admin from the database
-//     let admin = await logIncollection.findById(req.user.id);
-//     if (!admin) {
-//       console.log("Admin not found, redirecting to login.");
-//       return res.redirect("/login");
-//     }
-
-//     admin.facebookToken = accessToken;
-//     await admin.save();
-//     console.log("Access token saved to admin account.");
-
-//     // Fetch pages connected to the Facebook account
-//     const pagesResponse = await axios.get(
-//       `https://graph.facebook.com/v20.0/me/accounts`,
-//       {
-//         params: { access_token: accessToken, fields: "id,name,access_token" },
-//       }
-//     );
-
-//     const pages = pagesResponse.data.data;
-//     console.log("Total pages fetched:", pages.length);
-//     if (!pages.length) console.warn("No pages available for this account.");
-
-//     let allLeads = [];
-
-//     // Loop through each page to fetch its leadgen forms
-//     for (const page of pages) {
-//       console.log(`Processing page: ${page.name} (ID: ${page.id})`);
-
-//       try {
-//         const leadFormsResponse = await axios.get(
-//           `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
-//           {
-//             params: { access_token: page.access_token, fields: "id,name" },
-//           }
-//         );
-
-//         const leadForms = leadFormsResponse.data.data;
-//         console.log(`Forms fetched for page ${page.name}: ${leadForms.length}`);
-
-//         // Loop through each form to fetch leads
-//         for (const form of leadForms) {
-//           console.log(`Fetching leads for form: ${form.name} (ID: ${form.id})`);
-
-//           try {
-//             const leadsResponse = await axios.get(
-//               `https://graph.facebook.com/v20.0/${form.id}/leads`,
-//               {
-//                 params: {
-//                   access_token: page.access_token,
-//                   fields: "id,created_time,field_data",
-//                 },
-//               }
-//             );
-
-//             const leads = leadsResponse.data.data;
-//             console.log(
-//               `Total leads fetched for form ${form.name}: ${leads.length}`
-//             );
-
-//             leads.forEach((lead) => {
-//               allLeads.push({
-//                 ...lead, // Include original lead data
-//                 page_id: page.id,
-//                 page_name: page.name,
-//                 form_id: form.id,
-//                 form_name: form.name,
-//               });
-//             });
-
-//             if (leadsResponse.data.paging?.next) {
-//               console.log(
-//                 `Pagination detected. Next page URL: ${leadsResponse.data.paging.next}`
-//               );
-//             }
-//           } catch (err) {
-//             console.error(
-//               `Error fetching leads for form ${form.name}:`,
-//               err.message
-//             );
-//           }
-//         }
-//       } catch (err) {
-//         console.error(
-//           `Error fetching forms for page ${page.name}:`,
-//           err.message
-//         );
-//       }
-//     }
-
-//     console.log("Leads fetched with page and form details:", allLeads);
-
-//     // Save the leads to the database
-//     for (const lead of allLeads) {
-//       const existingLead = await leadsModel.findOne({
-//         lead_id: lead.id,
-//         cid: req.user.cid,
-//       });
-
-//       if (!existingLead) {
-//         const leadsData = lead.field_data.map((data) => ({
-//           que: data.name,
-//           ans: data.values[0],
-//         }));
-//         // let defPipe = await pipelineModel.findOne({ num: 4, cid: user.cid });
-//         const newLead = new leadsModel({
-//           lead_id: lead.id,
-//           income_time: lead.created_time,
-//           page_id: lead.page_id,
-//           page_name: lead.page_name,
-//           form_id: lead.form_id,
-//           form_name: lead.form_name,
-//           cid: admin.cid,
-//           leads_data: leadsData,
-//           // status: defPipe._id,
-//           app: "facebook",
-//         });
-
-//         await newLead.save();
-//         console.log(
-//           `Saved lead ${lead.id} from page "${lead.page_name}" and form "${lead.form_name}".`
-//         );
-//       } else {
-//         console.log(`Lead ${lead.id} already exists in the database.`);
-//       }
-//     }
-
-//     // Start background job for keeping access token alive, if necessary
-
-//     req.session.successMSG = "Connected to Facebook account.";
-//     res.redirect("/external/get/data");
-//   } catch (error) {
-//     console.error(
-//       "Error during Facebook callback:",
-//       error.response ? error.response.data : error.message
-//     );
-//     res.status(500).send("Error logging in with Facebook.");
-//   }
-// });
-
 app.get("/auth/facebook/callback", isAdminLoggedIn, checkSubscription, async (req, res) => {
   const { code } = req.query;
 
@@ -1758,7 +1533,7 @@ app.get("/team/invite", isAdminLoggedIn, async (req, res) => {
     \n Your password : ${password}
     \n🔗 https://360followups.com/member/login`;
 
-    let connStatus = await WaModel.findOne({ cid: user.cid });
+    let connStatus = await logIncollection.findOne({ cid: user.cid });
 
     const newMember = new memberModel({
       name,
@@ -1834,117 +1609,6 @@ function isAdminLoggedIn(req, res, next) {
   });
 }
 
-// function ensureQRCodeEvent() {
-//   // Avoid attaching multiple QR listeners by checking if it's already attached
-//   if (!client.listenerCount("qr")) {
-//     client.on("qr", (qrCode) => {
-//       try {
-//         const qrImage = qr.imageSync(qrCode, { type: "png" });
-//         qrCodeData = `data:image/png;base64,${qrImage.toString("base64")}`;
-//         // console.log("QR code generated and stored.");
-//       } catch (error) {
-//         console.error("Error generating QR Code:", error);
-//       }
-//     });
-//   }
-// }
-
-// //  Cleanup Session Files with Retry Logic
-// async function cleanupSessionFiles() {
-//   const sessionPath = path.join(__dirname, ".wwebjs_auth/session");
-//   for (let retries = 5; retries > 0; retries--) {
-//     try {
-//       if (fs.existsSync(sessionPath)) {
-//         fs.rmSync(sessionPath, { recursive: true, force: true });
-//         // console.log("Session files deleted successfully.");
-//       }
-//       break; // Exit loop if deletion is successful
-//     } catch (error) {
-//       console.error("Failed to delete session files:", error.message);
-//       if (retries > 1) {
-//         console.warn(`Retrying cleanup... (${retries - 1} attempts left)`);
-//         await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retrying
-//       }
-//     }
-//   }
-// }
-
-// function initializeWhatsAppClient() {
-//   // Remove all existing listeners to avoid duplication
-//   if (client) {
-//     client.removeAllListeners();
-//   }
-
-//   // Recreate the client to ensure fresh state
-//   client = new Client({
-//     puppeteer: {
-//       headless: true,
-//       ignoreHTTPSErrors: true,
-//       args: [
-//         "--ignore-certificate-errors",
-//         "--no-sandbox",
-//         "--disable-setuid-sandbox",
-//         "--disable-dev-shm-usage",
-//         "--disable-accelerated-2d-canvas",
-//         "--no-first-run",
-//         "--no-zygote",
-//         "--single-process",
-//         "--disable-gpu",
-//       ],
-//     },
-//     authStrategy: new LocalAuth(),
-//   });
-
-//   // Re-attach necessary event listeners
-//   ensureQRCodeEvent();
-
-//   client.on("ready", async () => {
-//     console.log("WhatsApp client is ready!");
-//     whatsappClientReady = true;
-//     isConnected = true;
-//     // shared.connectedPhoneNumber = client.info.wid.user; // Store phone 
-//     // console.log("Connected WhatsApp Number:", shared.connectedPhoneNumber);
-//     connectedPhoneNumber = client.info.wid.user;
-//     console.log("Connected WhatsApp Number:", connectedPhoneNumber);
-//     // startKeepAlive(client);
-//   });
-
-//   client.on("disconnected", async (reason) => {
-//     console.log("WhatsApp client has been disconnected due to:", reason);
-//     whatsappClientReady = false;
-//     isConnected = false;
-//     qrCodeData = "";
-//     setTimeout(() => {
-//       client.initialize();
-//     }, 5000);
-//     await cleanupSessionFiles();
-//     initializeWhatsAppClient();
-//   });
-
-//   client.on("auth_failure", async (message) => {
-//     console.error("Authentication failure:", message);
-//     whatsappClientReady = false;
-//     isConnected = false;
-//     qrCodeData = ""; // Reset QR code data on authentication failure
-//     await cleanupSessionFiles();
-//     initializeWhatsAppClient(); // Re-initialize to re-trigger QR code generation
-//   });
-
-//   whatsappClientReady = false; // Reset ready status
-//   client
-//     .initialize()
-//     .then(() => {
-//       console.log("Client re-initialized");
-//     })
-//     .catch((error) => {
-//       console.error("Error re-initializing client:", error);
-//     });
-// }
-
-// initializeWhatsAppClient();
-
-
-
 async function sendMessageToLead(
   adminWA,
   phoneNumber,
@@ -1952,29 +1616,16 @@ async function sendMessageToLead(
   imagePath = null,
   pdfPath = null
 ) {
-  if (adminWA === null || adminWA === undefined || adminWA === '') {
-    console.warn("WhatsApp client is not ready. please connect mobile number");
-    return;
-  }
+
   console.log("Phone number", phoneNumber);
 
-  // Check if WhatsApp client is ready
-  if (adminWA && !adminWA.isConnected) {
-    console.warn("WhatsApp client is not ready. please re-connect mobile number isConnected in DB=", adminWA.isConnected);
-    return;
-  }
-  console.log(
-    "Trying to send message. Client ready status:",
-    adminWA.isConnected
-  );
   const user = await logIncollection.findOne({ cid: adminWA.cid });
-  console.log(user);
-  
-  if(!global.clients[user._id.toString()]) {
-    console.log("client not find in findNewLead fun")
-    return
+  console.log(user.name);
+  let client;
+  if(global.sessions[user._id.toString()]){
+
+   client = global.sessions[user._id.toString()].client;
   }
-  let client = global.clients[user._id.toString()].client;
   if (client) {
     console.log("client availiable");
   }
@@ -1997,7 +1648,7 @@ async function sendMessageToLead(
       const imageMedia = MessageMedia.fromFilePath(imagePath);
       await client.sendMessage(`${phoneNumber}@c.us`, imageMedia, {
         caption: message,
-      });
+      }); 
     } else if ((pdfPath && !imagePath) || imagePath == "") {
       // send Only a pdf with text message
       const pdfMedia = MessageMedia.fromFilePath(pdfPath);
@@ -2011,23 +1662,6 @@ async function sendMessageToLead(
   } catch (error) {
     console.error("Error sending message:", error);
   }
-}
-
-
-
-
-
-let chalteRahoId;
-function chalteRaho(token, user) {
-  let i = 0;
-
-  chalteRahoId = setInterval(() => {
-    if (user && token) {
-      console.log(user.name, "token availiable");
-    }
-    findNewLead(token, user);
-    console.log("step", i++);
-  }, 60000);
 }
 
 

@@ -10,6 +10,7 @@ const logInSchema = new mongoose.Schema({
   },
   cid: {
     type: String,
+    ref: 'Company',
   },
   agentCode: {
     type: String,
@@ -53,7 +54,6 @@ const logInSchema = new mongoose.Schema({
       ref: "template",
     },
   ],
-
   name: {
     type: String,
     trim: true,

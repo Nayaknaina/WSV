@@ -335,9 +335,7 @@ input[type="checkbox"]:checked+.slide {
     border: 2px solid rgb(0, 0, 0);
 }
 
-.fa-square-facebook {
-    margin-left: 15px;
-}
+
 
 .formateDate {
     min-width: 100px;

@@ -43,6 +43,7 @@ payment_route.post('/pay', isAdminLoggedIn, paymentController.payProduct);
 
 payment_route.post('/success', isAdminLoggedIn, paymentController.successPage);
 
+
 payment_route.get('/cancel', isAdminLoggedIn, paymentController.cancelPage);
 
 // Uncomment this if you have a free lead route

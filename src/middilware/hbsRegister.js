@@ -11,6 +11,10 @@ hbs.registerHelper('lt', function (a, b) {
   return a < b;
 });
 
+hbs.registerHelper('eq', function (a,b){
+  return a===b;
+});
+
 // Register 'add' helper
 hbs.registerHelper('add', function (a, b) {
   return a + b;

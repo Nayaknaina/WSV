@@ -319,12 +319,12 @@ const crypto = require('crypto');
 
 
 const razorpay = new Razorpay({
-  key_id: 'rzp_test_OqOrf7Nc8Ueiv7',
-  key_secret: '9Ph6QKeLleapy8SMEMPY6Jfp',
+  key_id:  process.env.KEY_ID,
+  key_secret: process.env.KEY_SECRET,
 });
 const renderBuyPage = async (req, res) => {
   try {
-    console.log("Rendering pricing page...");
+    console.log("Rendering the payment page");
     res.sendFile(path.join(__dirname, "../public/pricing.html"));
   } catch (error) {
     console.error("Error rendering buy page:", error.message);
@@ -334,7 +334,7 @@ const renderBuyPage = async (req, res) => {
 const payProduct = async (req, res) => {
   try {
     const { plan } = req.body;
-    const price = plan === "monthly" ? 1500 : 12000;
+    const price = plan === "monthly" ? 1500000 : 1200000;
 
     const options = {
       amount: price,
@@ -370,7 +370,10 @@ const successPage = async (req, res) => {
     }
 
     let admin = await logIncollection.findById(req.user.id);
+    console.log("previous level",admin.subscriptionLevel);
+    
     admin.subscriptionLevel = "basic";
+
 
 
     if (plan === "monthly") {
@@ -384,13 +387,13 @@ const successPage = async (req, res) => {
     console.log("Payment successful and subscription updated.");
     res.render("success", { paymentDetails: { order_id, payment_id }, adminDetails: admin });
   } catch (error) {
+    
     console.error("Error verifying Razorpay payment:", error.message);
     res.status(500).send("Error verifying Razorpay payment");
   }
 };
 
 
-// Cancel Page Route
 const cancelPage = async (req, res) => {
   try {
     console.log("Payment canceled by user.");
@@ -405,4 +408,5 @@ module.exports = {
   payProduct,
   successPage,
   cancelPage,
+  
 };
