@@ -40,62 +40,67 @@ const userRoute = require("./routes/users.route.js");
 const Route = require("./routes/index.route.js");
 const externalRoute = require("./routes/external.route.js");
 const { log } = require("console");
-const cors = require('cors')
+const cors = require("cors");
 
-const { checkSubscription, capitalizeText, findMobileNumber, } = require("./middilware/middilware.js");
+const {
+  checkSubscription,
+  capitalizeText,
+  findMobileNumber,
+} = require("./middilware/middilware.js");
 
-app.use(cors())
+app.use(cors());
 // todo Whatsapp integrations-----------------------------------------
 const { startKeepAlive } = require("./middilware/whatsapp.js");
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qr = require("qr-image");
 const { trusted } = require("mongoose");
+const formModel = require("./models/form.model.js");
+const pageModel = require("./models/page.model.js");
 // Initialize variables
 let qrCodeData = "";
 let whatsappClientReady = false;
 let isConnected = false;
 let connectedPhoneNumber = "";
 
-function getFormattedTimestamp() {
-  const now = new Date();
-  const date = now.toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
-  const time = now.toLocaleTimeString('en-GB', { hour12: false }); // Format as HH:MM:SS in 24-hour
-  return `${date} T ${time}`;
-}
-const logFilePath = path.join(__dirname, 'Dev-server.log');
+// function getFormattedTimestamp() {
+//   const now = new Date();
+//   const date = now.toLocaleDateString('en-GB'); // Format as DD/MM/YYYY
+//   const time = now.toLocaleTimeString('en-GB', { hour12: false }); // Format as HH:MM:SS in 24-hour
+//   return `${date} T ${time}`;
+// }
+// const logFilePath = path.join(__dirname, 'Dev-server.log');
 
-// Create a write stream for logging into file
-const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
-// Override console.log to log to both file and terminal with custom timestamp format
-const originalConsoleLog = console.log;
-console.log = (...args) => {
-  const message = args.join(' ');
-  const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-  logStream.write(timestampedMessage); // Write to file
-  originalConsoleLog(timestampedMessage); // Write to terminal
-};
+// // Create a write stream for logging into file
+// const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
+// // Override console.log to log to both file and terminal with custom timestamp format
+// const originalConsoleLog = console.log;
+// console.log = (...args) => {
+//   const message = args.join(' ');
+//   const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+//   logStream.write(timestampedMessage); // Write to file
+//   originalConsoleLog(timestampedMessage); // Write to terminal
+// };
 
-const originalConsoleError = console.error;
-console.error = (...args) => {
-const message = args.join(' ');
-const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-logStream.write(timestampedMessage); // Write to file
-originalConsoleError(timestampedMessage); // Write to terminal
-};
-const originalConsoleWarn = console.warn;
-console.warn = (...args) => {
-const message = args.join(' ');
-const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
-logStream.write(timestampedMessage); // Write to file
-originalConsoleWarn(timestampedMessage); // Write to terminal
-};
+// const originalConsoleError = console.error;
+// console.error = (...args) => {
+// const message = args.join(' ');
+// const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+// logStream.write(timestampedMessage); // Write to file
+// originalConsoleError(timestampedMessage); // Write to terminal
+// };
+// const originalConsoleWarn = console.warn;
+// console.warn = (...args) => {
+// const message = args.join(' ');
+// const timestampedMessage = `${getFormattedTimestamp()} ${message}\n`;
+// logStream.write(timestampedMessage); // Write to file
+// originalConsoleWarn(timestampedMessage); // Write to terminal
+// };
 
-app.use((req, res, next) => {
-  const logMessage = ` ${req.method} ${req.url} ${res.statusCode}`;
-  console.log(logMessage); // This will log to both file and terminal
-  next();
-});
-
+// app.use((req, res, next) => {
+//   const logMessage = ` ${req.method} ${req.url} ${res.statusCode}`;
+//   console.log(logMessage); // This will log to both file and terminal
+//   next();
+// });
 
 // // Initialize the WhatsApp Client with Local Authentication
 let client = new Client({
@@ -120,10 +125,10 @@ let client = new Client({
 const sessionStore =
   process.env.NODE_ENV === "production"
     ? MongoStore.create({
-      mongoUrl:
-        "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
-      collectionName: "sessions", // Collection name for sessions
-    })
+        mongoUrl:
+          "mongodb+srv://nainanayak288:01QKzxY3dSOcP1nN@wsvconnect.bpxfx.mongodb.net/",
+        collectionName: "sessions", // Collection name for sessions
+      })
     : new session.MemoryStore();
 
 const static_path = path.join(__dirname, "../public");
@@ -248,23 +253,20 @@ app.use("/external", externalRoute);
 //       user = await memberModel.findById(req.user.id);
 //   }
 
-
 //   const phoneNumber = shared.connectedPhoneNumber || null;
 
 //   if (phoneNumber) {
 //       return res.json({
 //           isConnected: true,
-//           phoneNumber: phoneNumber 
+//           phoneNumber: phoneNumber
 //       });
 //   } else {
 //       return res.json({
 //           isConnected: false,
-//           phoneNumber: null 
+//           phoneNumber: null
 //       });
 //   }
 // });
-
-
 
 // app.get("/qr", isAdminLoggedIn, async (req, res) => {
 //   // console.log("qrCodeData genrated in /qr", req.user.name);
@@ -329,7 +331,6 @@ app.use("/external", externalRoute);
 //     });
 //   }
 
-
 // });
 // todo logout whatsapp
 // app.get("/logoutWA", isAdminLoggedIn, async (req, res) => {
@@ -370,7 +371,6 @@ app.use("/external", externalRoute);
 
 //         req.session.warnMsg = `You’ve been logged out of WhatsApp. Please reconnect to send ${futureCount} pending remarks`;
 
-
 //         console.log("WhatsApp client logged out successfully.");
 //       } catch (logoutError) {
 //         console.error("Error during logout process:", logoutError);
@@ -401,8 +401,7 @@ app.use("/external", externalRoute);
 //   }
 // });
 
-
-// todo fetch leads 
+// todo fetch leads
 // app.get("/fetch/leads", isAdminLoggedIn, checkSubscription, async (req, res) => {
 //   try {
 //     let user = await logIncollection.findOne({ cid: req.user.cid });
@@ -428,114 +427,505 @@ app.use("/external", externalRoute);
 //------------------------------------------------------
 // todo manual lead addition
 
-app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) => {
-  try {
-    console.log(req.body)
-    let user,uid=null,userType=null;
-    if (req.user.role === "admin") {
-      user = await logIncollection.findById(req.user.id);
-    } else {
-      user = await memberModel.findById(req.user.id);
-      uid=user._id;
-      userType = 'teamMember';
-    }
+app.post(
+  "/manual/lead",
+  isAdminLoggedIn,
+  checkSubscription,
+  async (req, res) => {
+    try {
+      console.log(req.body);
+      let user,
+        uid = null,
+        userType = null;
+      if (req.user.role === "admin") {
+        user = await logIncollection.findById(req.user.id);
+      } else {
+        user = await memberModel.findById(req.user.id);
+        uid = user._id;
+        userType = "teamMember";
+      }
 
-    const Admin = await logIncollection.findOne({ cid: user.cid });
-    if (!req.session.access) {
-      console.warn(`Subscription expired. Please renew to continue.`)
-      req.session.errorMSG = `Subscription expired. Please renew to continue`;
-      return res.redirect('/leads')
-    }
-    const leads_data = Object.entries(req.body)
-      .filter(([key]) => key !== "remark" && key !== "remarktime") // Exclude 'remark' and 'remarktime'
-      .map(([key, value]) => ({
-        que: key,
-        ans: value,
-      }));
-    // console.log(req.body);
-    // console.log(leads_data);
-    
-    // let defPipe = await pipelineModel.findOne({cid: user.cid, defaultVal: true})
-    let newManualLead = new leadsModel({
-      app: "manual",
-      cid: user.cid,
-      uid,
-      userType,
-      income_time: new Date(),
-      leads_data,
-    });
+      const Admin = await logIncollection.findOne({ cid: user.cid });
+      if (!req.session.access) {
+        console.warn(`Subscription expired. Please renew to continue.`);
+        req.session.errorMSG = `Subscription expired. Please renew to continue`;
+        return res.redirect("/leads");
+      }
+      const leads_data = Object.entries(req.body)
+        .filter(([key]) => key !== "remark" && key !== "remarktime") // Exclude 'remark' and 'remarktime'
+        .map(([key, value]) => ({
+          que: key,
+          ans: value,
+        }));
+      // console.log(req.body);
+      // console.log(leads_data);
 
-    let userContact = `${user.countryCode}${user.mobile}`;    // console.log(req.body, "====", userContact);
+      // let defPipe = await pipelineModel.findOne({cid: user.cid, defaultVal: true})
+      let newManualLead = new leadsModel({
+        app: "manual",
+        cid: user.cid,
+        uid,
+        userType,
+        income_time: new Date(),
+        leads_data,
+      });
 
-    const remarkDateTimeformat = new Date(req.body.remarkTime);
-    const remarkDate = remarkDateTimeformat.toISOString().split("T")[0];
-    const remarkTime = remarkDateTimeformat.toTimeString().split(" ")[0];
+      let userContact = `${user.countryCode}${user.mobile}`; // console.log(req.body, "====", userContact);
 
-    let remark = new remarkModel({
-      text: req.body.remark,
-      time: remarkTime,
-      date: remarkDate,
-      cid: req.user.cid,
-      uid: req.user.id,
-      lead_id: newManualLead._id,
-    });
+      const remarkDateTimeformat = new Date(req.body.remarkTime);
+      const remarkDate = remarkDateTimeformat.toISOString().split("T")[0];
+      const remarkTime = remarkDateTimeformat.toTimeString().split(" ")[0];
 
-    await remark.save();
-    user.myleads.push(newManualLead._id);
-    newManualLead.remarks.push(remark._id);
+      let remark = new remarkModel({
+        text: req.body.remark,
+        time: remarkTime,
+        date: remarkDate,
+        cid: req.user.cid,
+        uid: req.user.id,
+        lead_id: newManualLead._id,
+      });
 
-    let defPipe = await pipelineModel.findOne({ defaultVal: true, cid: user.cid });
-    if (defPipe) {
-      newManualLead.status = defPipe._id;
-    }
-    await newManualLead.save();
-    await user.save();
-    let leadContactNo = req.body.mobile;
-    // const mobileRegex = /^[6-9]\d{9}$/;
-    // const mobileRegex = /^\d{1,4}[6-9]\d{9}$/
-    // newManualLead.leads_data.forEach((item) => {
-    //   const answer = item.ans.trim();
+      await remark.save();
+      user.myleads.push(newManualLead._id);
+      newManualLead.remarks.push(remark._id);
+
+      let defPipe = await pipelineModel.findOne({
+        defaultVal: true,
+        cid: user.cid,
+      });
+      if (defPipe) {
+        newManualLead.status = defPipe._id;
+      }
+      await newManualLead.save();
+      await user.save();
+      let leadContactNo = req.body.mobile;
+      // const mobileRegex = /^[6-9]\d{9}$/;
+      // const mobileRegex = /^\d{1,4}[6-9]\d{9}$/
+      // newManualLead.leads_data.forEach((item) => {
+      //   const answer = item.ans.trim();
 
       // if (mobileRegex.test(answer)) {
       //   console.log("Valid Mobile Number found: try 1", answer);
       //   leadContactNo = answer;
       //   break;
-    //   }
-    // }
+      //   }
+      // }
 
+      // if (leadContactNo == null) {
+      //   const mobileRegex = /^\+?\d{1,3}\d{10}$/;
 
-    // if (leadContactNo == null) {
-    //   const mobileRegex = /^\+?\d{1,3}\d{10}$/;
+      //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
+      //     const answer = newManualLead.leads_data[i].ans.trim();
 
-    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
-    //     const answer = newManualLead.leads_data[i].ans.trim();
+      //     if (mobileRegex.test(answer)) {
+      //       console.log("Valid Mobile Number found: try 2", answer);
+      //       leadContactNo = answer;
+      //       break;
+      //     }
+      //   }
+      // }
 
-    //     if (mobileRegex.test(answer)) {
-    //       console.log("Valid Mobile Number found: try 2", answer);
-    //       leadContactNo = answer;
-    //       break;
-    //     }
-    //   }
-    // }
+      // if (leadContactNo == null) {
+      //   const mobileRegex = /^\d{10}$/;
 
-    // if (leadContactNo == null) {
-    //   const mobileRegex = /^\d{10}$/;
+      //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
+      //     const answer = newManualLead.leads_data[i].ans.trim();
 
-    //   for (let i = 0; i < newManualLead.leads_data.length; i++) {
-    //     const answer = newManualLead.leads_data[i].ans.trim();
+      //     if (mobileRegex.test(answer)) {
+      //       console.log("Valid Mobile Number found: try 3", answer);
+      //       leadContactNo = answer;
+      //       break;
+      //     }
+      //   }
+      // }
 
-    //     if (mobileRegex.test(answer)) {
-    //       console.log("Valid Mobile Number found: try 3", answer);
-    //       leadContactNo = answer;
-    //       break;
-    //     }
-    //   }
-    // }
+      console.warn("new lead found and just store in DB", leadContactNo);
 
+      const searchStrings = [
+        "name",
+        "Name",
+        "NAME",
+        "your name",
+        "your_name",
+        "Your_Name",
+        "Your_name",
+        "YOUR_NAME",
+        "YOUR NAME",
+        "YoyrName",
+        "YOURNAME",
+        "customerName",
+        "CustomerName",
+        "customer name",
+        "Customer Name",
+        "Customer_Name",
+        "customer_name",
+        "full name",
+        "full_name",
+        "Full_Name",
+        "FullName",
+        "FULL_NAME",
+        "first name",
+        "first_name",
+        "First_Name",
+        "आपका नाम",
+        "आपका_नाम",
+        "आपका_नाम:",
+        "नाम",
+        "पूरा नाम",
+        "पूरा_नाम",
+        "ग्राहक का नाम",
+        "ग्राहक_का_नाम",
+        "शुभ नाम",
+        "शुभ_नाम",
+      ];
 
-    console.warn("new lead found and just store in DB", leadContactNo);
+      let customerName = "";
 
+      newManualLead.leads_data.forEach((item) => {
+        const isMatch = searchStrings.some((str) =>
+          item.que.toLowerCase().includes(str.toLowerCase())
+        );
+        if (isMatch) {
+          customerName = item.ans;
+        }
+      });
 
+      if (customerName) {
+        // console.log("Matched customerName:", customerName);
+      } else {
+        customerName = "Sir/Madam";
+        // console.log("Un-Matched then customerName:", customerName);
+      }
+
+      console.log(leadContactNo);
+
+      const wellcomeTemp = await templateModel.findOne({
+        cid: user.cid,
+        num: 4,
+      });
+      let wellcomeTempImagePath, wellcomeTempPdfPath;
+      if (wellcomeTemp.image !== "") {
+        // img for user
+        wellcomeTempImagePath = path.join(
+          __dirname,
+          "../template/images/uploads/whatsapp/",
+          wellcomeTemp.image
+        );
+      }
+      if (wellcomeTemp.pdf !== "") {
+        // pdf for user
+        wellcomeTempPdfPath = path.join(
+          __dirname,
+          "../template/images/uploads/whatsapp/",
+          wellcomeTemp.pdf
+        );
+      }
+
+      let isWACnn = await logIncollection.findOne({ cid: user.cid });
+      if (global.sessions[isWACnn._id.toString()]) {
+        if (!global.sessions[isWACnn._id.toString()].IS_CONNECTED) {
+          req.session.warnMsg =
+            "Whatsapp is not connected Please Connect Whatsapp to Send Reamrk";
+        }
+      }
+      setTimeout(async () => {
+        let connStatus;
+        try {
+          connStatus = await logIncollection.findOne({ cid: req.user.cid });
+        } catch (err) {
+          console.error("Error fetching connStatus: ", err);
+        }
+        console.log("/manual/lead/");
+        // console.log("wellcome to lead ", leadContactNo);
+        let msg = wellcomeTemp.text;
+        let companyName = Admin.organizationName || "360FollowUps";
+        console.log("company name", companyName);
+        console.log(Admin.organizationName);
+
+        let personalizedMessage = msg
+          .replace("[customer name]", `*${customerName}*`)
+          .replace("[company name]", `*${companyName}*`)
+          .replace("[company name]", `*${companyName}*`);
+
+        console.log("company name", companyName);
+
+        // console.log(
+        //   "wellcome message log",
+        //   connStatus,
+        //   leadContactNo,
+        //   // wellcomeTemp.text,
+        //   // personalizedMessage,
+        //   // wellcomeTempImagePath,
+        //   // wellcomeTempPdfPath
+        // );
+
+        if (leadContactNo.toString().length === 10) {
+          leadContactNo = `${connStatus.countryCode}${leadContactNo}`;
+        }
+        personalizedMessage = capitalizeText(personalizedMessage);
+        sendMessageToLead(
+          connStatus,
+          leadContactNo,
+          personalizedMessage,
+          wellcomeTempImagePath,
+          wellcomeTempPdfPath
+        ); // reminder temp for user
+      }, 4500);
+
+      const remarkDateTime = new Date(`${remarkDate}T${remarkTime}`);
+      const currentTime = new Date();
+
+      let timeDifference = remarkDateTime - currentTime;
+      timeDifference -= 1000 * 60 * 30;
+      console.log(remarkDate, remarkTime);
+      console.log(timeDifference);
+
+      //todo  reminder message for team member
+      const reminderTemplateForMember = await templateModel.findOne({
+        cid: user.cid,
+        num: 2,
+      });
+
+      if (timeDifference > 0) {
+        // let reminderTempImagePath,reminderTempPdfPath;
+        setTimeout(async () => {
+          let connStatus;
+          try {
+            connStatus = await logIncollection.findOne({ cid: req.user.cid });
+          } catch (err) {
+            console.error("Error fetching connStatus: ", err);
+          }
+          console.log("/remark/add/:id");
+          console.log(leadContactNo, " lead contact number");
+
+          let msg = reminderTemplateForMember.text;
+
+          let companyName =
+            Admin.organizationName !== null ||
+            Admin.organizationName !== undefined ||
+            Admin.organizationName !== ""
+              ? Admin.organizationName
+              : "360FollowUps";
+
+          let personalizedMessage = msg
+            .replace("[team member name]", `*${user.name}*`)
+            .replace(
+              "[customer name]",
+              `*${customerName}*` + " Mobile no. " + `*${leadContactNo}*`
+            )
+            .replace("[date]", `*${remarkDate}*`)
+            .replace("[time]", `*${remarkTime}*`)
+            .replace("[company name]", `*${companyName}*`);
+          console.log("reminder to member ", userContact);
+          personalizedMessage = capitalizeText(personalizedMessage);
+          sendMessageToLead(
+            connStatus,
+            userContact,
+            personalizedMessage
+            // reminderTempImagePath,
+            // reminderTempPdfPath
+          ); // after temp msg sending to lead
+
+          // sendMessageToLead(
+          //   connStatus,
+          //   userContact,
+          //   remark.text
+          // );
+        }, timeDifference);
+      }
+
+      //todo  reminder message for customer
+      const reminderTemplateForCustomer = await templateModel.findOne({
+        cid: user.cid,
+        num: 1,
+      });
+
+      if (timeDifference > 0) {
+        // let reminderForCustomerTempImagePath,reminderForCusromerTempPdfPath;
+        setTimeout(async () => {
+          let connStatus;
+          try {
+            connStatus = await logIncollection.findOne({ cid: req.user.cid });
+          } catch (err) {
+            console.error("Error fetching connStatus: ", err);
+          }
+          console.log("/remark/add/:id");
+          console.log(leadContactNo, " lead contact number");
+
+          let msg = reminderTemplateForCustomer.text;
+          let companyName =
+            Admin.organizationName !== null ||
+            Admin.organizationName !== undefined ||
+            Admin.organizationName !== ""
+              ? Admin.organizationName
+              : "360FollowUps";
+
+          let personalizedMessage = msg
+            .replace("[customer name]", `*${customerName}*`)
+            .replace("[company name]", `*${companyName}*`)
+            .replace("[date]", `*${remarkDate}*`)
+            .replace("[time]", `*${remarkTime}*`)
+            .replace("[company name]", `*${companyName}*`);
+          console.log("reminder to lead ", leadContactNo);
+
+          personalizedMessage = capitalizeText(personalizedMessage);
+          if (leadContactNo.toString().length === 10) {
+            leadContactNo = `${connStatus.countryCode}${leadContactNo}`;
+          }
+          sendMessageToLead(
+            connStatus,
+            leadContactNo,
+            personalizedMessage
+            // reminderForCustomerTempImagePath,
+            // reminderForCusromerTempPdfPath
+          ); // after temp msg sending to lead
+        }, timeDifference);
+      }
+
+      // todo thankyou message to lead or customer
+      const thnakyouLeadTemplate = await templateModel.findOne({
+        cid: user.cid,
+        num: 5,
+      });
+
+      // console.log(
+      //   "after call template document----",
+      //   thnakyouLeadTemplate,
+      //   "------after call template document"
+      // );
+
+      setTimeout(async () => {
+        let connStatus;
+        try {
+          connStatus = await logIncollection.findOne({ cid: req.user.cid });
+        } catch (err) {
+          console.error("Error fetching connStatus: ", err);
+        }
+        console.log("/remark/add/:id");
+        console.log("thanks to lead ", leadContactNo);
+        console.log("Yahin se");
+
+        let msg = thnakyouLeadTemplate.text;
+        let companyName =
+          Admin.organizationName !== null &&
+          Admin.organizationName !== undefined &&
+          Admin.organizationName !== ""
+            ? Admin.organizationName
+            : "360FollowUps";
+        let personalizedMessage = msg
+          .replace("[customer name]", `*${customerName}*`)
+          .replace("[company name]", `*${companyName}*`);
+
+        // console.log(
+        //   "thankyu message log",
+        //   connStatus,
+        //   leadContactNo,
+        //   // thnakyouLeadTemplate.text,
+        //   // personalizedMessage
+        //   // LeadTempImagePath,
+        //   // LeadTempPdfPath
+        // );
+
+        personalizedMessage = capitalizeText(personalizedMessage);
+        if (leadContactNo.toString().length === 10) {
+          leadContactNo = `${connStatus.countryCode}${leadContactNo}`;
+        }
+        sendMessageToLead(
+          connStatus,
+          leadContactNo,
+          personalizedMessage
+          // LeadTempImagePath,
+          // LeadTempPdfPath
+        ); // reminder temp for user
+      }, 5000);
+
+      res.redirect("/leads");
+    } catch (err) {
+      console.log("Error in /user/manual/lead :- ", err);
+    }
+  }
+);
+
+app.post(
+  "/remark/add/:id",
+  isAdminLoggedIn,
+  checkSubscription,
+  async (req, res) => {
+    const { id } = req.params;
+    const { text, time, date } = req.body;
+    let user;
+
+    if (req.user.role === "admin") {
+      user = await logIncollection.findById(req.user.id);
+    } else user = await memberModel.findById(req.user.id);
+
+    if (!req.session.access) {
+      console.warn(`Subscription expired. Please renew to continue.`);
+      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+      return res.redirect("/leads");
+    }
+
+    let Admin = await logIncollection.findOne({ cid: user.cid });
+
+    let userContact = `${user.countryCode}${user.mobile}`;
+
+    let lead = await leadsModel.findById(id);
+
+    let remark = new remarkModel({
+      uid: user._id,
+      cid: user.cid,
+      lead_id: lead._id,
+      text,
+      time,
+      date,
+    });
+    await remark.save();
+
+    lead.remarks.push(remark._id);
+    await lead.save();
+    // console.log(lead);
+
+    const mobileRegex = /^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/;
+    let leadContactNo = null;
+    for (let i = 0; i < lead.leads_data.length; i++) {
+      const answer = lead.leads_data[i].ans.trim();
+
+      if (mobileRegex.test(answer)) {
+        console.log("Valid Mobile Number found: try 1", answer);
+        leadContactNo = answer;
+        break;
+      }
+    }
+
+    if (leadContactNo == null) {
+      const mobileRegex = /^\+?\d{1,3}\d{10}$/;
+
+      for (let i = 0; i < lead.leads_data.length; i++) {
+        const answer = lead.leads_data[i].ans.trim();
+
+        if (mobileRegex.test(answer)) {
+          console.log("Valid Mobile Number found: try 2", answer);
+          leadContactNo = answer;
+          break;
+        }
+      }
+    }
+
+    if (leadContactNo == null) {
+      const mobileRegex = /^\d{10}$/;
+
+      for (let i = 0; i < lead.leads_data.length; i++) {
+        const answer = lead.leads_data[i].ans.trim();
+
+        if (mobileRegex.test(answer)) {
+          console.log("Valid Mobile Number found: try 3", answer);
+          leadContactNo = answer;
+          break;
+        }
+      }
+    }
+
+    console.warn("Lead contact number debugginngg", leadContactNo);
 
     const searchStrings = [
       "name",
@@ -566,7 +956,6 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       "आपका नाम",
       "आपका_नाम",
       "आपका_नाम:",
-      "नाम",
       "पूरा नाम",
       "पूरा_नाम",
       "ग्राहक का नाम",
@@ -577,7 +966,7 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
 
     let customerName = "";
 
-    newManualLead.leads_data.forEach((item) => {
+    lead.leads_data.forEach((item) => {
       const isMatch = searchStrings.some((str) =>
         item.que.toLowerCase().includes(str.toLowerCase())
       );
@@ -587,121 +976,50 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
     });
 
     if (customerName) {
-      // console.log("Matched customerName:", customerName);
+      console.log("Matched customerName:", customerName);
     } else {
       customerName = "Sir/Madam";
-      // console.log("Un-Matched then customerName:", customerName);
+      console.log("Un-Matched then customerName:", customerName);
     }
 
     console.log(leadContactNo);
 
-    const wellcomeTemp = await templateModel.findOne({
-      cid: user.cid,
-      num: 4,
-    });
-    let wellcomeTempImagePath, wellcomeTempPdfPath;
-    if (wellcomeTemp.image !== "") {
-      // img for user
-      wellcomeTempImagePath = path.join(
-        __dirname,
-        "../template/images/uploads/whatsapp/",
-        wellcomeTemp.image
-      );
-    }
-    if (wellcomeTemp.pdf !== "") {
-      // pdf for user
-      wellcomeTempPdfPath = path.join(
-        __dirname,
-        "../template/images/uploads/whatsapp/",
-        wellcomeTemp.pdf
-      );
-    }
-
-    let isWACnn = await logIncollection.findOne({ cid: user.cid })
-    if (global.sessions[isWACnn._id.toString()]) {
-      if (!global.sessions[isWACnn._id.toString()].IS_CONNECTED) {
-        req.session.warnMsg = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk';
-      }
-    }
-    setTimeout(async () => {
-      let connStatus;
-      try {
-        connStatus = await logIncollection.findOne({ cid: req.user.cid });
-      } catch (err) {
-        console.error("Error fetching connStatus: ", err);
-      }
-      console.log("/manual/lead/");
-      // console.log("wellcome to lead ", leadContactNo);
-      let msg = wellcomeTemp.text;
-      let companyName = Admin.organizationName || "360FollowUps";
-      console.log("company name", companyName);
-      console.log(Admin.organizationName);
-
-
-
-      let personalizedMessage = msg
-        .replace("[customer name]", `*${customerName}*`)
-        .replace("[company name]", `*${companyName}*`)
-        .replace("[company name]", `*${companyName}*`);
-
-      console.log("company name", companyName);
-
-      // console.log(
-      //   "wellcome message log",
-      //   connStatus,
-      //   leadContactNo,
-      //   // wellcomeTemp.text,
-      //   // personalizedMessage,
-      //   // wellcomeTempImagePath,
-      //   // wellcomeTempPdfPath
-      // );
-
-      if(leadContactNo.toString().length === 10){
-        leadContactNo = `${connStatus.countryCode}${leadContactNo}`
-      }
-      personalizedMessage = capitalizeText(personalizedMessage);
-      sendMessageToLead(
-        connStatus,
-        leadContactNo,
-        personalizedMessage,
-        wellcomeTempImagePath,
-        wellcomeTempPdfPath
-      ); // reminder temp for user
-    }, 4500);
-
-
-    const remarkDateTime = new Date(`${remarkDate}T${remarkTime}`);
+    const remarkDateTime = new Date(`${date}T${time}:00`);
     const currentTime = new Date();
 
     let timeDifference = remarkDateTime - currentTime;
     timeDifference -= 1000 * 60 * 30;
-    console.log(remarkDate, remarkTime);
-    console.log(timeDifference);
 
-    //todo  reminder message for team member
     const reminderTemplateForMember = await templateModel.findOne({
-      cid: user.cid,
+      cid: req.user.cid,
       num: 2,
     });
 
+    console.log(timeDifference);
+
+    let isWACnn = await logIncollection.findOne({ cid: user.cid });
+    if (global.sessions[isWACnn._id.toString()]) {
+      if (!global.sessions[isWACnn._id.toString()].IS_CONNECTED) {
+        req.session.errorMSG =
+          "Whatsapp is not connected Please Connect Whatsapp to Send Reamrk";
+      }
+    }
+
+    //!reminder message for team member
     if (timeDifference > 0) {
       // let reminderTempImagePath,reminderTempPdfPath;
       setTimeout(async () => {
-        let connStatus;
-        try {
-          connStatus = await logIncollection.findOne({ cid: req.user.cid });
-        } catch (err) {
-          console.error("Error fetching connStatus: ", err);
-        }
-        console.log("/remark/add/:id");
-        console.log(leadContactNo, " lead contact number");
+        let connStatus = await logIncollection.findOne({ cid: req.user.cid });
 
+        console.log("/remark/add/:id");
+        console.log(leadContactNo);
+        console.log("reminder to members ", userContact);
         let msg = reminderTemplateForMember.text;
 
         let companyName =
-          Admin.organizationName !== null ||
-            Admin.organizationName !== undefined ||
-            Admin.organizationName !== ""
+          Admin.organizationName !== null &&
+          Admin.organizationName !== undefined &&
+          Admin.organizationName !== ""
             ? Admin.organizationName
             : "360FollowUps";
 
@@ -711,10 +1029,11 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
             "[customer name]",
             `*${customerName}*` + " Mobile no. " + `*${leadContactNo}*`
           )
-          .replace("[date]", `*${remarkDate}*`)
-          .replace("[time]", `*${remarkTime}*`)
+          .replace("[date]", `*${date}*`)
+          .replace("[time]", `*${time}*`)
+          .replace("[remark content]", remark.text)
           .replace("[company name]", `*${companyName}*`);
-        console.log("reminder to member ", userContact);
+
         personalizedMessage = capitalizeText(personalizedMessage);
         sendMessageToLead(
           connStatus,
@@ -723,53 +1042,45 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
           // reminderTempImagePath,
           // reminderTempPdfPath
         ); // after temp msg sending to lead
-
-        // sendMessageToLead(
-        //   connStatus,
-        //   userContact,
-        //   remark.text
-        // );
-
       }, timeDifference);
     }
 
     //todo  reminder message for customer
     const reminderTemplateForCustomer = await templateModel.findOne({
-      cid: user.cid,
+      cid: req.user.cid,
       num: 1,
     });
 
     if (timeDifference > 0) {
       // let reminderForCustomerTempImagePath,reminderForCusromerTempPdfPath;
       setTimeout(async () => {
-        let connStatus
+        let connStatus;
         try {
           connStatus = await logIncollection.findOne({ cid: req.user.cid });
         } catch (err) {
           console.error("Error fetching connStatus: ", err);
         }
         console.log("/remark/add/:id");
-        console.log(leadContactNo, " lead contact number");
+        console.log(leadContactNo);
+        console.log("reminder to lead ", leadContactNo);
 
         let msg = reminderTemplateForCustomer.text;
         let companyName =
-          Admin.organizationName !== null ||
-            Admin.organizationName !== undefined ||
-            Admin.organizationName !== ""
+          Admin.organizationName !== null &&
+          Admin.organizationName !== undefined &&
+          Admin.organizationName !== ""
             ? Admin.organizationName
             : "360FollowUps";
-
         let personalizedMessage = msg
           .replace("[customer name]", `*${customerName}*`)
           .replace("[company name]", `*${companyName}*`)
-          .replace("[date]", `*${remarkDate}*`)
-          .replace("[time]", `*${remarkTime}*`)
+          .replace("[date]", `*${date}*`)
+          .replace("[time]", `*${time}*`)
           .replace("[company name]", `*${companyName}*`);
-        console.log("reminder to lead ", leadContactNo);
 
         personalizedMessage = capitalizeText(personalizedMessage);
-        if(leadContactNo.toString().length === 10){
-          leadContactNo = `${connStatus.countryCode}${leadContactNo}`
+        if (leadContactNo.toString().length === 10) {
+          leadContactNo = `${connStatus.countryCode}${leadContactNo}`;
         }
         sendMessageToLead(
           connStatus,
@@ -783,18 +1094,12 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
 
     // todo thankyou message to lead or customer
     const thnakyouLeadTemplate = await templateModel.findOne({
-      cid: user.cid,
+      cid: req.user.cid,
       num: 5,
     });
 
-    // console.log(
-    //   "after call template document----",
-    //   thnakyouLeadTemplate,
-    //   "------after call template document"
-    // );
-
     setTimeout(async () => {
-      let connStatus
+      let connStatus;
       try {
         connStatus = await logIncollection.findOne({ cid: req.user.cid });
       } catch (err) {
@@ -802,33 +1107,18 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       }
       console.log("/remark/add/:id");
       console.log("thanks to lead ", leadContactNo);
-      console.log("Yahin se");
-
 
       let msg = thnakyouLeadTemplate.text;
-      let companyName =
-        Admin.organizationName !== null &&
-          Admin.organizationName !== undefined &&
-          Admin.organizationName !== ""
-          ? Admin.organizationName
-          : "360FollowUps";
+      let companyName = Admin.organizationName || "360FollowUps";
+      console.warn(companyName, "Thanjks me commpany ni aa rahi");
+      companyName = companyName == undefined ? "360FollowUps" : companyName;
       let personalizedMessage = msg
         .replace("[customer name]", `*${customerName}*`)
         .replace("[company name]", `*${companyName}*`);
 
-      // console.log(
-      //   "thankyu message log",
-      //   connStatus,
-      //   leadContactNo,
-      //   // thnakyouLeadTemplate.text,
-      //   // personalizedMessage
-      //   // LeadTempImagePath,
-      //   // LeadTempPdfPath
-      // );
-
       personalizedMessage = capitalizeText(personalizedMessage);
-      if(leadContactNo.toString().length === 10){
-        leadContactNo = `${connStatus.countryCode}${leadContactNo}`
+      if (leadContactNo.toString().length === 10) {
+        leadContactNo = `${connStatus.countryCode}${leadContactNo}`;
       }
       sendMessageToLead(
         connStatus,
@@ -839,301 +1129,15 @@ app.post("/manual/lead", isAdminLoggedIn, checkSubscription, async (req, res) =>
       ); // reminder temp for user
     }, 5000);
 
-    res.redirect("/leads");
-  } catch (err) {
-    console.log("Error in /user/manual/lead :- ", err);
+    return res.json(remark);
   }
-});
-
-app.post("/remark/add/:id", isAdminLoggedIn, checkSubscription, async (req, res) => {
-  const { id } = req.params;
-  const { text, time, date } = req.body;
-  let user;
-
-  if (req.user.role === "admin") {
-    user = await logIncollection.findById(req.user.id);
-  } else user = await memberModel.findById(req.user.id);
-
-  if (!req.session.access) {
-    console.warn(`Subscription expired. Please renew to continue.`)
-    req.session.errorMSG = `Subscription expired. Please renew to continue.`;
-    return res.redirect('/leads')
-  }
-
-  let Admin = await logIncollection.findOne({ cid: user.cid });
-
-  let userContact = `${user.countryCode}${user.mobile}`;
-
-  let lead = await leadsModel.findById(id);
-
-  let remark = new remarkModel({
-    uid: user._id,
-    cid: user.cid,
-    lead_id: lead._id,
-    text,
-    time,
-    date,
-  });
-  await remark.save();
-
-  lead.remarks.push(remark._id);
-  await lead.save();
-  // console.log(lead);
-
-  const mobileRegex = /^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/;
-  let leadContactNo = null;
-  for (let i = 0; i < lead.leads_data.length; i++) {
-    const answer = lead.leads_data[i].ans.trim();
-
-    if (mobileRegex.test(answer)) {
-      console.log("Valid Mobile Number found: try 1", answer);
-      leadContactNo = answer;
-      break;
-    }
-  }
-
-
-  if (leadContactNo == null) {
-    const mobileRegex = /^\+?\d{1,3}\d{10}$/;
-
-    for (let i = 0; i < lead.leads_data.length; i++) {
-      const answer = lead.leads_data[i].ans.trim();
-
-      if (mobileRegex.test(answer)) {
-        console.log("Valid Mobile Number found: try 2", answer);
-        leadContactNo = answer;
-        break;
-      }
-    }
-  }
-
-  if (leadContactNo == null) {
-    const mobileRegex = /^\d{10}$/;
-
-    for (let i = 0; i < lead.leads_data.length; i++) {
-      const answer = lead.leads_data[i].ans.trim();
-
-      if (mobileRegex.test(answer)) {
-        console.log("Valid Mobile Number found: try 3", answer);
-        leadContactNo = answer;
-        break;
-      }
-    }
-  }
-
-  console.warn("Lead contact number debugginngg", leadContactNo);
-
-  const searchStrings = [
-    "name",
-    "Name",
-    "NAME",
-    "your name",
-    "your_name",
-    "Your_Name",
-    "Your_name",
-    "YOUR_NAME",
-    "YOUR NAME",
-    "YoyrName",
-    "YOURNAME",
-    "customerName",
-    "CustomerName",
-    "customer name",
-    "Customer Name",
-    "Customer_Name",
-    "customer_name",
-    "full name",
-    "full_name",
-    "Full_Name",
-    "FullName",
-    "FULL_NAME",
-    "first name",
-    "first_name",
-    "First_Name",
-    "आपका नाम",
-    "आपका_नाम",
-    "आपका_नाम:",
-    "पूरा नाम",
-    "पूरा_नाम",
-    "ग्राहक का नाम",
-    "ग्राहक_का_नाम",
-    "शुभ नाम",
-    "शुभ_नाम",
-  ];;
-
-  let customerName = "";
-
-  lead.leads_data.forEach((item) => {
-    const isMatch = searchStrings.some((str) =>
-      item.que.toLowerCase().includes(str.toLowerCase())
-    );
-    if (isMatch) {
-      customerName = item.ans;
-    }
-  });
-
-  if (customerName) {
-    console.log("Matched customerName:", customerName);
-  } else {
-    customerName = "Sir/Madam";
-    console.log("Un-Matched then customerName:", customerName);
-  }
-
-  console.log(leadContactNo);
-
-  const remarkDateTime = new Date(`${date}T${time}:00`);
-  const currentTime = new Date();
-
-  let timeDifference = remarkDateTime - currentTime;
-  timeDifference -= 1000 * 60 * 30;
-
-  const reminderTemplateForMember = await templateModel.findOne({
-    cid: req.user.cid,
-    num: 2,
-  });
-
-  console.log(timeDifference);
-
-  let isWACnn = await logIncollection.findOne({ cid: user.cid });
-  if (global.sessions[isWACnn._id.toString()]) {
-    if (!global.sessions[isWACnn._id.toString()].IS_CONNECTED) {
-      req.session.errorMSG = 'Whatsapp is not connected Please Connect Whatsapp to Send Reamrk'
-    }
-  }
-
-  //!reminder message for team member
-  if (timeDifference > 0) {
-    // let reminderTempImagePath,reminderTempPdfPath;
-    setTimeout(async () => {
-      let connStatus = await logIncollection.findOne({ cid: req.user.cid });
-
-      console.log("/remark/add/:id");
-      console.log(leadContactNo);
-      console.log("reminder to members ", userContact);
-      let msg = reminderTemplateForMember.text;
-
-      let companyName =
-        Admin.organizationName !== null &&
-          Admin.organizationName !== undefined &&
-          Admin.organizationName !== ""
-          ? Admin.organizationName
-          : "360FollowUps";
-
-      let personalizedMessage = msg
-        .replace("[team member name]", `*${user.name}*`)
-        .replace(
-          "[customer name]",
-          `*${customerName}*` + " Mobile no. " + `*${leadContactNo}*`
-        )
-        .replace("[date]", `*${date}*`)
-        .replace("[time]", `*${time}*`)
-        .replace("[remark content]", remark.text)
-        .replace("[company name]", `*${companyName}*`);
-
-      personalizedMessage = capitalizeText(personalizedMessage);
-      sendMessageToLead(
-        connStatus,
-        userContact,
-        personalizedMessage
-        // reminderTempImagePath,
-        // reminderTempPdfPath
-      ); // after temp msg sending to lead
-
-    }, timeDifference);
-  }
-
-  //todo  reminder message for customer
-  const reminderTemplateForCustomer = await templateModel.findOne({
-    cid: req.user.cid,
-    num: 1,
-  });
-
-  if (timeDifference > 0) {
-    // let reminderForCustomerTempImagePath,reminderForCusromerTempPdfPath;
-    setTimeout(async () => {
-      let connStatus;
-      try {
-        connStatus = await logIncollection.findOne({ cid: req.user.cid });
-      } catch (err) {
-        console.error("Error fetching connStatus: ", err);
-      }
-      console.log("/remark/add/:id");
-      console.log(leadContactNo);
-      console.log("reminder to lead ", leadContactNo);
-
-      let msg = reminderTemplateForCustomer.text;
-      let companyName =
-        Admin.organizationName !== null &&
-          Admin.organizationName !== undefined &&
-          Admin.organizationName !== ""
-          ? Admin.organizationName
-          : "360FollowUps";
-      let personalizedMessage = msg
-        .replace("[customer name]", `*${customerName}*`)
-        .replace("[company name]", `*${companyName}*`)
-        .replace("[date]", `*${date}*`)
-        .replace("[time]", `*${time}*`)
-        .replace("[company name]", `*${companyName}*`);
-
-
-      personalizedMessage = capitalizeText(personalizedMessage);
-      if(leadContactNo.toString().length === 10){
-        leadContactNo = `${connStatus.countryCode}${leadContactNo}`
-      }
-      sendMessageToLead(
-        connStatus,
-        leadContactNo,
-        personalizedMessage
-        // reminderForCustomerTempImagePath,
-        // reminderForCusromerTempPdfPath
-      ); // after temp msg sending to lead
-    }, timeDifference);
-  }
-
-  // todo thankyou message to lead or customer
-  const thnakyouLeadTemplate = await templateModel.findOne({
-    cid: req.user.cid,
-    num: 5,
-  });
-
-  setTimeout(async () => {
-    let connStatus;
-    try {
-      connStatus = await logIncollection.findOne({ cid: req.user.cid });
-    } catch (err) {
-      console.error("Error fetching connStatus: ", err);
-    }
-    console.log("/remark/add/:id");
-    console.log("thanks to lead ", leadContactNo);
-
-    let msg = thnakyouLeadTemplate.text;
-    let companyName = Admin.organizationName || "360FollowUps"
-    console.warn(companyName, "Thanjks me commpany ni aa rahi");
-    companyName = companyName == undefined ? "360FollowUps" : companyName;
-    let personalizedMessage = msg
-      .replace("[customer name]", `*${customerName}*`)
-      .replace("[company name]", `*${companyName}*`);
-
-    personalizedMessage = capitalizeText(personalizedMessage);
-    if(leadContactNo.toString().length === 10){
-      leadContactNo = `${connStatus.countryCode}${leadContactNo}`
-    }
-    sendMessageToLead(
-      connStatus,
-      leadContactNo,
-      personalizedMessage
-      // LeadTempImagePath,
-      // LeadTempPdfPath
-    ); // reminder temp for user
-  }, 5000);
-
-  return res.json(remark);
-});
+);
 
 // todo Google Authentication Routes
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] }),
-  (req, res) => { }
+  (req, res) => {}
 );
 // todo google callback
 app.get(
@@ -1148,18 +1152,33 @@ app.get(
       const cid = uuidv4();
       user.cid = cid;
       user.role = "admin";
-      user.signupDate = new Date();//added
+      user.signupDate = new Date(); //added
       await user.save();
       req.session.showForm = true;
     }
     if (!(user.myPipelines.length >= 6)) {
       const pipelines = [
         { title: "new lead", color: "#28A745", defaultVal: true, num: 1 },
-        { title: "initial contacted", color: "#0fbabd", defaultVal: false, num: 2 },
-        { title: "quatation sent", color: "#007BFF", defaultVal: false, num: 3 },
+        {
+          title: "initial contacted",
+          color: "#0fbabd",
+          defaultVal: false,
+          num: 2,
+        },
+        {
+          title: "quatation sent",
+          color: "#007BFF",
+          defaultVal: false,
+          num: 3,
+        },
         { title: "deal pending", color: "#FFC107", defaultVal: false, num: 4 },
         { title: "deal closed", color: "#0FBABD", defaultVal: false, num: 5 },
-        { title: "deal cancelled", color: "#DC3545", defaultVal: false, num: 6 },
+        {
+          title: "deal cancelled",
+          color: "#DC3545",
+          defaultVal: false,
+          num: 6,
+        },
       ].map(
         (pipelineData) =>
           new pipelineModel({
@@ -1170,7 +1189,6 @@ app.get(
             cid: user.cid,
           })
       );
-
 
       // Save all pipelines in parallel
       await Promise.all(
@@ -1287,18 +1305,17 @@ app.get(
       await user.save();
     }
 
-
     const subExp = new Date(user.subscriptionExpiry);
     const today = new Date();
     const diffTime = subExp - today;
     const daysLeft = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (daysLeft <= 0) {
-      console.warn(`Subscription expired. Please renew to continue.`)
+      console.warn(`Subscription expired. Please renew to continue.`);
       req.session.errorMSG = `Subscription expired. Please renew to continue.`;
-    }
-    else {// days left success left
-      req.session.successMSG = `Your  ${subscriptionLevel} plan started. You have ${daysLeft} days remaining.`
+    } else {
+      // days left success left
+      req.session.successMSG = `Your  ${subscriptionLevel} plan started. You have ${daysLeft} days remaining.`;
     }
 
     const token = await generateToken(user);
@@ -1328,85 +1345,93 @@ app.get("/auth/facebook", (req, res) => {
   res.redirect(facebookAuthUrl);
 });
 
-app.get("/auth/facebook/callback", isAdminLoggedIn, checkSubscription, async (req, res) => {
-  const { code } = req.query;
+app.get(
+  "/auth/facebook/callback",
+  isAdminLoggedIn,
+  checkSubscription,
+  async (req, res) => {
+    const { code } = req.query;
 
-  if (!code) {
-    console.log("No authorization code provided.");
-    return res.status(400).send("Invalid authorization code");
-  }
+    if (!code) {
+      console.log("No authorization code provided.");
+      return res.status(400).send("Invalid authorization code");
+    }
 
-  try {
-    const tokenResponse = await axios.get(
-      "https://graph.facebook.com/v20.0/oauth/access_token",
-      {
-        params: {
-          client_id: process.env.FB_CLIENT_ID,
-          redirect_uri: process.env.REDIRECT_URI,
-          client_secret: process.env.FB_CLIENT_SECRET,
-          code,
-        },
+    try {
+      const tokenResponse = await axios.get(
+        "https://graph.facebook.com/v20.0/oauth/access_token",
+        {
+          params: {
+            client_id: process.env.FB_CLIENT_ID,
+            redirect_uri: process.env.REDIRECT_URI,
+            client_secret: process.env.FB_CLIENT_SECRET,
+            code,
+          },
+        }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+      const admin = await logIncollection.findById(req.user.id);
+
+      if (!admin) {
+        return res.redirect("/login");
       }
-    );
 
-    const accessToken = tokenResponse.data.access_token;
-    const admin = await logIncollection.findById(req.user.id);
+      admin.facebookToken = accessToken;
+      await admin.save();
 
-    if (!admin) {
-      return res.redirect("/login");
-    }
+      req.session.successMSG = "Connected to Facebook account.";
 
-    admin.facebookToken = accessToken;
-    await admin.save();
+      // todo if Subscription end i cant give you permission to fetch your leads
+      if (!req.session.access) {
+        req.session.errorMSG = `Subscription expired. Please renew to continue.`;
+        console.warn(req.session.errorMSG);
+        return res.redirect("/leads");
+      }
+      let allLeads = await fetchLeadsFromFacebook(accessToken,admin);
 
-    req.session.successMSG = "Connected to Facebook account.";
-
-    // todo if Subscription end i cant give you permission to fetch your leads 
-    if (!req.session.access) {
-      req.session.errorMSG = `Subscription expired. Please renew to continue.`;
-      console.warn(req.session.errorMSG);
-      return res.redirect("/leads");
-    }
-    let allLeads = await fetchLeadsFromFacebook(accessToken);
-
-    // Save leads to database (if needed)
-    for (const lead of allLeads) {
-      const existingLead = await leadsModel.findOne({ lead_id: lead.id, cid: req.user.cid });
-
-      if (!existingLead) {
-        const leadsData = lead.field_data.map((data) => ({
-          que: data.name,
-          ans: data.values[0],
-        }));
-
-        const newLead = new leadsModel({
+      // Save leads to database (if needed)
+      for (const lead of allLeads) {
+        const existingLead = await leadsModel.findOne({
           lead_id: lead.id,
-          income_time: lead.created_time,
-          page_id: lead.page_id,
-          page_name: lead.page_name,
-          form_id: lead.form_id,
-          form_name: lead.form_name,
-          cid: admin.cid,
-          leads_data: leadsData,
-          app: "facebook",
+          cid: req.user.cid,
         });
 
-        await newLead.save();
-      }
-    }
+        if (!existingLead) {
+          const leadsData = lead.field_data.map((data) => ({
+            que: data.name,
+            ans: data.values[0],
+          }));
 
-    res.redirect("/leads");
-  } catch (error) {
-    console.error(
-      "Error during Facebook callback:",
-      error.response ? error.response.data : error.message
-    );
-    res.status(500).send("Error logging in with Facebook.");
+          const newLead = new leadsModel({
+            lead_id: lead.id,
+            income_time: lead.created_time,
+            page_id: lead.page_id,
+            page_name: lead.page_name,
+            form_id: lead.form_id,
+            form_name: lead.form_name,
+            cid: admin.cid,
+            leads_data: leadsData,
+            app: "facebook",
+          });
+
+          await newLead.save();
+        }
+      }
+
+      res.redirect("/leads");
+    } catch (error) {
+      console.error(
+        "Error during Facebook callback:",
+        error.response ? error.response.data : error.message
+      );
+      res.status(500).send("Error logging in with Facebook.");
+    }
   }
-});
+);
 
 //todo fetch lead--on
-async function fetchLeadsFromFacebook(accessToken) {
+async function fetchLeadsFromFacebook(accessToken, user) {
   let allLeads = [];
   const pagesResponse = await axios.get(
     `https://graph.facebook.com/v20.0/me/accounts`,
@@ -1416,14 +1441,50 @@ async function fetchLeadsFromFacebook(accessToken) {
   const pages = pagesResponse.data.data;
 
   for (const page of pages) {
+
+    let PAGE = await pageModel.findOne({cid: user.cid, pageId: page.id})
+    if(PAGE){
+      PAGE.pageToken = page.access_token
+    }
+    else{
+      PAGE = new pageModel({
+        cid:user.cid,
+        uid:user._id,
+        pageId: page.id,
+        pageName: page.name,
+        pageToken: page.access_token,
+      })
+      await PAGE.save();
+    }
+
+
     const formsResponse = await axios.get(
       `https://graph.facebook.com/v20.0/${page.id}/leadgen_forms`,
       { params: { access_token: page.access_token, fields: "id,name" } }
     );
 
     const forms = formsResponse.data.data;
+    PAGE.totalForms = forms.length;
+    await PAGE.save();
 
     for (const form of forms) {
+
+      let newForm = await formModel.findOne({ cid: user.cid, formId: form.id });
+      if (!newForm) {
+  
+        newForm = new formModel({
+          cid: user.cid,
+          uid: user._id,
+          pageId: PAGE._id,
+          formId: form.id,
+          formName: form.name,
+
+        });
+        await newForm.save();
+        PAGE.forms.push(newForm._id);
+        await PAGE.save()
+      }
+
       let nextPageUrl = `https://graph.facebook.com/v20.0/${form.id}/leads`;
 
       while (nextPageUrl) {
@@ -1433,10 +1494,11 @@ async function fetchLeadsFromFacebook(accessToken) {
             fields: "id,created_time,field_data",
           },
         });
-
+        newForm.totalLeads += response.data.data.length;;
+        await newForm.save()
+        
 
         for (const lead of response.data.data) {
-
           lead.page_id = page.id;
           lead.page_name = page.name;
           lead.form_id = form.id;
@@ -1452,6 +1514,20 @@ async function fetchLeadsFromFacebook(accessToken) {
   return allLeads;
 }
 
+app.get("/get-token", isAdminLoggedIn, async (req, res) => {
+  try {
+    let user = await logIncollection.findById(req.user.id);
+    console.log(user.facebookToken);
+    if (user.facebookToken) {
+      fetchLeadsFromFacebook(user.facebookToken, user);
+    }
+
+    res.redirect("/user/dashboard");
+  } catch (error) {
+    console.log("Error in /user/integration", error);
+    res.redirect("/user/dashboard");
+  }
+});
 
 // todo logout facebook
 app.get("/logoutfacebook", isAdminLoggedIn, async (req, res) => {
@@ -1572,18 +1648,15 @@ app.get("/:page", (req, res) => {
   });
 });
 
-
-
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
   process.exit(1); // Exit the process to restart the server
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection:', reason);
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection:", reason);
   process.exit(1); // Exit the process to restart the server
 });
-
 
 // Start the server
 app.listen(port, () => {
@@ -1616,21 +1689,18 @@ async function sendMessageToLead(
   imagePath = null,
   pdfPath = null
 ) {
-
   console.log("Phone number", phoneNumber);
 
   const user = await logIncollection.findOne({ cid: adminWA.cid });
   console.log(user.name);
   let client;
-  if(global.sessions[user._id.toString()]){
-
-   client = global.sessions[user._id.toString()].client;
+  if (global.sessions[user._id.toString()]) {
+    client = global.sessions[user._id.toString()].client;
   }
   if (client) {
     console.log("client availiable");
   }
   if (!client) return "User session not initialized";
-
 
   try {
     // If imagePath and captionText are provided, send image with caption
@@ -1648,7 +1718,7 @@ async function sendMessageToLead(
       const imageMedia = MessageMedia.fromFilePath(imagePath);
       await client.sendMessage(`${phoneNumber}@c.us`, imageMedia, {
         caption: message,
-      }); 
+      });
     } else if ((pdfPath && !imagePath) || imagePath == "") {
       // send Only a pdf with text message
       const pdfMedia = MessageMedia.fromFilePath(pdfPath);
@@ -1663,6 +1733,5 @@ async function sendMessageToLead(
     console.error("Error sending message:", error);
   }
 }
-
 
 module.exports = app;

@@ -10,7 +10,8 @@ const memberModel = require("../models/member.model.js");
 const remarkModel = require("../models/remark.model.js");
 const leadsModel = require("../models/leads.model.js");
 const templateModel = require("../models/temlate.model.js");
-const WaModel = require("../models/wA.model.js");
+const pageModel = require("../models/page.model.js");
+const formModel = require("../models/form.model.js");
 // const manualLeadModel = require("../models/manualLeads.model.js");
 const crypto = require('crypto');
 
@@ -30,7 +31,8 @@ const uploadCSV = require("../service/csvMulter.js");
 
 const { csvFileDataChangIntoLeadHandler } = require("../controllers/user.controller.js");
 const wAModel = require("../models/wA.model.js");
-const paymentModel = require('../models/paySuccess.model.js')
+const paymentModel = require('../models/paySuccess.model.js');
+const { default: axios } = require("axios");
 
 router.get("/team", isAdminLoggedIn, async (req, res) => {
   let user;
@@ -1141,9 +1143,161 @@ router.get('/get/users',async (req,res)=>{
   }
 })
 
+
+// todo integretion facebook routes
+router.get('/integration', isAdminLoggedIn, async (req,res) => {
+  try {
+    let user;
+
+    if (req.user.role === "admin")
+      user = await logIncollection.findById(req.user.id);
+    else user = await memberModel.findById(req.user.id);
+
+
+    let pages = await pageModel.find({cid:user.cid}).populate("forms")
+    // console.log(pages)
+    pages.forEach(async(page) =>{
+      let res = page.forms.some(form => form.permited);
+      if(res){
+        let page = await pageModel.findById(page._id)
+        page.permitted = true;
+        return;
+      }
+    })
+    
+
+    res.render('integration',{user, pages})
+
+  } catch (error) {
+    console.log("Error in /user/integration", error)
+    res.redirect('/user/dashboard')
+  }
+})
+
+//todo update page permission with linked all forms 
+router.post('/fb/page/:id', isAdminLoggedIn,async (req, res) => {
+  const pageId = req.params.id;
+  const { permitted } = req.body;
+
+  try {
+      const page = await pageModel.findById(pageId);
+      if (!page) {
+        return res.status(404).json({ success: false, message: 'Page not found' });
+      }
+
+      page.permitted = permitted;
+      await page.save();
+      
+      const forms = await formModel.find({pageId});
+      if(!permitted){
+        await Promise.all(forms.map(async (form) => {
+          form.permitted = false;
+          await form.save();
+      }));
+      }
+      else{
+        await Promise.all(forms.map(async (form) => {
+          form.permitted = true;
+          await form.save();
+      }));
+      }
+
+      res.json({ success: true, permitted: page.permitted });
+  } catch (error) {
+      console.error('Error updating page:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+//todo update form permission 
+router.post('/fb/form/:id', isAdminLoggedIn,async (req, res) => {
+  const formId = req.params.id;
+  const { permitted } = req.body;
+  let PAGE = {permitted: true, pageId: null};
+  try {
+      const form = await formModel.findById(formId);
+      if (!form) {
+        return res.status(404).json({ success: false, message: 'form not found' });
+      }
+
+      form.permitted = permitted;
+      await form.save();
+      if(!permitted){
+        let count= 0;
+      let forms = await formModel.find({pageId:form.pageId});
+      forms.forEach(form => {
+        if(!form.permitted){
+          count++;
+        }
+      })
+      if(count === forms.length){
+        let page = await pageModel.findById(form.pageId)
+        page.permitted = false;
+        await page.save()
+        PAGE.pageId = page._id;
+        PAGE.permitted = false;
+      }
+    }
+      res.json({ success: true, permitted: form.permitted,PAGE });
+  } catch (error) {
+      console.error('Error updating page:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+
+router.get('/fetch-lead', isAdminLoggedIn, async (req,res) => {
+  try {
+    console.log("/fetch-lead")
+
+    let pages = await pageModel.find({cid: req.user.cid, permitted: true})
+
+    if(!pages) return res.redirect('/user/dashboard')
+
+    pages.forEach(async page => {
+      let forms = await formModel.find({cid: req.user.cid, permitted: true, pageId: page._id})
+      if (!forms) return 
+      forms.forEach(async form => {
+        let leads = await fetchLeadFromFB(form.formId, page.pageToken)
+        console.log(`PAGE NAME :- ${page.pageName} ==>> FORM NAME :- ${form.formName} have ${leads} leads`)
+      })
+    });
+
+    res.redirect('/user/dashboard')
+  } catch (error) {
+    console.log("ERROR in ", error)
+  }
+})
+
 module.exports = router;
 
 
-// function delay(ms) {
-//   return new Promise((resolve) => setTimeout(resolve, ms));
-// }
+async function fetchLeadFromFB(formId,pageToken){
+  try {
+    let allLeads = 0
+    let nextPageUrl = `https://graph.facebook.com/v20.0/${formId}/leads`;
+
+    while (nextPageUrl) {
+      const response = await axios.get(nextPageUrl, {
+        params: {
+          access_token: pageToken,
+          fields: "id,created_time,field_data",
+        },
+      });
+
+      // Add current batch of leads to the total list
+      allLeads += response.data.data.length;
+
+      console.log(`Fetched ${response.data.data.length} leads from ${formId} in this batch.`);
+
+      // Get the next page URL if available
+      nextPageUrl = response.data.paging?.next || null;
+      // console.log(nextPageUrl)
+    }
+    
+    console.log(formId,allLeads)
+    return allLeads;
+  } catch (error) {
+    console.log("ERROR fetchLeadFormFB fun", error)
+  }
+}

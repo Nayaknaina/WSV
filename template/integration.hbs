@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Connect
+    </title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="./" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.0/css/all.css">
+
+    <link rel="stylesheet" href="https://d3cuh014go2nda.cloudfront.net/global/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/custom.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+
+    <link rel="stylesheet" type="text/css" href="/styles/loader.css">
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" type="text/javascript">
+        window.heap = window.heap || [], heap.load = function (e, t) {
+            window.heap.appid = e, window.heap.config = t = t || {};
+            var r = t.forceSSL || "https:" === document.location.protocol,
+                a = document.createElement("script");
+            a.type = "text/javascript", a.async = !0, a.src = (r ? "https:" : "http:") + "//cdn.heapanalytics.com/js/heap-" + e + ".js";
+            var n = document.getElementsByTagName("script")[0];
+            n.parentNode.insertBefore(a, n);
+            for (var o = function (e) {
+                return function () {
+                    heap.push([e].concat(Array.prototype.slice.call(arguments, 0)))
+                }
+            }, p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"], c = 0; c < p.length; c++) heap[p[c]] = o(p[c])
+        };
+        heap.load("490363613");
+    </script>
+    <script nonce="Hg5F/VDpALFrdOCYRvBAvQ==" async
+        src="https://www.googletagmanager.com/gtm.js?id=GTM-TQ5D84C&nonce=Hg5F/VDpALFrdOCYRvBAvQ=="></script>
+
+    <link rel="stylesheet" href="/assets/css/integration.css">
+    <!-- Latest jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+</head>
+
+
+<body>
+    {{!-- {{> nav}} --}}
+
+    <div class="container-fluid">
+        <div class="row">
+            {{> sidebar}}
+
+            <div class="fg-main-content-wrap col-xl-11 col-lg-11 col-md-11 col-sm-12 p-0 p-b-30 home-section">
+                <div>
+                    <div class="container-fluid bg-white shadow-sm m-b-40">
+                        <div class="container">
+                            <div class="row page-titles p-t-35 p-b-15">
+                                <div class="col-lg-12 col-12 align-self-center">
+                                    <h1 class="text-bodycolor">Website Integration</h1>
+                                    <p class="text-secondary font-14"> </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="container mt-4">
+                        <ul class="list-unstyled">
+                            <ul class="main-ul">
+                                <div class="ul-item">
+                                    <span>Facebook</span>
+                                    <div class="actions">
+                                        <span>Pages: {{pages.length}}</span>
+                                        <i class="fa-solid fa-chevron-down" onclick="toggleList(this)"></i>
+                                    </div>
+                                </div>
+
+                                <ul class="nested list-unstyled">
+                                    {{#if pages}}
+                                    {{#each pages}}
+
+                                    <li class="hiden-ul">
+                                        <div class="ul-item">
+                                            <span>{{pageName}}</span>
+                                            <div class="actions">
+                                        <label class="switch">
+                                            <input type="checkbox" 
+                                            {{#if permitted}}
+                                            checked
+                                            {{/if}}
+                                             class="2nd-switch"
+                                             id="page-{{_id}}"
+                                             onchange="changePermissionOfPage('{{_id}}')"
+                                             >
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span>{{forms.length}}</span>
+                                        <i class="fa-solid fa-chevron-down" onclick="toggleList(this)"></i>
+                                    </div>
+                                    </div>
+
+                                    {{#if forms}}
+                                        <ul class="nested list-unstyled">
+
+                                            {{#each forms}}
+                                            <li class="last-list">
+                                                <p>{{formName}}</p>
+                                                <div class="form-switch">
+                                                    <label class="switch">
+                                                    <input type="checkbox" 
+                                                    {{#if permitted}}
+                                                        checked
+                                                    {{/if}}
+
+                                                    class="page-{{../_id}}"
+                                                    id="form-{{_id}}"
+                                                    onchange="changePermissionOfForm('{{_id}}')"
+                                                    >
+                                                    <span class="slider"></span>
+                                                </label>
+                                                <span>{{totalLeads}}</span>
+                                                </div>
+                                            </li>
+                                            {{/each}}
+            
+                                        </ul>
+                                    {{/if}}
+                                    </li>
+
+                                    {{/each}}
+                                    {{/if}}
+                                    
+                                </ul>
+
+
+                            </ul>
+
+
+                            {{!-- whatsapp --}}
+                            {{!-- <ul class="main-ul">
+                                <div class="ul-item">
+                                    <span>Instagram</span>
+                                    <i class="fa-solid fa-chevron-down" onclick="toggleList(this)"></i>
+                                </div>
+                                <ul class="nested list-unstyled">
+                                    <li class="hiden-ul">
+                                        <div class="ul-item">
+                                            <span>Sub-item 1.1</span>
+                                            <i class="fa-solid fa-chevron-down" onclick="toggleList(this)"></i>
+                                        </div>
+                                        <ul class="nested list-unstyled">
+                                            <li>Sub-item 1.1.1</li>
+                                            <li>Sub-item 1.1.2</li>
+                                        </ul>
+                                    </li>
+                                    <li class="hiden-ul">
+                                        <span>Sub-item 1.2</span>
+                                        <div class="ul-item">
+                                            <span>Item 1</span>
+                                            <i class="fa-solid fa-chevron-down" onclick="toggleList(this)"></i>
+                                        </div>
+                                        <ul class="nested list-unstyled">
+                                            <li>Sub-item 1.2.1</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </ul> --}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/integration.js"></script>
+</body>
+
+</html>
